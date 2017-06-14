@@ -1,0 +1,63 @@
+{
+    "proxyUrl": {
+        "url": "/mapstore/proxy/?url=",
+        "useCORS": ["http://localhost", "http://192.168.1.38", "http://disasterrisk.af.geonode.org"]
+    },
+	  "geoStoreUrl": "/mapstore/rest/geostore",
+    "printUrl": "https://demo.geo-solutions.it/geoserver/pdf/info.json",
+    "themePrefix": "nfdclient",
+    "translationsPath": "/static/assets/translations",
+	  "plugins": {
+        "desktop": [{
+            "name": "Map",
+            "cfg": {
+                "mapType": "leaflet",
+                "tools": ["measurement", "locate", "draw"]
+            }
+        }, {
+            "name": "DrawerMenu",
+            "cfg": {
+                "glyph": "cleveland"
+            }
+        },
+        "TOC",
+        "OmniBar",
+        "Search",
+        "BurgerMenu",
+        "Login",
+        "Toolbar",
+        "Expander",
+        "Locate",
+        "ZoomAll",
+        "ZoomIn",
+        "ZoomOut",
+        "ViewEditNaturalFeatures",
+        "AddNaturalFeatures"
+      ],
+      "mobile": [{
+          "name": "Map",
+          "cfg": {
+              "mapType": "leaflet",
+              "tools": ["measurement", "locate", "draw"]
+          }
+      }, {
+          "name": "DrawerMenu",
+          "cfg": {
+              "glyph": "cleveland"
+          }
+      },
+      "TOC",
+      "OmniBar",
+      "BurgerMenu",
+      "Login",
+      "Toolbar",
+      "Expander",
+      "Locate",
+      "ZoomAll",
+      "ZoomIn",
+      "ZoomOut",
+      "ViewEditNaturalFeatures",
+      "AddNaturalFeatures"
+    ]
+	}
+}
