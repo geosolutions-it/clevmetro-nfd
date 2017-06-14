@@ -12,13 +12,13 @@ virtualenv metroparksnfd
 # activate the virtual env
 source metroparksnfd/bin/activate
 # install requirements
-cd ../workspace/nfdapi
-pip install -r requirements.txt
+pip install -r ../clevmetro-nfd/nfdapi/requirements.txt
 ```
 
 Create database schema:
 
 ```shell
+cd clevmetro-nfd/nfdapi
 $ ./manage.py makemigrations core
 $ ./manage.py migrate
 $ ./manage.py createinitialrevisions
