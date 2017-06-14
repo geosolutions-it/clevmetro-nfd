@@ -55,7 +55,7 @@ usfws_status = [('C', 'Candidate'),
 
 def init_model():
     if OccurrenceCategory.objects.count()==0:
-        for entry in occurrence_cat:        
+        for entry in occurrence_subcat:        
             c = OccurrenceCategory()
             c.code = entry[0]
             c.name = entry[1]
