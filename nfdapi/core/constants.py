@@ -1,5 +1,21 @@
 
 
+occurrence_subcat = [('co', 'Conifer', 'plant'),
+                     ('fe', 'Fern', 'plant'),
+                     ('fl', 'Flowering plant', 'plant'),
+                     ('pl', 'Plant - generic', 'plant'), # for other kind of plants such as non-conifer trees
+                     ('mo', 'Moss', 'plant'),
+                     ('fu', 'Fungus', 'fungus'),
+                     ('sl', 'Slime mold', 'slime mold'),
+                     ('ln', 'Land animal', 'animal'),
+                     ('lk', 'Pond lake animal', 'animal'),
+                     ('st', 'Stream animal', 'animal'),
+                     ('we', 'Wetland animal', 'animal'),
+                     ('na', 'Natural area', 'natural area')
+    ]
+
+
+
 point_of_contact_items = [{
 		"key": "name",
 		"label": "Name",
@@ -193,6 +209,4 @@ featureTypes = {
 			verifier
 			]
 	}
-	
-	
 }

@@ -30,11 +30,22 @@ class DictionaryTableExtended(models.Model):
     class Meta:
         abstract = True
 
-class OccurrenceCategory(DictionaryTable): # natural_area, plant, animal, fungus, slimemold
+class OccurrenceCategory(DictionaryTable):
+    # natural_area, plant, animal, fungus, slimemold
     main_cat = models.TextField()
+    
+    def natural_key(self):
+        return (self.main_cat, self.code, self.name)
+    
+class PointOfContact(models.Model):
+    name = models.TextField()
+    affiliation = models.TextField()
+    phone1 = models.TextField()
+    phone2 = models.TextField()
+    email = models.TextField()
+    street_address = models.TextField()
 
-
-class Occurence(models.Model):
+class Occurrence(models.Model):
     geom = PointField()
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
@@ -177,13 +188,13 @@ class TaxonDetails(models.Model):
     #habitat = models.ForeignKey(HabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
 
 @reversion.register()
-class OccurenceTaxon(Occurence):
+class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species_element = models.ForeignKey(ElementSpecies, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.ForeignKey(TaxonDetails, on_delete=models.SET_NULL, blank=True, null=True)
 
 @reversion.register()
-class OccurenceNaturalArea(Occurence):
+class OccurrenceNaturalArea(Occurrence):
     natural_area_element = models.ForeignKey(ElementNaturalAreas, on_delete=models.SET_NULL, blank=True, null=True)
 
 class Gender(DictionaryTable):
@@ -236,12 +247,12 @@ class AnimalDetails(TaxonDetails):
     class Meta:
         abstract = True
 
-class AnimalAquaticDetails(AnimalDetails):
+class AquaticAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(AquaticSampler, on_delete=models.SET_NULL, blank=True, null=True)
     class Meta:
         abstract = True
 
-class AnimalLandDetails(AnimalDetails):
+class LandAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(TerrestrialSampler, on_delete=models.SET_NULL, blank=True, null=True)
     stratum = models.ForeignKey(TerrestrialStratum, on_delete=models.SET_NULL, blank=True, null=True)
     class Meta:
@@ -268,7 +279,7 @@ class LenticSize(models.Model):
     class Meta:
         abstract = True
         
-class PondLakeAnimalDetails(AnimalAquaticDetails, LenticSize):
+class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
     pond_lake_name = models.TextField()
     pond_lake_type = models.ForeignKey(PondLakeType, on_delete=models.SET_NULL, blank=True, null=True)
     pond_lake_use = models.ForeignKey(PondLakeUse, on_delete=models.SET_NULL, blank=True, null=True)
@@ -306,7 +317,7 @@ class StreamSubstracte(models.Model):
 class WaterFlowType(DictionaryTable):
     pass
 
-class StreamAnimalDetails(AnimalAquaticDetails):
+class StreamAnimalDetails(AquaticAnimalDetails):
     stream_name_1 = models.TextField()
     stream_name_2 = models.TextField()
     pemso_code = models.TextField()
@@ -340,7 +351,7 @@ class WaterSource(DictionaryTable):
 class WetlandHabitatFeature(DictionaryTable):
     pass
     
-class WetlandAnimalDetails(AnimalAquaticDetails, LenticSize):
+class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     wetland_name = models.TextField()
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
     active_management = models.NullBooleanField(blank=True, null=True)

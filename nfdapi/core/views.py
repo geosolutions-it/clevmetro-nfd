@@ -6,7 +6,7 @@ from django.http import HttpResponse
 import datetime
 from rest_framework.serializers import Serializer
 from rest_framework import serializers
-from core.models import OccurenceTaxon
+from core.models import OccurrenceTaxon
 from djgeojson.views import GeoJSONLayerView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
@@ -59,15 +59,38 @@ class LayerTaxonSerializer(Serializer):
 
 class PlantLayerView(GeoJSONLayerView):
     properties = ['occurrence_cat']
+    use_natural_keys = True
     
     def get_queryset(self):
-        return OccurenceTaxon.objects.filter(occurrence_cat__main_cat='pl')
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='plant')
 
 class AnimalLayerView(GeoJSONLayerView):
     properties = ['occurrence_cat']
+    use_natural_keys = True
     
     def get_queryset(self):
-        return OccurenceTaxon.objects.filter(occurrence_cat__main_cat='an')
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='animal')
+
+class SlimeMoldLayerView(GeoJSONLayerView):
+    properties = ['occurrence_cat']
+    use_natural_keys = True
+    
+    def get_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='slime mold')
+                                              
+class FungusLayerView(GeoJSONLayerView):
+    properties = ['occurrence_cat']
+    use_natural_keys = True
+    
+    def get_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='fungus')
+
+class NaturalAreaLayerView(GeoJSONLayerView):
+    properties = ['occurrence_cat']
+    use_natural_keys = True
+    
+    def get_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='natural area')
 
 class TaxonFeatureTypeView(APIView):
     permission_classes = ()
@@ -76,8 +99,8 @@ class TaxonFeatureTypeView(APIView):
     """
     def get_object(self, pk):
         try:
-            return OccurenceTaxon.objects.get(pk=pk)
-        except OccurenceTaxon.DoesNotExist:
+            return OccurrenceTaxon.objects.get(pk=pk)
+        except OccurrenceTaxon.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
@@ -92,8 +115,8 @@ class PlantDetail(APIView):
     """
     def get_object(self, pk):
         try:
-            return OccurenceTaxon.objects.get(pk=pk)
-        except OccurenceTaxon.DoesNotExist:
+            return OccurrenceTaxon.objects.get(pk=pk)
+        except OccurrenceTaxon.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
@@ -118,7 +141,7 @@ class PlantDetail(APIView):
     
 """
     class Meta:
-        model = OccurenceTaxon
+        model = OccurrenceTaxon
         fields = ('inclusion_date', 'released')
 """
 

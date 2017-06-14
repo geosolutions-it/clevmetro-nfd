@@ -19,7 +19,7 @@ from django.contrib import admin
 from rest_framework.authtoken import views
 from core import views as coreviews
 from djgeojson.views import GeoJSONLayerView
-from core.models import OccurenceTaxon, OccurenceNaturalArea
+from core.models import OccurrenceTaxon, OccurrenceNaturalArea
 
 
 urlpatterns = [
@@ -27,9 +27,12 @@ urlpatterns = [
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^api-token-auth/', views.obtain_auth_token),
     url(r'^test0/', coreviews.current_datetime),
-    url(r'^layers/taxon/$', GeoJSONLayerView.as_view(model=OccurenceTaxon), name='taxon'),
-    url(r'^layers/plant/$', coreviews.PlantLayerView.as_view(model=OccurenceTaxon), name='plantList'),
-    url(r'^layers/plant/([0-9]+)/$', coreviews.PlantDetail.as_view(), name='plantDetail'),
-    url(r'^layers/animal/$', coreviews.AnimalLayerView.as_view(model=OccurenceTaxon), name='animalList'),
-    url(r'^layers/natural-areas/$', GeoJSONLayerView.as_view(model=OccurenceNaturalArea), name='naturalarea'),
+    url(r'^layers/taxon/$', GeoJSONLayerView.as_view(model=OccurrenceTaxon), name='taxon'),
+    url(r'^layers/plants/$', coreviews.PlantLayerView.as_view(model=OccurrenceTaxon), name='plantList'),
+    url(r'^layers/plants/([0-9]+)/$', coreviews.PlantDetail.as_view(), name='plantDetail'),
+    url(r'^layers/animals/$', coreviews.AnimalLayerView.as_view(model=OccurrenceTaxon), name='animalList'),
+    url(r'^layers/slimemolds/$', coreviews.SlimeMoldLayerView.as_view(model=OccurrenceTaxon), name='slimemoldList'),
+    url(r'^layers/animals/$', coreviews.AnimalLayerView.as_view(model=OccurrenceTaxon), name='animalList'),
+    url(r'^layers/fungi/$', coreviews.FungusLayerView.as_view(model=OccurrenceTaxon), name='fungiList'),
+    url(r'^layers/naturalareas/$', coreviews.NaturalAreaLayerView.as_view(model=OccurrenceNaturalArea), name='naturalareaList'),
 ] 
