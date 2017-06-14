@@ -61,8 +61,13 @@ class PlantLayerView(GeoJSONLayerView):
     properties = ['occurrence_cat']
     
     def get_queryset(self):
-        return OccurenceTaxon.objects.filter(occurrence_cat__code='pl')
+        return OccurenceTaxon.objects.filter(occurrence_cat__main_cat='pl')
+
+class AnimalLayerView(GeoJSONLayerView):
+    properties = ['occurrence_cat']
     
+    def get_queryset(self):
+        return OccurenceTaxon.objects.filter(occurrence_cat__main_cat='an')
 
 class TaxonFeatureTypeView(APIView):
     permission_classes = ()

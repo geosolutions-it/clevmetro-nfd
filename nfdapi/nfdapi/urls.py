@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^test0/', coreviews.current_datetime),
     url(r'^layers/taxon/$', GeoJSONLayerView.as_view(model=OccurenceTaxon), name='taxon'),
     url(r'^layers/plant/$', coreviews.PlantLayerView.as_view(model=OccurenceTaxon), name='plantList'),
-    url(r'^layers/plant/([0-9]+)/$', coreviews.PlantDetail.as_view(), name='plantDetal'),
+    url(r'^layers/plant/([0-9]+)/$', coreviews.PlantDetail.as_view(), name='plantDetail'),
+    url(r'^layers/animal/$', coreviews.AnimalLayerView.as_view(model=OccurenceTaxon), name='animalList'),
     url(r'^layers/natural-areas/$', GeoJSONLayerView.as_view(model=OccurenceNaturalArea), name='naturalarea'),
 ] 

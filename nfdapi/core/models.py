@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 import reversion
 from django.contrib.gis.db.models.fields import PointField
+from  django.utils import timezone
 
 class Versioned(models.Model):
     identity = models.BigIntegerField()
@@ -29,15 +30,15 @@ class DictionaryTableExtended(models.Model):
     class Meta:
         abstract = True
 
-class OccurrenceCategory(DictionaryTable):
-    # natural_area, plant, animal, fungus, slimemold
-    pass
+class OccurrenceCategory(DictionaryTable): # natural_area, plant, animal, fungus, slimemold
+    main_cat = models.TextField()
+
 
 class Occurence(models.Model):
     geom = PointField()
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
-    inclusion_date = models.DateTimeField()
+    inclusion_date = models.DateTimeField(default=timezone.now)
     class Meta:
         abstract = True
 
@@ -367,8 +368,7 @@ class PlantDetails(TaxonDetails):
     """
     AQUI ME QUEDO: HAY QUE DEFINIR MODELO PARA PlaintDetails y sus subclases
     """
-    class Meta:
-        abstract = True
+    pass
 
     
 

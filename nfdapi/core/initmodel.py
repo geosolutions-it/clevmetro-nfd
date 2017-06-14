@@ -20,6 +20,7 @@ occurrence_cat = [('pl', 'plant'),
 occurrence_subcat = [('co', 'Conifer', 'pl'),
                      ('fe', 'Fern', 'pl'),
                      ('fl', 'Flowering plant', 'pl'),
+                     ('pl', 'Plant - generic', 'pl'), # for other kind of plants such as non-conifer trees
                      ('mo', 'Moss', 'pl'),
                      ('fu', 'Fungus', 'fu'),
                      ('sl', 'Slime mold', 'sl'),
@@ -59,6 +60,7 @@ def init_model():
             c = OccurrenceCategory()
             c.code = entry[0]
             c.name = entry[1]
+            c.main_cat = entry[2]
             c.save()
     
     if IucnRedListCategory.objects.count()==0:
@@ -91,16 +93,48 @@ def insert_test_data():
     sp_elem.iucn_red_list_category = iucn_cat
     #sp_elem.nrcs_usda_symbol = 
     sp_elem.save()
-    
-    
+
     t = OccurenceTaxon()
-    t.ocurrence_cat = plant_cat
-    t.geom = poly='POINT( 10 10)'
+    t.occurrence_cat = plant_cat
+    t.geom = 'POINT( -81.564302 41.201797 )'
     t.species_element = sp_elem
     t.save()
 
     t = OccurenceTaxon()
-    t.ocurrence_cat = plant_cat
-    t.geom = poly='POINT( 20 35)'
+    t.occurrence_cat = plant_cat
+    t.geom = 'POINT( -81.520700 41.243243 )'
     t.species_element = sp_elem
+    t.save()
+    
+    t = OccurenceTaxon()
+    t.occurrence_cat = plant_cat
+    t.geom = 'POINT( -81.575804 41.279632 )'
+    t.species_element = sp_elem
+    t.save()
+    
+    stream_animal_cat = OccurrenceCategory.objects.get(code='st')
+    
+    species = Species()
+    species.tsn = '180549'
+    species.first_common = 'North American river otter'
+    species.name_sci = 'Lontra canadensis'
+    species.save()
+    
+        
+    sp_elem = ElementSpecies()
+    sp_elem.other_code = "lontra_cnd"
+    sp_elem.species = species
+    sp_elem.iucn_red_list_category = iucn_cat
+    sp_elem.save()
+    
+    t = OccurenceTaxon()
+    t.geom = 'POINT( -81.554282 41.379035 )'
+    t.species_element = sp_elem
+    t.occurrence_cat = stream_animal_cat
+    t.save()
+    
+    t = OccurenceTaxon()
+    t.geom = 'POINT( -81.546814 41.386602 )'
+    t.species_element = sp_elem
+    t.occurrence_cat = stream_animal_cat
     t.save()
