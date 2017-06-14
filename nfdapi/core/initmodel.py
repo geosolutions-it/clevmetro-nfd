@@ -26,7 +26,7 @@ occurrence_subcat = [('co', 'Conifer', 'pl'),
                      ('ln', 'Land animal', 'an'),
                      ('lk', 'Pond lake animal', 'an'),
                      ('st', 'Stream animal', 'an'),
-                     ('we', 'Wetland animal', 'an')
+                     ('we', 'Wetland animal', 'an'),
                      ('na', 'Natural area', 'na')
     ]
 

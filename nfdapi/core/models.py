@@ -342,7 +342,7 @@ class WetlandHabitatFeature(DictionaryTable):
 class WetlandAnimalDetails(AnimalAquaticDetails, LenticSize):
     wetland_name = models.TextField()
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
-    active_management = models.BooleanField(blank=True, null=True)
+    active_management = models.NullBooleanField(blank=True, null=True)
     wetland_location = models.ForeignKey(WetlandLocation, on_delete=models.SET_NULL, blank=True, null=True)
     vegetation = models.ForeignKey(WetlandVetegationStructure, on_delete=models.CASCADE, blank=True, null=True)
     connectivity = models.ForeignKey(WetlandConnectivity, on_delete=models.SET_NULL, blank=True, null=True)
