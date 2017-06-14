@@ -54,32 +54,40 @@ usfws_status = [('C', 'Candidate'),
                 ('T(S/A)', 'Threatened due to similar appearance'),
                 ('UR', 'Under Review')]
 
-def init_model():
-    if OccurrenceCategory.objects.count()==0:
-        for entry in occurrence_subcat:        
-            c = OccurrenceCategory()
-            c.code = entry[0]
-            c.name = entry[1]
-            c.main_cat = entry[2]
-            c.save()
+def clean_model():
+    OccurrenceCategory.objects.all().delete()
+    IucnRedListCategory.objects.all().delete()
+    UsfwsStatus.objects.all().delete()
     
-    if IucnRedListCategory.objects.count()==0:
-        for entry in iucn_redlist:        
-            c = IucnRedListCategory()
-            c.code = entry[0]
-            c.name = entry[1]
-            c.save()
-    
-    if UsfwsStatus.objects.count()==0:
-        for entry in usfws_status:        
-            c = UsfwsStatus()
-            c.code = entry[0]
-            c.name = entry[1]
-            c.save() 
+def init_model(clean=True):
+    if clean:
+        clean_model()    
 
-def insert_test_data():
+    for entry in occurrence_subcat:        
+        c = OccurrenceCategory()
+        c.code = entry[0]
+        c.name = entry[1]
+        c.main_cat = entry[2]
+        c.save()
+
+    for entry in iucn_redlist:        
+        c = IucnRedListCategory()
+        c.code = entry[0]
+        c.name = entry[1]
+        c.save()
+
+    for entry in usfws_status:        
+        c = UsfwsStatus()
+        c.code = entry[0]
+        c.name = entry[1]
+        c.save() 
+
+def insert_test_data(clean=True):
+    if clean:
+        OccurenceTaxon.objects.all().delete()
+        
     plant_cat = OccurrenceCategory.objects.get(code='pl')
-    iucn_cat = IucnRedListCategory.objects.get(pk=4)
+    iucn_cat = IucnRedListCategory.objects.get(code='LC'    )
     
     species = Species()
     species.tsn = '19290'

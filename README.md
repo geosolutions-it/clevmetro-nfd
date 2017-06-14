@@ -24,9 +24,14 @@ $ ./manage.py migrate
 $ ./manage.py createinitialrevisions
 ```
 
-Initialize some dictionary tables (Using `./manage.py shell`):
+Optional: Initialize some dictionary tables (Using `./manage.py shell`. Warning: it will delete existing dict tables):
 ```python
 from core import initmodel as i
 i.init_model()
+```
+Optional: Insert some test data (Warning: it will delete existing occurrences):
+```python
+from core import initmodel as i
+i.insert_test_data()
 ```
 
