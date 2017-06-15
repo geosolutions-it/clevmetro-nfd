@@ -8,7 +8,11 @@
 const NATURAL_FEATURES_ERROR = 'NATURAL_FEATURES_ERROR';
 const NATURAL_FEATURES_LOADING = 'NATURAL_FEATURES_LOADING';
 const NATURAL_FEATURES_LOADED = 'NATURAL_FEATURES_LOADED';
-const GET_NATURAL_FEATURES = 'GET_NATURAL_FEATURES';
+const GET_ANIMALS = 'GET_ANIMALS';
+const GET_PLANTS = 'GET_PLANTS';
+const GET_MUSHROOMS = 'GET_MUSHROOMS';
+const GET_NATURAL_AREAS = 'GET_NATURAL_AREAS';
+const GET_SLIME_MOLDS = 'GET_SLIME_MOLDS';
 const NATURAL_FEATURE_SELECTED = 'NATURAL_FEATURE_TYPE_SELECTED';
 const NATURAL_FEATURE_ERROR = 'NATURAL_FEATURE_ERROR';
 const NATURAL_FEATURE_LOADED = 'NATURAL_FEATURE_LOADED';
@@ -50,14 +54,35 @@ function naturalFeaturesLoaded(data, url) {
 
 function getAnimals(url) {
     return {
-        type: GET_NATURAL_FEATURES,
+        type: GET_ANIMALS,
+        url
+    };
+}
+
+function getPlants(url) {
+    return {
+        type: GET_PLANTS,
         url
     };
 }
 
 function getMushrooms(url) {
     return {
-        type: GET_NATURAL_FEATURES,
+        type: GET_MUSHROOMS,
+        url
+    };
+}
+
+function getNaturalAreas(url) {
+    return {
+        type: GET_NATURAL_AREAS,
+        url
+    };
+}
+
+function getSlimeMolds(url) {
+    return {
+        type: GET_SLIME_MOLDS,
         url
     };
 }
@@ -85,11 +110,11 @@ function naturalFeatureTypeError(error) {
     };
 }
 
-function naturalFeatureSelected(properties, msId) {
+function naturalFeatureSelected(properties, nfid) {
     return {
         type: NATURAL_FEATURE_SELECTED,
         properties,
-        msId
+        nfid
     };
 }
 
@@ -107,10 +132,10 @@ function naturalFeatureError(error) {
     };
 }
 
-function createNaturalFeature(msId) {
+function createNaturalFeature(nfid) {
     return {
         type: CREATE_NATURAL_FEATURE,
-        msId
+        nfid
     };
 }
 
@@ -121,9 +146,9 @@ function naturalFeatureCreated(featureType) {
     };
 }
 
-function addNaturalFeature(msId) {
+function addNaturalFeature(nfid) {
     return (dispatch) => {
-        dispatch(createNaturalFeature(msId));
+        dispatch(createNaturalFeature(nfid));
         dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
     };
 }
@@ -267,7 +292,8 @@ module.exports = {
     NATURAL_FEATURES_ERROR, naturalFeaturesError,
     NATURAL_FEATURES_LOADING, naturalFeaturesLoading,
     NATURAL_FEATURES_LOADED, naturalFeaturesLoaded,
-    GET_NATURAL_FEATURES, getAnimals, getMushrooms,
+    GET_ANIMALS, GET_PLANTS, GET_MUSHROOMS, GET_NATURAL_AREAS, GET_SLIME_MOLDS,
+    getAnimals, getPlants, getMushrooms, getNaturalAreas, getSlimeMolds,
     NATURAL_FEATURE_SELECTED, naturalFeatureSelected,
     NATURAL_FEATURE_LOADED, naturalFeatureLoaded,
     NATURAL_FEATURE_ERROR, naturalFeatureError,
