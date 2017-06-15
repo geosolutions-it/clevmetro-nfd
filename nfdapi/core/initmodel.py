@@ -1,6 +1,8 @@
 from models import OccurrenceCategory, OccurrenceTaxon
 from models import IucnRedListCategory, UsfwsStatus
-from models import ElementSpecies, ElementPlant, ElementBird, Species
+from models import ElementSpecies, ElementPlant, ElementBird, Species, DayTime
+from django.utils.translation import ugettext_lazy as _
+
 
 from constants import occurrence_subcat
 
@@ -36,22 +38,47 @@ usfws_status = [('C', 'Candidate'),
                 ('T(S/A)', 'Threatened due to similar appearance'),
                 ('UR', 'Under Review')]
 
-def clean_model():
-    OccurrenceCategory.objects.all().delete()
-    IucnRedListCategory.objects.all().delete()
-    UsfwsStatus.objects.all().delete()
-    
-def init_model(clean=True):
-    if clean:
-        clean_model()    
+day_time = [("da", "Dawn", _("Dawn")),
+            ("em", "Early morning", _("Early morning")),
+            ("mo", "Morning", _("Morning")),
+            ("lm", "Late morning", _("Late morning")),
+            ("no", "Noon", _("Noon")),
+            ("ea", "Early afternoon", _("Early afternoon")),
+            ("af", "Afternoon", _("Afternoon")),
+            ("la", "Late afternoon", _("Late afternoon")),
+            ("du", "Dusk", _("Dusk")),
+            ("ee", "Early evening", _("Early evening")),
+            ("ev", "Evening", _("Evening")),
+            ("le", "Late evening", _("Late evening")),
+            ("ln", "Late night/after midnight", _("Late night/after midnight")),
+            ("un", "Unknown", _("Unknown"))]
 
+
+def _init_dict_table(model_class, values, clean=True):
+    if clean:
+        model_class.objects.all().delete()
+        
+    for entry in values:        
+        c = model_class()
+        c.code = entry[0]
+        c.name = entry[1]
+        c.save()
+
+def init_model(clean=True):
+
+    _init_dict_table(IucnRedListCategory, iucn_redlist, clean)
+    _init_dict_table(UsfwsStatus, usfws_status, clean)
+    _init_dict_table(DayTime, day_time, clean)
+    
+    if clean:
+        OccurrenceCategory.objects.all().delete()
     for entry in occurrence_subcat:        
         c = OccurrenceCategory()
         c.code = entry[0]
         c.name = entry[1]
         c.main_cat = entry[2]
         c.save()
-
+    """
     for entry in iucn_redlist:        
         c = IucnRedListCategory()
         c.code = entry[0]
@@ -62,7 +89,8 @@ def init_model(clean=True):
         c = UsfwsStatus()
         c.code = entry[0]
         c.name = entry[1]
-        c.save() 
+        c.save()
+    """ 
 
 def insert_test_data(clean=True):
     if clean:

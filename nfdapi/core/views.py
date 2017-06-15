@@ -6,13 +6,17 @@ from django.http import HttpResponse
 import datetime
 from rest_framework.serializers import Serializer
 from rest_framework import serializers
-from core.models import OccurrenceTaxon
+from core.models import OccurrenceTaxon, Occurrence, OccurrenceNaturalArea
 from djgeojson.views import GeoJSONLayerView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
+from django.template.context_processors import request
+from featuretype import FeatureTypeSerializer
+
 
 
 # Create your views here.
@@ -91,6 +95,24 @@ class NaturalAreaLayerView(GeoJSONLayerView):
     
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='natural area')
+
+
+@api_view(['GET'])
+@permission_classes([])
+def get_feature_type(request, occurrence_maincat, feature_id):
+    if occurrence_maincat[0]=='n': # natural areas
+        feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
+    else:
+        feat = OccurrenceTaxon.objects.get(pk=feature_id)
+    main_cat = feat.occurrence_cat.main_cat
+    subcat_code = feat.occurrence_cat.code
+    serializer = FeatureTypeSerializer()
+    ftdata = serializer.get_feature_type(main_cat, subcat_code)
+    return Response(ftdata)
+
+"""
+"""
+
 
 class TaxonFeatureTypeView(APIView):
     permission_classes = ()

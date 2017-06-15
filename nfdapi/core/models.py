@@ -45,11 +45,37 @@ class PointOfContact(models.Model):
     email = models.TextField()
     street_address = models.TextField()
 
+
+class DayTime(DictionaryTable):
+    pass
+
+class Season(DictionaryTable):
+    pass
+
+class RecordOrigin(DictionaryTable):
+    pass
+
+class RecordingStation(DictionaryTable):
+    pass
+
+class OccurrenceObservation(models.Model):
+    observation_date = models.DateField(blank=True)
+    recording_datetime = models.DateField(blank=True)
+    daytime = models.ForeignKey(DayTime, on_delete=models.SET_NULL, blank=True, null=True)
+    season = models.ForeignKey(Season, on_delete=models.SET_NULL, blank=True, null=True)
+    record_origin = models.ForeignKey(RecordOrigin, on_delete=models.SET_NULL, blank=True, null=True)
+    recording_station = models.ForeignKey(RecordingStation, on_delete=models.SET_NULL, blank=True, null=True)
+    reporter = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='reporter')
+    recorder = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='recorder')
+    verifier = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='verifier')
+
 class Occurrence(models.Model):
     geom = PointField()
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
+    observation = models.ForeignKey(OccurrenceObservation, on_delete=models.CASCADE, blank=True, null=True)
+    
     class Meta:
         abstract = True
 
@@ -166,14 +192,25 @@ class ElementSegmentedWorm(ElementSpecies, ToxicSpecies):
 class ElementSessileAnimal(ElementSpecies, ToxicSpecies):
     pass
 
+class Preservative(DictionaryTable):
+    pass
+
+class Storage(DictionaryTable):
+    pass
+
+class Repository(DictionaryTable):
+    pass
+
 @reversion.register()    
 class Voucher(models.Model):
     voucher_number = models.PositiveIntegerField()
     specimen_collected = models.BooleanField(default=False)
     parts_collected = models.BooleanField(default=False)
     specimen_number = models.BooleanField(default=False)
-    minumero = models.IntegerField(default=0)
-    mitextin = models.IntegerField( blank=True, null=True, default=None)
+    preservative = models.ForeignKey(Preservative, on_delete=models.SET_NULL, blank=True, null=True)
+    storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, blank=True, null=True)
+    repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, blank=True, null=True)
+
 
 """
 class HabitatCategory(DictionaryTable):
@@ -191,7 +228,7 @@ class TaxonDetails(models.Model):
 class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species_element = models.ForeignKey(ElementSpecies, on_delete=models.SET_NULL, blank=True, null=True)
-    details = models.ForeignKey(TaxonDetails, on_delete=models.SET_NULL, blank=True, null=True)
+    details = models.ForeignKey(TaxonDetails, on_delete=models.CASCADE, blank=True, null=True)
 
 @reversion.register()
 class OccurrenceNaturalArea(Occurrence):

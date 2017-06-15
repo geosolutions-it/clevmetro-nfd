@@ -1,17 +1,26 @@
+from django.utils.translation import ugettext_lazy as _
+
+occurrence_cat_dict = {
+    'plant': _('Plant'),
+    'fungus': _('Fungus'),
+    'slime_mold': _('Slime mold'),
+    'animal': _('Animal'),
+    'natural_area': _('Natural area')
+    }
 
 
-occurrence_subcat = [('co', 'Conifer', 'plant'),
-                     ('fe', 'Fern', 'plant'),
-                     ('fl', 'Flowering plant', 'plant'),
-                     ('pl', 'Plant - generic', 'plant'), # for other kind of plants such as non-conifer trees
-                     ('mo', 'Moss', 'plant'),
-                     ('fu', 'Fungus', 'fungus'),
-                     ('sl', 'Slime mold', 'slime mold'),
-                     ('ln', 'Land animal', 'animal'),
-                     ('lk', 'Pond lake animal', 'animal'),
-                     ('st', 'Stream animal', 'animal'),
-                     ('we', 'Wetland animal', 'animal'),
-                     ('na', 'Natural area', 'natural area')
+occurrence_subcat = [('co', 'Conifer', 'plant', _('Conifer')),
+                     ('fe', 'Fern', 'plant', _('Fern')),
+                     ('fl', 'Flowering plant', 'plant', _('Flowering plant')),
+                     ('pl', 'Plant - generic', 'plant', _('Plant - generic')), # for other kind of plants such as non-conifer trees
+                     ('mo', 'Moss', 'plant', _('Moss')),
+                     ('fu', 'Fungus', 'fungus', _('Fungus')),
+                     ('sl', 'Slime mold', 'slime_mold', _('Slime mold')),
+                     ('ln', 'Land animal', 'animal', _('Land animal')),
+                     ('lk', 'Pond lake animal', 'animal', _('Pond lake animal')),
+                     ('st', 'Stream animal', 'animal', _('Stream animal')),
+                     ('we', 'Wetland animal', 'animal', _('Wetland animal')),
+                     ('na', 'Natural area', 'natural_area', _('Natural area'))
     ]
 
 
