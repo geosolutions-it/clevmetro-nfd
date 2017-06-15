@@ -1,10 +1,12 @@
 from models import OccurrenceCategory, OccurrenceTaxon
 from models import IucnRedListCategory, UsfwsStatus
 from models import ElementSpecies, ElementPlant, ElementBird, Species, DayTime
-from django.utils.translation import ugettext_lazy as _
+from models import Season, RecordOrigin, Preservative, Storage, Repository
+from models import Gender
 
+# mark messages for translations but don't translate then right now 
+def _(message): return message
 
-from constants import occurrence_subcat
 
 plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
           'plant_flowering_plant', 'plant_moss_or_ally']
@@ -14,45 +16,125 @@ animals = ['animal', 'animal_aquatic_animal', 'animal_land_animal',
            'animal_pond_lake_animal', 'animal_stream_animal', 'animal_wetland_animal']
 natural_area = ['natural_area']
 
+occurrence_cat_dict = {
+    'plant': _('Plant'),
+    'fungus': _('Fungus'),
+    'slime_mold': _('Slime mold'),
+    'animal': _('Animal'),
+    'natural_area': _('Natural area')
+    }
 
-iucn_redlist = [('CR', 'CR: Critically endangered'),
-                ('DD', 'DD: Data deficient'),
-                ('EN', 'EN: Endangered'),
-                ('LC', 'LC: Least concern'),
-                ('NA', 'NA: Not applicable'),
-                ('NE', 'NE: Not evaluated'),
-                ('NT', 'NT: Near threatened'),
-                ('VU', 'VU: Vulnerable')]
 
-usfws_status = [('C', 'Candidate'),
-                ('D', 'Delisted'),
-                ('EE', 'Emergency endangered'),
-                ('LE', 'Endangered'),
-                ('E(S/A)', 'Endangered due to similar appearance'),
-                ('NL', 'Not Listed'),
-                ('PE', 'Proposed endangered'),
-                ('PT', 'Proposed threatened'),
-                ('RT', 'Resolved Taxon'),
-                ('SC', 'Species of Concern'),
-                ('LT', 'Threatened'),
-                ('T(S/A)', 'Threatened due to similar appearance'),
-                ('UR', 'Under Review')]
+occurrence_subcat = [('co', _('Conifer'), 'plant'),
+                     ('fe', _('Fern'), 'plant'),
+                     ('fl', _('Flowering plant'), 'plant'),
+                     ('pl', _('Plant - generic'), 'plant'), # for other kind of plants such as non-conifer trees
+                     ('mo', _('Moss'), 'plant'),
+                     ('fu', _('Fungus'), 'fungus'),
+                     ('sl', _('Slime mold'), 'slime_mold', ),
+                     ('ln', _('Land animal'), 'animal'),
+                     ('lk', _('Pond lake animal'), 'animal'),
+                     ('st', _('Stream animal'), 'animal'),
+                     ('we', _('Wetland animal'), 'animal'),
+                     ('na', _('Natural area'), 'natural_area')
+    ]
 
-day_time = [("da", "Dawn", _("Dawn")),
-            ("em", "Early morning", _("Early morning")),
-            ("mo", "Morning", _("Morning")),
-            ("lm", "Late morning", _("Late morning")),
-            ("no", "Noon", _("Noon")),
-            ("ea", "Early afternoon", _("Early afternoon")),
-            ("af", "Afternoon", _("Afternoon")),
-            ("la", "Late afternoon", _("Late afternoon")),
-            ("du", "Dusk", _("Dusk")),
-            ("ee", "Early evening", _("Early evening")),
-            ("ev", "Evening", _("Evening")),
-            ("le", "Late evening", _("Late evening")),
-            ("ln", "Late night/after midnight", _("Late night/after midnight")),
-            ("un", "Unknown", _("Unknown"))]
+iucn_redlist = [('CR', _('CR: Critically endangered')),
+                ('DD', _('DD: Data deficient')),
+                ('EN', _('EN: Endangered')),
+                ('LC', _('LC: Least concern')),
+                ('NA', _('NA: Not applicable')),
+                ('NE', _('NE: Not evaluated')),
+                ('NT', _('NT: Near threatened')),
+                ('VU', _('VU: Vulnerable'))]
 
+usfws_status = [('C', _('Candidate')),
+                ('D', _('Delisted')),
+                ('EE', _('Emergency endangered')),
+                ('LE', _('Endangered')),
+                ('E(S/A)', _('Endangered due to similar appearance')),
+                ('NL', _('Not Listed')),
+                ('PE', _('Proposed endangered')),
+                ('PT', _('Proposed threatened')),
+                ('RT', _('Resolved Taxon')),
+                ('SC', _('Species of Concern')),
+                ('LT', _('Threatened')),
+                ('T(S/A)', _('Threatened due to similar appearance')),
+                ('UR', _('Under Review'))]
+
+day_time = [("da", _("Dawn")),
+            ("em", _("Early morning")),
+            ("mo", _("Morning")),
+            ("lm", _("Late morning")),
+            ("no", _("Noon")),
+            ("ea", _("Early afternoon")),
+            ("af", _("Afternoon")),
+            ("la", _("Late afternoon")),
+            ("du", _("Dusk")),
+            ("ee", _("Early evening")),
+            ("ev", _("Evening")),
+            ("le", _("Late evening")),
+            ("ln", _("Late night/after midnight")),
+            ("un", _("Unknown"))]
+
+
+season = [
+    ("es", _("Early spring")),
+    ("ms", _("Mid spring")),
+    ("ls", _("Late spring")),
+    ("es", _("Early summer")),
+    ("ms", _("Mid summer")),
+    ("ls", _("Late summer")),
+    ("ef", _("Early fall")),
+    ("mf", _("Mid fall")),
+    ("lf", _("Late fall")),
+    ("ew", _("Early winter")),
+    ("mw", _("Mid winter")),
+    ("lw", _("Late winter"))
+    ]
+ 
+record_origin = [
+    ("bi", _("bioblitz")),
+    ("ct", _("camera trap")),
+    ("co", _("checking casual observer report")),
+    ("hr", _("checking historical record")),
+    ("in", _("incidental")),
+    ("mc", _("monitoring, census")),
+    ("mi", _("monitoring, initial")),
+    ("ml", _("monitoring, long term")),
+    ("mp", _("monitoring, property assessment")),
+    ("se", _("searching"))
+    ]
+
+preservative = [
+    ("et", _("ethanol")),
+    ("fd", _("formaldehyde")),
+    ("fi", _("formalin")),
+    ("ft", _("formalternate")),
+    ("is", _("isopropanol")),
+    ("na", _("N/A"))
+    ]
+
+storage = [
+    ("es", _("dried egg shell")),
+    ("dp", _("dried/pressed/mounted")),
+    ("se", _("dried skeletal element")),
+    ("ds", _("dried skeleton")),
+    ("ds", _("dried skin")),
+    ("fr", _("frozen")),
+    ("vi", _("vial")),
+    ("na", _("N/A"))
+]
+
+gender = [
+    ("fe", _("female")),
+    ("fp", _("female (parthenogenic)")),
+    ("gy", _("gynandromorphic")),
+    ("he", _("hermaphroditic")),
+    ("hp", _("hermaphroditic (parthenogenic)")),
+    ("na", _("n/a")),
+    ("un", _("unknown"))
+    ]
 
 def _init_dict_table(model_class, values, clean=True):
     if clean:
@@ -69,6 +151,10 @@ def init_model(clean=True):
     _init_dict_table(IucnRedListCategory, iucn_redlist, clean)
     _init_dict_table(UsfwsStatus, usfws_status, clean)
     _init_dict_table(DayTime, day_time, clean)
+    _init_dict_table(Season, season, clean)
+    _init_dict_table(RecordOrigin, record_origin, clean)
+    _init_dict_table(Preservative, preservative, clean)
+    _init_dict_table(Gender, gender, clean)
     
     if clean:
         OccurrenceCategory.objects.all().delete()
@@ -78,19 +164,6 @@ def init_model(clean=True):
         c.name = entry[1]
         c.main_cat = entry[2]
         c.save()
-    """
-    for entry in iucn_redlist:        
-        c = IucnRedListCategory()
-        c.code = entry[0]
-        c.name = entry[1]
-        c.save()
-
-    for entry in usfws_status:        
-        c = UsfwsStatus()
-        c.code = entry[0]
-        c.name = entry[1]
-        c.save()
-    """ 
 
 def insert_test_data(clean=True):
     if clean:
