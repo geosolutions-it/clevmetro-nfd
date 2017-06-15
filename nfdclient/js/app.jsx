@@ -12,7 +12,7 @@ const appReducers = {
     naturalfeatures: require('./reducers/naturalfeatures'),
     selection: require('../MapStore2/web/client/reducers/selection')
 };
-const {initState, getAnimals, getMushrooms} = require('./actions/naturalfeatures');
+const {initState, getAnimals, getPlants, getNaturalAreas, getMushrooms, getSlimeMolds} = require('./actions/naturalfeatures');
 const dEpics = require('./epics/naturalfeatures');
 const ConfigUtils = require('../MapStore2/web/client/utils/ConfigUtils');
 // ConfigUtils.setLocalConfigurationFile('/static/js/risksConfig.json');
@@ -42,14 +42,14 @@ const StandardRouter = connect((state) => ({
 }))(require('../MapStore2/web/client/components/app/StandardRouter'));
 
 const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(null, initialState, appReducers, {...dEpics});
-// const geomPath = window.DISASTERRISK && window.DISASTERRISK.app && window.DISASTERRISK.app.geometry || '/risks/data_extraction/geom/AF/';
-const restApiURL = 'http://192.168.1.38/gs-local/ws_jrodrigo/ows';
-// const geomPath = 'http://disasterrisk.af.geonode.org/risks/data_extraction/geom/AF/';
 const initialActions = init ? [
     () => initState(init)
 ] : [
-    () => getAnimals(restApiURL, 'refinerias'),
-    () => getMushrooms(restApiURL, 'pp_gas')
+    () => getAnimals('http://localhost/nfdapi/layers/animals/'),
+    () => getPlants('http://localhost/nfdapi/layers/plants/'),
+    () => getNaturalAreas('http://localhost/nfdapi/layers/naturalareas/'),
+    () => getMushrooms('http://localhost/nfdapi/layers/fungi/'),
+    () => getSlimeMolds('http://localhost/nfdapi/layers/slimemolds/')
 ];
 const appConfig = {
     storeOpts,

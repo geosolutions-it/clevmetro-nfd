@@ -2,8 +2,8 @@
     "map": {
         "projection": "EPSG:900913",
         "units": "m",
-        "center": {"x": 1250000.000000, "y": 5370000.000000, "crs": "EPSG:900913"},
-        "zoom":5,
+        "center": {"x": -9090996.041556, "y": 5057073.790709, "crs": "EPSG:900913"},
+        "zoom":10,
         "maxExtent": [-20037508.34, -20037508.34,20037508.34, 20037508.34],
         "layers": [{
             "type": "osm",
@@ -19,7 +19,17 @@
             "group": "Natural features",
             "name": "Animals",
             "hideLoading": true,
-            "id": "animals",
+            "id": "animal",
+            "styleName": "marker",
+            "features" : []
+        }, {
+            "type": "vector",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Plants",
+            "hideLoading": true,
+            "id": "plant",
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-green.png"
@@ -34,6 +44,35 @@
             "hideLoading": true,
             "id": "mushrooms",
             "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-green.png"
+            },
+            "features" : []
+        }, {
+            "type": "vector",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Natural areas",
+            "hideLoading": true,
+            "id": "natural_areas",
+            "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-green.png"
+            },
+            "features" : []
+        }, {
+            "type": "vector",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Slime/Molds",
+            "hideLoading": true,
+            "id": "slime_molds",
+            "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-green.png"
+            },
             "features" : []
         }]
     }

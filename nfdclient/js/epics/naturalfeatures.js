@@ -13,7 +13,11 @@ const {setControlProperty} = require('../../MapStore2/web/client/actions//contro
 const axios = require('../../MapStore2/web/client/libs/ajax');
 
 const {
-    GET_NATURAL_FEATURES,
+    GET_ANIMALS,
+    GET_PLANTS,
+    GET_NATURAL_AREAS,
+    GET_MUSHROOMS,
+    GET_SLIME_MOLDS,
     NATURAL_FEATURE_SELECTED,
     NATURAL_FEATURE_LOADED,
     NATURAL_FEATURE_TYPE_LOADED,
@@ -166,18 +170,46 @@ const createEmptyFeature = (featureType) => {
     return emptyFeature;
 };
 
+const getLayerId = (properties) => {
+    let layerId = "";
+    if (properties.occurrence_cat[0] === 'plant') {
+        layerId = 'plants';
+    } else if (properties.occurrence_cat[0] === 'animal') {
+        layerId = 'animals';
+    }
+    return layerId;
+};
+
 const getAnimalsEpic = (action$, store) =>
-    action$.ofType(GET_NATURAL_FEATURES)
+    action$.ofType(GET_ANIMALS)
     .audit(() => {
         const isMapConfigured = (store.getState()).mapInitialConfig && true;
         return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
     })
     .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url + '?service=WFS&version=1.0.0&request=GetFeature&typeName=ws_jrodrigo:refinerias&maxFeatures=50&outputFormat=application%2Fjson'))
+        Rx.Observable.defer(() => Api.getData(action.url))
         .retry(1)
         .map(val => [
             // changeLayerProperties('animals', {features: val.features.map((f, idx) => (assign({}, f, {id: idx, ftype: 'animals'}))) || []}),
-            changeLayerProperties('animals', {features: val.features}),
+            changeLayerProperties('animal', {features: val.features}),
+            naturalFeaturesLoaded(val.features, action.url)
+        ])
+        .mergeAll()
+        .startWith(naturalFeaturesLoading())
+        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
+    );
+
+const getPlantsEpic = (action$, store) =>
+    action$.ofType(GET_PLANTS)
+    .audit(() => {
+        const isMapConfigured = (store.getState()).mapInitialConfig && true;
+        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
+    })
+    .switchMap(action =>
+        Rx.Observable.defer(() => Api.getData(action.url))
+        .retry(1)
+        .map(val => [
+            changeLayerProperties('plant', {features: val.features}),
             naturalFeaturesLoaded(val.features, action.url)
         ])
         .mergeAll()
@@ -186,17 +218,52 @@ const getAnimalsEpic = (action$, store) =>
     );
 
 const getMushroomsEpic = (action$, store) =>
-    action$.ofType(GET_NATURAL_FEATURES)
+    action$.ofType(GET_MUSHROOMS)
     .audit(() => {
         const isMapConfigured = (store.getState()).mapInitialConfig && true;
         return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
     })
     .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url + '?service=WFS&version=1.0.0&request=GetFeature&typeName=ws_jrodrigo:pp_gas&maxFeatures=50&outputFormat=application%2Fjson'))
+        Rx.Observable.defer(() => Api.getData(action.url))
         .retry(1)
         .map(val => [
-            // changeLayerProperties('mushrooms', {features: val.features.map((f, idx) => (assign({}, f, {id: idx, ftype: 'mushrooms'}))) || []}),
             changeLayerProperties('mushrooms', {features: val.features}),
+            naturalFeaturesLoaded(val.features, action.url)
+        ])
+        .mergeAll()
+        .startWith(naturalFeaturesLoading())
+        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
+    );
+
+const getNaturalAreasEpic = (action$, store) =>
+    action$.ofType(GET_NATURAL_AREAS)
+    .audit(() => {
+        const isMapConfigured = (store.getState()).mapInitialConfig && true;
+        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
+    })
+    .switchMap(action =>
+        Rx.Observable.defer(() => Api.getData(action.url))
+        .retry(1)
+        .map(val => [
+            changeLayerProperties('natural_areas', {features: val.features}),
+            naturalFeaturesLoaded(val.features, action.url)
+        ])
+        .mergeAll()
+        .startWith(naturalFeaturesLoading())
+        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
+    );
+
+const getSlimeMoldsEpic = (action$, store) =>
+    action$.ofType(GET_SLIME_MOLDS)
+    .audit(() => {
+        const isMapConfigured = (store.getState()).mapInitialConfig && true;
+        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
+    })
+    .switchMap(action =>
+        Rx.Observable.defer(() => Api.getData(action.url))
+        .retry(1)
+        .map(val => [
+            changeLayerProperties('slime_molds', {features: val.features}),
             naturalFeaturesLoaded(val.features, action.url)
         ])
         .mergeAll()
@@ -207,7 +274,7 @@ const getMushroomsEpic = (action$, store) =>
 const getNaturalFeatureTypeEpic = (action$) =>
     action$.ofType(NATURAL_FEATURE_SELECTED, CREATE_NATURAL_FEATURE)
     .switchMap((action) => {
-        return Rx.Observable.defer( () => axios.get('http://192.168.1.38/gs-local/ws_jrodrigo/ows?service=WFS&version=1.1.0&request=DescribeFeatureType&typeName=ws_jrodrigo:' + action.msId.split('.')[0] + '&outputFormat=application/json'))
+        return Rx.Observable.defer( () => axios.get('http://localhost/nfdapi/featureTypes/' + getLayerId(action.properties) + '/' + action.nfid))
             .map((response) => {
                 let mode;
                 if (action.type === NATURAL_FEATURE_SELECTED) {
@@ -297,7 +364,10 @@ const addNaturalFeatureGeometryEpic = (action$) =>
 
 module.exports = {
     getAnimalsEpic,
+    getPlantsEpic,
     getMushroomsEpic,
+    getNaturalAreasEpic,
+    getSlimeMoldsEpic,
     naturalFeatureSelectedEpic,
     naturalFeatureLoadedEpic,
     getNaturalFeatureTypeEpic,

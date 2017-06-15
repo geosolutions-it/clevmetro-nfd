@@ -72,13 +72,13 @@ var geometryToLayer = function(geojson, options) {
     case 'Point':
         latlng = coordsToLatLng(coords);
         layer = getPointLayer(pointToLayer, geojson, latlng, options);
-        layer.msId = geojson.id;
+        layer.nfid = geojson.id;
         return layer;
     case 'MultiPoint':
         for (i = 0, len = coords.length; i < len; i++) {
             latlng = coordsToLatLng(coords[i]);
             layer = getPointLayer(pointToLayer, geojson, latlng, options);
-            layer.msId = geojson.id;
+            layer.nfid = geojson.id;
             layers.push(layer);
         }
         return new L.FeatureGroup(layers);
@@ -86,13 +86,13 @@ var geometryToLayer = function(geojson, options) {
     case 'LineString':
         latlngs = coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, coordsToLatLng);
         layer = new L.Polyline(latlngs, options.style);
-        layer.msId = geojson.id;
+        layer.nfid = geojson.id;
         return layer;
     case 'MultiLineString':
         latlngs = coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, coordsToLatLng);
         for (i = 0, len = latlngs.length; i < len; i++) {
             layer = new L.Polyline(latlngs[i], options.style);
-            layer.msId = geojson.id;
+            layer.nfid = geojson.id;
             if (layer) {
                 layers.push(layer);
             }
@@ -101,13 +101,13 @@ var geometryToLayer = function(geojson, options) {
     case 'Polygon':
         latlngs = coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, coordsToLatLng);
         layer = new L.Polygon(latlngs, options.style);
-        layer.msId = geojson.id;
+        layer.nfid = geojson.id;
         return layer;
     case 'MultiPolygon':
         latlngs = coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, coordsToLatLng);
         for (i = 0, len = latlngs.length; i < len; i++) {
             layer = new L.Polygon(latlngs[i], options.style);
-            layer.msId = geojson.id;
+            layer.nfid = geojson.id;
             if (layer) {
                 layers.push(layer);
             }
@@ -174,7 +174,7 @@ let Feature = React.createClass({
             this._layer = geometryToLayer({
                 type: newProps.type,
                 geometry: newProps.geometry,
-                msId: this.props.msId
+                nfid: this.props.msId
             }, {
                 style: newProps.style,
                 pointToLayer: newProps.styleName !== "marker" ? function(feature, latlng) {
