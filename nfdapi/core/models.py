@@ -199,6 +199,7 @@ class Storage(DictionaryTable):
     pass
 
 class Repository(DictionaryTable):
+    #FIXME: repository needs extra attributes (and maybe has to be managed as a non-dictionary table)
     pass
 
 @reversion.register()    
