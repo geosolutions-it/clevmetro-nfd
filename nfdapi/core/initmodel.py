@@ -1,6 +1,6 @@
 from models import OccurrenceCategory, OccurrenceTaxon
 from models import IucnRedListCategory, UsfwsStatus
-from models import ElementSpecies, ElementPlant, ElementBird, Species, DayTime
+from models import ElementSpecies, DayTime
 from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
 from core.models import TerrestrialSampler, LandAnimalDetails,\
@@ -200,58 +200,49 @@ def insert_test_data(clean=True):
     if clean:
         OccurrenceTaxon.objects.all().delete()
         TaxonDetails.objects.all().delete()
-        Species.objects.all().delete()
         ElementSpecies.objects.all().delete()
         OccurrenceObservation.objects.all().delete()
         
     plant_cat = OccurrenceCategory.objects.get(code='pl')
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     
-    species = Species()
+    species = ElementSpecies()
     species.tsn = '19290'
     species.first_common = 'White oak'
     species.name_sci = 'Quercus alba'
-    species.save()
-    
-    sp_elem = ElementPlant()
-    sp_elem.other_code = "qrc_alba"
-    sp_elem.species = species
-    sp_elem.iucn_red_list_category = iucn_cat
+    species.other_code = "qrc_alba"
+    species.species = species
+    species.iucn_red_list_category = iucn_cat
     #sp_elem.nrcs_usda_symbol = 
-    sp_elem.save()
+    species.save()
 
     t = OccurrenceTaxon()
     t.occurrence_cat = plant_cat
     t.geom = 'POINT( -81.564302 41.201797 )'
-    t.species_element = sp_elem
+    t.species_element = species
     t.save()
 
     t = OccurrenceTaxon()
     t.occurrence_cat = plant_cat
     t.geom = 'POINT( -81.520700 41.243243 )'
-    t.species_element = sp_elem
+    t.species_element = species
     t.save()
     
     t = OccurrenceTaxon()
     t.occurrence_cat = plant_cat
     t.geom = 'POINT( -81.575804 41.279632 )'
-    t.species_element = sp_elem
+    t.species_element = species
     t.save()
     
-    stream_animal_cat = OccurrenceCategory.objects.get(code='st')
-    
-    species = Species()
+    stream_animal_cat = OccurrenceCategory.objects.get(code='st')    
+        
+    species = ElementSpecies()
     species.tsn = '180549'
     species.first_common = 'North American river otter'
     species.name_sci = 'Lontra canadensis'
+    species.other_code = "lontra_cnd"
+    species.iucn_red_list_category = iucn_cat
     species.save()
-    
-        
-    sp_elem = ElementSpecies()
-    sp_elem.other_code = "lontra_cnd"
-    sp_elem.species = species
-    sp_elem.iucn_red_list_category = iucn_cat
-    sp_elem.save()
     
     gender = Gender.objects.get(code='fe')
     
@@ -272,7 +263,7 @@ def insert_test_data(clean=True):
     
     t = OccurrenceTaxon()
     t.geom = 'POINT( -81.554282 41.379035 )'
-    t.species_element = sp_elem
+    t.species_element = species
     t.occurrence_cat = stream_animal_cat
     t.details = stream_details
     t.observation = observation
@@ -296,7 +287,7 @@ def insert_test_data(clean=True):
     
     t = OccurrenceTaxon()
     t.geom = 'POINT( -81.546814 41.386602 )'
-    t.species_element = sp_elem
+    t.species_element = species
     t.occurrence_cat = stream_animal_cat
     t.details = stream_details
     t.observation = observation
@@ -319,24 +310,19 @@ def insert_test_data(clean=True):
     
     land_animal_details.gender = gender
     land_animal_details.save()
-    
         
-    species = Species()
+    species = ElementSpecies()
     species.tsn = '180544'
     species.first_common = 'American black bear'
     species.name_sci = 'Ursus americanus'
+    species.other_code = "bl_bear"
+    species.species = species
+    species.iucn_red_list_category = iucn_cat
     species.save()
-    
-        
-    sp_elem_bear = ElementSpecies()
-    sp_elem_bear.other_code = "bl_bear"
-    sp_elem_bear.species = species
-    sp_elem_bear.iucn_red_list_category = iucn_cat
-    sp_elem_bear.save()
     
     t = OccurrenceTaxon()
     t.geom = 'POINT( -81.526814 41.366602 )'
-    t.species_element = sp_elem_bear
+    t.species_element = species
     t.occurrence_cat = land_animal_cat
     t.details = land_animal_details
     t.observation = observation

@@ -103,22 +103,6 @@ class Element(models.Model):
     
     class Meta:
         abstract = True
-        
-class Family(models.Model):
-    tsn = models.IntegerField(blank=True)
-    name_sci = models.TextField()
-    common_name = models.TextField()
-    second_common = models.TextField()
-    third_common = models.TextField()
-
-class Species(models.Model):
-    tsn = models.IntegerField(blank=True)
-    name_sci = models.TextField()
-    synonym = models.TextField()
-    first_common = models.TextField()
-    second_common = models.TextField()
-    third_common = models.TextField()
-    family = models.ForeignKey(Family, on_delete=models.SET_NULL, blank=True, null=True)
 
 class RegionalStatus(DictionaryTableExtended):
     pass
@@ -133,42 +117,46 @@ class ElementType(DictionaryTable):
     # alga, arachnid, bird, conifer, etc
     pass
 
-class ElementSpecies(models.Model):
-    species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
-    native = models.BooleanField(default=True)
-    oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
-    other_code = models.TextField()
-    species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
 
-class ToxicSpecies(models.Model):
-    epa_numeric_code = models.TextField()
+class Tsn(models.Model):
+    tsn = models.IntegerField(blank=True)
+    name_sci = models.TextField()
+    common_name = models.TextField()
+    second_common = models.TextField(blank=True)
+    third_common = models.TextField(blank=True)
     class Meta:
         abstract = True
-
-class ElementPlant(ElementSpecies, ToxicSpecies):
-    # nota: las plantas todas tienen el codigo toxico EPA salvo: Conifer, Fern, Moss
-    nrcs_usda_symbol = models.TextField()
-    synonym_nrcs_usda_symbol = models.TextField()
-
-class ElementBird(ElementSpecies):
-    ibp_english = models.CharField(max_length=4)
-    ibp_scientific = models.CharField(max_length=6)
-    bblab_number = models.CharField(max_length=6)
-
-class ElementCrustacean(ElementSpecies, ToxicSpecies):
+        
+class Phylum(Tsn):
     pass
 
-class ElementFlatworm(ElementSpecies, ToxicSpecies):
-    pass
+        
+class Family(Tsn):
+    phylum = models.ForeignKey(Phylum, on_delete=models.SET_NULL, blank=True, null=True)
 
 class MushroomGroup(DictionaryTable):
     pass
 
-class ElementFungus(ElementSpecies, ToxicSpecies):
-    nrcs_usda_symbol = models.TextField()
-    synonym_nrcs_usda_symbol = models.TextField()
+class ElementSpecies(models.Model):
+    tsn = models.IntegerField(blank=True)
+    name_sci = models.TextField()
+    synonym = models.TextField(blank=True)
+    first_common = models.TextField()
+    second_common = models.TextField(blank=True)
+    third_common = models.TextField(blank=True)
+    native = models.BooleanField(default=True)
+    oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
+    usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
+    iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    other_code = models.TextField(blank=True)
+    #species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
+    family = models.ForeignKey(Family, on_delete=models.SET_NULL, blank=True, null=True)
+    ibp_english = models.CharField(max_length=4, blank=True)
+    ibp_scientific = models.CharField(max_length=6, blank=True)
+    bblab_number = models.CharField(max_length=6, blank=True)
+    nrcs_usda_symbol = models.TextField(blank=True)
+    synonym_nrcs_usda_symbol = models.TextField(blank=True)
+    epa_numeric_code = models.TextField(blank=True)
     mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True) 
     
 class ElementNaturalAreas(Element):
@@ -176,21 +164,6 @@ class ElementNaturalAreas(Element):
     general_description = models.TextField()
     area = models.FloatField()
     landscape_position =  models.TextField() #FIXME
-
-class ElementInsect(ElementSpecies, ToxicSpecies):
-    pass
-
-class ElementMolusc(ElementSpecies, ToxicSpecies):
-    pass
-
-class ElementRoundworm(ElementSpecies, ToxicSpecies):
-    pass
-
-class ElementSegmentedWorm(ElementSpecies, ToxicSpecies):
-    pass
-
-class ElementSessileAnimal(ElementSpecies, ToxicSpecies):
-    pass
 
 class Preservative(DictionaryTable):
     pass
