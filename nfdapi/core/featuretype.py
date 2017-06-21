@@ -7,8 +7,8 @@ from django.contrib.gis.db.models.fields import GeometryField
 from django.utils.translation import ugettext_lazy as _
 
 from core.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetails,\
-    StreamAnimalDetails, LandAnimalDetails
-from core.models import AnimalDetails, AnimalLifestages, OccurrenceObservation, PointOfContact
+    StreamAnimalDetails, LandAnimalDetails, ElementSpecies
+from core.models import AnimalLifestages, OccurrenceObservation, PointOfContact
 
 featuretype_form_fragments = {
     "observation": [
@@ -18,26 +18,27 @@ featuretype_form_fragments = {
         {"formname": "verifier", "formlabel": _("Observation verifier"), "model": PointOfContact}
         ],
     "voucher": [{"formname": "voucher", "formlabel": _("Observation voucher"), "model": Voucher}],
+    "species": [{"formname": "species", "formlabel": _("What is it?"), "model": ElementSpecies}]
     }
 
 occurrence_defs = {
     "ln": {
         "mainmodel": OccurrenceTaxon,
-        "forms": [
+        "forms": featuretype_form_fragments["species"]+[
             {"formname": "landanimaldetails", "formlabel": _("Details"), "model": LandAnimalDetails},
             {"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages}
             ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
     },
     "st": {
         "mainmodel": OccurrenceTaxon,
-        "forms": [
+        "forms": featuretype_form_fragments["species"]+[
             {"formname": "streamanimaldetails", "formlabel": _("Details"), "model": StreamAnimalDetails},
             {"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages}
             ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
     },
     "pl": {
         "mainmodel": OccurrenceTaxon,
-        "forms": [
+        "forms": featuretype_form_fragments["species"]+[
             {"formname": "plantdetails", "formlabel": _("Details"), "model": PlantDetails},
             #{"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages},
             ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
@@ -56,6 +57,7 @@ class FeatureInfoSerializer():
         
         self.result['featuretype'] = main_cat
         self.result['versions'] = 1 #FIXME
+        self._add_form_values(occurrence_instance.species_element, 'species')
         self._add_form_values(occurrence_instance.observation, 'observation')
         self._add_form_values(occurrence_instance.voucher, 'voucher')
         details_instance = occurrence_instance.get_details()
