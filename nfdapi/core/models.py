@@ -16,14 +16,14 @@ class Versioned(models.Model):
         abstract = True
 
 class DictionaryTable(models.Model):
-    code = models.TextField()
+    code = models.TextField(unique=True)
     name = models.TextField()
     
     class Meta:
         abstract = True
     
 class DictionaryTableExtended(models.Model):
-    code = models.TextField()
+    code = models.TextField(unique=True)
     name = models.TextField()
     description = models.TextField()
     
@@ -38,12 +38,12 @@ class OccurrenceCategory(DictionaryTable):
         return (self.main_cat, self.code, self.name)
     
 class PointOfContact(models.Model):
-    name = models.TextField()
-    affiliation = models.TextField()
-    phone1 = models.TextField()
-    phone2 = models.TextField()
-    email = models.TextField()
-    street_address = models.TextField()
+    name = models.TextField(blank=True)
+    affiliation = models.TextField(blank=True)
+    phone1 = models.TextField(blank=True)
+    phone2 = models.TextField(blank=True)
+    email = models.TextField(blank=True)
+    street_address = models.TextField(blank=True)
 
 
 class DayTime(DictionaryTable):
@@ -230,6 +230,43 @@ class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species_element = models.ForeignKey(ElementSpecies, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.ForeignKey(TaxonDetails, on_delete=models.CASCADE, blank=True, null=True)
+    
+    def _get_details_class(self):
+        if self.occurrence_cat:
+            if self.occurrence_cat.code=='co':
+                return PlantDetails #FIXME
+            elif self.occurrence_cat.code=='fe':
+                return PlantDetails #FIXME
+            elif self.occurrence_cat.code=='fl':
+                return PlantDetails #FIXME
+            elif self.occurrence_cat.code=='pl':
+                return PlantDetails
+            elif self.occurrence_cat.code=='mo':
+                return SlimeMoldDetails
+            elif self.occurrence_cat.code=='fu':
+                return TaxonDetails #FIXME
+            elif self.occurrence_cat.code=='sl':
+                return SlimeMoldDetails
+            elif self.occurrence_cat.code=='ln':
+                return LandAnimalDetails
+            elif self.occurrence_cat.code=='lk':
+                return PondLakeAnimalDetails
+            elif self.occurrence_cat.code=='st':
+                return StreamAnimalDetails
+            elif self.occurrence_cat.code=='we':
+                return WetlandAnimalDetails
+        
+    def get_details(self):
+        """
+        Gets the taxon details using the right model for the concrete instance. By default,
+        Django will return the generic model instance (TaxonDetails) instead of an instance
+        of LandAnimalDetails, PondLakeAnimalDetails, etc.
+        """
+        try:
+            if self.details:
+                return self._get_details_class().objects.get(pk=self.details.id)
+        except:
+            pass
 
 @reversion.register()
 class OccurrenceNaturalArea(Occurrence):
@@ -293,8 +330,6 @@ class AquaticAnimalDetails(AnimalDetails):
 class LandAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(TerrestrialSampler, on_delete=models.SET_NULL, blank=True, null=True)
     stratum = models.ForeignKey(TerrestrialStratum, on_delete=models.SET_NULL, blank=True, null=True)
-    class Meta:
-        abstract = True
 
 class PondLakeType(DictionaryTable):
     pass

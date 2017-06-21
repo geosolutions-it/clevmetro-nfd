@@ -3,6 +3,9 @@ from models import IucnRedListCategory, UsfwsStatus
 from models import ElementSpecies, ElementPlant, ElementBird, Species, DayTime
 from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
+from core.models import TerrestrialSampler, LandAnimalDetails,\
+    StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact
+from django.utils import timezone
 
 # mark messages for translations but don't translate then right now 
 def _(message): return message
@@ -79,9 +82,9 @@ day_time = [("da", _("Dawn")),
 
 
 season = [
-    ("es", _("Early spring")),
-    ("ms", _("Mid spring")),
-    ("ls", _("Late spring")),
+    ("eg", _("Early spring")),
+    ("mg", _("Mid spring")),
+    ("lg", _("Late spring")),
     ("es", _("Early summer")),
     ("ms", _("Mid summer")),
     ("ls", _("Late summer")),
@@ -132,8 +135,35 @@ gender = [
     ("gy", _("gynandromorphic")),
     ("he", _("hermaphroditic")),
     ("hp", _("hermaphroditic (parthenogenic)")),
+    ("ml", _("male")),
     ("na", _("n/a")),
     ("un", _("unknown"))
+    ]
+
+terrestrial_sampler = [
+    ("av", _("aspirator/vacuum")),
+    ("at", _("audio transect")),
+    ("bt", _("baited box/cage trap")),
+    ("bf", _("Berlese funnel")),
+    ("fo", _("fogger")),
+    ("ft", _("funnel trap")),
+    ("ga", _("glue trap alone")),
+    ("gf", _("glue trap with drift fence")),
+    ("hc", _("hand collecting")),
+    ("ht", _("harp trap")),
+    ("lg", _("light trap")),
+    ("ln", _("line transect")),
+    ("mt", _("Malaise trap")),
+    ("mn", _("mist net")),
+    ("ms", _("mustard soil extraction")),
+    ("pa", _("pitfall trap alone")),
+    ("pf", _("pitfall trap with drift fence")),
+    ("sn", _("snare")),
+    ("sr", _("sound recording")),
+    ("st", _("stovepipe trap")),
+    ("wc", _("wildlife camera")),
+    ("wt", _("windowpane trap")),
+    ("yt", _("yellow pan trap"))
     ]
 
 def _init_dict_table(model_class, values, clean=True):
@@ -155,6 +185,7 @@ def init_model(clean=True):
     _init_dict_table(RecordOrigin, record_origin, clean)
     _init_dict_table(Preservative, preservative, clean)
     _init_dict_table(Gender, gender, clean)
+    _init_dict_table(TerrestrialSampler, terrestrial_sampler, clean)
     
     if clean:
         OccurrenceCategory.objects.all().delete()
@@ -168,6 +199,10 @@ def init_model(clean=True):
 def insert_test_data(clean=True):
     if clean:
         OccurrenceTaxon.objects.all().delete()
+        TaxonDetails.objects.all().delete()
+        Species.objects.all().delete()
+        ElementSpecies.objects.all().delete()
+        OccurrenceObservation.objects.all().delete()
         
     plant_cat = OccurrenceCategory.objects.get(code='pl')
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
@@ -218,14 +253,93 @@ def insert_test_data(clean=True):
     sp_elem.iucn_red_list_category = iucn_cat
     sp_elem.save()
     
+    gender = Gender.objects.get(code='fe')
+    
+    stream_details = StreamAnimalDetails()
+    stream_details.gender = gender
+    stream_details.stream_name_1 = 'Ramdom stream name1'
+    stream_details.save()
+    
+    reporter = PointOfContact()
+    reporter.name = "I'm the reporter"
+    reporter.save()
+    
+    observation = OccurrenceObservation()
+    observation.observation_date = timezone.now()
+    observation.recording_datetime = timezone.now()
+    observation.reporter = reporter
+    observation.save()
+    
     t = OccurrenceTaxon()
     t.geom = 'POINT( -81.554282 41.379035 )'
     t.species_element = sp_elem
     t.occurrence_cat = stream_animal_cat
+    t.details = stream_details
+    t.observation = observation
     t.save()
+    
+    stream_details = StreamAnimalDetails()
+    stream_details.gender = gender
+    stream_details.stream_name_1 = 'Ramdom stream name2'
+    stream_details.save()
+    
+    recorder = PointOfContact()
+    recorder.name = "I'm the recorder2"
+    recorder.save()
+    
+    observation = OccurrenceObservation()
+    observation.observation_date = timezone.now()
+    observation.recording_datetime = timezone.now()
+    observation.recorder = recorder
+    observation.save()
+    
     
     t = OccurrenceTaxon()
     t.geom = 'POINT( -81.546814 41.386602 )'
     t.species_element = sp_elem
     t.occurrence_cat = stream_animal_cat
+    t.details = stream_details
+    t.observation = observation
     t.save()
+    
+    recorder = PointOfContact()
+    recorder.name = "I'm the recorder"
+    recorder.save()
+    
+    observation = OccurrenceObservation()
+    observation.observation_date = timezone.now()
+    observation.recording_datetime = timezone.now()
+    observation.recorder = recorder
+    observation.save()
+    
+    land_animal_cat = OccurrenceCategory.objects.get(code='ln')
+    land_animal_details = LandAnimalDetails()
+    sound_recording = TerrestrialSampler.objects.get(code='sr')
+    land_animal_details.sampler = sound_recording
+    
+    land_animal_details.gender = gender
+    land_animal_details.save()
+    
+        
+    species = Species()
+    species.tsn = '180544'
+    species.first_common = 'American black bear'
+    species.name_sci = 'Ursus americanus'
+    species.save()
+    
+        
+    sp_elem_bear = ElementSpecies()
+    sp_elem_bear.other_code = "bl_bear"
+    sp_elem_bear.species = species
+    sp_elem_bear.iucn_red_list_category = iucn_cat
+    sp_elem_bear.save()
+    
+    t = OccurrenceTaxon()
+    t.geom = 'POINT( -81.526814 41.366602 )'
+    t.species_element = sp_elem_bear
+    t.occurrence_cat = land_animal_cat
+    t.details = land_animal_details
+    t.observation = observation
+    t.save()
+    
+    
