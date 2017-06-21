@@ -15,7 +15,7 @@ from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.context_processors import request
-from featuretype import FeatureTypeSerializer
+from featuretype import FeatureTypeSerializer, FeatureInfoSerializer
 
 
 
@@ -108,6 +108,19 @@ def get_feature_type(request, occurrence_maincat, feature_id):
     subcat_code = feat.occurrence_cat.code
     serializer = FeatureTypeSerializer()
     ftdata = serializer.get_feature_type(main_cat, subcat_code)
+    return Response(ftdata)
+
+@api_view(['GET'])
+@permission_classes([])
+def get_feature_info(request, occurrence_maincat, feature_id):
+    if occurrence_maincat[0]=='n': # natural areas
+        feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
+    else:
+        feat = OccurrenceTaxon.objects.get(pk=feature_id)
+    #main_cat = feat.occurrence_cat.main_cat
+    #subcat_code = feat.occurrence_cat.code
+    serializer = FeatureInfoSerializer()
+    ftdata = serializer.get_feature_info(feat)
     return Response(ftdata)
 
 """
