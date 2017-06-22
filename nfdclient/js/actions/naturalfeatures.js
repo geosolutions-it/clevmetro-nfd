@@ -30,6 +30,7 @@ const NATURAL_FEATURE_POLYGON_ADDED = 'NATURAL_FEATURE_POLYGON_ADDED';
 
 const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
+// const axios = require('../../MapStore2/web/client/libs/ajax');
 
 function naturalFeaturesError(error) {
     return {
@@ -110,11 +111,24 @@ function naturalFeatureTypeError(error) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid) {
+/*function naturalFeatureSelected(properties, nfid) {
     return {
         type: NATURAL_FEATURE_SELECTED,
         properties,
         nfid
+    };
+}*/
+
+function naturalFeatureSelected(properties, nfid) {
+    return (dispatch) => {
+        return Api.getFeatureType(properties, nfid).then((resp) => {
+            if (typeof resp.data === 'object' && resp.data.forms && resp.data.forms[0]) {
+                const featureType = resp.data;
+                dispatch(naturalFeatureTypeLoaded(featureType, properties, "viewedit"));
+            }
+        }).catch((error) => {
+            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+        });
     };
 }
 

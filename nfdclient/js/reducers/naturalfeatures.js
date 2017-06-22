@@ -15,7 +15,7 @@ function naturalfeatures(state = {}, action) {
     switch (action.type) {
         case NATURAL_FEATURE_TYPE_LOADED: {
             return assign({}, state, {
-                naturalFeatureType: action.featureType,
+                naturalFeatureType: action.featureType.forms,
                 mode: action.mode
             });
         }
