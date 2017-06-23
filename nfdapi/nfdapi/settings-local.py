@@ -15,9 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-#APP_NAME = ""
-#APP_NAME = "/"
-APP_NAME = "nfdapi/"
+APP_NAME = ""
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -143,6 +141,5 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-# we need to run django-admin collectstatic whenever dependences are modified or updated
-STATIC_ROOT = '/var/www/clevmetronfd-static'
-STATIC_URL = '/nfdapi-static/'
+
+STATIC_URL = '/static/'
