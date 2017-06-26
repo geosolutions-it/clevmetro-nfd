@@ -10,6 +10,16 @@ const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 const assign = require('object-assign');
 const dataCache = {};
 
+const getLayerId = (properties) => {
+    let layerId = "";
+    if (properties.occurrence_cat[0] === 'plant') {
+        layerId = 'plants';
+    } else if (properties.occurrence_cat[0] === 'animal') {
+        layerId = 'animals';
+    }
+    return layerId;
+};
+
 const Api = {
     addBaseUrl: function(options) {
         return assign(options, {baseURL: ConfigUtils.getDefaults().geoStoreUrl});
@@ -40,6 +50,10 @@ const Api = {
     deleteNaturalFeature: function(id, feature) {
         let url = "users/user/" + id;
         return axios.put(url, {NaturalFeature: feature}, this.addBaseUrl()).then(function(response) {return response.data; });
+    },
+    getFeatureType: function(properties, nfid) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/featuretypes/' + getLayerId(properties) + '/' + nfid;
+        return axios.get(url).then(function(response) {return response.data; });
     }
 };
 

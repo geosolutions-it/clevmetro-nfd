@@ -10,7 +10,7 @@ const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 // const assign = require('object-assign');
 const {setControlProperty} = require('../../MapStore2/web/client/actions//controls');
-const axios = require('../../MapStore2/web/client/libs/ajax');
+// const axios = require('../../MapStore2/web/client/libs/ajax');
 
 const {
     GET_ANIMALS,
@@ -18,16 +18,16 @@ const {
     GET_NATURAL_AREAS,
     GET_MUSHROOMS,
     GET_SLIME_MOLDS,
-    NATURAL_FEATURE_SELECTED,
+    // NATURAL_FEATURE_SELECTED,
     NATURAL_FEATURE_LOADED,
     NATURAL_FEATURE_TYPE_LOADED,
-    CREATE_NATURAL_FEATURE,
+    // CREATE_NATURAL_FEATURE,
     NATURAL_FEATURE_CREATED,
     naturalFeaturesLoaded,
     naturalFeaturesLoading,
     naturalFeaturesError,
-    naturalFeatureTypeError,
-    naturalFeatureTypeLoaded,
+    // naturalFeatureTypeError,
+    // naturalFeatureTypeLoaded,
     naturalFeatureLoaded,
     updateNaturalFeatureForm,
     naturalFeatureCreated,
@@ -35,7 +35,7 @@ const {
 } = require('../actions/naturalfeatures');
 
 const {END_DRAWING} = require('../../MapStore2/web/client/actions/draw');
-
+/*
 const types = {
     // string
     // 'xsd:ENTITIES': 'string',
@@ -91,10 +91,10 @@ const types = {
     // 'xsd:hexBinary': 'string',
     // 'xsd:NOTATION': 'string',
     'xsd:float': 'number'
-};
+};*/
 
-const fieldConfig = {};
-const extractInfo = (data) => {
+// const fieldConfig = {};
+/*const extractInfo = (data) => {
     return [{
             name: 'Who is this?',
             icon: 'question-sign',
@@ -158,7 +158,7 @@ const extractInfo = (data) => {
                     return conf;
                 })
         }];
-};
+};*/
 
 const createEmptyFeature = (featureType) => {
     const emptyFeature = {};
@@ -170,7 +170,7 @@ const createEmptyFeature = (featureType) => {
     return emptyFeature;
 };
 
-const getLayerId = (properties) => {
+/*const getLayerId = (properties) => {
     let layerId = "";
     if (properties.occurrence_cat[0] === 'plant') {
         layerId = 'plants';
@@ -178,7 +178,7 @@ const getLayerId = (properties) => {
         layerId = 'animals';
     }
     return layerId;
-};
+};*/
 
 const getAnimalsEpic = (action$, store) =>
     action$.ofType(GET_ANIMALS)
@@ -271,10 +271,11 @@ const getSlimeMoldsEpic = (action$, store) =>
         .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
     );
 
-const getNaturalFeatureTypeEpic = (action$) =>
+/*const getNaturalFeatureTypeEpic = (action$) =>
     action$.ofType(NATURAL_FEATURE_SELECTED, CREATE_NATURAL_FEATURE)
-    .switchMap((action) => {
-        return Rx.Observable.defer( () => axios.get('http://localhost/nfdapi/featureTypes/' + getLayerId(action.properties) + '/' + action.nfid))
+    .switchMap(action =>
+        // return Rx.Observable.defer( () => axios.get('http://geosolutions.scolab.eu/nfdapi/featuretypes/' + getLayerId(action.properties) + '/' + action.nfid))
+        Rx.Observable.defer(() => Api.getData('http://geosolutions.scolab.eu/nfdapi/featuretypes/' + getLayerId(action.properties) + '/' + action.nfid))
             .map((response) => {
                 let mode;
                 if (action.type === NATURAL_FEATURE_SELECTED) {
@@ -282,8 +283,8 @@ const getNaturalFeatureTypeEpic = (action$) =>
                 } else if (action.type === CREATE_NATURAL_FEATURE) {
                     mode = "add";
                 }
-                if (typeof response.data === 'object' && response.data.featureTypes && response.data.featureTypes[0]) {
-                    const featureType = extractInfo(response.data);
+                if (typeof response.data === 'object' && response.data.forms && response.data.forms[0]) {
+                    const featureType = response.data;
                     return Rx.Observable.from([naturalFeatureTypeLoaded(featureType, action.properties, mode)]);
                 }
                 try {
@@ -294,8 +295,8 @@ const getNaturalFeatureTypeEpic = (action$) =>
                 return Rx.Observable.from([naturalFeatureTypeError('Error: naturalfeature types are empty')]);
             })
             .mergeAll()
-            .catch(e => Rx.Observable.of(naturalFeatureTypeError(e.message)));
-    });
+            .catch(e => Rx.Observable.of(naturalFeatureTypeError(e.message)))
+    );*/
 
 const naturalFeatureSelectedEpic = action$ =>
     action$.ofType(NATURAL_FEATURE_TYPE_LOADED)
@@ -370,7 +371,7 @@ module.exports = {
     getSlimeMoldsEpic,
     naturalFeatureSelectedEpic,
     naturalFeatureLoadedEpic,
-    getNaturalFeatureTypeEpic,
+    // getNaturalFeatureTypeEpic,
     naturalFeatureCreatedEpic,
     addNaturalFeatureGeometryEpic
 };
