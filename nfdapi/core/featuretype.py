@@ -57,6 +57,7 @@ class FeatureInfoSerializer():
         
         self.result['featuretype'] = main_cat
         self.result['versions'] = 1 #FIXME
+        self.result['formvalues'] = []
         self._add_form_values(occurrence_instance.species_element, 'species')
         self._add_form_values(occurrence_instance.observation, 'observation')
         self._add_form_values(occurrence_instance.voucher, 'voucher')
@@ -75,7 +76,6 @@ class FeatureInfoSerializer():
     def _add_form_values(self, form_instance, form_name):
         if (form_instance):
             fields = form_instance._meta.get_fields()
-            form_values = []
             for f in fields:
                 fdef = {}
                 fvalue = getattr(form_instance, f.name, None)
@@ -83,33 +83,24 @@ class FeatureInfoSerializer():
                     pass
                 elif getattr(f, 'primary_key', False):
                     pass
-                elif isinstance(f, CharField) or isinstance(f, TextField):
-                    fdef['key'] = f.name
-                    fdef['value'] = fvalue
-                elif isinstance(f, BooleanField):
-                    fdef['key'] = f.name
+                elif isinstance(f, CharField) or isinstance(f, TextField) or isinstance(f, BooleanField):
+                    fdef['key'] = form_name + "." + f.name
                     fdef['value'] = fvalue
                 elif isinstance(f, DateTimeField) or isinstance(f, DateField):
-                    fdef['key'] = f.name
+                    fdef['key'] = form_name + "." + f.name
                     fdef['value'] = fvalue
                 elif isinstance(f, GeometryField):
                     # skip geoms
                     pass
-                elif isinstance(f, FloatField) or isinstance(f, DecimalField):
-                    fdef['key'] = f.name
-                    fdef['value'] = fvalue
-                elif isinstance(f, IntegerField):
-                    fdef['key'] = f.name
+                elif isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
+                    fdef['key'] = form_name + "." + f.name
                     fdef['value'] = fvalue
                 elif isinstance(f, ForeignKey):
                     if issubclass(f.related_model, DictionaryTable):
-                        fdef['key'] = f.name
+                        fdef['key'] = form_name + "." + f.name
                         fdef['value'] = fvalue.code
                 if 'key' in fdef:
-                    form_values.append(fdef) 
-                    
-            self.result[form_name] = form_values
-        
+                    self.result['formvalues'].append(fdef)  
     
 
 class FeatureTypeSerializer():
@@ -123,12 +114,12 @@ class FeatureTypeSerializer():
             form = {}
             form['formlabel'] = formdef['formlabel']
             form['formname'] = formdef['formname']
-            form['formitems'] = self.get_form_featuretype(formdef['model'])
+            form['formitems'] = self.get_form_featuretype(formdef['formname'], formdef['model'])
             forms.append(form)
         return result
     
 
-    def get_form_featuretype(self, model):
+    def get_form_featuretype(self, form_name, model):
         fields = model._meta.get_fields()
         result = []
         for f in fields:
@@ -142,6 +133,8 @@ class FeatureTypeSerializer():
                 fdef['type'] = 'boolean'
             elif isinstance(f, DateTimeField):
                 fdef['type'] = 'datetime'
+            elif isinstance(f, DateField):
+                fdef['type'] = 'date'
             elif isinstance(f, GeometryField):
                 # skip geoms
                 pass
@@ -163,7 +156,7 @@ class FeatureTypeSerializer():
                     fdef['type'] = 'fk'
                 
             if 'type' in fdef:        
-                fdef['key'] = f.name
+                fdef['key'] = form_name + "." + f.name
                 fdef['label'] = _(f.name) 
                 result.append(fdef)
         return result
