@@ -16,8 +16,54 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.template.context_processors import request
 from featuretype import FeatureTypeSerializer, FeatureInfoSerializer
+from featuretype import LandAnimalSerializer
+
+import reversion
+from reversion.models import Version
+
+@api_view(['GET'])
+@permission_classes([])
+def test_url(request):
+    occurrences = OccurrenceTaxon.objects.all()
+    if len(occurrences) > 0:
+        la = occurrences[len(occurrences)-1]
+        serializer = LandAnimalSerializer(la)
+        return Response(serializer.data)
+    else:
+        return Response({"error": "no OccurrenceTaxon available"})    
+
+@api_view(['GET'])
+@permission_classes([])
+def test_url2(request):
+    occurrences = OccurrenceTaxon.objects.all()
+    if len(occurrences) > 0:
+        la = occurrences[len(occurrences)-1]
+        serializer = LandAnimalSerializer(la)
+        
+        serializer2 = LandAnimalSerializer(la, data=serializer.data)
+        serializer2.is_valid()
+        serializer2.save()
+        
+        serializer = LandAnimalSerializer(la)
+        return Response(serializer.data)
+        #return Response(serializer2.validated_data)
+    else:
+        return Response({"error": "no OccurrenceTaxon available"})   
 
 
+@api_view(['GET'])
+@permission_classes([])
+def test_url3(request):
+    occurrences = OccurrenceTaxon.objects.all()
+    if len(occurrences) > 0:
+        la = occurrences[len(occurrences)-1]
+        versions = Version.objects.get_for_object(la)
+        if len(versions)>1:
+            la_old = versions[1]
+            serializer = LandAnimalSerializer(la_old.field_dict)
+            return Response(serializer.data)
+    
+    return Response({"error": "no old versions available"})    
 
 # Create your views here.
 def current_datetime(request):

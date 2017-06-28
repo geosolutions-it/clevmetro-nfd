@@ -6,14 +6,6 @@ import reversion
 from django.contrib.gis.db.models.fields import PointField
 from  django.utils import timezone
 
-class Versioned(models.Model):
-    identity = models.BigIntegerField()
-    version_birth_date = models.DateTimeField()
-    version_start_date = models.DateTimeField()
-    version_end_date = models.DateTimeField(blank=True, null=True)
-    
-    class Meta:
-        abstract = True
 
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
@@ -36,7 +28,8 @@ class OccurrenceCategory(DictionaryTable):
     
     def natural_key(self):
         return (self.main_cat, self.code, self.name)
-    
+
+@reversion.register()    
 class PointOfContact(models.Model):
     name = models.TextField(blank=True)
     affiliation = models.TextField(blank=True)
@@ -58,6 +51,7 @@ class RecordOrigin(DictionaryTable):
 class RecordingStation(DictionaryTable):
     pass
 
+@reversion.register()
 class OccurrenceObservation(models.Model):
     observation_date = models.DateField(blank=True)
     recording_datetime = models.DateField(blank=True)
@@ -71,6 +65,7 @@ class OccurrenceObservation(models.Model):
 
 class Occurrence(models.Model):
     geom = PointField()
+    version = models.IntegerField(default=1)
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
@@ -80,20 +75,20 @@ class Occurrence(models.Model):
         abstract = True
 
      
-class CmStatus(models.Model):
-    status = models.TextField()
+class CmStatus(DictionaryTableExtended):
+    pass
 
     
 class SRank(models.Model):
-    srank = models.TextField()
+    pass
 
 
-class NRank(models.Model):
-    nrank = models.TextField()
+class NRank(DictionaryTable):
+    pass
 
 
-class GRank(models.Model):
-    grank = models.TextField()
+class GRank(DictionaryTable):
+    pass
 
 class Element(models.Model):
     cm_status = models.ForeignKey(CmStatus, on_delete=models.SET_NULL, blank=True, null=True)
@@ -118,46 +113,36 @@ class ElementType(DictionaryTable):
     pass
 
 
-class Tsn(models.Model):
-    tsn = models.IntegerField(blank=True)
-    name_sci = models.TextField()
-    common_name = models.TextField()
-    second_common = models.TextField(blank=True)
-    third_common = models.TextField(blank=True)
-    class Meta:
-        abstract = True
-        
-class Phylum(Tsn):
-    pass
-
-        
-class Family(Tsn):
-    phylum = models.ForeignKey(Phylum, on_delete=models.SET_NULL, blank=True, null=True)
-
 class MushroomGroup(DictionaryTable):
     pass
 
-class ElementSpecies(models.Model):
-    tsn = models.IntegerField(blank=True)
-    name_sci = models.TextField()
-    synonym = models.TextField(blank=True)
-    first_common = models.TextField()
-    second_common = models.TextField(blank=True)
-    third_common = models.TextField(blank=True)
+class ElementSpecies(Element):
     native = models.BooleanField(default=True)
     oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
     usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
     iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
     other_code = models.TextField(blank=True)
     #species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
-    family = models.ForeignKey(Family, on_delete=models.SET_NULL, blank=True, null=True)
     ibp_english = models.CharField(max_length=4, blank=True)
     ibp_scientific = models.CharField(max_length=6, blank=True)
     bblab_number = models.CharField(max_length=6, blank=True)
     nrcs_usda_symbol = models.TextField(blank=True)
     synonym_nrcs_usda_symbol = models.TextField(blank=True)
     epa_numeric_code = models.TextField(blank=True)
-    mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True) 
+    mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
+
+class Species(models.Model):
+    first_common = models.TextField()
+    name_sci = models.TextField()
+    tsn = models.IntegerField(blank=True)
+    synonym = models.TextField(blank=True)
+    second_common = models.TextField(blank=True)
+    third_common = models.TextField(blank=True)
+    family = models.TextField(blank=True)
+    family_common = models.TextField(blank=True)
+    phylum = models.TextField(blank=True)
+    phylum_common = models.TextField(blank=True)
+    element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
     
 class ElementNaturalAreas(Element):
     natural_area_code_nac = models.TextField()
@@ -175,7 +160,7 @@ class Repository(DictionaryTable):
     #FIXME: repository needs extra attributes (and maybe has to be managed as a non-dictionary table)
     pass
 
-@reversion.register()    
+@reversion.register()
 class Voucher(models.Model):
     voucher_number = models.PositiveIntegerField()
     specimen_collected = models.BooleanField(default=False)
@@ -201,10 +186,10 @@ class TaxonDetails(models.Model):
 @reversion.register()
 class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
-    species_element = models.ForeignKey(ElementSpecies, on_delete=models.SET_NULL, blank=True, null=True)
+    species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.ForeignKey(TaxonDetails, on_delete=models.CASCADE, blank=True, null=True)
     
-    def _get_details_class(self):
+    def get_details_class(self):
         if self.occurrence_cat:
             if self.occurrence_cat.code=='co':
                 return PlantDetails #FIXME
@@ -237,7 +222,7 @@ class OccurrenceTaxon(Occurrence):
         """
         try:
             if self.details:
-                return self._get_details_class().objects.get(pk=self.details.id)
+                return self.get_details_class().objects.get(pk=self.details.id)
         except:
             pass
 
@@ -264,6 +249,7 @@ class AquaticSampler(DictionaryTable):
 class TerrestrialStratum(DictionaryTable):
     pass
 
+@reversion.register()
 class AnimalLifestages(models.Model):
     egg = models.IntegerField()
     egg_mass = models.IntegerField()
@@ -295,11 +281,13 @@ class AnimalDetails(TaxonDetails):
     class Meta:
         abstract = True
 
+@reversion.register()
 class AquaticAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(AquaticSampler, on_delete=models.SET_NULL, blank=True, null=True)
     class Meta:
         abstract = True
 
+@reversion.register()
 class LandAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(TerrestrialSampler, on_delete=models.SET_NULL, blank=True, null=True)
     stratum = models.ForeignKey(TerrestrialStratum, on_delete=models.SET_NULL, blank=True, null=True)
@@ -324,7 +312,8 @@ class LenticSize(models.Model):
 
     class Meta:
         abstract = True
-        
+
+@reversion.register()
 class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
     pond_lake_name = models.TextField()
     pond_lake_type = models.ForeignKey(PondLakeType, on_delete=models.SET_NULL, blank=True, null=True)
@@ -346,6 +335,7 @@ class HmfeiLocalAbundance(DictionaryTable):
 class LoticHabitatType(DictionaryTable):
     pass
 
+@reversion.register()
 class StreamSubstracte(models.Model):
     artificial = models.FloatField()
     bedrock = models.FloatField()
@@ -363,6 +353,7 @@ class StreamSubstracte(models.Model):
 class WaterFlowType(DictionaryTable):
     pass
 
+@reversion.register()
 class StreamAnimalDetails(AquaticAnimalDetails):
     stream_name_1 = models.TextField()
     stream_name_2 = models.TextField()
@@ -380,6 +371,7 @@ class WetlandType(DictionaryTable):
 class WetlandLocation(DictionaryTable):
     pass
 
+@reversion.register()
 class WetlandVetegationStructure(models.Model):
     buttonbush = models.FloatField()
     cattail = models.FloatField()
@@ -396,7 +388,8 @@ class WaterSource(DictionaryTable):
 
 class WetlandHabitatFeature(DictionaryTable):
     pass
-    
+
+@reversion.register()  
 class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     wetland_name = models.TextField()
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
@@ -416,6 +409,7 @@ class SlimeMoldClass(DictionaryTable):
 class SlimeMoldMedia(DictionaryTable):
     pass
 
+@reversion.register()
 class SlimeMoldDetails(TaxonDetails):
     lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_class = models.ForeignKey(SlimeMoldClass, on_delete=models.SET_NULL, blank=True, null=True)
