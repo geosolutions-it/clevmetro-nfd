@@ -18,7 +18,6 @@ from django.contrib import admin
 
 from rest_framework.authtoken import views
 from core import views as coreviews
-from djgeojson.views import GeoJSONLayerView
 from core.models import OccurrenceTaxon, OccurrenceNaturalArea
 
 from settings import APP_NAME
@@ -32,9 +31,6 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'test2/', coreviews.test_url2),
     url(r'^'+APP_NAME+r'test3/', coreviews.test_url3),
     
-    url(r'^'+APP_NAME+r'layers/taxon/$', GeoJSONLayerView.as_view(model=OccurrenceTaxon), name='taxon'),
-    
-    #url(r'^'+APP_NAME+r'layers/plants/$', coreviews.PlantLayerView.as_view(model=OccurrenceTaxon), name='plantList'),
     url(r'^'+APP_NAME+r'layers/plants/$', coreviews.TaxonLayerList.as_view(), name='plantList'),
     url(r'^'+APP_NAME+r'layers/animals/$', coreviews.TaxonLayerList.as_view(), name='animalList'),
     url(r'^'+APP_NAME+r'layers/slimemolds/$', coreviews.TaxonLayerList.as_view(), name='slimemoldList'),

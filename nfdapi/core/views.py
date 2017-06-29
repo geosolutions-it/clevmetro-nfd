@@ -7,7 +7,6 @@ import datetime
 from rest_framework.serializers import Serializer
 from rest_framework import serializers
 from core.models import OccurrenceTaxon, Occurrence, OccurrenceNaturalArea
-from djgeojson.views import GeoJSONLayerView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -73,38 +72,6 @@ def current_datetime(request):
     html = "<html><body>It is now %s.</body></html>" % now
     return HttpResponse(html)
 
-"""
-def ElementSpeciesSerializer(serializers.Serializer):
-    #species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
-    native = serializers.BooleanField()
-    #oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    #usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    #iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
-    other_code = serializers.TextField()
-    #species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
-"""
-    
-"""
-def LayerTaxonFeatInfoSerializer(serializers.Serializer):
-    element = ElementSpeciesSerializer(required=False)
-"""
-"""
-def LayerTaxonSerializer(serializers.Serializer):
-    inclusion_date = serializers.DateTimeField()
-    released = serializers.BooleanField()
-    #geom = serializers.GeometryField() # we need to import geojson serializer
-"""
-
-class LayerList2(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
-    
-    def post(self, request, format=None):
-        serializer = CreateOccurrenceSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #class TaxonLayerList(ListCreateAPIView):
 class TaxonLayerList(APIView):
