@@ -20,6 +20,7 @@ import reversion
 from reversion.models import Version
 from rest_framework.fields import empty
 from rest_framework_gis import serializers as gisserializer
+from django.db.models.fields import NOT_PROVIDED
 
 def _(message): return message
 
@@ -247,6 +248,8 @@ def get_serializer_fields(form_name, model):
         
         kwargs = {}
         kwargs['required'] = False # set all form fields as not required, as related fields may be missing
+        if getattr(f, 'default', NOT_PROVIDED) != NOT_PROVIDED:
+            kwargs['default'] = getattr(f, 'default')
         
         if getattr(f, 'primary_key', False):
             pass
