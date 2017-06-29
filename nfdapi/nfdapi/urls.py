@@ -31,18 +31,21 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'test/', coreviews.test_url),
     url(r'^'+APP_NAME+r'test2/', coreviews.test_url2),
     url(r'^'+APP_NAME+r'test3/', coreviews.test_url3),
+    
     url(r'^'+APP_NAME+r'layers/taxon/$', GeoJSONLayerView.as_view(model=OccurrenceTaxon), name='taxon'),
-    url(r'^'+APP_NAME+r'layers/plants/$', coreviews.PlantLayerView.as_view(model=OccurrenceTaxon), name='plantList'),
-    url(r'^'+APP_NAME+r'layers/plants/([0-9]+)/$', coreviews.get_feature_info),
-    url(r'^'+APP_NAME+r'layers/animals/$', coreviews.AnimalLayerView.as_view(model=OccurrenceTaxon), name='animalList'),
-    url(r'^'+APP_NAME+r'layers/(animals)/([0-9]+)/$', coreviews.get_feature_info),
-    url(r'^'+APP_NAME+r'layers/slimemolds/$', coreviews.SlimeMoldLayerView.as_view(model=OccurrenceTaxon), name='slimemoldList'),
-    url(r'^'+APP_NAME+r'layers/(slimemolds)/([0-9]+)/$', coreviews.get_feature_info),
-    url(r'^'+APP_NAME+r'layers/animals/$', coreviews.AnimalLayerView.as_view(model=OccurrenceTaxon), name='animalList'),
-    url(r'^'+APP_NAME+r'layers/(animals)/([0-9]+)/$', coreviews.get_feature_info),
-    url(r'^'+APP_NAME+r'layers/fungi/$', coreviews.FungusLayerView.as_view(model=OccurrenceTaxon), name='fungiList'),
-    url(r'^'+APP_NAME+r'layers/(fungi)/([0-9]+)/$', coreviews.get_feature_info),
-    url(r'^'+APP_NAME+r'layers/naturalareas/$', coreviews.NaturalAreaLayerView.as_view(model=OccurrenceNaturalArea), name='naturalareaList'),
-    url(r'^'+APP_NAME+r'layers/(naturalareas)/([0-9]+)/$', coreviews.get_feature_info),
+    
+    #url(r'^'+APP_NAME+r'layers/plants/$', coreviews.PlantLayerView.as_view(model=OccurrenceTaxon), name='plantList'),
+    url(r'^'+APP_NAME+r'layers/plants/$', coreviews.TaxonLayerList.as_view(), name='plantList'),
+    url(r'^'+APP_NAME+r'layers/animals/$', coreviews.TaxonLayerList.as_view(), name='animalList'),
+    url(r'^'+APP_NAME+r'layers/slimemolds/$', coreviews.TaxonLayerList.as_view(), name='slimemoldList'),
+    url(r'^'+APP_NAME+r'layers/fungi/$', coreviews.TaxonLayerList.as_view(), name='fungiList'),
+    #url(r'^'+APP_NAME+r'layers/naturalareas/$', coreviews.NaturalAreaLayerView.as_view(model=OccurrenceNaturalArea), name='naturalareaList'),
+    
+    url(r'^'+APP_NAME+r'layers/(plants|animals|slimemolds|fungui|naturalareas)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
+    #url(r'^'+APP_NAME+r'layers/(animals)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
+    #url(r'^'+APP_NAME+r'layers/(slimemolds)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
+    #url(r'^'+APP_NAME+r'layers/(fungi)/([0-9]+)/$', coreviews.get_feature_info),
+    #url(r'^'+APP_NAME+r'layers/(naturalareas)/([0-9]+)/$', coreviews.get_feature_info),
+    
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/([0-9]+)/$', coreviews.get_feature_type),
 ] 

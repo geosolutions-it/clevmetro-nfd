@@ -188,7 +188,7 @@ class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.ForeignKey(TaxonDetails, on_delete=models.CASCADE, blank=True, null=True)
-    
+            
     def get_details_class(self):
         if self.occurrence_cat:
             if self.occurrence_cat.code=='co':
@@ -200,7 +200,7 @@ class OccurrenceTaxon(Occurrence):
             elif self.occurrence_cat.code=='pl':
                 return PlantDetails
             elif self.occurrence_cat.code=='mo':
-                return SlimeMoldDetails
+                return PlantDetails # FIXME Moss
             elif self.occurrence_cat.code=='fu':
                 return TaxonDetails #FIXME
             elif self.occurrence_cat.code=='sl':

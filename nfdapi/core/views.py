@@ -15,11 +15,13 @@ from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.context_processors import request
-from featuretype import FeatureTypeSerializer, FeatureInfoSerializer
-from featuretype import LandAnimalSerializer
+from featuretype import FeatureTypeSerializer, FeatureInfoSerializer, CreateOccurrenceSerializer, LayerTaxonSerializer
+from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
 from reversion.models import Version
+from core.featuretype import TaxonDetailsSerializer
+from rest_framework.generics import ListCreateAPIView
 
 @api_view(['GET'])
 @permission_classes([])
@@ -27,7 +29,7 @@ def test_url(request):
     occurrences = OccurrenceTaxon.objects.all()
     if len(occurrences) > 0:
         la = occurrences[len(occurrences)-1]
-        serializer = LandAnimalSerializer(la)
+        serializer = TaxonDetailsSerializer(la)
         return Response(serializer.data)
     else:
         return Response({"error": "no OccurrenceTaxon available"})    
@@ -38,13 +40,13 @@ def test_url2(request):
     occurrences = OccurrenceTaxon.objects.all()
     if len(occurrences) > 0:
         la = occurrences[len(occurrences)-1]
-        serializer = LandAnimalSerializer(la)
+        serializer = TaxonDetailsSerializer(la)
         
-        serializer2 = LandAnimalSerializer(la, data=serializer.data)
+        serializer2 = TaxonDetailsSerializer(la, data=serializer.data)
         serializer2.is_valid()
         serializer2.save()
         
-        serializer = LandAnimalSerializer(la)
+        serializer = TaxonDetailsSerializer(la)
         return Response(serializer.data)
         #return Response(serializer2.validated_data)
     else:
@@ -60,7 +62,7 @@ def test_url3(request):
         versions = Version.objects.get_for_object(la)
         if len(versions)>1:
             la_old = versions[1]
-            serializer = LandAnimalSerializer(la_old.field_dict)
+            serializer = TaxonDetailsSerializer(la_old.field_dict)
             return Response(serializer.data)
     
     return Response({"error": "no old versions available"})    
@@ -93,6 +95,85 @@ def LayerTaxonSerializer(serializers.Serializer):
     #geom = serializers.GeometryField() # we need to import geojson serializer
 """
 
+class LayerList2(GeoJSONLayerView):
+    properties = ['occurrence_cat']
+    use_natural_keys = True
+    
+    def post(self, request, format=None):
+        serializer = CreateOccurrenceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#class TaxonLayerList(ListCreateAPIView):
+class TaxonLayerList(APIView):
+    permission_classes = [] #FIXME when authentication is implemented
+    def get(self, request, format=None):
+        queryset = OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='animal')
+        serializer = LayerTaxonSerializer(queryset, many=True)
+        return Response(serializer.data)
+    def post(self, request, format=None):
+        serializer = CreateOccurrenceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class NaturalAreaLayerList(APIView):
+    permission_classes = [] #FIXME when authentication is implemented
+    def get(self, request, format=None):
+        queryset = OccurrenceNaturalArea.objects.all()
+        serializer = LayerTaxonSerializer(queryset, many=True)
+        return Response(serializer.data)
+    def post(self, request, format=None):
+        serializer = CreateOccurrenceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LayerDetail(APIView):
+    permission_classes = [] #FIXME when authentication is implemented
+    """
+    Retrieve, update or delete a snippet instance.
+    """
+    def get_object(self, occurrence_maincat, pk):
+        try:
+            if occurrence_maincat[0]=='n': # natural areas
+                return OccurrenceNaturalArea.objects.get(pk=pk)
+            else:
+                return OccurrenceTaxon.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            raise Http404
+
+    def get(self, request, occurrence_maincat, pk, format=None):
+        feature = self.get_object(occurrence_maincat, pk)
+        if isinstance(feature, OccurrenceNaturalArea):
+            return Response({"error": "not supported yet"})
+        else:
+            serializer = TaxonDetailsSerializer(feature)
+        return Response(serializer.data)
+
+    def put(self, request, occurrence_maincat, pk, format=None):
+        feature = self.get_object(occurrence_maincat, pk)
+        if isinstance(feature, OccurrenceNaturalArea):
+            return Response({"error": "not supported yet"})
+        else:
+            serializer = TaxonDetailsSerializer(feature, data=request.data)         
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, occurrence_maincat, pk, format=None):
+        feature = self.get_object(occurrence_maincat, pk)
+        with reversion.create_revision():
+            feature.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 class DictionarySerializer(Serializer):
     code = serializers.CharField()
     name = serializers.CharField()
@@ -100,48 +181,47 @@ class DictionarySerializer(Serializer):
     def __init__(self, instance=None, data=None, **kwargs):
         super(DictionarySerializer, self).__init__(**kwargs)
 
-
+"""
 class LayerTaxonSerializer(Serializer):
     occurrence_cat = DictionarySerializer(required=False)
     
     def __init__(self, instance=None, data=None, **kwargs):
         super(LayerTaxonSerializer, self).__init__(**kwargs)
+"""
 
-class PlantLayerView(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
+"""
+@api_view(['GET', 'POST', 'HEAD'])
+@permission_classes([])
+class PlantLayerView(LayerList):
+    model = OccurrenceTaxon
     
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='plant')
 
-class AnimalLayerView(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
-    
+@api_view(['GET', 'POST', 'HEAD'])
+@permission_classes([])
+class AnimalLayerView(LayerList):
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='animal')
 
-class SlimeMoldLayerView(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
-    
+@api_view(['GET', 'POST', 'HEAD'])
+@permission_classes([])
+class SlimeMoldLayerView(LayerList):
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='slime mold')
-                                              
-class FungusLayerView(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
-    
+
+@api_view(['GET', 'POST', 'HEAD'])
+@permission_classes([])
+class FungusLayerView(LayerList):
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='fungus')
 
-class NaturalAreaLayerView(GeoJSONLayerView):
-    properties = ['occurrence_cat']
-    use_natural_keys = True
-    
+@api_view(['GET', 'POST', 'HEAD'])
+@permission_classes([])
+class NaturalAreaLayerView(LayerList):
     def get_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='natural area')
-
+"""
 
 @api_view(['GET'])
 @permission_classes([])
@@ -150,10 +230,8 @@ def get_feature_type(request, occurrence_maincat, feature_id):
         feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
     else:
         feat = OccurrenceTaxon.objects.get(pk=feature_id)
-    main_cat = feat.occurrence_cat.main_cat
-    subcat_code = feat.occurrence_cat.code
-    serializer = FeatureTypeSerializer()
-    ftdata = serializer.get_feature_type(main_cat, subcat_code)
+    serializer = FeatureTypeSerializer(feat)
+    ftdata = serializer.get_feature_type()
     return Response(ftdata)
 
 @api_view(['GET'])
@@ -300,70 +378,4 @@ layers = plants + slime_mold + fungus + animals + natural_area
  element_slime_mold
  element_taxon
 
-"""
-
-
-"""
-@csrf_exempt
-def snippet_list(request):
-    #List all code snippets, or create a new snippet.
-    
-    if request.method == 'GET':
-        snippets = Snippet.objects.all()
-        serializer = SnippetSerializer(snippets, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = SnippetSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    
-class SnippetSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(required=False, allow_blank=True, max_length=100)
-    code = serializers.CharField(style={'base_template': 'textarea.html'})
-    linenos = serializers.BooleanField(required=False)
-    language = serializers.ChoiceField(choices=LANGUAGE_CHOICES, default='python')
-    style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
-
-    def create(self, validated_data):
-        #Create and return a new `Snippet` instance, given the validated data.
-        return Snippet.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        #Update and return an existing `Snippet` instance, given the validated data.
-        instance.title = validated_data.get('title', instance.title)
-        instance.code = validated_data.get('code', instance.code)
-        instance.linenos = validated_data.get('linenos', instance.linenos)
-        instance.language = validated_data.get('language', instance.language)
-        instance.style = validated_data.get('style', instance.style)
-        instance.save()
-        return instance
-
-@csrf_exempt
-def snippet_detail(request, pk):
-    #Retrieve, update or delete a code snippet.
-    try:
-        snippet = Snippet.objects.get(pk=pk)
-    except Snippet.DoesNotExist:
-        return HttpResponse(status=404)
-
-    if request.method == 'GET':
-        serializer = SnippetSerializer(snippet)
-        return JsonResponse(serializer.data)
-
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = SnippetSerializer(snippet, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
-
-    elif request.method == 'DELETE':
-        snippet.delete()
-        return HttpResponse(status=204)
 """

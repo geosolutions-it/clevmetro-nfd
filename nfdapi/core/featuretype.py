@@ -6,7 +6,9 @@ from django.db.models.fields.related import ForeignKey
 from django.contrib.gis.db.models.fields import GeometryField
 
 from core.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetails,\
-    StreamAnimalDetails, LandAnimalDetails, ElementSpecies, Species
+    StreamAnimalDetails, LandAnimalDetails, ElementSpecies, Species,\
+    PondLakeAnimalDetails, WetlandAnimalDetails, SlimeMoldDetails,\
+    OccurrenceNaturalArea, OccurrenceCategory
 from core.models import AnimalLifestages, OccurrenceObservation, PointOfContact
 from rest_framework.serializers import Serializer, ModelSerializer
 from django.db import models as db_models
@@ -17,13 +19,45 @@ from rest_framework.serializers import Field
 import reversion
 from reversion.models import Version
 from rest_framework.fields import empty
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 def _(message): return message
+
+def get_form_dict(forms):
+    # FIXME: move any form pre-processing out of the instance
+    form_dict = {}
+    for form in forms:
+        form_dict[form[0]] = form
+    return form_dict
+
+MANAGEMENT_FORM_NAME = _('occurrencemanagement')
+MANAGEMENT_FORM_ITEMS = [{
+        "key": "id",
+        "label": _("id"),
+        "type": "integer"
+    },{
+        "key": "featuretype",
+        "label": _("featuretype"),
+        "type": "string",
+    },{
+        "key": "featuresubtype",
+        "label": _("featuresubtype"),
+        "type": "string",
+    },{
+        "key": "version",
+        "label": _("version"),
+        "type": "integer",
+    },{
+        "key": "total_versions",
+        "label": _("total_versions"),
+        "type": "integer",
+    }]
+    
 
 LAND_ANIMAL_TYPE = [
     (_('species'), Species, ['species.element_species']),
     (_('species.element_species'), ElementSpecies, []),
-    #(_('occurrencemanagement'), OccurrenceTaxon, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
     (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
     (_('observation.reporter'), PointOfContact, []),
     (_('observation.verifier'), PointOfContact, []),
@@ -31,9 +65,66 @@ LAND_ANIMAL_TYPE = [
     (_('voucher'), Voucher, []),
     (_('landanimaldetails'), LandAnimalDetails, [])
     ]
+LAND_ANIMAL_TYPE_DICT = get_form_dict(LAND_ANIMAL_TYPE)
+
+STREAM_ANIMAL_TYPE = [
+    (_('species'), Species, ['species.element_species']),
+    (_('species.element_species'), ElementSpecies, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('voucher'), Voucher, []),
+    (_('streamanimaldetails'), StreamAnimalDetails, [])
+    ]
+
+STREAM_ANIMAL_TYPE_DICT = get_form_dict(STREAM_ANIMAL_TYPE)
+
+PONDLAKE_ANIMAL_TYPE = [
+    (_('species'), Species, ['species.element_species']),
+    (_('species.element_species'), ElementSpecies, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('voucher'), Voucher, []),
+    (_('pondlakeanimaldetails'), PondLakeAnimalDetails, [])
+    ]
+PONDLAKE_ANIMAL_TYPE_DICT = get_form_dict(PONDLAKE_ANIMAL_TYPE)
+
+
+WETLAND_ANIMAL_TYPE = [
+    (_('species'), Species, ['species.element_species']),
+    (_('species.element_species'), ElementSpecies, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('voucher'), Voucher, []),
+    (_('wetlandanimaldetails'), WetlandAnimalDetails, [])
+    ]
+WETLAND_ANIMAL_TYPE_DICT = get_form_dict(WETLAND_ANIMAL_TYPE)
+
+SLIMEMOLD_TYPE = [
+    (_('species'), Species, ['species.element_species']),
+    (_('species.element_species'), ElementSpecies, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('voucher'), Voucher, []),
+    (_('slimemolddetails'), SlimeMoldDetails, [])
+    ]
+SLIMEMOLD_TYPE_DICT = get_form_dict(SLIMEMOLD_TYPE)
+
 
 del _
 from django.utils.translation import ugettext_lazy as _
+
 
 featuretype_form_fragments = {
     "observation": [
@@ -128,7 +219,7 @@ class FeatureInfoSerializer():
                     self.result['formvalues'].append(fdef)  
     
 
-class FeatureTypeSerializer():
+class FeatureTypeSerializerOld():
     def get_feature_type(self, name, subcat_code):
         occurrence_def = occurrence_defs[subcat_code]
         result = {}
@@ -181,6 +272,99 @@ class FeatureTypeSerializer():
                     fdef['type'] = 'fk'
                 
             if 'type' in fdef:        
+                fdef['key'] = form_name + "." + f.name
+                fdef['label'] = _(f.name) 
+                result.append(fdef)
+        return result
+
+
+class FeatureTypeSerializer():
+    def __init__(self, instance):
+        self.instance = instance
+        if instance.occurrence_cat:
+            if instance.occurrence_cat.code=='co':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='fe':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='fl':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='pl':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='mo':
+                return None # FIXME moss
+            elif instance.occurrence_cat.code=='fu':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='sl':
+                self.forms = SLIMEMOLD_TYPE
+                self._form_dict = SLIMEMOLD_TYPE_DICT
+            elif instance.occurrence_cat.code=='ln':
+                self.forms = LAND_ANIMAL_TYPE
+                self._form_dict = LAND_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='lk':
+                self.forms = PONDLAKE_ANIMAL_TYPE
+                self._form_dict = PONDLAKE_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='st':
+                self.forms = STREAM_ANIMAL_TYPE
+                self._form_dict = STREAM_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='we':
+                self.forms = WETLAND_ANIMAL_TYPE
+                self._form_dict = WETLAND_ANIMAL_TYPE_DICT
+    
+    def get_feature_type(self):
+        result = {}
+        result['featuretype'] = self.instance.occurrence_cat.main_cat
+        result['featuresubtype'] = self.instance.occurrence_cat.code
+        forms = []
+        for formdef in self.forms:
+            form = {}
+            form_name = formdef[0]
+            form['formlabel'] = _(form_name)
+            form['formname'] = form_name
+            if form_name != MANAGEMENT_FORM_NAME:
+                form['formitems'] = self.get_form_featuretype(form_name, formdef[1])
+            else:
+                form['formitems'] = MANAGEMENT_FORM_ITEMS
+            forms.append(form)
+        result['forms'] = forms
+        return result
+
+    def get_form_featuretype(self, form_name, model):
+        fields = model._meta.get_fields()
+        result = []
+        for f in fields:
+            fdef = {}
+            
+            if getattr(f, 'primary_key', False):
+                fdef['type'] = 'pk'
+            elif isinstance(f, CharField) or isinstance(f, TextField):
+                fdef['type'] = 'string'
+            elif isinstance(f, BooleanField):
+                fdef['type'] = 'boolean'
+            elif isinstance(f, DateTimeField):
+                fdef['type'] = 'datetime'
+            elif isinstance(f, DateField):
+                fdef['type'] = 'date'
+            elif isinstance(f, GeometryField):
+                # skip geoms
+                pass
+            elif isinstance(f, FloatField) or isinstance(f, DecimalField):
+                fdef['type'] = 'double'
+            elif isinstance(f, IntegerField):
+                fdef['type'] = 'integer'
+            elif isinstance(f, ForeignKey):
+                if issubclass(f.related_model, DictionaryTable):
+                    fdef['type'] = 'stringcombo'
+                    items = []
+                    for item in f.related_model.objects.all():
+                        idef = {}
+                        idef['key'] = item.code
+                        idef['value'] = item.name
+                        items.append(idef)
+                    fdef['values'] = {'items': items}
+                else:
+                    fdef['type'] = 'fk'
+                
+            if 'type' in fdef:
                 fdef['key'] = form_name + "." + f.name
                 fdef['label'] = _(f.name) 
                 result.append(fdef)
@@ -259,7 +443,38 @@ def get_serializer_fields(form_name, model):
     return result
 
 
-class MetroparksSerializer(Serializer):
+class TaxonDetailsSerializer(Serializer):
+    
+    def __init__(self, instance=None, data=empty, **kwargs):
+        if instance.occurrence_cat:
+            if instance.occurrence_cat.code=='co':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='fe':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='fl':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='pl':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='mo':
+                return None # FIXME moss
+            elif instance.occurrence_cat.code=='fu':
+                return None #FIXME
+            elif instance.occurrence_cat.code=='sl':
+                self.forms = SLIMEMOLD_TYPE
+                self._form_dict = SLIMEMOLD_TYPE_DICT
+            elif instance.occurrence_cat.code=='ln':
+                self.forms = LAND_ANIMAL_TYPE
+                self._form_dict = LAND_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='lk':
+                self.forms = PONDLAKE_ANIMAL_TYPE
+                self._form_dict = PONDLAKE_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='st':
+                self.forms = STREAM_ANIMAL_TYPE
+                self._form_dict = STREAM_ANIMAL_TYPE_DICT
+            elif instance.occurrence_cat.code=='we':
+                self.forms = WETLAND_ANIMAL_TYPE
+                self._form_dict = WETLAND_ANIMAL_TYPE_DICT
+        super(TaxonDetailsSerializer, self).__init__(instance, data, **kwargs)
     
     def get_fields(self):
         """
@@ -271,16 +486,17 @@ class MetroparksSerializer(Serializer):
         fields['inclusion_date'] = rest_fields.DateTimeField()
         fields['occurrence_cat'] = DictionaryField()
         fields['version'] = rest_fields.IntegerField(read_only=True)
-        fields['versions'] = TotalVersionsField()
+        fields['total_versions'] = TotalVersionsField()
         
         
         forms = self.get_forms()
         for form in forms:
             form_name = form[0]
-            model_class = form[1]
-            serializer_fields = get_serializer_fields(form_name, model_class)
-            for field_name, serializer_field_class in serializer_fields.items():
-                fields[field_name] = serializer_field_class
+            if form_name != MANAGEMENT_FORM_NAME:
+                model_class = form[1]
+                serializer_fields = get_serializer_fields(form_name, model_class)
+                for field_name, serializer_field_class in serializer_fields.items():
+                    fields[field_name] = serializer_field_class
         return fields
     
     def get_forms(self):
@@ -299,20 +515,6 @@ class MetroparksSerializer(Serializer):
                     name = form_name + "." + f.name
                     result.append(name)
         return result
-    
-    """
-    Not implemented for the moment
-    def create(self, validated_data):
-
-        with reversion.create_revision():
-            ModelClass = self.Meta.model
-            if isinstance(ModelClass, OccurrenceTaxon):
-                # taxon
-                pass
-            else:
-                # natural area
-                pass
-    """
     
     def set_form_values(self, form_name, instance, validated_data, force_save=False):
         if instance and validated_data:
@@ -366,37 +568,21 @@ class MetroparksSerializer(Serializer):
                 else:
                     setattr(parent_instance, form_name, related_instance)
         return any_saved
-        
-    def update0(self, instance, validated_data):
-        with reversion.create_revision():
-            observation_children = [
-                ('reporter', PointOfContact, []),
-                ('verifier', PointOfContact, []),
-                ('recorder', PointOfContact, []),
-                ]
-            self._update_form('observation', OccurrenceObservation, validated_data, instance, child_forms=observation_children)
-            self._update_form('voucher', Voucher, validated_data, instance)
-            details_model_class = instance.get_details_class()
-            self._update_form('landanimaldetails', details_model_class, validated_data, instance)
-            
-            if isinstance(instance, OccurrenceTaxon):
-                # taxon
-                pass
-            else:
-                # natural area
-                pass
-            instance.version = instance.version + 1
-            instance.save()
-        return instance
     
+    def _get_form_dict(self):
+        if not self._form_dict:
+            self._form_dict = get_form_dict(self.get_forms())
+        return self._form_dict
+        
     def _get_form_def_tree(self, form_name, model_class, children):
         complete_children_def = []
         for child in children:
-            (child_form_name, child_model_class, child_children) = self._form_dict[child]
+            (child_form_name, child_model_class, child_children) = self._get_form_dict()[child]
             child_def = self._get_form_def_tree(child_form_name, child_model_class, child_children)
             complete_children_def.append(child_def)
         return (form_name, model_class, complete_children_def)
-        
+    
+    
     
     def get_toplevel_forms(self):
         forms = []
@@ -411,7 +597,8 @@ class MetroparksSerializer(Serializer):
         with reversion.create_revision():
             print self.get_toplevel_forms()
             for (form_name, model_class, children) in self.get_toplevel_forms():
-                self._update_form(form_name, model_class, validated_data, instance, children)
+                if form_name != MANAGEMENT_FORM_NAME:
+                    self._update_form(form_name, model_class, validated_data, instance, children)
             
             if isinstance(instance, OccurrenceTaxon):
                 # taxon
@@ -420,24 +607,84 @@ class MetroparksSerializer(Serializer):
                 # natural area
                 pass
             instance.version = instance.version + 1
+            instance.released = validated_data.get("released", False)
             instance.save()
         return instance
     
     def to_representation(self, instance):
-        return Serializer.to_representation(self, instance)
+        r = Serializer.to_representation(self, instance)
+        result = {}
+        result["id"] = r["id"]
+        result["formvalues"] = r
+        result["version"] = r["version"]
+        result["total_versions"] = r["total_versions"]
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = instance.occurrence_cat.code
+        return result
     
     def to_internal_value(self, data):
-        return Serializer.to_internal_value(self, data)
+        formvalues = data['formvalues'] 
+        return Serializer.to_internal_value(self, formvalues)
 
 
-class LandAnimalSerializer(MetroparksSerializer):
-    def __init__(self, instance=None, data=empty, **kwargs):
-        self.forms = LAND_ANIMAL_TYPE
-        # FIXME: move any form pre-processing out of the instance
-        self._form_dict = {}
-        for form in self.forms:
-            self._form_dict[form[0]] = form
+class CreateOccurrenceSerializer(Serializer):
+    id = rest_fields.IntegerField(required=False, read_only=True)
+    featuretype = rest_fields.IntegerField(required=False, read_only=True)
+    featuresubtype = rest_fields.IntegerField()
+    version = rest_fields.IntegerField(required=False, read_only=True)
+    total_versions = rest_fields.IntegerField(required=False, read_only=True)
+    
+    def create(self, validated_data):
+        subtype = validated_data['featuresubtype']
+        category = OccurrenceCategory.objects.get(code=subtype)
+        if subtype == 'na': # natural area
+            instance = OccurrenceNaturalArea()
+        else:
+            instance = OccurrenceTaxon()
+        instance.occurrence_cat = category
+        instance.save()
+        return instance
 
-        super(LandAnimalSerializer, self).__init__(instance, data, **kwargs)
+class LayerTaxonSerializer(GeoFeatureModelSerializer):
+    id = rest_fields.IntegerField(required=False, read_only=True)
+    featuretype = rest_fields.IntegerField(required=False, read_only=True)
+    featuresubtype = rest_fields.IntegerField()
+    version = rest_fields.IntegerField(required=False, read_only=True)
+    total_versions = rest_fields.IntegerField(required=False, read_only=True)
+    
+    def get_properties(self, instance, fields):
+        # This is a PostgreSQL HStore field, which django maps to a dict
+        result = {}
+        versions = Version.objects.get_for_object(instance)
+        result['total_versions'] = len(versions)
+        result['version'] = instance.version
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = instance.occurrence_cat.code
+        result['id'] = instance.id
+        return result
+    
+    class Meta:
+        model = OccurrenceTaxon
+        geo_field = "geom"
+        fields = ('id', 'featuretype', 'featuresubtype', 'version', 'total_versions')
+        # you can also explicitly declare which fields you want to include
+        # as with a ModelSerializer.
 
-        
+class LayerNaturalAreaSerializer(GeoFeatureModelSerializer):
+    def get_properties(self, instance, fields):
+        # This is a PostgreSQL HStore field, which django maps to a dict
+        result = {}
+        versions = Version.objects.get_for_object(instance)
+        result['total_versions'] = len(versions)
+        result['version'] = instance.version
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = instance.occurrence_cat.code
+        return result
+    
+    class Meta:
+        model = OccurrenceNaturalArea
+        geo_field = "geom"
+        fields = ('__all__',)
+
+        # you can also explicitly declare which fields you want to include
+        # as with a ModelSerializer.

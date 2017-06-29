@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'djgeojson',
     'reversion',
     'rest_framework',
+    'rest_framework_gis',
     'rest_framework.authtoken',
     'rest_auth',
     'core',
