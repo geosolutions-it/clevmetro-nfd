@@ -19,7 +19,7 @@ from rest_framework.serializers import Field
 import reversion
 from reversion.models import Version
 from rest_framework.fields import empty
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
+from rest_framework_gis import serializers as gisserializer
 
 def _(message): return message
 
@@ -629,10 +629,11 @@ class TaxonDetailsSerializer(Serializer):
 
 class CreateOccurrenceSerializer(Serializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
-    featuretype = rest_fields.IntegerField(required=False, read_only=True)
-    featuresubtype = rest_fields.IntegerField()
+    featuretype = rest_fields.CharField(required=False, read_only=True)
+    featuresubtype = rest_fields.CharField()
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
+    geom = gisserializer.GeometryField()
     
     def create(self, validated_data):
         subtype = validated_data['featuresubtype']
@@ -642,13 +643,18 @@ class CreateOccurrenceSerializer(Serializer):
         else:
             instance = OccurrenceTaxon()
         instance.occurrence_cat = category
+        instance.geom = validated_data.get("geom")
         instance.save()
-        return instance
+        result = {}
+        result['id'] = instance.pk
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = subtype
+        return result
 
-class LayerTaxonSerializer(GeoFeatureModelSerializer):
+class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
-    featuretype = rest_fields.IntegerField(required=False, read_only=True)
-    featuresubtype = rest_fields.IntegerField()
+    featuretype = rest_fields.CharField(required=False, read_only=True)
+    featuresubtype = rest_fields.CharField()
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
     
@@ -670,7 +676,7 @@ class LayerTaxonSerializer(GeoFeatureModelSerializer):
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.
 
-class LayerNaturalAreaSerializer(GeoFeatureModelSerializer):
+class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
     def get_properties(self, instance, fields):
         # This is a PostgreSQL HStore field, which django maps to a dict
         result = {}
