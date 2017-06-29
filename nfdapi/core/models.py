@@ -117,7 +117,7 @@ class MushroomGroup(DictionaryTable):
     pass
 
 class ElementSpecies(Element):
-    native = models.BooleanField(default=True)
+    native = models.NullBooleanField(default=True)
     oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
     usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
     iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
@@ -163,9 +163,9 @@ class Repository(DictionaryTable):
 @reversion.register()
 class Voucher(models.Model):
     voucher_number = models.PositiveIntegerField(null=True)
-    specimen_collected = models.BooleanField(default=False)
-    parts_collected = models.BooleanField(default=False)
-    specimen_number = models.BooleanField(default=False)
+    specimen_collected = models.NullBooleanField(default=False)
+    parts_collected = models.NullBooleanField(default=False)
+    specimen_number = models.NullBooleanField(default=False)
     preservative = models.ForeignKey(Preservative, on_delete=models.SET_NULL, blank=True, null=True)
     storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, blank=True, null=True)
     repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, blank=True, null=True)

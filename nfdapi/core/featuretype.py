@@ -258,7 +258,9 @@ def get_serializer_fields(form_name, model):
             kwargs['allow_blank'] = getattr(f, 'blank', False)
             kwargs['allow_null'] = True
             fdef = rest_fields.CharField(**kwargs)
-        elif isinstance(f, BooleanField) or isinstance(f, NullBooleanField):
+        elif isinstance(f, BooleanField):
+            fdef = rest_fields.BooleanField(**kwargs)
+        elif isinstance(f, NullBooleanField):
             fdef = rest_fields.NullBooleanField(**kwargs)
         elif isinstance(f, DateTimeField):
             kwargs['allow_null'] = True
@@ -404,7 +406,8 @@ class TaxonDetailsSerializer(Serializer):
                 plain_name = self._get_attrib_name(fname)
                 new_value = form_validated_data.get(plain_name)
                 old_value =  getattr(instance, plain_name, None)
-                if new_value != old_value and not(new_value == None and old_value == ''):
+                #if (new_value != old_value) and not (instance.pk is None and new_value is None):
+                if new_value != None and new_value != old_value:
                     modified = True
                     setattr(instance, plain_name, new_value)
             if force_save or modified:
