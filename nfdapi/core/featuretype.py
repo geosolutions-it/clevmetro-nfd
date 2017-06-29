@@ -126,158 +126,6 @@ del _
 from django.utils.translation import ugettext_lazy as _
 
 
-featuretype_form_fragments = {
-    "observation": [
-        {"formname": "observation", "formlabel": _("Observation"), "model": OccurrenceObservation},
-        {"formname": "reporter", "formlabel": _("Observation reporter"), "model": PointOfContact},
-        {"formname": "recorder", "formlabel": _("Observation recorder"), "model": PointOfContact},
-        {"formname": "verifier", "formlabel": _("Observation verifier"), "model": PointOfContact}
-        ],
-    "voucher": [{"formname": "voucher", "formlabel": _("Observation voucher"), "model": Voucher}],
-    "species": [{"formname": "species", "formlabel": _("What is it?"), "model": ElementSpecies}]
-    }
-
-occurrence_defs = {
-    "ln": {
-        "mainmodel": OccurrenceTaxon,
-        "forms": featuretype_form_fragments["species"]+[
-            {"formname": "landanimaldetails", "formlabel": _("Details"), "model": LandAnimalDetails},
-            {"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages}
-            ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
-    },
-    "st": {
-        "mainmodel": OccurrenceTaxon,
-        "forms": featuretype_form_fragments["species"]+[
-            {"formname": "streamanimaldetails", "formlabel": _("Details"), "model": StreamAnimalDetails},
-            {"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages}
-            ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
-    },
-    "pl": {
-        "mainmodel": OccurrenceTaxon,
-        "forms": featuretype_form_fragments["species"]+[
-            {"formname": "plantdetails", "formlabel": _("Details"), "model": PlantDetails},
-            #{"formname": "animal_lifestages", "formlabel": _("Animal lifestages"), "model": AnimalLifestages},
-            ]+featuretype_form_fragments["observation"]+featuretype_form_fragments["voucher"]
-    }
-}
-
-
-class FeatureInfoSerializer():
-    def __init__(self):
-        self.result = {}
-    
-    def get_feature_info(self, occurrence_instance):
-        main_cat = occurrence_instance.occurrence_cat.main_cat
-        subcat_code = occurrence_instance.occurrence_cat.code
-        #occurrence_def = occurrence_defs[subcat_code]
-        
-        self.result['featuretype'] = main_cat
-        self.result['versions'] = 1 #FIXME
-        self.result['formvalues'] = []
-        self._add_form_values(occurrence_instance.species_element, 'species')
-        self._add_form_values(occurrence_instance.observation, 'observation')
-        self._add_form_values(occurrence_instance.voucher, 'voucher')
-        details_instance = occurrence_instance.get_details()
-        details_form_name = details_instance.__class__.__name__.lower()
-        self._add_form_values(details_instance, details_form_name)
-        if occurrence_instance.observation:
-            self._add_form_values(occurrence_instance.observation.reporter, 'reporter')
-            self._add_form_values(occurrence_instance.observation.recorder, 'recorder')
-            self._add_form_values(occurrence_instance.observation.verifier, 'verifier')
-        #FIXME: consider the rest of main fields from occurrence
-        
-        #FIXME: should include also the geojson
-        return self.result
-    
-    def _add_form_values(self, form_instance, form_name):
-        if (form_instance):
-            fields = form_instance._meta.get_fields()
-            for f in fields:
-                fdef = {}
-                fvalue = getattr(form_instance, f.name, None)
-                if not fvalue:
-                    pass
-                elif getattr(f, 'primary_key', False):
-                    pass
-                elif isinstance(f, CharField) or isinstance(f, TextField) or isinstance(f, BooleanField):
-                    fdef['key'] = form_name + "." + f.name
-                    fdef['value'] = fvalue
-                elif isinstance(f, DateTimeField) or isinstance(f, DateField):
-                    fdef['key'] = form_name + "." + f.name
-                    fdef['value'] = fvalue
-                elif isinstance(f, GeometryField):
-                    # skip geoms
-                    pass
-                elif isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
-                    fdef['key'] = form_name + "." + f.name
-                    fdef['value'] = fvalue
-                elif isinstance(f, ForeignKey):
-                    if issubclass(f.related_model, DictionaryTable):
-                        fdef['key'] = form_name + "." + f.name
-                        fdef['value'] = fvalue.code
-                if 'key' in fdef:
-                    self.result['formvalues'].append(fdef)  
-    
-
-class FeatureTypeSerializerOld():
-    def get_feature_type(self, name, subcat_code):
-        occurrence_def = occurrence_defs[subcat_code]
-        result = {}
-        result['featuretype'] = name
-        forms = []
-        result['forms'] = forms
-        for formdef in occurrence_def['forms']:
-            form = {}
-            form['formlabel'] = formdef['formlabel']
-            form['formname'] = formdef['formname']
-            form['formitems'] = self.get_form_featuretype(formdef['formname'], formdef['model'])
-            forms.append(form)
-        return result
-    
-
-    def get_form_featuretype(self, form_name, model):
-        fields = model._meta.get_fields()
-        result = []
-        for f in fields:
-            fdef = {}
-            
-            if getattr(f, 'primary_key', False):
-                fdef['type'] = 'pk'
-            elif isinstance(f, CharField) or isinstance(f, TextField):
-                fdef['type'] = 'string'
-            elif isinstance(f, BooleanField):
-                fdef['type'] = 'boolean'
-            elif isinstance(f, DateTimeField):
-                fdef['type'] = 'datetime'
-            elif isinstance(f, DateField):
-                fdef['type'] = 'date'
-            elif isinstance(f, GeometryField):
-                # skip geoms
-                pass
-            elif isinstance(f, FloatField) or isinstance(f, DecimalField):
-                fdef['type'] = 'double'
-            elif isinstance(f, IntegerField):
-                fdef['type'] = 'integer'
-            elif isinstance(f, ForeignKey):
-                if issubclass(f.related_model, DictionaryTable):
-                    fdef['type'] = 'stringcombo'
-                    items = []
-                    for item in f.related_model.objects.all():
-                        idef = {}
-                        idef['key'] = item.code
-                        idef['value'] = item.name
-                        items.append(idef)
-                    fdef['values'] = {'items': items}
-                else:
-                    fdef['type'] = 'fk'
-                
-            if 'type' in fdef:        
-                fdef['key'] = form_name + "." + f.name
-                fdef['label'] = _(f.name) 
-                result.append(fdef)
-        return result
-
-
 class FeatureTypeSerializer():
     def __init__(self, instance):
         self.instance = instance
@@ -516,18 +364,46 @@ class TaxonDetailsSerializer(Serializer):
                     result.append(name)
         return result
     
+    def _get_validated_data_form(self, validated_data, form_name):
+        """
+        full_qualified_name: dictionary key including subdicts (e.g. species.element_species.native)
+        Returns the value equivalent to validated_data['species']['element_species']['native'] or None
+        """
+        if validated_data:
+            if form_name == MANAGEMENT_FORM_NAME:
+                return validated_data
+            else:            
+                parts = form_name.split(".")
+                subdict = validated_data
+                for part in parts:
+                    subdict = subdict.get(part)
+                    if subdict is None:
+                        return None
+            return subdict
+    
+    def _get_attrib_name(self, full_qualified_name):
+        """
+        Gets the non fully qualified name of the provided attrib
+        Example _get_attrib_name("species.element_species.native") returns "native"
+        """
+        parts = full_qualified_name.split(".")
+        if len(parts)>0:
+            return parts[-1]
+    
     def set_form_values(self, form_name, instance, validated_data, force_save=False):
-        if instance and validated_data:
+        form_validated_data = self._get_validated_data_form(validated_data, form_name)
+        if instance and form_validated_data:
             fields = self._get_form_fieldnames(form_name, instance)
             #if instance.pk is None:
             #    force_save = True
             modified = False
             for fname in fields:
-                new_value = validated_data.get(form_name + "." + fname)
-                old_value = getattr(instance, fname, None)
-                if new_value != old_value:
+                plain_name = self._get_attrib_name(fname)
+                new_value = form_validated_data.get(plain_name)
+                old_value =  getattr(instance, plain_name, None)
+                if new_value != old_value and not(new_value == None and old_value == ''):
                     modified = True
-                    setattr(instance, fname, new_value)
+                    setattr(instance, plain_name, new_value)
             if force_save or modified:
                 instance.save()
                 return True
@@ -659,7 +535,6 @@ class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
     
     def get_properties(self, instance, fields):
-        # This is a PostgreSQL HStore field, which django maps to a dict
         result = {}
         versions = Version.objects.get_for_object(instance)
         result['total_versions'] = len(versions)
@@ -685,12 +560,13 @@ class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
         result['version'] = instance.version
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
+        result['id'] = instance.id
         return result
     
     class Meta:
         model = OccurrenceNaturalArea
         geo_field = "geom"
-        fields = ('__all__',)
+        fields = ('id', 'featuretype', 'featuresubtype', 'version', 'total_versions')
 
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.

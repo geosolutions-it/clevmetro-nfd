@@ -123,12 +123,12 @@ class ElementSpecies(Element):
     iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
     other_code = models.TextField(blank=True)
     #species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
-    ibp_english = models.CharField(max_length=4, blank=True)
-    ibp_scientific = models.CharField(max_length=6, blank=True)
-    bblab_number = models.CharField(max_length=6, blank=True)
-    nrcs_usda_symbol = models.TextField(blank=True)
-    synonym_nrcs_usda_symbol = models.TextField(blank=True)
-    epa_numeric_code = models.TextField(blank=True)
+    ibp_english = models.CharField(max_length=4, blank=True, default='')
+    ibp_scientific = models.CharField(max_length=6, blank=True, default='')
+    bblab_number = models.CharField(max_length=6, blank=True, default='')
+    nrcs_usda_symbol = models.TextField(blank=True, default='')
+    synonym_nrcs_usda_symbol = models.TextField(blank=True, default='')
+    epa_numeric_code = models.TextField(blank=True, default='')
     mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
 
 class Species(models.Model):
@@ -162,7 +162,7 @@ class Repository(DictionaryTable):
 
 @reversion.register()
 class Voucher(models.Model):
-    voucher_number = models.PositiveIntegerField()
+    voucher_number = models.PositiveIntegerField(null=True)
     specimen_collected = models.BooleanField(default=False)
     parts_collected = models.BooleanField(default=False)
     specimen_number = models.BooleanField(default=False)
