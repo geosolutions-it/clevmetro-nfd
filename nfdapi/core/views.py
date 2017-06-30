@@ -63,11 +63,11 @@ def test_url3(request):
 
 class TaxonLayerList(APIView):
     permission_classes = [] #FIXME when authentication is implemented
-    def get(self, request, format=None):
-        queryset = OccurrenceTaxon.objects.filter(occurrence_cat__main_cat='animal')
+    def get(self, request, main_cat, format=None):
+        queryset = OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=main_cat)
         serializer = LayerTaxonSerializer(queryset, many=True)
         return Response(serializer.data)
-    def post(self, request, format=None):
+    def post(self, request, main_cat, format=None):
         serializer = CreateOccurrenceSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()

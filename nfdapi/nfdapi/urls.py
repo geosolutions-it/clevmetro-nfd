@@ -31,10 +31,7 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'test2/', coreviews.test_url2),
     url(r'^'+APP_NAME+r'test3/', coreviews.test_url3),
     
-    url(r'^'+APP_NAME+r'layers/plants/$', coreviews.TaxonLayerList.as_view(), name='plantList'),
-    url(r'^'+APP_NAME+r'layers/animals/$', coreviews.TaxonLayerList.as_view(), name='animalList'),
-    url(r'^'+APP_NAME+r'layers/slimemolds/$', coreviews.TaxonLayerList.as_view(), name='slimemoldList'),
-    url(r'^'+APP_NAME+r'layers/fungi/$', coreviews.TaxonLayerList.as_view(), name='fungiList'),
+    url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
     url(r'^'+APP_NAME+r'layers/naturalareas/$', coreviews.NaturalAreaLayerList.as_view(), name='naturalareaList'),
     
     url(r'^'+APP_NAME+r'layers/(plants|animals|slimemolds|fungui|naturalareas)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
