@@ -1,11 +1,13 @@
 from models import OccurrenceCategory, OccurrenceTaxon
 from models import IucnRedListCategory, UsfwsStatus
-from models import ElementSpecies, DayTime
+from models import ElementSpecies, DayTime, Species
 from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
 from core.models import TerrestrialSampler, LandAnimalDetails,\
     StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact
 from django.utils import timezone
+import reversion
+from reversion.models import Version
 
 # mark messages for translations but don't translate then right now 
 def _(message): return message
@@ -200,132 +202,150 @@ def insert_test_data(clean=True):
     if clean:
         OccurrenceTaxon.objects.all().delete()
         TaxonDetails.objects.all().delete()
+        Species.objects.all().delete()
         ElementSpecies.objects.all().delete()
         OccurrenceObservation.objects.all().delete()
         
     plant_cat = OccurrenceCategory.objects.get(code='pl')
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
+    with reversion.create_revision():
+        element_species = ElementSpecies()
+        element_species.iucn_red_list_category = iucn_cat
+        element_species.other_code = "qrc_alba"
+        #element_species.nrcs_usda_symbol = 
+        element_species.save()
+        
+        species = Species()
+        species.tsn = '19290'
+        species.first_common = 'White oak'
+        species.name_sci = 'Quercus alba'
+        species.element_species = element_species
+        species.save()
     
-    species = ElementSpecies()
-    species.tsn = '19290'
-    species.first_common = 'White oak'
-    species.name_sci = 'Quercus alba'
-    species.other_code = "qrc_alba"
-    species.species = species
-    species.iucn_red_list_category = iucn_cat
-    #sp_elem.nrcs_usda_symbol = 
-    species.save()
+    with reversion.create_revision():
+        t = OccurrenceTaxon()
+        t.occurrence_cat = plant_cat
+        t.geom = 'POINT( -81.564302 41.201797 )'
+        t.species = species
+        t.save()
 
-    t = OccurrenceTaxon()
-    t.occurrence_cat = plant_cat
-    t.geom = 'POINT( -81.564302 41.201797 )'
-    t.species_element = species
-    t.save()
+    with reversion.create_revision():
+        t = OccurrenceTaxon()
+        t.occurrence_cat = plant_cat
+        t.geom = 'POINT( -81.520700 41.243243 )'
+        t.species = species
+        t.save()
 
-    t = OccurrenceTaxon()
-    t.occurrence_cat = plant_cat
-    t.geom = 'POINT( -81.520700 41.243243 )'
-    t.species_element = species
-    t.save()
-    
-    t = OccurrenceTaxon()
-    t.occurrence_cat = plant_cat
-    t.geom = 'POINT( -81.575804 41.279632 )'
-    t.species_element = species
-    t.save()
+    with reversion.create_revision():
+        t = OccurrenceTaxon()
+        t.occurrence_cat = plant_cat
+        t.geom = 'POINT( -81.575804 41.279632 )'
+        t.species = species
+        t.save()
     
     stream_animal_cat = OccurrenceCategory.objects.get(code='st')    
+    
+    with reversion.create_revision():
+        element_species = ElementSpecies()
+        element_species.other_code = "lontra_cnd"
+        element_species.iucn_red_list_category = iucn_cat
+        element_species.save()
         
-    species = ElementSpecies()
-    species.tsn = '180549'
-    species.first_common = 'North American river otter'
-    species.name_sci = 'Lontra canadensis'
-    species.other_code = "lontra_cnd"
-    species.iucn_red_list_category = iucn_cat
-    species.save()
+        species = Species()
+        species.tsn = '180549'
+        species.first_common = 'North American river otter'
+        species.name_sci = 'Lontra canadensis'
+        species.element_species = element_species
+        species.save()
     
     gender = Gender.objects.get(code='fe')
     
-    stream_details = StreamAnimalDetails()
-    stream_details.gender = gender
-    stream_details.stream_name_1 = 'Ramdom stream name1'
-    stream_details.save()
-    
-    reporter = PointOfContact()
-    reporter.name = "I'm the reporter"
-    reporter.save()
-    
-    observation = OccurrenceObservation()
-    observation.observation_date = timezone.now()
-    observation.recording_datetime = timezone.now()
-    observation.reporter = reporter
-    observation.save()
-    
-    t = OccurrenceTaxon()
-    t.geom = 'POINT( -81.554282 41.379035 )'
-    t.species_element = species
-    t.occurrence_cat = stream_animal_cat
-    t.details = stream_details
-    t.observation = observation
-    t.save()
-    
-    stream_details = StreamAnimalDetails()
-    stream_details.gender = gender
-    stream_details.stream_name_1 = 'Ramdom stream name2'
-    stream_details.save()
-    
-    recorder = PointOfContact()
-    recorder.name = "I'm the recorder2"
-    recorder.save()
-    
-    observation = OccurrenceObservation()
-    observation.observation_date = timezone.now()
-    observation.recording_datetime = timezone.now()
-    observation.recorder = recorder
-    observation.save()
-    
-    
-    t = OccurrenceTaxon()
-    t.geom = 'POINT( -81.546814 41.386602 )'
-    t.species_element = species
-    t.occurrence_cat = stream_animal_cat
-    t.details = stream_details
-    t.observation = observation
-    t.save()
-    
-    recorder = PointOfContact()
-    recorder.name = "I'm the recorder"
-    recorder.save()
-    
-    observation = OccurrenceObservation()
-    observation.observation_date = timezone.now()
-    observation.recording_datetime = timezone.now()
-    observation.recorder = recorder
-    observation.save()
-    
-    land_animal_cat = OccurrenceCategory.objects.get(code='ln')
-    land_animal_details = LandAnimalDetails()
-    sound_recording = TerrestrialSampler.objects.get(code='sr')
-    land_animal_details.sampler = sound_recording
-    
-    land_animal_details.gender = gender
-    land_animal_details.save()
+    with reversion.create_revision():
+        stream_details = StreamAnimalDetails()
+        stream_details.gender = gender
+        stream_details.stream_name_1 = 'Ramdom stream name1'
+        stream_details.save()
         
-    species = ElementSpecies()
-    species.tsn = '180544'
-    species.first_common = 'American black bear'
-    species.name_sci = 'Ursus americanus'
-    species.other_code = "bl_bear"
-    species.species = species
-    species.iucn_red_list_category = iucn_cat
-    species.save()
+        reporter = PointOfContact()
+        reporter.name = "I'm the reporter"
+        reporter.save()
+        
+        observation = OccurrenceObservation()
+        observation.observation_date = timezone.now()
+        observation.recording_datetime = timezone.now()
+        observation.reporter = reporter
+        observation.save()
+        
+        t = OccurrenceTaxon()
+        t.geom = 'POINT( -81.554282 41.379035 )'
+        t.species_element = species
+        t.occurrence_cat = stream_animal_cat
+        t.details = stream_details
+        t.observation = observation
+        t.save()
     
-    t = OccurrenceTaxon()
-    t.geom = 'POINT( -81.526814 41.366602 )'
-    t.species_element = species
-    t.occurrence_cat = land_animal_cat
-    t.details = land_animal_details
-    t.observation = observation
-    t.save()
+    with reversion.create_revision():
+        stream_details = StreamAnimalDetails()
+        stream_details.gender = gender
+        stream_details.stream_name_1 = 'Ramdom stream name2'
+        stream_details.save()
+        
+        recorder = PointOfContact()
+        recorder.name = "I'm the recorder2"
+        recorder.save()
+        
+        observation = OccurrenceObservation()
+        observation.observation_date = timezone.now()
+        observation.recording_datetime = timezone.now()
+        observation.recorder = recorder
+        observation.save()
+        
+        
+        t = OccurrenceTaxon()
+        t.geom = 'POINT( -81.546814 41.386602 )'
+        t.species = species
+        t.occurrence_cat = stream_animal_cat
+        t.details = stream_details
+        t.observation = observation
+        t.save()
     
-    
+    with reversion.create_revision():
+        recorder = PointOfContact()
+        recorder.name = "I'm the recorder"
+        recorder.save()
+        
+        observation = OccurrenceObservation()
+        observation.observation_date = timezone.now()
+        observation.recording_datetime = timezone.now()
+        observation.recorder = recorder
+        observation.save()
+        
+        land_animal_cat = OccurrenceCategory.objects.get(code='ln')
+        land_animal_details = LandAnimalDetails()
+        sound_recording = TerrestrialSampler.objects.get(code='sr')
+        land_animal_details.sampler = sound_recording
+        
+        land_animal_details.gender = gender
+        land_animal_details.save()
+            
+        element_species = ElementSpecies()
+        element_species.other_code = "bl_bear"
+        element_species.iucn_red_list_category = iucn_cat
+        element_species.save()
+        
+        species = Species()
+        species.tsn = '180544'
+        species.first_common = 'American black bear'
+        species.name_sci = 'Ursus americanus'
+        species.element_species = element_species
+        species.save()
+        
+        t = OccurrenceTaxon()
+        t.geom = 'POINT( -81.526814 41.366602 )'
+        t.species = species
+        t.occurrence_cat = land_animal_cat
+        t.details = land_animal_details
+        t.observation = observation
+        t.save()
+        
+        
