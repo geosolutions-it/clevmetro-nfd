@@ -21,6 +21,9 @@
             "hideLoading": true,
             "id": "animal",
             "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-purple.png"
+            },
             "features" : []
         }, {
             "type": "vector",
@@ -40,12 +43,12 @@
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
-            "name": "Mushrooms",
+            "name": "Fungus",
             "hideLoading": true,
-            "id": "mushrooms",
+            "id": "fungus",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-green.png"
+                "iconUrl": "./assets/img/marker-icon-yellow.png"
             },
             "features" : []
         }, {
@@ -55,11 +58,8 @@
             "group": "Natural features",
             "name": "Natural areas",
             "hideLoading": true,
-            "id": "natural_areas",
+            "id": "naturalarea",
             "styleName": "marker",
-            "style": {
-                "iconUrl": "./assets/img/marker-icon-green.png"
-            },
             "features" : []
         }, {
             "type": "vector",
@@ -68,10 +68,10 @@
             "group": "Natural features",
             "name": "Slime/Molds",
             "hideLoading": true,
-            "id": "slime_molds",
+            "id": "slimemold",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-green.png"
+                "iconUrl": "./assets/img/marker-icon-marine.png"
             },
             "features" : []
         }]

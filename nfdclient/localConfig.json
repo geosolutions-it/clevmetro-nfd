@@ -1,7 +1,7 @@
 {
     "proxyUrl": {
         "url": "/mapstore/proxy/?url=",
-        "useCORS": ["http://localhost", "http://192.168.1.38", "http://geosolutions.scolab.eu"]
+        "useCORS": ["http://localhost", "http://localhost:8081", "http://192.168.1.38", "http://192.168.1.38:8081", "http://geosolutions.scolab.eu"]
     },
 	  "geoStoreUrl": "/mapstore/rest/geostore",
     "printUrl": "https://demo.geo-solutions.it/geoserver/pdf/info.json",

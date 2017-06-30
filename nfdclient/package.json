@@ -118,6 +118,7 @@
         "react": "15.4.2",
         "react-addons-shallow-compare": "15.4.2",
         "react-bootstrap": "0.30.7",
+        "react-bootstrap-date-picker": "5.0.1",
         "react-codemirror": "0.2.6",
         "react-color": "2.11.3",
         "react-confirm-button": "0.0.2",

@@ -16,7 +16,9 @@ module.exports = {
     initialState: {
         defaultState: {
             naturalfeatures: {
-                naturalFeatureType: [],
+                forms: [],
+                featuretype: "",
+                featuresubtype: "",
                 selectedFeature: {},
                 newFeature: {},
                 dockSize: 0.35

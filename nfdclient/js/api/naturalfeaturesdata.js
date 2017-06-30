@@ -10,27 +10,17 @@ const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 const assign = require('object-assign');
 const dataCache = {};
 
-const getLayerId = (properties) => {
-    let layerId = "";
-    if (properties.occurrence_cat[0] === 'plant') {
-        layerId = 'plants';
-    } else if (properties.occurrence_cat[0] === 'animal') {
-        layerId = 'animals';
-    }
-    return layerId;
-};
-
 const Api = {
     addBaseUrl: function(options) {
         return assign(options, {baseURL: ConfigUtils.getDefaults().geoStoreUrl});
     },
     getData: function(url) {
-        const cached = dataCache[url];
+        /*const cached = dataCache[url];
         if (cached && new Date().getTime() < cached.timestamp + (ConfigUtils.getConfigProp('cacheDataExpire') || 60) * 1000) {
             return new Promise((resolve) => {
                 resolve(cached.data);
             });
-        }
+        }*/
         return axios.get(url).then((response) => {
             dataCache[url] = {
                 timestamp: new Date().getTime(),
@@ -39,21 +29,25 @@ const Api = {
             return response.data;
         });
     },
-    updateNaturalFeature: function(id, feature) {
-        let url = "users/user/" + id;
-        return axios.put(url, {NaturalFeature: feature}, this.addBaseUrl()).then(function(response) {return response.data; });
+    updateNaturalFeature: function(featuretype, feature) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + featuretype + '/';
+        return axios.put(url, feature).then(function(response) {return response.data; });
     },
-    saveNaturalFeature: function(id, feature) {
-        let url = "users/user/" + id;
-        return axios.put(url, {NaturalFeature: feature}, this.addBaseUrl()).then(function(response) {return response.data; });
+    deleteNaturalFeature: function(layerId, nfid) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + layerId + '/' + nfid;
+        return axios.delete(url).then(function(response) {return response.data; });
     },
-    deleteNaturalFeature: function(id, feature) {
-        let url = "users/user/" + id;
-        return axios.put(url, {NaturalFeature: feature}, this.addBaseUrl()).then(function(response) {return response.data; });
-    },
-    getFeatureType: function(properties, nfid) {
-        let url = 'http://geosolutions.scolab.eu/nfdapi/featuretypes/' + getLayerId(properties) + '/' + nfid;
+    getFeatureType: function(layerId, nfid) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/featuretypes/' + layerId + '/' + nfid;
         return axios.get(url).then(function(response) {return response.data; });
+    },
+    getFeatureInfo: function(layerId, nfid) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + layerId + '/' + nfid;
+        return axios.get(url).then(function(response) {return response.data; });
+    },
+    createNewFeature: function(feature) {
+        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + feature.featuretype + '/';
+        return axios.post(url, feature).then(function(response) {return response.data; });
     }
 };
 
