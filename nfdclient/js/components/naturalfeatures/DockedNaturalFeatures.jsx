@@ -360,7 +360,7 @@ const DockedNaturalFeatures = React.createClass({
         ] : [
             <Button key="save" bsSize="small"
                 bsStyle="primary"
-                onClick={() => this.props.onSave(this.props.currentFeature)}
+                onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                 disabled={false}>
                 <Message msgId="naturalfeatures.save" />
             </Button>

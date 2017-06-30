@@ -19,6 +19,7 @@ const NATURAL_FEATURE_LOADED = 'NATURAL_FEATURE_LOADED';
 const UPDATE_NATURAL_FEATURE_FORM = 'UPDATE_NATURAL_FEATURE_FORM';
 const GET_NATURAL_FEATURE_TYPE = 'GET_NATURAL_FEATURE_TYPE';
 const NATURAL_FEATURE_TYPE_LOADED = 'NATURAL_FEATURE_TYPE_LOADED';
+const NATURAL_FEATURE_ADDED = 'NATURAL_FEATURE_ADDED';
 const NATURAL_FEATURE_TYPE_ERROR = 'NATURAL_FEATURE_TYPE_ERROR';
 const UPDATE_NATURAL_FEATURE = 'UPDATE_NATURAL_FEATURE';
 const CREATE_NATURAL_FEATURE = 'CREATE_NATURAL_FEATURE';
@@ -208,6 +209,13 @@ function naturalFeatureError(error) {
     };
 }
 
+function naturalFeatureAdded(error) {
+    return {
+        type: NATURAL_FEATURE_ADDED,
+        error
+    };
+}
+
 function createNaturalFeature(properties) {
     return (dispatch) => {
         if (properties.featuretype === 'plant') {
@@ -224,11 +232,14 @@ function createNaturalFeature(properties) {
     };
 }
 
-function naturalFeatureCreated(featuretype, id) {
+function naturalFeatureCreated(featuretype, featuresubtype, id) {
     return (dispatch) => {
         return Api.getFeatureType(featuretype, id).then((response) => {
             if (response.forms && response.forms[0]) {
                 let emptyFeat = createEmptyFeature(response.forms);
+                emptyFeat.id = id;
+                emptyFeat.featuretype = featuretype;
+                emptyFeat.featuresubtype = featuresubtype;
                 dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
                 dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
                 dispatch(updateNaturalFeatureForm(emptyFeat));
@@ -246,7 +257,7 @@ function naturalFeatureMarkerAdded(feature) {
         return Api.createNewFeature(feature).then((resp) => {
             if (resp) {
                 dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(naturalFeatureCreated(resp.featuretype, resp.id));
+                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
             }
         }).catch((error) => {
             dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
@@ -331,6 +342,7 @@ function updateNaturalFeature(featuretype, featuresubtype, properties) {
         return Api.updateNaturalFeature(featuretype, feature).then(() => {
             dispatch(updateNaturalFeatureSuccess(properties.id));
             dispatch(reloadFeatureType(featuretype));
+            dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
         }).catch((error) => {
             dispatch(updateNaturalFeatureError(properties.id, error));
         });
@@ -388,7 +400,7 @@ module.exports = {
     GET_NATURAL_FEATURE_TYPE, getNaturalFeatureType, reloadFeatureType,
     NATURAL_FEATURE_TYPE_LOADED, naturalFeatureTypeLoaded,
     NATURAL_FEATURE_TYPE_ERROR, naturalFeatureTypeError,
-    CREATE_NATURAL_FEATURE, createNaturalFeature, naturalFeatureCreated,
+    CREATE_NATURAL_FEATURE, createNaturalFeature, naturalFeatureCreated, naturalFeatureAdded,
     SAVE_NATURAL_FEATURE, saveNaturalFeature,
     saveNaturalFeatureLoading, saveNaturalFeatureSuccess,
     saveNaturalFeatureError,

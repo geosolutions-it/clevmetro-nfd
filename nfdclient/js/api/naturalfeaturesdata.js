@@ -30,7 +30,7 @@ const Api = {
         });
     },
     updateNaturalFeature: function(featuretype, feature) {
-        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + featuretype + '/';
+        let url = 'http://geosolutions.scolab.eu/nfdapi/layers/' + featuretype + '/' + feature.id + '/';
         return axios.put(url, feature).then(function(response) {return response.data; });
     },
     deleteNaturalFeature: function(layerId, nfid) {

@@ -11,7 +11,7 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {createNaturalFeature/*, addNaturalFeature*/, saveNaturalFeature} = require('../actions/naturalfeatures');
+const {createNaturalFeature/*, addNaturalFeature*/, updateNaturalFeature} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
@@ -21,13 +21,15 @@ const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
 const SmartDockedNaturalFeatures = connect((state) => ({
     isVisible: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
     forms: state.naturalfeatures.forms,
-    currentFeature: state.naturalfeatures.newFeature,
+    featuretype: state.naturalfeatures.featuretype,
+    featuresubtype: state.naturalfeatures.featuresubtype,
+    currentFeature: state.naturalfeatures.selectedFeature,
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     isAdmin: true
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
-    onSave: saveNaturalFeature.bind(null),
+    onUpdate: updateNaturalFeature.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
