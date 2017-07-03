@@ -411,6 +411,7 @@ const DockedNaturalFeatures = React.createClass({
         );
     },
     // {(this.props.mode === 'add') ? this.renderDrawTools() : null}
+    // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
         return (
             <Dock
@@ -429,7 +430,7 @@ const DockedNaturalFeatures = React.createClass({
                     <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
                 </div>
                 <div>
-                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
+                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs">
                         {this.renderTabs()}
                     </Tabs>
                 </div>
