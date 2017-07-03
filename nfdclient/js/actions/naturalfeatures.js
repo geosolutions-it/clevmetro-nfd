@@ -27,6 +27,7 @@ const SAVE_NATURAL_FEATURE = 'SAVE_NATURAL_FEATURE';
 const DELETE_NATURAL_FEATURE = 'DELETE_NATURAL_FEATURE';
 const NATURAL_FEATURE_MARKER_ADDED = 'NATURAL_FEATURE_MARKER_ADDED';
 const NATURAL_FEATURE_POLYGON_ADDED = 'NATURAL_FEATURE_POLYGON_ADDED';
+const UPDATE_NATURAL_FEATURE_ERROR = 'UPDATE_NATURAL_FEATURE_ERROR';
 
 const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
@@ -328,7 +329,7 @@ function updateNaturalFeatureSuccess(id) {
 
 function updateNaturalFeatureError(id, error) {
     return {
-        type: UPDATE_NATURAL_FEATURE,
+        type: UPDATE_NATURAL_FEATURE_ERROR,
         status: "error",
         id,
         error
@@ -406,7 +407,7 @@ module.exports = {
     saveNaturalFeatureError,
     UPDATE_NATURAL_FEATURE, updateNaturalFeature,
     updateNaturalFeatureLoading, updateNaturalFeatureSuccess,
-    updateNaturalFeatureError,
+    UPDATE_NATURAL_FEATURE_ERROR, updateNaturalFeatureError,
     DELETE_NATURAL_FEATURE, deleteNaturalFeature,
     deleteNaturalFeatureLoading, deleteNaturalFeatureSuccess,
     deleteNaturalFeatureError,

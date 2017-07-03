@@ -8,7 +8,8 @@
 const assign = require('object-assign');
 const {
     NATURAL_FEATURE_TYPE_LOADED,
-    UPDATE_NATURAL_FEATURE_FORM
+    UPDATE_NATURAL_FEATURE_FORM,
+    UPDATE_NATURAL_FEATURE_ERROR
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -24,6 +25,11 @@ function naturalfeatures(state = {}, action) {
         case UPDATE_NATURAL_FEATURE_FORM: {
             return assign({}, state, {
                 selectedFeature: action.feature
+            });
+        }
+        case UPDATE_NATURAL_FEATURE_ERROR: {
+            return assign({}, state, {
+                errors: action.error.data
             });
         }
         default:

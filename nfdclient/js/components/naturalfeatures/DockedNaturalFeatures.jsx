@@ -22,6 +22,7 @@ const DockedNaturalFeatures = React.createClass({
         featuretype: React.PropTypes.string,
         featuresubtype: React.PropTypes.string,
         currentFeature: React.PropTypes.object,
+        errors: React.PropTypes.object,
         isVisible: React.PropTypes.bool,
         onToggle: React.PropTypes.func,
         onSave: React.PropTypes.func,
@@ -50,6 +51,7 @@ const DockedNaturalFeatures = React.createClass({
             forms: [],
             photos: [],
             currentFeature: {},
+            errors: {},
             isVisible: false,
             initWidth: 600,
             dockSize: 0.35,
@@ -410,6 +412,16 @@ const DockedNaturalFeatures = React.createClass({
           </div>
         );
     },
+    renderErrors() {
+        let errorItems = [];
+        for (let key in this.props.errors) {
+            if (key) {
+                let e = key + ': ' + this.props.errors[key][0];
+                errorItems.push(<li>{e}</li>);
+            }
+        }
+        return (<ul>{errorItems}</ul>);
+    },
     // {(this.props.mode === 'add') ? this.renderDrawTools() : null}
     // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
@@ -433,6 +445,9 @@ const DockedNaturalFeatures = React.createClass({
                     <Tabs defaultActiveKey={1} id="naturalfeature-tabs">
                         {this.renderTabs()}
                     </Tabs>
+                    <div className="nf-errors">
+                        {this.renderErrors()}
+                    </div>
                 </div>
                 <div className="dock-panel-footer">
                     <div className="dock-panel-footer-buttons">

@@ -19,6 +19,7 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     featuretype: state.naturalfeatures.featuretype,
     featuresubtype: state.naturalfeatures.featuresubtype,
     currentFeature: state.naturalfeatures.selectedFeature,
+    errors: state.naturalfeatures.errors,
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     isAdmin: true

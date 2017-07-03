@@ -21,6 +21,7 @@ module.exports = {
                 featuresubtype: "",
                 selectedFeature: {},
                 newFeature: {},
+                errors: {},
                 dockSize: 0.35
             }
         },

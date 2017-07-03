@@ -123,8 +123,8 @@ const LeafletDrawSupport = React.createClass({
         if (newProps.drawMethod === 'Marker') {
             let NaturalFeatureMarker = L.Icon.extend({
                 options: {
-                    iconUrl: newProps.options.icon,
-                    iconAnchor: [12, 40]
+                    iconUrl: newProps.options.icon/*,
+                    iconAnchor: [12, 40]*/
                 }
             });
             this.drawControl = new L.Draw.Marker(this.props.map, {
@@ -144,12 +144,12 @@ const LeafletDrawSupport = React.createClass({
         navigator.geolocation.getCurrentPosition((currentPosition) => {
             this.drawing = false;
             let smallIcon = new L.Icon({
-                iconUrl: newProps.options.icon,
-                iconAnchor: [12, 40]
+                iconUrl: newProps.options.icon/*,
+                iconAnchor: [12, 40]*/
             });
             let marker = L.marker(L.latLng(currentPosition.coords.latitude, currentPosition.coords.longitude), {
                 icon: smallIcon
-            }).addTo(this.props.map);
+            });// .addTo(this.props.map);
             // let drawn geom stay on the map
             let geoJesonFt = marker.toGeoJSON();
 
@@ -159,8 +159,17 @@ const LeafletDrawSupport = React.createClass({
             geoJesonFt.properties.featuresubtype = newProps.options.properties.featuresubtype;
             this.drawMarkerLayer.addData(geoJesonFt);
 
+            let newFeature = {
+                featuretype: newProps.options.properties.featuretype,
+                featuresubtype: newProps.options.properties.featuresubtype,
+                geom: {
+                    type: "Point",
+                    coordinates: geoJesonFt.geometry.coordinates
+                }
+            };
+
             this.props.onChangeDrawingStatus('stop', this.props.drawMethod, this.props.drawOwner);
-            this.props.onEndDrawing(geoJesonFt, this.props.drawOwner);
+            this.props.onEndDrawing(newFeature, this.props.drawOwner);
 
         }, (error) => {
             if (error.code === 1) {
