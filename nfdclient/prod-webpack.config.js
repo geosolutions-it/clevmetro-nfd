@@ -43,6 +43,7 @@ webpackConfig.plugins = [
     }),
     new NormalModuleReplacementPlugin(/map\/leaflet\/Feature/, path.join(__dirname, "js", "ms2Override", "LeafletFeature.jsx")),
     new NormalModuleReplacementPlugin(/map\/leaflet\/DrawSupport/, path.join(__dirname, "js", "ms2Override", "LeafletDrawSupport.jsx")),
+    new NormalModuleReplacementPlugin(/map\/leaflet\/Map/, path.join(__dirname, "js", "ms2Override", "LeafletMap.jsx")),
     extractThemesPlugin
 ];
 webpackConfig.devtool = undefined;
