@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
-from featuretype import FeatureTypeSerializer, CreateOccurrenceSerializer, LayerTaxonSerializer
+from featuretype import FeatureTypeSerializer, CreateOccurrenceSerializer, LayerTaxonSerializer, OccurrenceSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
@@ -107,7 +107,8 @@ class LayerDetail(APIView):
         if isinstance(feature, OccurrenceNaturalArea):
             return Response({"error": "not supported yet"})
         else:
-            serializer = TaxonDetailsSerializer(feature)
+            serializer = OccurrenceSerializer(feature)
+            #serializer = TaxonDetailsSerializer(feature)
         return Response(serializer.data)
 
     def put(self, request, occurrence_maincat, pk, format=None):
@@ -115,7 +116,8 @@ class LayerDetail(APIView):
         if isinstance(feature, OccurrenceNaturalArea):
             return Response({"error": "not supported yet"})
         else:
-            serializer = TaxonDetailsSerializer(feature, data=request.data)         
+            serializer = OccurrenceSerializer(feature, data=request.data)
+            #serializer = TaxonDetailsSerializer(feature, data=request.data)         
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
