@@ -36,11 +36,30 @@ const LeafletDrawSupport = React.createClass({
         };
     },
     componentWillReceiveProps(newProps) {
+        this.clean();
         let drawingStrings = this.props.messages || (this.context.messages) ? this.context.messages.drawLocal : false;
         if (drawingStrings) {
             L.drawLocal = drawingStrings;
         }
-        if (this.props.drawStatus !== newProps.drawStatus || this.props.drawMethod !== newProps.drawMethod) {
+        switch (newProps.drawStatus) {
+            case ("start"):
+                if (isMobile.any) {
+                    this.addMobileDrawInteraction(newProps);
+                } else {
+                    this.addDrawInteraction(newProps);
+                    // this.addMobileDrawInteraction(newProps);
+                }
+                break;
+            case ("stop"):
+                this.removeDrawInteraction();
+                break;
+            case ("clean"):
+                this.clean();
+                break;
+            default :
+                return;
+        }
+        /*if (this.props.drawStatus !== newProps.drawStatus || this.props.drawMethod !== newProps.drawMethod) {
             switch (newProps.drawStatus) {
                 case ("start"):
                     if (isMobile.any) {
@@ -59,7 +78,7 @@ const LeafletDrawSupport = React.createClass({
                 default :
                     return;
             }
-        }
+        }*/
     },
     onDraw: {
         drawStart() {
@@ -129,7 +148,7 @@ const LeafletDrawSupport = React.createClass({
             });
             this.drawControl = new L.Draw.Marker(this.props.map, {
                 icon: new NaturalFeatureMarker(),
-                repeatMode: true
+                repeatMode: false
             });
         }
 

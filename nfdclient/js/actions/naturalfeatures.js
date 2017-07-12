@@ -155,15 +155,15 @@ function updateNaturalFeatureForm(feature) {
 function reloadFeatureType(featuretype) {
     return (dispatch) => {
         if (featuretype === 'plant') {
-            dispatch(getPlants('https://geosolutions.scolab.eu/nfdapi/layers/plant/'));
+            dispatch(getPlants('https://dev.nfd.geo-solutions.it/nfdapi/layers/plant/'));
         } else if (featuretype === 'animal') {
-            dispatch(getAnimals('https://geosolutions.scolab.eu/nfdapi/layers/animal/'));
+            dispatch(getAnimals('https://dev.nfd.geo-solutions.it/nfdapi/layers/animal/'));
         } else if (featuretype === 'fungus') {
-            dispatch(getFungus('https://geosolutions.scolab.eu/nfdapi/layers/fungus/'));
+            dispatch(getFungus('https://dev.nfd.geo-solutions.it/nfdapi/layers/fungus/'));
         } else if (featuretype === 'slimemold') {
-            dispatch(getSlimeMolds('https://geosolutions.scolab.eu/nfdapi/layers/slimemold/'));
+            dispatch(getSlimeMolds('https://dev.nfd.geo-solutions.it/nfdapi/layers/slimemold/'));
         } else if (featuretype === 'naturalarea') {
-            dispatch(getNaturalAreas('https://geosolutions.scolab.eu/nfdapi/layers/naturalarea/'));
+            dispatch(getNaturalAreas('https://dev.nfd.geo-solutions.it/nfdapi/layers/naturalarea/'));
         }
     };
 }

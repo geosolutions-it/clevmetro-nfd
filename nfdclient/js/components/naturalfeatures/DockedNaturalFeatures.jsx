@@ -91,7 +91,7 @@ const DockedNaturalFeatures = React.createClass({
         if (formname === 'species') {
             icon = 'question-sign';
         } else if (formname === 'species.element_species') {
-            icon = 'question-sign';
+            icon = 'star';
         } else if (formname.includes("details")) {
             icon = 'th-list';
         } else if (formname.includes("lifestages")) {
@@ -118,22 +118,64 @@ const DockedNaturalFeatures = React.createClass({
     getOptions(values) {
         return values.items.map((item, index) => {
             return (
-                <option value={item.key} key={index}>{item.value}</option>
+                <option style={{fontSize: "12px"}} value={item.key} key={index}>{item.value}</option>
             );
         });
+    },
+    getPrettyFeatureType(ft) {
+        let featuretype = '';
+        if (ft === 'plant') {
+            featuretype = 'Plant';
+        } else if (ft === 'animal') {
+            featuretype = 'Animal';
+        } else if (ft === 'fungus') {
+            featuretype = 'Fungus';
+        } else if (ft === 'slimemold') {
+            featuretype = 'Slime/Mold';
+        } else if (ft === 'naturalarea') {
+            featuretype = 'Natural area';
+        }
+        return featuretype;
+    },
+    getPrettyFeatureSubType(fst) {
+        let featuresubtype = '';
+        if (fst === 'co') {
+            featuresubtype = ' (Conifer)';
+        } else if (fst === 'fe') {
+            featuresubtype = ' (Fern)';
+        } else if (fst === 'fl') {
+            featuresubtype = ' (Flowering plant)';
+        } else if (fst === 'pl') {
+            featuresubtype = ' (Plant generic)';
+        } else if (fst === 'mo') {
+            featuresubtype = ' (Moss)';
+        } else if (fst === 'ln') {
+            featuresubtype = ' (Land animal)';
+        } else if (fst === 'lk') {
+            featuresubtype = ' (Pond Lake animal)';
+        } else if (fst === 'st') {
+            featuresubtype = ' (Stream animal)';
+        } else if (fst === 'we') {
+            featuresubtype = ' (Wetland animal)';
+        }
+        return featuresubtype;
     },
     renderTabContent(tab) {
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
             if (item.type === 'string') {
                 let value = "";
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
@@ -170,12 +212,12 @@ const DockedNaturalFeatures = React.createClass({
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
-                                (<select style={{height: "24px"}} className="form-control" value={value || ""}>
+                                (<select style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={value || ""} onChange={this.handleChange}>
                                     <option value="">---</option>
                                     {this.getOptions(item.values)}
                                 </select>)
                                 :
-                                (<select disabled style={{height: "24px"}} className="form-control" bsSize="small" value={value || ""}>
+                                (<select disabled style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" bsSize="small" value={value || ""}>
                                     {this.getOptions(item.values)}
                                 </select>)
                             }
@@ -370,7 +412,7 @@ const DockedNaturalFeatures = React.createClass({
         ];
     },
     renderHistoric() {
-        return (
+        /*return (
             <div className="nf-historic">
                 <Button key="previous" bsSize="small"
                     bsStyle="primary"
@@ -386,7 +428,8 @@ const DockedNaturalFeatures = React.createClass({
                     <Glyphicon glyph={"menu-right"}/>
                 </Button>
             </div>
-        );
+        );*/
+        return null;
     },
     renderDrawTools() {
         return (
@@ -425,6 +468,7 @@ const DockedNaturalFeatures = React.createClass({
     // {(this.props.mode === 'add') ? this.renderDrawTools() : null}
     // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
+        let title = this.getPrettyFeatureType(this.props.featuretype) + this.getPrettyFeatureSubType(this.props.featuresubtype);
         return (
             <Dock
                 zIndex={1030 /*below dialogs, above left menu*/}
@@ -440,6 +484,7 @@ const DockedNaturalFeatures = React.createClass({
                 dockHiddenStyle={null}>
                 <div style={{width: "100%", minHeight: "35px", fontSize: "26px", padding: "15px"}}>
                     <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
+                    <span className="nfd-form-title">{title}</span>
                 </div>
                 <div>
                     <Tabs defaultActiveKey={1} id="naturalfeature-tabs">

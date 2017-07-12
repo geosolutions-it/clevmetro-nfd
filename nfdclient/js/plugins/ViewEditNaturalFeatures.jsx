@@ -34,7 +34,7 @@ const SmartDockedNaturalFeatures = connect((state) => ({
 const ViewEditNaturalFeaturesPlugin = React.createClass({
     render() {
         return (
-            <div>
+            <div id="docked-tutorial">
                 <SmartDockedNaturalFeatures mode="viewedit"/>
             </div>
         );

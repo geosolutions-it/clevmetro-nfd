@@ -43,7 +43,7 @@
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
-            "name": "Fungus",
+            "name": "Fungi",
             "hideLoading": true,
             "id": "fungus",
             "styleName": "marker",

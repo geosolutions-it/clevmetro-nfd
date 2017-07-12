@@ -10,6 +10,7 @@ module.exports = {
     plugins: {
         MapPlugin: require('../MapStore2/web/client/plugins/Map'),
         DrawerMenuPlugin: require('../MapStore2/web/client/plugins/DrawerMenu'),
+        TutorialPlugin: require('../MapStore2/web/client/plugins/Tutorial'),
         TOCPlugin: require('../MapStore2/web/client/plugins/TOC'),
         OmniBarPlugin: require('../MapStore2/web/client/plugins/OmniBar'),
         SearchPlugin: require('../MapStore2/web/client/plugins/Search'),
