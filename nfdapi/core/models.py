@@ -31,12 +31,12 @@ class OccurrenceCategory(DictionaryTable):
 
 @reversion.register()    
 class PointOfContact(models.Model):
-    name = models.TextField(blank=True)
-    affiliation = models.TextField(blank=True)
-    phone1 = models.TextField(blank=True)
-    phone2 = models.TextField(blank=True)
-    email = models.TextField(blank=True)
-    street_address = models.TextField(blank=True)
+    name = models.TextField(blank=False)
+    affiliation = models.TextField(blank=True, default='')
+    phone1 = models.TextField(blank=True, default='')
+    phone2 = models.TextField(blank=True, default='')
+    email = models.TextField(blank=True, default='')
+    street_address = models.TextField(blank=True, default='')
 
 
 class DayTime(DictionaryTable):
@@ -187,7 +187,7 @@ class TaxonDetails(models.Model):
 class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
-    details = models.ForeignKey(TaxonDetails, on_delete=models.CASCADE, blank=True, null=True)
+    details = models.OneToOneField(TaxonDetails, on_delete=models.CASCADE, null=True)
             
     def get_details_class(self):
         if self.occurrence_cat:
