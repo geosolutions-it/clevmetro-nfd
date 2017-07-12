@@ -9,7 +9,7 @@ const React = require('react');
 const {connect} = require('react-redux');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {updateNaturalFeature, deleteNaturalFeature} = require('../actions/naturalfeatures');
+const {updateNaturalFeature, deleteNaturalFeature, getSpecie} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const DockedNaturalFeatures = require('../components/naturalfeatures/DockedNaturalFeatures');
@@ -27,6 +27,7 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     onToggle: toggleControl.bind(null, 'vieweditnaturalfeatures', null),
     onUpdate: updateNaturalFeature.bind(null),
     onDelete: deleteNaturalFeature.bind(null),
+    getSpecie: getSpecie.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing
 })(DockedNaturalFeatures);

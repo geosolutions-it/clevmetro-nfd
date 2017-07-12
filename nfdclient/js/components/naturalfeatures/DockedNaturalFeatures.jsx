@@ -9,6 +9,8 @@ const React = require('react');
 const Dock = require('react-dock');
 const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox} = require('react-bootstrap');
 const DatePicker = require("react-bootstrap-date-picker");
+const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
+const AsyncTypeahead = asyncContainer(Typeahead);
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
 const _ = require('lodash');
@@ -44,7 +46,9 @@ const DockedNaturalFeatures = React.createClass({
         getMyLocationEnabled: React.PropTypes.bool,
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
-        photos: React.PropTypes.array
+        photos: React.PropTypes.array,
+        getSpecie: React.PropTypes.func,
+        selectedSpecie: React.PropTypes.number
     },
     getDefaultProps() {
         return {
@@ -64,6 +68,7 @@ const DockedNaturalFeatures = React.createClass({
             onSave: () => {},
             onUpdate: () => {},
             onDelete: () => {},
+            getSpecie: () => {},
             previousVersion: () => {},
             nextVersion: () => {},
             onChangeDrawingStatus: () => {},
@@ -169,6 +174,10 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
+                let readOnly = false;
+                if (item.readonly) {
+                    readOnly = true;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
@@ -182,6 +191,7 @@ const DockedNaturalFeatures = React.createClass({
                                 (<FormControl
                                     style={{width: "100%", height: "24px", fontSize: "12px"}}
                                     value={value}
+                                    readOnly={readOnly}
                                     onChange={this.handleChange}
                                     key={item.key}
                                     name={item.key}
@@ -202,13 +212,17 @@ const DockedNaturalFeatures = React.createClass({
                 );
             } else if (item.type === 'stringcombo') {
                 let value = "";
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
@@ -226,19 +240,28 @@ const DockedNaturalFeatures = React.createClass({
                 );
             } else if (item.type === 'integer') {
                 let value = "";
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
+                let readOnly = false;
+                if (item.readonly) {
+                    readOnly = true;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
                                 (<FormControl
                                     style={{width: "100%", height: "24px", fontSize: "12px"}}
                                     value={value}
+                                    readOnly={readOnly}
                                     onChange={this.handleChange}
                                     key={item.key}
                                     name={item.key}
@@ -263,19 +286,28 @@ const DockedNaturalFeatures = React.createClass({
                 );
             } else if (item.type === 'double') {
                 let value = "";
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
+                let readOnly = false;
+                if (item.readonly) {
+                    readOnly = true;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
                                 (<FormControl
                                     style={{width: "100%", height: "24px", fontSize: "12px"}}
                                     value={value}
+                                    readOnly={readOnly}
                                     onChange={this.handleChange}
                                     key={item.key}
                                     name={item.key}
@@ -300,13 +332,17 @@ const DockedNaturalFeatures = React.createClass({
                 );
             } else if (item.type === 'boolean') {
                 let value = false;
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
@@ -319,13 +355,17 @@ const DockedNaturalFeatures = React.createClass({
                 );
             } else if (item.type === 'date') {
                 let value = null;
+                let label = item.label;
+                if (item.mandatory) {
+                    label = '* ' + item.label;
+                }
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{item.label}</ControlLabel>
+                            <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
@@ -340,7 +380,18 @@ const DockedNaturalFeatures = React.createClass({
         });
         return (
             <div className="nf-tab-content">
-                <Table style={{width: "100%"}} responsive striped condensed bordered>
+                <AsyncTypeahead
+                    {...this.state}
+                    labelKey="name"
+                    bsSize="small"
+                    maxResults={20}
+                    onSearch={this._handleSearch}
+                    placeholder="Search for a specie..."
+                    renderMenuItemChildren={this._renderMenuItemChildren}
+                    selected={this.props.selectedSpecie}
+                    onChange={this._handleSpeciesChange}
+                />
+            <Table style={{width: "100%", marginTop: "10px"}} responsive striped condensed bordered>
                     <caption style={{display: "table-caption", textAlign: "center", backgroundColor: "#ccc", color: "#ffffff"}}>{tabName}</caption>
                     <tbody style={{width: "100%"}}>{items}</tbody>
                 </Table>
@@ -502,6 +553,26 @@ const DockedNaturalFeatures = React.createClass({
                 </div>
             </Dock>
         );
+    },
+    _renderMenuItemChildren(option) {
+        return (
+            <div key={option.id}>
+                <span>{option.name}</span>
+            </div>
+        );
+    },
+    _handleSpeciesChange(e) {
+        if (e.length === 1) {
+            this.props.getSpecie(e[0].id);
+        }
+    },
+    _handleSearch(query) {
+        if (!query) {
+            return;
+        }
+        fetch(`https://dev.nfd.geo-solutions.it/nfdapi/species/?search=${query}`)
+            .then(resp => resp.json())
+            .then(json => this.setState({options: json}));
     },
     handleVisibility(index, label) {
         if (this.props.mode === 'add') {

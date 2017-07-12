@@ -183,6 +183,18 @@ function getFeatureInfo(properties, nfid) {
     };
 }
 
+function getSpecie(id) {
+    return (dispatch) => {
+        return Api.getSpecie(id).then((resp) => {
+            if (resp) {
+                dispatch(updateNaturalFeatureForm(resp));
+            }
+        }).catch((error) => {
+            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+        });
+    };
+}
+
 function naturalFeatureSelected(properties, nfid) {
     return (dispatch) => {
         return Api.getFeatureType(properties.featuretype, nfid).then((resp) => {
@@ -412,5 +424,6 @@ module.exports = {
     deleteNaturalFeatureLoading, deleteNaturalFeatureSuccess,
     deleteNaturalFeatureError,
     NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
-    NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded
+    NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
+    getSpecie
 };

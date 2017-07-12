@@ -45,6 +45,10 @@ const Api = {
         let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + layerId + '/' + nfid + '/';
         return axios.get(url).then(function(response) {return response.data; });
     },
+    getSpecie: function(id) {
+        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/species/' + id + '/';
+        return axios.get(url).then(function(response) {return response.data; });
+    },
     createNewFeature: function(feature) {
         let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + feature.featuretype + '/';
         return axios.post(url, feature).then(function(response) {return response.data; });

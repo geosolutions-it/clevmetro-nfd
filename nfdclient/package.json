@@ -151,6 +151,7 @@
         "react-twitter-widgets": "1.2.0",
         "react-widgets": "3.4.6",
         "react-fontawesome": "1.6.1",
+        "react-bootstrap-typeahead": "1.4.1",
         "recharts": "0.21.2",
         "redux": "3.6.0",
         "redux-logger": "2.6.1",

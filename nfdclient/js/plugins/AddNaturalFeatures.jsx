@@ -11,7 +11,7 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {createNaturalFeature/*, addNaturalFeature*/, updateNaturalFeature} = require('../actions/naturalfeatures');
+const {createNaturalFeature/*, addNaturalFeature*/, updateNaturalFeature, getSpecie} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
@@ -31,6 +31,7 @@ const SmartDockedNaturalFeatures = connect((state) => ({
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
     onUpdate: updateNaturalFeature.bind(null),
+    getSpecie: getSpecie.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
