@@ -1,0 +1,12 @@
+.nfd-legend {
+    padding: 10px;
+    background-color: #ffffff;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    z-index: 1021;
+    box-shadow: -1px 1px 5px 1px #5e5e5e;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
