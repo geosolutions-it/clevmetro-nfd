@@ -881,10 +881,21 @@
             "draw": "Draw",
             "or": "or",
             "animals": "Animals",
-            "mushrooms": "Mushrooms",
+            "fungus": "Fungus",
             "plants": "Plants",
             "naturalarea": "Natural area",
-            "slimemold": "Slime/mold"
+            "slimemold": "Slime/mold",
+            "conifer": "Conifer",
+            "fern": "Fern",
+            "flowering_plant": "Flowering plant",
+            "plant_generic": "Plant - generic",
+            "moss": "Moss",
+            "fungus": "Fungus",
+            "land_animal": "Land animal",
+            "pond_lake_animal": "Pond lake animal",
+            "stream_animal": "Stream animal",
+            "wetland_animal": "Wetland animal"
+
         }
     }
 }

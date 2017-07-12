@@ -47,14 +47,19 @@
     display: block;
 }
 
+.nf-errors {
+    padding: 20px;
+    color: #ff0000;
+}
+
 /* tablets and desktop */
 @media only screen and (min-width: 768px) {
     .dock-panel-footer {
-        position: fixed;
+        /* position: fixed; */
         bottom: 0px;
         padding: 20px;
         border-top: 1px solid #ccc;
-        width: 35%;
+        /* width: 35%; */
         text-align: right;
     }
     .dock-panel-footer-buttons {
@@ -70,11 +75,11 @@
 /* phones */
 @media only screen and (max-width: 767px) {
     .dock-panel-footer {
-        position: fixed;
+        /* position: fixed; */
         bottom: 0px;
         padding: 20px;
         border-top: 1px solid #ccc;
-        width: 100%;
+        /* width: 100%; */
         text-align: right;
     }
     .dock-panel-footer-buttons {
@@ -90,11 +95,11 @@
 /* portrait phones */
 @media only screen and (max-width: 767px) and (orientation: portrait) {
     .dock-panel-footer {
-        position: fixed;
+        /* position: fixed; */
         bottom: 0px;
         padding: 20px;
         border-top: 1px solid #ccc;
-        width: 100%;
+        /* width: 100%; */
         text-align: right;
     }
     .dock-panel-footer-buttons {

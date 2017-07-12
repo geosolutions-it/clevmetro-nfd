@@ -7,7 +7,8 @@
  */
 const React = require('react');
 const Dock = require('react-dock');
-const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button} = require('react-bootstrap');
+const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox} = require('react-bootstrap');
+const DatePicker = require("react-bootstrap-date-picker");
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
 const _ = require('lodash');
@@ -17,8 +18,11 @@ require('./DockedNaturalFeatures.css');
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
-        naturalFeatureType: React.PropTypes.array,
+        forms: React.PropTypes.array,
+        featuretype: React.PropTypes.string,
+        featuresubtype: React.PropTypes.string,
         currentFeature: React.PropTypes.object,
+        errors: React.PropTypes.object,
         isVisible: React.PropTypes.bool,
         onToggle: React.PropTypes.func,
         onSave: React.PropTypes.func,
@@ -44,9 +48,10 @@ const DockedNaturalFeatures = React.createClass({
     },
     getDefaultProps() {
         return {
-            naturalFeatureType: [],
+            forms: [],
             photos: [],
             currentFeature: {},
+            errors: {},
             isVisible: false,
             initWidth: 600,
             dockSize: 0.35,
@@ -81,18 +86,54 @@ const DockedNaturalFeatures = React.createClass({
     onGetMyLocationClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
     },
+    getIcon(formname) {
+        let icon = 'question-sign';
+        if (formname === 'species') {
+            icon = 'question-sign';
+        } else if (formname === 'species.element_species') {
+            icon = 'question-sign';
+        } else if (formname.includes("details")) {
+            icon = 'th-list';
+        } else if (formname.includes("lifestages")) {
+            icon = 'refresh';
+        } else if (formname === 'occurrencemanagement') {
+            icon = 'cog';
+        } else if (formname === 'observation') {
+            icon = 'eye-open';
+        } else if (formname === 'observation.reporter') {
+            icon = 'reporter';
+        } else if (formname === 'observation.recorder') {
+            icon = 'recorder';
+        } else if (formname === 'observation.verifier') {
+            icon = 'verifier';
+        } else if (formname === 'voucher') {
+            icon = 'tag';
+        } else if (formname === 'photograh') {
+            icon = 'question-sign';
+        } else if (formname === 'location') {
+            icon = 'question-sign';
+        }
+        return icon;
+    },
+    getOptions(values) {
+        return values.items.map((item, index) => {
+            return (
+                <option value={item.key} key={index}>{item.value}</option>
+            );
+        });
+    },
     renderTabContent(tab) {
-        let tabName = tab.name;
-        let items = tab.attributes.map((attribute) => {
-            if (attribute.type === 'string') {
+        let tabName = tab.formlabel;
+        let items = tab.formitems.map((item) => {
+            if (item.type === 'string') {
                 let value = "";
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[attribute.attribute]) {
-                    value = this.props.currentFeature[attribute.attribute];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 return (
-                    <tr style={{width: "100%"}} key={attribute.attribute + "-row"}>
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{attribute.label}</ControlLabel>
+                            <ControlLabel>{item.label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             {this.props.isAdmin ?
@@ -100,17 +141,155 @@ const DockedNaturalFeatures = React.createClass({
                                     style={{width: "100%", height: "24px", fontSize: "12px"}}
                                     value={value}
                                     onChange={this.handleChange}
-                                    key={attribute.attribute}
-                                    name={attribute.attribute}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
                                     type="text"/>)
                                 :
                                 (<FormControl
                                     style={{width: "100%", height: "24px", fontSize: "12px"}}
                                     readOnly
                                     value={value}
-                                    key={attribute.attribute}
-                                    name={attribute.attribute}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
                                     type="text"/>)
+                            }
+                        </td>
+                    </tr>
+                );
+            } else if (item.type === 'stringcombo') {
+                let value = "";
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
+                }
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{item.label}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            {this.props.isAdmin ?
+                                (<select style={{height: "24px"}} className="form-control" value={value || ""}>
+                                    <option value="">---</option>
+                                    {this.getOptions(item.values)}
+                                </select>)
+                                :
+                                (<select disabled style={{height: "24px"}} className="form-control" bsSize="small" value={value || ""}>
+                                    {this.getOptions(item.values)}
+                                </select>)
+                            }
+                        </td>
+                    </tr>
+                );
+            } else if (item.type === 'integer') {
+                let value = "";
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
+                }
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{item.label}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            {this.props.isAdmin ?
+                                (<FormControl
+                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                    value={value}
+                                    onChange={this.handleChange}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
+                                    min="0"
+                                    step="1"
+                                    type="number"/>)
+                                :
+                                (<FormControl
+                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                    readOnly
+                                    value={value}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
+                                    min="0"
+                                    step="1"
+                                    type="number"/>)
+                            }
+                        </td>
+                    </tr>
+                );
+            } else if (item.type === 'double') {
+                let value = "";
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
+                }
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{item.label}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            {this.props.isAdmin ?
+                                (<FormControl
+                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                    value={value}
+                                    onChange={this.handleChange}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
+                                    min="0"
+                                    step="any"
+                                    type="number"/>)
+                                :
+                                (<FormControl
+                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                    readOnly
+                                    value={value}
+                                    key={item.key}
+                                    name={item.key}
+                                    componentClass="input"
+                                    min="0"
+                                    step="any"
+                                    type="number"/>)
+                            }
+                        </td>
+                    </tr>
+                );
+            } else if (item.type === 'boolean') {
+                let value = false;
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
+                }
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{item.label}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            {this.props.isAdmin ?
+                                (<Checkbox checked={value} onChange={this.handleChange}/>)
+                                :
+                                (<Checkbox checked={value} disabled/>)
+                            }
+                        </td>
+                    </tr>
+                );
+            } else if (item.type === 'date') {
+                let value = null;
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
+                }
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{item.label}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            {this.props.isAdmin ?
+                                (<DatePicker style={{height: "24px"}} value={value} onChange={this.handleChange} />)
+                                :
+                                (<DatePicker disabled style={{height: "24px"}} value={value} />)
                             }
                         </td>
                     </tr>
@@ -128,10 +307,10 @@ const DockedNaturalFeatures = React.createClass({
     },
     renderTabs() {
         let tabs = [];
-        this.props.naturalFeatureType.map((tab, index) => {
+        this.props.forms.map((tab, index) => {
             let i = index + 1;
             let key = "tab-" + i;
-            let tabIcon = tab.icon;
+            let tabIcon = this.getIcon(tab.formname);
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     {this.renderTabContent(tab)}
@@ -149,31 +328,33 @@ const DockedNaturalFeatures = React.createClass({
                 </Tab>
             );
         }*/
-        let lastIndex = tabs.length + 1;
-        tabs.push(
-            <Tab eventKey={lastIndex} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                <div className="nf-tab-content">
-                    <span className="btn btn-default btn-file">
-                        Select or capture images <input type="file" accept="image/*" id="captured-images" multiple="multiple" onChange={this.handleImageChange}/>
-                    </span>
-                    <output id="result" />
-                </div>
-            </Tab>
-        );
+        if (this.props.mode === 'add') {
+            let lastIndex = tabs.length + 1;
+            tabs.push(
+                <Tab eventKey={lastIndex} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
+                    <div className="nf-tab-content">
+                        <span className="btn btn-default btn-file">
+                            Select or capture images <input type="file" accept="image/*" id="captured-images" multiple="multiple" onChange={this.handleImageChange}/>
+                        </span>
+                        <output id="result" />
+                    </div>
+                </Tab>
+            );
+        }
         return tabs;
     },
     renderButtons() {
         return (this.props.mode === 'viewedit') ? [
             <Button key="delete" bsSize="small"
                 bsStyle="primary"
-                onClick={() => this.props.onDelete(this.props.currentFeature)}
+                onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.id)}
                 style={{marginRight: "10px"}}
                 disabled={false}>
                 <Message msgId="naturalfeatures.delete" />
             </Button>,
             <Button key="update" bsSize="small"
                 bsStyle="primary"
-                onClick={() => this.props.onUpdate(this.props.currentFeature)}
+                onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                 disabled={false}>
                 <Message msgId="naturalfeatures.update" />
             </Button>
@@ -181,7 +362,7 @@ const DockedNaturalFeatures = React.createClass({
         ] : [
             <Button key="save" bsSize="small"
                 bsStyle="primary"
-                onClick={() => this.props.onSave(this.props.currentFeature)}
+                onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                 disabled={false}>
                 <Message msgId="naturalfeatures.save" />
             </Button>
@@ -231,6 +412,18 @@ const DockedNaturalFeatures = React.createClass({
           </div>
         );
     },
+    renderErrors() {
+        let errorItems = [];
+        for (let key in this.props.errors) {
+            if (key) {
+                let e = key + ': ' + this.props.errors[key][0];
+                errorItems.push(<li>{e}</li>);
+            }
+        }
+        return (<ul>{errorItems}</ul>);
+    },
+    // {(this.props.mode === 'add') ? this.renderDrawTools() : null}
+    // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
         return (
             <Dock
@@ -249,15 +442,12 @@ const DockedNaturalFeatures = React.createClass({
                     <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
                 </div>
                 <div>
-                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={
-                        (index, label) =>
-                            (label.target.className === "glyphicon glyphicon-camera") ?
-                                document.getElementById("nfdraw-tools").style.display = "none" :
-                                document.getElementById("nfdraw-tools").style.display = "block"
-                    }>
+                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs">
                         {this.renderTabs()}
                     </Tabs>
-                    {(this.props.mode === 'add') ? this.renderDrawTools() : null}
+                    <div className="nf-errors">
+                        {this.renderErrors()}
+                    </div>
                 </div>
                 <div className="dock-panel-footer">
                     <div className="dock-panel-footer-buttons">
@@ -267,6 +457,15 @@ const DockedNaturalFeatures = React.createClass({
                 </div>
             </Dock>
         );
+    },
+    handleVisibility(index, label) {
+        if (this.props.mode === 'add') {
+            if (label.target.className === "glyphicon glyphicon-camera") {
+                document.getElementById("nfdraw-tools").style.display = "none";
+            } else {
+                document.getElementById("nfdraw-tools").style.display = "block";
+            }
+        }
     },
     limitDockHeight(size) {
         if (size >= this.props.maxDockSize) {

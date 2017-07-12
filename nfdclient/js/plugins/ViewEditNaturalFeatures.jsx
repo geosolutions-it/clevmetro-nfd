@@ -15,8 +15,11 @@ const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/ac
 const DockedNaturalFeatures = require('../components/naturalfeatures/DockedNaturalFeatures');
 const SmartDockedNaturalFeatures = connect((state) => ({
     isVisible: state.controls.vieweditnaturalfeatures && state.controls.vieweditnaturalfeatures.enabled,
-    naturalFeatureType: state.naturalfeatures.naturalFeatureType,
+    forms: state.naturalfeatures.forms,
+    featuretype: state.naturalfeatures.featuretype,
+    featuresubtype: state.naturalfeatures.featuresubtype,
     currentFeature: state.naturalfeatures.selectedFeature,
+    errors: state.naturalfeatures.errors,
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     isAdmin: true

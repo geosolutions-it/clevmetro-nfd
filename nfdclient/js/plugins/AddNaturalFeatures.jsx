@@ -11,7 +11,7 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {addNaturalFeature, saveNaturalFeature} = require('../actions/naturalfeatures');
+const {createNaturalFeature/*, addNaturalFeature*/, updateNaturalFeature} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
@@ -20,14 +20,17 @@ const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
 
 const SmartDockedNaturalFeatures = connect((state) => ({
     isVisible: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
-    naturalFeatureType: state.naturalfeatures.naturalFeatureType,
-    currentFeature: state.naturalfeatures.newFeature,
+    forms: state.naturalfeatures.forms,
+    featuretype: state.naturalfeatures.featuretype,
+    featuresubtype: state.naturalfeatures.featuresubtype,
+    currentFeature: state.naturalfeatures.selectedFeature,
+    errors: state.naturalfeatures.errors,
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     isAdmin: true
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
-    onSave: saveNaturalFeature.bind(null),
+    onUpdate: updateNaturalFeature.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
@@ -61,11 +64,18 @@ const AddNaturalFeatures = React.createClass({
             this.props.visible ?
             (<div>
                 <DropdownButton id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
-                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature("refinerias.43")}><Message msgId="naturalfeatures.animals"/></MenuItem>
-                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature("mushrooms")}><Message msgId="naturalfeatures.mushrooms"/></MenuItem>
-                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature("plants")}><Message msgId="naturalfeatures.plants"/></MenuItem>
-                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature("naturalarea")}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
-                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature("slimemold")}><Message msgId="naturalfeatures.slimemold"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "fe"})}><Message msgId="naturalfeatures.fern"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "fl"})}><Message msgId="naturalfeatures.flowering_plant"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "pl"})}><Message msgId="naturalfeatures.plant_generic"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "mo"})}><Message msgId="naturalfeatures.moss"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "fungus", "featuresubtype": "fu"})}><Message msgId="naturalfeatures.fungus"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "slimemold", "featuresubtype": "sl"})}><Message msgId="naturalfeatures.slimemold"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "ln"})}><Message msgId="naturalfeatures.land_animal"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "lk"})}><Message msgId="naturalfeatures.pond_lake_animal"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "st"})}><Message msgId="naturalfeatures.stream_animal"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "we"})}><Message msgId="naturalfeatures.wetland_animal"/></MenuItem>
+                    <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
                 </DropdownButton>
                 <SmartDockedNaturalFeatures mode="add"/>
             </div>) : null
@@ -79,7 +89,7 @@ module.exports = {
         disabled: state.controls && state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.disabled,
         visible: true
     }), {
-        onToggleNewNaturalFeature: addNaturalFeature
+        onToggleNewNaturalFeature: createNaturalFeature
     })(AddNaturalFeatures), {
         OmniBar: {
             name: "addnf",

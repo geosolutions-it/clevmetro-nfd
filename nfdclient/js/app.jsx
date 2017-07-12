@@ -12,7 +12,7 @@ const appReducers = {
     naturalfeatures: require('./reducers/naturalfeatures'),
     selection: require('../MapStore2/web/client/reducers/selection')
 };
-const {initState, getAnimals, getPlants, getNaturalAreas, getMushrooms, getSlimeMolds} = require('./actions/naturalfeatures');
+const {initState, getAnimals, getPlants/*, getNaturalAreas*/, getFungus, getSlimeMolds} = require('./actions/naturalfeatures');
 const dEpics = require('./epics/naturalfeatures');
 const ConfigUtils = require('../MapStore2/web/client/utils/ConfigUtils');
 // ConfigUtils.setLocalConfigurationFile('/static/js/risksConfig.json');
@@ -45,11 +45,11 @@ const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(nu
 const initialActions = init ? [
     () => initState(init)
 ] : [
-    () => getAnimals('http://geosolutions.scolab.eu/nfdapi/layers/animals/'),
-    () => getPlants('http://geosolutions.scolab.eu/nfdapi/layers/plants/'),
-    () => getNaturalAreas('http://geosolutions.scolab.eu/nfdapi/layers/naturalareas/'),
-    () => getMushrooms('http://geosolutions.scolab.eu/nfdapi/layers/fungi/'),
-    () => getSlimeMolds('http://geosolutions.scolab.eu/nfdapi/layers/slimemolds/')
+    () => getAnimals('https://geosolutions.scolab.eu/nfdapi/layers/animal/'),
+    () => getPlants('https://geosolutions.scolab.eu/nfdapi/layers/plant/'),
+    // () => getNaturalAreas('https://geosolutions.scolab.eu/nfdapi/layers/naturalarea/'),
+    () => getFungus('https://geosolutions.scolab.eu/nfdapi/layers/fungus/'),
+    () => getSlimeMolds('https://geosolutions.scolab.eu/nfdapi/layers/slimemold/')
 ];
 const appConfig = {
     storeOpts,
