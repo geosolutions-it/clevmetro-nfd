@@ -205,9 +205,11 @@ def insert_test_data(clean=True):
         Species.objects.all().delete()
         ElementSpecies.objects.all().delete()
         OccurrenceObservation.objects.all().delete()
-        
-    plant_cat = OccurrenceCategory.objects.get(code='pl')
+    
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
+    """    
+    plant_cat = OccurrenceCategory.objects.get(code='pl')
+    
     with reversion.create_revision():
         element_species = ElementSpecies()
         element_species.iucn_red_list_category = iucn_cat
@@ -242,7 +244,7 @@ def insert_test_data(clean=True):
         t.geom = 'POINT( -81.575804 41.279632 )'
         t.species = species
         t.save()
-    
+    """
     stream_animal_cat = OccurrenceCategory.objects.get(code='st')    
     
     with reversion.create_revision():
