@@ -18,6 +18,7 @@ from core.featuretype import TaxonDetailsSerializer, SpeciesSearchSerializer,\
 from rest_framework.generics import ListCreateAPIView, ListAPIView,\
     RetrieveAPIView
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 
 @api_view(['GET'])
 @permission_classes([])
@@ -145,11 +146,18 @@ def get_feature_type(request, occurrence_maincat, feature_id):
     ftdata = serializer.get_feature_type()
     return Response(ftdata)
 
+class SpeciesPaginationClass(PageNumberPagination):
+    page_size = 15
+    
+    def get_paginated_response(self, data):
+        return Response(data)
+    
 @permission_classes([])
 class SpeciesSearch(ListAPIView):
     queryset = Species.objects.all()
     serializer_class = SpeciesSearchSerializer
     filter_backends = (SearchFilter,)
+    pagination_class = SpeciesPaginationClass
     search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
 
 @permission_classes([])
