@@ -45,11 +45,11 @@ const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(nu
 const initialActions = init ? [
     () => initState(init)
 ] : [
-    () => getAnimals('https://geosolutions.scolab.eu/nfdapi/layers/animal/'),
-    () => getPlants('https://geosolutions.scolab.eu/nfdapi/layers/plant/'),
-    // () => getNaturalAreas('https://geosolutions.scolab.eu/nfdapi/layers/naturalarea/'),
-    () => getFungus('https://geosolutions.scolab.eu/nfdapi/layers/fungus/'),
-    () => getSlimeMolds('https://geosolutions.scolab.eu/nfdapi/layers/slimemold/')
+    () => getAnimals('https://dev.nfd.geo-solutions.it/nfdapi/layers/animal/'),
+    () => getPlants('https://dev.nfd.geo-solutions.it/nfdapi/layers/plant/'),
+    // () => getNaturalAreas('https://dev.nfd.geo-solutions.it/nfdapi/layers/naturalarea/'),
+    () => getFungus('https://dev.nfd.geo-solutions.it/nfdapi/layers/fungus/'),
+    () => getSlimeMolds('https://dev.nfd.geo-solutions.it/nfdapi/layers/slimemold/')
 ];
 const appConfig = {
     storeOpts,

@@ -1,7 +1,7 @@
 {
     "proxyUrl": {
         "url": "/mapstore/proxy/?url=",
-        "useCORS": ["http://localhost", "http://localhost:8081", "http://192.168.1.38", "http://192.168.1.38:8081", "http://geosolutions.scolab.eu", "https://geosolutions.scolab.eu"]
+        "useCORS": ["http://localhost", "http://localhost:8081", "http://192.168.1.38", "http://192.168.1.38:8081", "http://geosolutions.scolab.eu", "https://geosolutions.scolab.eu", "http://dev.nfd.geo-solutions.it", "https://dev.nfd.geo-solutions.it"]
     },
 	  "geoStoreUrl": "/mapstore/rest/geostore",
     "printUrl": "https://demo.geo-solutions.it/geoserver/pdf/info.json",
@@ -12,22 +12,49 @@
             "name": "Map",
             "cfg": {
                 "mapType": "leaflet",
-                "tools": ["measurement", "locate", "draw"]
+                "tools": ["measurement", "draw"]
             }
         }, {
             "name": "DrawerMenu",
             "cfg": {
                 "glyph": "cleveland"
             }
+        }, {
+            "name": "Tutorial",
+            "cfg": {
+              "rawSteps": [
+                  {
+                      "title": "Welcome to the natural features database of the Cleveland metroparks",
+                      "text": "Click on start to initialize the tutorial",
+                      "selector": "#intro-tutorial"
+                  },
+                  {
+                      "title": "Layer tree",
+                      "text": "<div><ol><li>Click on the logo button to open the layer tree</li><li>Here the user can manage the layers</li></ol></div>",
+                      "selector": "#drawer-menu-button"
+                  },
+                  {
+                      "title": "Legend",
+                      "text": "Displays the legend of the layers",
+                      "selector": "#nfd-legend"
+                  },
+                  {
+                      "title": "Visualization",
+                      "text": "<div><ol><li>Click on the marker to get informations</li><li>The panel opens</li><li>Select the tab to see the contents</li><li>When the user has logged in as an admin, he/she can edit existing observation, click on the marker</li><li>Click and type to change the attributes on every field</li><li>Click on update button to finish the edit and save, or click on delete button to remove the observation</li><li>Click on the X button to close the panel</li></ol></div>",
+                      "selector": "#map"
+                  },
+                  {
+                      "title": "Add new observation",
+                      "text": "<div><ol><li>When the user has logged in as an admin, the add icon is activated</li><li>Select a subspecies from the drop-down menu</li><li>Click on the map to add the marker in the desired location</li><li>The edit panel opens</li><li>Click on the input field to edit and type to add new informations</li><li>Click on a different tab to add more informations</li><li>Click on save button to finish the edit and save</li></ol></div>",
+                      "selector": "#addnf-menu-button"
+                  }
+              ]
+            }
         },
         "TOC",
         "OmniBar",
-        "Search",
-        "BurgerMenu",
-        "Login",
         "Toolbar",
         "Expander",
-        "Locate",
         "ZoomAll",
         "ZoomIn",
         "ZoomOut",
@@ -38,7 +65,7 @@
           "name": "Map",
           "cfg": {
               "mapType": "leaflet",
-              "tools": ["measurement", "locate", "draw"]
+              "tools": ["measurement", "draw"]
           }
       }, {
           "name": "DrawerMenu",
@@ -48,11 +75,8 @@
       },
       "TOC",
       "OmniBar",
-      "BurgerMenu",
-      "Login",
       "Toolbar",
       "Expander",
-      "Locate",
       "ZoomAll",
       "ZoomIn",
       "ZoomOut",
