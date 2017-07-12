@@ -18,7 +18,7 @@ from collections import Mapping, OrderedDict
 from rest_framework.serializers import Field
 import reversion
 from reversion.models import Version
-from rest_framework.fields import empty
+from rest_framework.fields import empty, SerializerMethodField
 from rest_framework_gis import serializers as gisserializer
 from django.db.models.fields import NOT_PROVIDED
 
@@ -246,6 +246,21 @@ def check_all_null(field_dict):
         elif value is not None:
             return False
     return True
+
+def to_flat_representation(values_dict, parent_path=None):
+    result = {}
+    for fname, fvalue in values_dict.items():
+        if parent_path:
+            global_fname = parent_path + "." + fname
+        else:
+            global_fname = fname
+
+        if fname != 'geom' and isinstance(fvalue, dict):
+            child_dict = to_flat_representation(fvalue, global_fname)
+            result.update(child_dict)
+        else:
+            result[global_fname] = fvalue
+    return result
 
 class CustomModelSerializerMixin(object):
     """
@@ -565,22 +580,6 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     species = SpeciesSerializer(required=False)
     observation = OccurrenceObservationSerializer(required=False)
     details = DetailsSerializer(required=False) 
-
-
-    def to_flat_representation(self, values_dict, parent_path=None):
-        result = {}
-        for fname, fvalue in values_dict.items():
-            if parent_path:
-                global_fname = parent_path + "." + fname
-            else:
-                global_fname = fname
-
-            if fname != 'geom' and isinstance(fvalue, dict):
-                child_dict = self.to_flat_representation(fvalue, global_fname)
-                result.update(child_dict)
-            else:
-                result[global_fname] = fvalue
-        return result
     
     def to_representation(self, instance):
         details_name = instance.get_details_class().__name__.lower()
@@ -589,7 +588,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
 
         result = {}
         result["id"] = r["id"]
-        result["formvalues"] = self.to_flat_representation(r)
+        result["formvalues"] = to_flat_representation(r)
         #result["geom"] = r.get("geom")
         #del result["formvalues"]["geom"]
         result["version"] = r["version"]
@@ -891,4 +890,27 @@ class TaxonDetailsSerializer(UpdateOccurrenceMixin, Serializer):
     def to_internal_value(self, data):
         formvalues = data['formvalues'] 
         return Serializer.to_internal_value(self, formvalues)
+
+""" -------------------------------------------
+SPECIES SEARCH
+---------------------------------------------- """
+class SpeciesSearchSerializer(ModelSerializer):
+    name = SerializerMethodField()
+
+    def get_name(self, obj):
+        return '{} - {}'.format(obj.first_common, obj.name_sci) 
     
+    class Meta:
+        model = Species
+        fields = ('id', 'name')
+
+class SpeciesSearchResultSerializer(ModelSerializer):
+    element_species = ElementSpeciesSerializer(required=False)
+    
+    class Meta:
+        model = Species
+        fields = "__all__"
+        
+    def to_representation(self, instance):
+        r = super(SpeciesSearchResultSerializer, self).to_representation(instance)
+        return to_flat_representation(r, 'species')

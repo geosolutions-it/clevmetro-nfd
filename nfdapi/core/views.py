@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from core.models import OccurrenceTaxon, OccurrenceNaturalArea
+from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -13,8 +13,11 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
 from reversion.models import Version
-from core.featuretype import TaxonDetailsSerializer
-from rest_framework.generics import ListCreateAPIView
+from core.featuretype import TaxonDetailsSerializer, SpeciesSearchSerializer,\
+    SpeciesSearchResultSerializer, SpeciesSerializer
+from rest_framework.generics import ListCreateAPIView, ListAPIView,\
+    RetrieveAPIView
+from rest_framework.filters import SearchFilter
 
 @api_view(['GET'])
 @permission_classes([])
@@ -141,6 +144,19 @@ def get_feature_type(request, occurrence_maincat, feature_id):
     serializer = FeatureTypeSerializer(feat)
     ftdata = serializer.get_feature_type()
     return Response(ftdata)
+
+@permission_classes([])
+class SpeciesSearch(ListAPIView):
+    queryset = Species.objects.all()
+    serializer_class = SpeciesSearchSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
+
+@permission_classes([])
+class SpeciesDetail(RetrieveAPIView):
+    queryset = Species.objects.all()
+    serializer_class = SpeciesSearchResultSerializer
+    search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
 
 """
 class TaxonFeatureTypeView(APIView):
