@@ -560,7 +560,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     featuresubtype = DictionaryField(read_only=True)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = TotalVersionsField(required=False, read_only=True)
-    geom = gisserializer.GeometryField()
+    #geom = gisserializer.GeometryField()
     voucher = VoucherSerializer(required=False)
     species = SpeciesSerializer(required=False)
     observation = OccurrenceObservationSerializer(required=False)
@@ -590,8 +590,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result = {}
         result["id"] = r["id"]
         result["formvalues"] = self.to_flat_representation(r)
-        result["geom"] = r.get("geom")
-        del result["formvalues"]["geom"]
+        #result["geom"] = r.get("geom")
+        #del result["formvalues"]["geom"]
         result["version"] = r["version"]
         result["total_versions"] = r["total_versions"]
         result['featuretype'] = instance.occurrence_cat.main_cat
@@ -600,7 +600,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     
     def to_internal_value(self, data):
         plaindata = data['formvalues']
-        plaindata['geom'] = data.get('geom')
+        #plaindata['geom'] = data.get('geom')
         
         """
         Dict of native values <- Dict of primitive datatypes.
@@ -833,6 +833,7 @@ class FeatureTypeSerializer():
                 
             if 'type' in fdef:
                 fdef['mandatory'] = (not getattr(f, "null", True) and not getattr(f, "blank", True))
+                fdef['readonly'] = False
                 fdef['key'] = form_name + "." + f.name
                 fdef['label'] = _(f.name) 
                 result.append(fdef)
