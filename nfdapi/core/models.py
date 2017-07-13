@@ -134,21 +134,21 @@ class ElementSpecies(Element):
 class Species(models.Model):
     first_common = models.TextField()
     name_sci = models.TextField()
-    tsn = models.IntegerField(blank=True)
-    synonym = models.TextField(blank=True)
-    second_common = models.TextField(blank=True)
-    third_common = models.TextField(blank=True)
-    family = models.TextField(blank=True)
-    family_common = models.TextField(blank=True)
-    phylum = models.TextField(blank=True)
-    phylum_common = models.TextField(blank=True)
+    tsn = models.IntegerField(null=True)
+    synonym = models.TextField(blank=True, default='')
+    second_common = models.TextField(blank=True, default='')
+    third_common = models.TextField(blank=True, default='')
+    family = models.TextField(blank=True, default='')
+    family_common = models.TextField(blank=True, default='')
+    phylum = models.TextField(blank=True, default='')
+    phylum_common = models.TextField(blank=True, default='')
     element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
     
 class ElementNaturalAreas(Element):
-    natural_area_code_nac = models.TextField()
-    general_description = models.TextField()
-    area = models.FloatField()
-    landscape_position =  models.TextField() #FIXME
+    natural_area_code_nac = models.TextField(blank=True, default='')
+    general_description = models.TextField(blank=True, default='')
+    area = models.FloatField(null=True)
+    landscape_position =  models.TextField(blank=True, default='') #FIXME
 
 class Preservative(DictionaryTable):
     pass
