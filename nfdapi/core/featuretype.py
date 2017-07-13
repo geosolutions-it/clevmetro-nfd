@@ -21,6 +21,7 @@ from reversion.models import Version
 from rest_framework.fields import empty, SerializerMethodField
 from rest_framework_gis import serializers as gisserializer
 from django.db.models.fields import NOT_PROVIDED
+from rest_framework.exceptions import ValidationError
 
 def _(message): return message
 
@@ -248,7 +249,7 @@ def check_all_null(field_dict):
     return True
 
 def to_flat_representation(values_dict, parent_path=None):
-    result = {}
+    result = OrderedDict()
     for fname, fvalue in values_dict.items():
         if parent_path:
             global_fname = parent_path + "." + fname
@@ -489,7 +490,14 @@ class UpdateOccurrenceMixin(object):
     def update(self, instance, validated_data):
         with reversion.create_revision():
             for (form_name, model_class, children) in self.get_toplevel_forms():
-                if form_name != MANAGEMENT_FORM_NAME:
+                if form_name == 'species':
+                    try:
+                        species_id = validated_data['species']['id']
+                        selected_species = Species.objects.get(pk=species_id)
+                        instance.species = selected_species
+                    except:
+                        raise ValidationError({"species": [_("No species was selected")]})
+                elif form_name != MANAGEMENT_FORM_NAME:
                     self._update_form(form_name, model_class, validated_data, instance, children)
             
             if isinstance(instance, OccurrenceTaxon):
@@ -518,6 +526,13 @@ class ElementSpeciesSerializer(CustomModelSerializerMixin,ModelSerializer):
         
 class SpeciesSerializer(CustomModelSerializerMixin,ModelSerializer):
     element_species = ElementSpeciesSerializer(required=False)
+    
+    def to_internal_value(self, data):
+        result = super(SpeciesSerializer, self).to_internal_value(data)
+        if data.get("id"):
+            # We need the id of the new species to set it in the occurrence 
+            result['id'] = data.get('id')
+        return result
     
     class Meta:
         model = Species
@@ -619,10 +634,12 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         formvalues = {}
         for global_field_name in plaindata:
             field_parts = global_field_name.split(".")
-            if field_parts>1:
+            if len(field_parts)>1:
                 base = formvalues
                 for local_field_name in field_parts[:-1]:
                     base[local_field_name] = base.get(local_field_name, {})
+                    if base[local_field_name] is None:
+                        base[local_field_name] = {}
                     base = base[local_field_name]
                 base[field_parts[-1]] = plaindata[global_field_name] 
             else:
@@ -656,7 +673,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                 rest_fields.set_value(ret, field.source_attrs, validated_value)
 
         if errors:
-            raise rest_fields.ValidationError(errors)
+            raise rest_fields.ValidationError(to_flat_representation(errors))
 
         return ret
 
