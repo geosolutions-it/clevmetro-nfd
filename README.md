@@ -19,7 +19,6 @@ Create database schema:
 
 ```shell
 cd clevmetro-nfd/nfdapi
-$ ./manage.py makemigrations core
 $ ./manage.py migrate
 $ ./manage.py createinitialrevisions
 ```
