@@ -570,7 +570,7 @@ const DockedNaturalFeatures = React.createClass({
         if (!query) {
             return;
         }
-        fetch(`https://dev.nfd.geo-solutions.it/nfdapi/species/?search=${query}`)
+        fetch(`/nfdapi/species/?search=${query}`)
             .then(resp => resp.json())
             .then(json => this.setState({options: json}));
     },

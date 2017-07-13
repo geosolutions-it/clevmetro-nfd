@@ -30,27 +30,27 @@ const Api = {
         });
     },
     updateNaturalFeature: function(featuretype, feature) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + featuretype + '/' + feature.id + '/';
+        let url = '/nfdapi/layers/' + featuretype + '/' + feature.id + '/';
         return axios.put(url, feature).then(function(response) {return response.data; });
     },
     deleteNaturalFeature: function(layerId, nfid) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + layerId + '/' + nfid + '/';
+        let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
         return axios.delete(url).then(function(response) {return response.data; });
     },
     getFeatureType: function(layerId, nfid) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/featuretypes/' + layerId + '/' + nfid + '/';
+        let url = '/nfdapi/featuretypes/' + layerId + '/' + nfid + '/';
         return axios.get(url).then(function(response) {return response.data; });
     },
     getFeatureInfo: function(layerId, nfid) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + layerId + '/' + nfid + '/';
+        let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
         return axios.get(url).then(function(response) {return response.data; });
     },
     getSpecie: function(id) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/species/' + id + '/';
+        let url = '/nfdapi/species/' + id + '/';
         return axios.get(url).then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
-        let url = 'https://dev.nfd.geo-solutions.it/nfdapi/layers/' + feature.featuretype + '/';
+        let url = '/nfdapi/layers/' + feature.featuretype + '/';
         return axios.post(url, feature).then(function(response) {return response.data; });
     }
 };

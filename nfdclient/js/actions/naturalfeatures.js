@@ -163,15 +163,15 @@ function updateSpeciesForms(feature) {
 function reloadFeatureType(featuretype) {
     return (dispatch) => {
         if (featuretype === 'plant') {
-            dispatch(getPlants('https://dev.nfd.geo-solutions.it/nfdapi/layers/plant/'));
+            dispatch(getPlants('/nfdapi/layers/plant/'));
         } else if (featuretype === 'animal') {
-            dispatch(getAnimals('https://dev.nfd.geo-solutions.it/nfdapi/layers/animal/'));
+            dispatch(getAnimals('/nfdapi/layers/animal/'));
         } else if (featuretype === 'fungus') {
-            dispatch(getFungus('https://dev.nfd.geo-solutions.it/nfdapi/layers/fungus/'));
+            dispatch(getFungus('/nfdapi/layers/fungus/'));
         } else if (featuretype === 'slimemold') {
-            dispatch(getSlimeMolds('https://dev.nfd.geo-solutions.it/nfdapi/layers/slimemold/'));
+            dispatch(getSlimeMolds('/nfdapi/layers/slimemold/'));
         } else if (featuretype === 'naturalarea') {
-            dispatch(getNaturalAreas('https://dev.nfd.geo-solutions.it/nfdapi/layers/naturalarea/'));
+            dispatch(getNaturalAreas('/nfdapi/layers/naturalarea/'));
         }
     };
 }
