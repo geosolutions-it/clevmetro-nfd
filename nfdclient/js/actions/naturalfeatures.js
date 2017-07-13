@@ -17,6 +17,7 @@ const NATURAL_FEATURE_SELECTED = 'NATURAL_FEATURE_TYPE_SELECTED';
 const NATURAL_FEATURE_ERROR = 'NATURAL_FEATURE_ERROR';
 const NATURAL_FEATURE_LOADED = 'NATURAL_FEATURE_LOADED';
 const UPDATE_NATURAL_FEATURE_FORM = 'UPDATE_NATURAL_FEATURE_FORM';
+const UPDATE_SPECIES_FORMS = 'UPDATE_SPECIES_FORMS';
 const GET_NATURAL_FEATURE_TYPE = 'GET_NATURAL_FEATURE_TYPE';
 const NATURAL_FEATURE_TYPE_LOADED = 'NATURAL_FEATURE_TYPE_LOADED';
 const NATURAL_FEATURE_ADDED = 'NATURAL_FEATURE_ADDED';
@@ -152,6 +153,13 @@ function updateNaturalFeatureForm(feature) {
     };
 }
 
+function updateSpeciesForms(feature) {
+    return {
+        type: UPDATE_SPECIES_FORMS,
+        feature
+    };
+}
+
 function reloadFeatureType(featuretype) {
     return (dispatch) => {
         if (featuretype === 'plant') {
@@ -187,7 +195,7 @@ function getSpecie(id) {
     return (dispatch) => {
         return Api.getSpecie(id).then((resp) => {
             if (resp) {
-                dispatch(updateNaturalFeatureForm(resp));
+                dispatch(updateSpeciesForms(resp));
             }
         }).catch((error) => {
             dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
@@ -425,5 +433,6 @@ module.exports = {
     deleteNaturalFeatureError,
     NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
     NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
-    getSpecie
+    getSpecie,
+    updateSpeciesForms, UPDATE_SPECIES_FORMS
 };

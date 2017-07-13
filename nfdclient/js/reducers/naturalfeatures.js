@@ -9,7 +9,8 @@ const assign = require('object-assign');
 const {
     NATURAL_FEATURE_TYPE_LOADED,
     UPDATE_NATURAL_FEATURE_FORM,
-    UPDATE_NATURAL_FEATURE_ERROR
+    UPDATE_NATURAL_FEATURE_ERROR,
+    UPDATE_SPECIES_FORMS
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -24,12 +25,25 @@ function naturalfeatures(state = {}, action) {
         }
         case UPDATE_NATURAL_FEATURE_FORM: {
             return assign({}, state, {
-                selectedFeature: action.feature
+                selectedFeature: action.feature,
+                errors: {}
             });
         }
         case UPDATE_NATURAL_FEATURE_ERROR: {
+            if (action.error.status>=500) {
+                return assign({}, state, {
+                    errors: { badrequest: [action.error.statusText] }
+                });
+            }
+            else {
+                return assign({}, state, {
+                    errors: action.error.data
+                });
+            }
+        }
+        case UPDATE_SPECIES_FORMS: {
             return assign({}, state, {
-                errors: action.error.data
+                selectedFeature: assign({}, state.selectedFeature, action.feature)
             });
         }
         default:
