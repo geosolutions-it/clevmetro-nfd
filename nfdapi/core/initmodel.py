@@ -15,7 +15,7 @@ def _(message): return message
 
 plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
           'plant_flowering_plant', 'plant_moss_or_ally']
-slime_mold = ['slime_mold']
+slimemold = ['slimemold']
 fungus = ['fungus']
 animals = ['animal', 'animal_aquatic_animal', 'animal_land_animal',
            'animal_pond_lake_animal', 'animal_stream_animal', 'animal_wetland_animal']
@@ -24,7 +24,7 @@ natural_area = ['natural_area']
 occurrence_cat_dict = {
     'plant': _('Plant'),
     'fungus': _('Fungus'),
-    'slime_mold': _('Slime mold'),
+    'slimemold': _('Slime mold'),
     'animal': _('Animal'),
     'natural_area': _('Natural area')
     }
@@ -36,7 +36,7 @@ occurrence_subcat = [('co', _('Conifer'), 'plant'),
                      ('pl', _('Plant - generic'), 'plant'), # for other kind of plants such as non-conifer trees
                      ('mo', _('Moss'), 'plant'),
                      ('fu', _('Fungus'), 'fungus'),
-                     ('sl', _('Slime mold'), 'slime_mold', ),
+                     ('sl', _('Slime mold'), 'slimemold', ),
                      ('ln', _('Land animal'), 'animal'),
                      ('lk', _('Pond lake animal'), 'animal'),
                      ('st', _('Stream animal'), 'animal'),
