@@ -17,13 +17,10 @@
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
-            "name": "Animals",
+            "name": "Natural areas",
             "hideLoading": true,
-            "id": "animal",
+            "id": "naturalarea",
             "styleName": "marker",
-            "style": {
-                "iconUrl": "./assets/img/marker-icon-purple.png"
-            },
             "features" : []
         }, {
             "type": "vector",
@@ -36,6 +33,19 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-green.png"
+            },
+            "features" : []
+        }, {
+            "type": "vector",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Slime Molds",
+            "hideLoading": true,
+            "id": "slimemold",
+            "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-marine.png"
             },
             "features" : []
         }, {
@@ -56,22 +66,12 @@
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
-            "name": "Natural areas",
+            "name": "Animals",
             "hideLoading": true,
-            "id": "naturalarea",
-            "styleName": "marker",
-            "features" : []
-        }, {
-            "type": "vector",
-            "queryable": true,
-            "visibility": true,
-            "group": "Natural features",
-            "name": "Slime/Molds",
-            "hideLoading": true,
-            "id": "slimemold",
+            "id": "animal",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-marine.png"
+                "iconUrl": "./assets/img/marker-icon-purple.png"
             },
             "features" : []
         }]
