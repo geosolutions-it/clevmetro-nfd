@@ -339,20 +339,26 @@ const DockedNaturalFeatures = React.createClass({
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<Checkbox checked={value} onChange={this.handleChange}/>)
-                                :
-                                (<Checkbox checked={value} disabled/>)
-                            }
-                        </td>
-                    </tr>
-                );
+                {
+                    let self = this;
+                    let handleBooleanChange = function(evt) {
+                        self.handleChange({target: {name: evt.target.name, value: evt.target.checked}});
+                    };
+                    return (
+                        <tr style={{width: "100%"}} key={item.key + "-row"}>
+                            <td style={{width: "40%"}}>
+                                <ControlLabel>{label}</ControlLabel>
+                            </td>
+                            <td style={{width: "60%"}}>
+                                {this.props.isAdmin ?
+                                    (<Checkbox name={item.key} checked={value} onChange={handleBooleanChange}/>)
+                                    :
+                                    (<Checkbox name={item.key} checked={value} disabled/>)
+                                }
+                            </td>
+                        </tr>
+                    );
+                }
             } else if (item.type === 'date') {
                 let value = null;
                 let label = item.label;
@@ -362,20 +368,26 @@ const DockedNaturalFeatures = React.createClass({
                 if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<DatePicker style={{height: "24px"}} value={value} onChange={this.handleChange} />)
-                                :
-                                (<DatePicker disabled style={{height: "24px"}} value={value} />)
-                            }
-                        </td>
-                    </tr>
-                );
+                {
+                    let self = this;
+                    let handleDateChange = function(value, formattedValue) {
+                        self.handleChange({target: {name: item.key, value: value}});
+                    };
+                    return (
+                        <tr style={{width: "100%"}} key={item.key + "-row"}>
+                            <td style={{width: "40%"}}>
+                                <ControlLabel>{label}</ControlLabel>
+                            </td>
+                            <td style={{width: "60%"}}>
+                                {this.props.isAdmin ?
+                                    (<DatePicker style={{height: "24px"}} value={value} onChange={handleDateChange} />)
+                                    :
+                                    (<DatePicker disabled style={{height: "24px"}} value={value} />)
+                                }
+                            </td>
+                        </tr>
+                    );
+                }
             }
         });
         return (
