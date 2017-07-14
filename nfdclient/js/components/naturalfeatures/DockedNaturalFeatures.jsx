@@ -370,8 +370,8 @@ const DockedNaturalFeatures = React.createClass({
                 }
                 {
                     let self = this;
-                    let handleDateChange = function(value, formattedValue) {
-                        self.handleChange({target: {name: item.key, value: value}});
+                    let handleDateChange = function(newDate) {
+                        self.handleChange({target: {name: item.key, value: newDate}});
                     };
                     return (
                         <tr style={{width: "100%"}} key={item.key + "-row"}>
