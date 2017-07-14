@@ -4,7 +4,8 @@ from models import ElementSpecies, DayTime, Species
 from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
 from core.models import TerrestrialSampler, LandAnimalDetails,\
-    StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact
+    StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact,\
+    Voucher
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -205,6 +206,7 @@ def insert_test_data(clean=True):
         Species.objects.all().delete()
         ElementSpecies.objects.all().delete()
         OccurrenceObservation.objects.all().delete()
+        Voucher.objects.all().delete()
     
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     """    
@@ -254,10 +256,14 @@ def insert_test_data(clean=True):
         element_species.save()
         
         species = Species()
-        species.tsn = '180549'
+        species.tsn = 180549
         species.first_common = 'North American river otter'
         species.name_sci = 'Lontra canadensis'
         species.element_species = element_species
+        species.family = 'Mustelidae'
+        species.family_common = 'Mustelids'
+        species.phylum = 'Chordata'
+        species.phylum_common = 'Chordates'
         species.save()
     
     gender = Gender.objects.get(code='fe')
@@ -280,7 +286,7 @@ def insert_test_data(clean=True):
         
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.554282 41.379035 )'
-        t.species_element = species
+        t.species = species
         t.occurrence_cat = stream_animal_cat
         t.details = stream_details
         t.observation = observation
@@ -323,10 +329,9 @@ def insert_test_data(clean=True):
         observation.save()
         
         land_animal_cat = OccurrenceCategory.objects.get(code='ln')
-        land_animal_details = LandAnimalDetails()
         sound_recording = TerrestrialSampler.objects.get(code='sr')
-        land_animal_details.sampler = sound_recording
-        
+        land_animal_details = LandAnimalDetails()
+        land_animal_details.sampler = sound_recording        
         land_animal_details.gender = gender
         land_animal_details.save()
             
@@ -336,14 +341,32 @@ def insert_test_data(clean=True):
         element_species.save()
         
         species = Species()
-        species.tsn = '180544'
+        species.tsn = 180544
         species.first_common = 'American black bear'
         species.name_sci = 'Ursus americanus'
         species.element_species = element_species
+        species.family = 'Ursidae'
+        species.family_common = 'Bears'
+        species.phylum = 'Chordata'
+        species.phylum_common = 'Chordate'
         species.save()
         
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.526814 41.366602 )'
+        t.species = species
+        t.occurrence_cat = land_animal_cat
+        t.details = land_animal_details
+        t.observation = observation
+        t.save()
+
+        land_animal_details = LandAnimalDetails()
+        camera = TerrestrialSampler.objects.get(code='wc')
+        land_animal_details.sampler = camera        
+        land_animal_details.gender = gender
+        land_animal_details.save()
+        
+        t = OccurrenceTaxon()
+        t.geom = 'POINT( -81.226814 41.166602 )'
         t.species = species
         t.occurrence_cat = land_animal_cat
         t.details = land_animal_details
