@@ -30,16 +30,14 @@ function naturalfeatures(state = {}, action) {
             });
         }
         case UPDATE_NATURAL_FEATURE_ERROR: {
-            if (action.error.status>=500) {
+            if (action.error.status >= 500) {
                 return assign({}, state, {
                     errors: { badrequest: [action.error.statusText] }
                 });
             }
-            else {
-                return assign({}, state, {
-                    errors: action.error.data
-                });
-            }
+            return assign({}, state, {
+                errors: action.error.data
+            });
         }
         case UPDATE_SPECIES_FORMS: {
             return assign({}, state, {
