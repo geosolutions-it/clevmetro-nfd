@@ -641,9 +641,11 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                     if base[local_field_name] is None:
                         base[local_field_name] = {}
                     base = base[local_field_name]
-                base[field_parts[-1]] = plaindata[global_field_name] 
+                if not (isinstance(base.get(field_parts[-1]), dict) and plaindata[global_field_name] is None):  # avoid overwritting new values with old empty forms
+                    base[field_parts[-1]] = plaindata[global_field_name]
             else:
-                formvalues[global_field_name] = plaindata[global_field_name]
+                if not (isinstance(formvalues.get(global_field_name), dict) and plaindata[global_field_name] is None): # avoid overwritting new values with old empty forms 
+                    formvalues[global_field_name] = plaindata[global_field_name]
 
         for field in fields:
             validate_method = getattr(self, 'validate_' + field.field_name, None)
@@ -821,7 +823,11 @@ class FeatureTypeSerializer():
             elif isinstance(f, CharField) or isinstance(f, TextField):
                 fdef['type'] = 'string'
             elif isinstance(f, BooleanField):
-                fdef['type'] = 'boolean'
+                #fdef['type'] = 'boolean' # FIXME: uncomment when supported by the client
+                pass
+            elif isinstance(f, NullBooleanField):
+                #fdef['type'] = 'boolean' # FIXME: uncomment when supported by the client
+                pass
             elif isinstance(f, DateTimeField):
                 fdef['type'] = 'datetime'
             elif isinstance(f, DateField):
