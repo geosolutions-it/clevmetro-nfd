@@ -261,10 +261,10 @@ function naturalFeatureCreated(featuretype, featuresubtype, id) {
                 emptyFeat.id = id;
                 emptyFeat.featuretype = featuretype;
                 emptyFeat.featuresubtype = featuresubtype;
-                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
-                dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
+                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "viewedit"));
+                dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
                 dispatch(updateNaturalFeatureForm(emptyFeat));
-                dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
+                dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
             dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
