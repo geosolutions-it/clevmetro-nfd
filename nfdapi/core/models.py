@@ -32,11 +32,11 @@ class OccurrenceCategory(DictionaryTable):
 @reversion.register()    
 class PointOfContact(models.Model):
     name = models.TextField(blank=False)
-    affiliation = models.TextField(blank=True, default='')
-    phone1 = models.TextField(blank=True, default='')
-    phone2 = models.TextField(blank=True, default='')
-    email = models.TextField(blank=True, default='')
-    street_address = models.TextField(blank=True, default='')
+    affiliation = models.TextField(blank=True, null=True, default='')
+    phone1 = models.TextField(blank=True, null=True, default='')
+    phone2 = models.TextField(blank=True, null=True, default='')
+    email = models.TextField(blank=True, null=True, default='')
+    street_address = models.TextField(blank=True, null=True, default='')
 
 
 class DayTime(DictionaryTable):
@@ -53,8 +53,8 @@ class RecordingStation(DictionaryTable):
 
 @reversion.register()
 class OccurrenceObservation(models.Model):
-    observation_date = models.DateField(blank=True)
-    recording_datetime = models.DateField(blank=True)
+    observation_date = models.DateField(blank=True, null=True)
+    recording_datetime = models.DateField(blank=True, null=True)
     daytime = models.ForeignKey(DayTime, on_delete=models.SET_NULL, blank=True, null=True)
     season = models.ForeignKey(Season, on_delete=models.SET_NULL, blank=True, null=True)
     record_origin = models.ForeignKey(RecordOrigin, on_delete=models.SET_NULL, blank=True, null=True)
