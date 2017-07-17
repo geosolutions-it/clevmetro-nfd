@@ -30,7 +30,6 @@ UTILITY METHODS AND CLASSES
 ---------------------------------------------- """
 
 def get_form_dict(forms):
-    # FIXME: move any form pre-processing out of the instance
     form_dict = {}
     for form in forms:
         form_dict[form[0]] = form
@@ -170,6 +169,8 @@ class DictionaryExtendedField(rest_fields.CharField):
 class TotalVersionsField(rest_fields.IntegerField):
     def get_attribute(self, instance):
         versions = Version.objects.get_for_object(instance)
+        if versions<1:
+            versions = 1
         return len(versions)
 
 def get_serializer_fields(form_name, model):
@@ -386,11 +387,11 @@ class UpdateOccurrenceMixin(object):
             modified = False
             for f in fields:
                 if getattr(f, 'primary_key', False):
-                    # FIXME: we may need to manage primary key for Species
                     pass
-                elif isinstance(f, CharField) or isinstance(f, TextField) or isinstance(f, BooleanField) or \
-                    isinstance(f, DateTimeField) or isinstance(f, DateField) or isinstance(f, FloatField) or \
-                    isinstance(f, DecimalField) or isinstance(f, IntegerField):
+                elif isinstance(f, CharField) or isinstance(f, TextField) or \
+                    isinstance(f, BooleanField) or isinstance(f, NullBooleanField)or \
+                    isinstance(f, DateTimeField) or isinstance(f, DateField) or \
+                    isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
                     new_value = form_validated_data.get(f.name)
                     old_value =  getattr(instance, f.name, None)
                     if new_value != None and new_value != old_value:
@@ -420,7 +421,7 @@ class UpdateOccurrenceMixin(object):
         if 'details' in form_name:
             related_instance = parent_instance.get_details()
         else:
-            related_instance = getattr(parent_instance, form_name, None)
+            related_instance = getattr(parent_instance, self._get_local_name(form_name), None)
         if not related_instance:
             related_instance = model_class()
         return related_instance
@@ -495,6 +496,7 @@ class UpdateOccurrenceMixin(object):
                         species_id = validated_data['species']['id']
                         selected_species = Species.objects.get(pk=species_id)
                         instance.species = selected_species
+                        self._update_form('species.element_species', ElementSpecies, validated_data, selected_species)
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
@@ -823,11 +825,9 @@ class FeatureTypeSerializer():
             elif isinstance(f, CharField) or isinstance(f, TextField):
                 fdef['type'] = 'string'
             elif isinstance(f, BooleanField):
-                #fdef['type'] = 'boolean' # FIXME: uncomment when supported by the client
-                pass
+                fdef['type'] = 'boolean'
             elif isinstance(f, NullBooleanField):
-                #fdef['type'] = 'boolean' # FIXME: uncomment when supported by the client
-                pass
+                fdef['type'] = 'boolean'
             elif isinstance(f, DateTimeField):
                 fdef['type'] = 'datetime'
             elif isinstance(f, DateField):

@@ -370,8 +370,8 @@ const DockedNaturalFeatures = React.createClass({
                 }
                 {
                     let self = this;
-                    let handleDateChange = function(newDate) {
-                        self.handleChange({target: {name: item.key, value: newDate}});
+                    let handleDateChange = function(isoDate, formattedDate) {
+                        self.handleChange({target: {name: item.key, value: formattedDate}});
                     };
                     return (
                         <tr style={{width: "100%"}} key={item.key + "-row"}>
@@ -380,9 +380,9 @@ const DockedNaturalFeatures = React.createClass({
                             </td>
                             <td style={{width: "60%"}}>
                                 {this.props.isAdmin ?
-                                    (<DatePicker style={{height: "24px"}} value={value} onChange={handleDateChange} />)
+                                    (<DatePicker dateFormat="YYYY-MM-DD" style={{height: "24px"}} value={value} onChange={handleDateChange} />)
                                     :
-                                    (<DatePicker disabled style={{height: "24px"}} value={value} />)
+                                    (<DatePicker dateFormat="YYYY-MM-DD" disabled style={{height: "24px"}} value={value} />)
                                 }
                             </td>
                         </tr>
