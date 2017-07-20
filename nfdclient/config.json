@@ -21,6 +21,10 @@
             "hideLoading": true,
             "id": "naturalarea",
             "styleName": "marker",
+            "style": {
+                "iconUrl": "./assets/img/marker-icon-blue.png",
+                "highlightIconUrl": "./assets/img/marker-icon-blue-highlight.png"
+            },
             "features" : []
         }, {
             "type": "vector",
@@ -32,7 +36,8 @@
             "id": "plant",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-green.png"
+                "iconUrl": "./assets/img/marker-icon-green.png",
+                "highlightIconUrl": "./assets/img/marker-icon-green-highlight.png"
             },
             "features" : []
         }, {
@@ -45,7 +50,8 @@
             "id": "slimemold",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-marine.png"
+                "iconUrl": "./assets/img/marker-icon-marine.png",
+                "highlightIconUrl": "./assets/img/marker-icon-marine-highlight.png"
             },
             "features" : []
         }, {
@@ -58,7 +64,8 @@
             "id": "fungus",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-yellow.png"
+                "iconUrl": "./assets/img/marker-icon-yellow.png",
+                "highlightIconUrl": "./assets/img/marker-icon-yellow-highlight.png"
             },
             "features" : []
         }, {
@@ -71,7 +78,8 @@
             "id": "animal",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-purple.png"
+                "iconUrl": "./assets/img/marker-icon-purple.png",
+                "highlightIconUrl": "./assets/img/marker-icon-purple-highlight.png"
             },
             "features" : []
         }]

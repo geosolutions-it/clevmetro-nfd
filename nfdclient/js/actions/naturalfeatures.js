@@ -203,7 +203,7 @@ function getSpecie(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid) {
+function naturalFeatureSelected(properties, nfid, lflid) {
     return (dispatch) => {
         return Api.getFeatureType(properties.featuretype, nfid).then((resp) => {
             if (resp.forms && resp.forms[0]) {
@@ -239,16 +239,18 @@ function naturalFeatureAdded(error) {
 
 function createNaturalFeature(properties) {
     return (dispatch) => {
+        //dispatch(changeDrawingStatus("start", "CircleMarker", "dockednaturalfeatures", [], {properties: properties}));
+            
         if (properties.featuretype === 'plant') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-green.png'}));
+            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-green-highlight.png'}));
         } else if (properties.featuretype === 'animal') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-purple.png'}));
+            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-purple-highlight.png'}));
         } else if (properties.featuretype === 'fungus') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-yellow.png'}));
+            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-yellow-highlight.png'}));
         } else if (properties.featuretype === 'slimemold') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-marine.png'}));
+            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-marine-highlight.png'}));
         } else if (properties.featuretype === 'naturalarea') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon.png'}));
+            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-blue-highlight.png'}));
         }
     };
 }
