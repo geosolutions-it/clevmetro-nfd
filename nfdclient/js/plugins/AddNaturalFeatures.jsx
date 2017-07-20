@@ -65,18 +65,18 @@ const AddNaturalFeatures = React.createClass({
             this.props.visible ?
             (<div>
                 <DropdownButton id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
-                    <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
+                    {/* <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
                     <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "fe"})}><Message msgId="naturalfeatures.fern"/></MenuItem>
                     <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "fl"})}><Message msgId="naturalfeatures.flowering_plant"/></MenuItem>
                     <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "pl"})}><Message msgId="naturalfeatures.plant_generic"/></MenuItem>
                     <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "mo"})}><Message msgId="naturalfeatures.moss"/></MenuItem>
-                    <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "fungus", "featuresubtype": "fu"})}><Message msgId="naturalfeatures.fungus"/></MenuItem>
+                    <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "fungus", "featuresubtype": "fu"})}><Message msgId="naturalfeatures.fungus"/></MenuItem> */}
                     <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "slimemold", "featuresubtype": "sl"})}><Message msgId="naturalfeatures.slimemold"/></MenuItem>
                     <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "ln"})}><Message msgId="naturalfeatures.land_animal"/></MenuItem>
                     <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "lk"})}><Message msgId="naturalfeatures.pond_lake_animal"/></MenuItem>
                     <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "st"})}><Message msgId="naturalfeatures.stream_animal"/></MenuItem>
                     <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "we"})}><Message msgId="naturalfeatures.wetland_animal"/></MenuItem>
-                    <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
+                    {/*<MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>*/}
                 </DropdownButton>
                 <SmartDockedNaturalFeatures mode="add"/>
             </div>) : null
