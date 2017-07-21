@@ -6,7 +6,6 @@ import reversion
 from django.contrib.gis.db.models.fields import PointField
 from  django.utils import timezone
 
-
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
     name = models.TextField()
@@ -58,7 +57,8 @@ class OccurrenceObservation(models.Model):
     daytime = models.ForeignKey(DayTime, on_delete=models.SET_NULL, blank=True, null=True)
     season = models.ForeignKey(Season, on_delete=models.SET_NULL, blank=True, null=True)
     record_origin = models.ForeignKey(RecordOrigin, on_delete=models.SET_NULL, blank=True, null=True)
-    recording_station = models.ForeignKey(RecordingStation, on_delete=models.SET_NULL, blank=True, null=True)
+    #recording_station = models.ForeignKey(RecordingStation, on_delete=models.SET_NULL, blank=True, null=True)
+    recording_station = models.TextField(blank=True, null=True, default='')
     reporter = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='reporter')
     recorder = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='recorder')
     verifier = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='verifier')
@@ -79,7 +79,7 @@ class CmStatus(DictionaryTableExtended):
     pass
 
     
-class SRank(models.Model):
+class SRank(DictionaryTable):
     pass
 
 
@@ -134,7 +134,7 @@ class ElementSpecies(Element):
 class Species(models.Model):
     first_common = models.TextField()
     name_sci = models.TextField()
-    tsn = models.IntegerField(null=True)
+    tsn = models.PositiveIntegerField(null=True)
     synonym = models.TextField(blank=True, default='')
     second_common = models.TextField(blank=True, default='')
     third_common = models.TextField(blank=True, default='')
@@ -168,7 +168,7 @@ class Voucher(models.Model):
     specimen_number = models.NullBooleanField(default=False)
     preservative = models.ForeignKey(Preservative, on_delete=models.SET_NULL, blank=True, null=True)
     storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, blank=True, null=True)
-    repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, blank=True, null=True)
+    repository = models.TextField(null=True, blank=True, default='')
 
 
 """
@@ -406,7 +406,7 @@ class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
 class SlimeMoldLifestages(DictionaryTable):
     pass
 
-class SlimeMoldClass(DictionaryTable):
+class SlimeMoldClass(DictionaryTableExtended):
     pass
 
 class SlimeMoldMedia(DictionaryTable):
@@ -414,7 +414,7 @@ class SlimeMoldMedia(DictionaryTable):
 
 @reversion.register()
 class SlimeMoldDetails(TaxonDetails):
-    lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+    #lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_class = models.ForeignKey(SlimeMoldClass, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_media = models.ForeignKey(SlimeMoldMedia, on_delete=models.SET_NULL, blank=True, null=True)
 

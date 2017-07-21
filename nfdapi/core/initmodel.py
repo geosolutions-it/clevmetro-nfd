@@ -5,7 +5,12 @@ from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
 from core.models import TerrestrialSampler, LandAnimalDetails,\
     StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact,\
-    Voucher
+    Voucher, CmStatus, SRank, NRank, GRank, MushroomGroup, RegionalStatus, Marks,\
+    DiseasesAndAbnormalities, AquaticSampler, StreamDesignatedUse, ChannelType,\
+    LoticHabitatType, HmfeiLocalAbundance, WaterFlowType, TerrestrialStratum,\
+    PondLakeType, PondLakeUse, LakeMicrohabitat, ShorelineType, WetlandType,\
+    WetlandLocation, WetlandConnectivity, WetlandHabitatFeature, WaterSource,\
+    SlimeMoldMedia, SlimeMoldClass
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -122,14 +127,14 @@ preservative = [
     ]
 
 storage = [
-    ("es", _("dried egg shell")),
-    ("dp", _("dried/pressed/mounted")),
-    ("se", _("dried skeletal element")),
-    ("ds", _("dried skeleton")),
-    ("ds", _("dried skin")),
-    ("fr", _("frozen")),
-    ("vi", _("vial")),
-    ("na", _("N/A"))
+    ("1", _("dried egg shell")),
+    ("2", _("dried/pressed/mounted")),
+    ("3", _("dried skeletal element")),
+    ("4", _("dried skeleton")),
+    ("5", _("dried skin")),
+    ("6", _("frozen")),
+    ("7", _("vial")),
+    ("8", _("N/A"))
 ]
 
 gender = [
@@ -169,9 +174,409 @@ terrestrial_sampler = [
     ("yt", _("yellow pan trap"))
     ]
 
-def _init_dict_table(model_class, values, clean=True):
+cm_status =  [
+    ("CM0", _("Extirpated"), _("No longer found in Cleveland Metroparks or its watersheds")),
+    ("CM1", _("Unique"), _("Single occurrence in Park System or its watersheds")),
+    ("CM2", _("Exclusive"), _("Several occurrences but in a single watershed")),
+    ("CM3", _("Restricted"), _("Several occurrences, more than one watershed, but all east, west or south")),
+    ("CM4", _("Occassional"), _("Several occurrences, more than one watershed, any area")),
+    ("CM5", _("Common"), _("Common in Cleveland Metroparks but rare elsewhere")),
+    ("CM6", _("Special interest"), _("Tracked for specific purposes"))
+    ]
+
+g_rank = [
+    ("C", _("Element extant only in cultivation/captivity")),
+    ("G?", _("Globally unranked")),
+    ("G1", _("Globally critically imperiled")),
+    ("G1G2", _("Globally imperiled/critically imperiled")),
+    ("G2", _("Globally imperiled")),
+    ("G2G3", _("Globally vulnerable/imperiled")),
+    ("G3", _("Globally vulnerable")),
+    ("G3G4", _("Globally vulnerable/apparently secure")),
+    ("G4", _("Globally apparently secure")),
+    ("G4G5", _("Globally secure/apparently secure")),
+    ("G5", _("Globally demonstrably secure")),
+    ("GH", _("Historically known, hoping to rediscover")),
+    ("GU", _("Globally unrankable")),
+    ]
+
+n_rank = [
+    ("N1", _("Critically imperiled in US")),
+    ("N1B, N2N", _("Breeding population critically imperiled, non-breeding population imperiled in US")),
+    ("N1B, N3N", _("Breeding population imperiled, non-breeding population rare or uncommon in US")),
+    ("N1B, N4N", _("Breeding population critically imperiled, non-breeding population apparently secure in US")),
+    ("N1B, N5N", _("Breeding population critically imperiled, non-breeding population demonstrably secure in US")),
+    ("N1N2", _("Between imperiled and critically imperiled in US")),
+    ("N2", _("Imperiled in US")),
+    ("N2B, N1N", _("Breeding population imperiled, non-breeding population critically imperiled in US")),
+    ("N2B, N3N", _("Breeding population imperiled, non-breeding population rare or uncommon in US")),
+    ("N2B, N4N", _("Breeding population imperiled, non-breeding population apparently secure in US")),
+    ("N2B, N5N", _("Breeding population imperiled, non-breeding population demonstrably secure in US")),
+    ("N2N3", _("Between imperiled and rare in US")),
+    ("N3", _("Rare or uncommon in US")),
+    ("N3B, N1N", _("Breeding population rare or uncommon, non-breeding population critically imperiled in US")),
+    ("N3B, N2N", _("Breeding population rare or uncommon, non-breeding population imperiled in US")),
+    ("N3B, N4N", _("Breeding population rare or uncommon, non-breeding population apparently secure in US")),
+    ("N3B, N5N", _("Breeding population rare or uncommon, non-breeding population demonstrably secure in US")),
+    ("N3N4", _("Between uncommon and common in US")),
+    ("N4", _("Widespread, abundant, apparently secure in US")),
+    ("N4B, N1N", _("Breeding population apparently secure, non-breeding population criticaly imperiled in US")),
+    ("N4B, N2N", _("Breeding population apparently secure, non-breeding population imperiled in US")),
+    ("N4B, N3N", _("Breeding population apparently secure, non-breeding population rae or uncommon in US")),
+    ("N4B, N5N", _("Breeding population apparently secure, non-breeding population demonstrably secure in US")),
+    ("N4N5", _("Assumed secure to demonstrably secure in US")),
+    ("N5", _("Demonstrably widespread,abundant and secure in US")),
+    ("N5B, N2N", _("Breeding population demonstrably secure, non-breeding population imperiled in US")),
+    ("N5B, N3N", _("Breeding population demonstrably secure, non-breeding population rare or uncommon in US")),
+    ("N5B, N4N", _("Breeding population demonstrably secure, non-breeding population apparently secure in US")),
+    ("NA", _("Accidental in US")),
+    ("NE", _("Exotic species established in the US")),
+    ("NH", _("Historical occurrences only but it is suspected of still being in US")),
+    ("NU", _("Unrankable, more information needed")),
+    ("NZ", _("Not a conservation concern in the US"))
+    ]
+    
+s_rank = [
+    ("S1", _("Critically imperiled")),
+    ("S1B, S2N", _("Breeding population criticaly imperiled, non-breeding population imperiled")),
+    ("S1B, S3N", _("Breeding population imperiled, non-breeding population rare or uncommon")),
+    ("S1B, S4N", _("Breeding population critically imperiled, non-breeding population apparently secure")),
+    ("S1B, S5N", _("Breeding population criticaly imperiled, non-breeding population demonstrably secure")),
+    ("S1S2", _("Almost critically imperiled")),
+    ("S2", _("Imperiled")),
+    ("S2B, S1N", _("Breeding population imperiled, non-breeding population critically imperiled")),
+    ("S2B, S3N", _("Breeding population imperiled, non-breeding population rare or uncommon")),
+    ("S2B, S4N", _("Breeding population imperiled, non-breeding population apparently secure")),
+    ("S2B, S5N", _("Breeding population imperiled, non-breeding population demonstrably secure")),
+    ("S2S3", _("Rare to almost imperiled in the state")),
+    ("S3", _("Vulnerable because of rarity")),
+    ("S3B, S1N", _("Breeding population rare or uncommon, non-breeding population critically imperiled")),
+    ("S3B, S2N", _("Breeding population rare or uncommon, non-breeding population imperiled")),
+    ("S3B, S4N", _("Breeding population rare or uncommon, non-breeding population apparently secure")),
+    ("S3B, S5N", _("Breeding population rare or uncommon, non-breeding population demonstrably secure")),
+    ("S3S4", _("Between uncommon and common in the state")),
+    ("S4", _("Widespread, abundant, apparently secure in the state")),
+    ("S4B, S1N", _("Breeding population apparently secure, non-breeding population criticaly imperiled")),
+    ("S4B, S2N", _("Breeding population apparently secure, non-breeding population imperiled")),
+    ("S4B, S3N", _("Breeding population apparently secure, non-breeding population rae or uncommon")),
+    ("S4B, S5N", _("Breeding population apparently secure, non-breeding population demonstrably secure")),
+    ("S4S5", _("Almost completely demonstrably secure")),
+    ("S5", _("Demonstrably widespread,abundant and secure")),
+    ("S5B, S2N", _("Breeding population demonstrably secure, non-breeding population imperiled")),
+    ("S5B, S3N", _("Breeding population demonstrably secure, non-breeding population rare or uncommon")),
+    ("S5B, S4N", _("Breeding population demonstrably secure, non-breeding population apparently secure")),
+    ("SA", _("Accidental in the state")),
+    ("SE", _("Exotic species established in the state")),
+    ("SH", _("Historical occurrences only but it is suspected of still being in the state")),
+    ("SR", _("Reported in the state but occurrence(s) not documented")),
+    ("SU", _("Unrankable, more information needed")),
+    ("SZ", _("Not a conservation concern in the state"))
+    ]
+
+oh_status = [
+    ("A", _("A-Added"), _("Recently added for review")),
+    ("E", _("E-State Endangered"), _("Threatened with extirpation in Ohio")),
+    ("ET", _("ET-Extinct"), _("No longer exists anywhere")),
+    ("P", _("P-Potentially Threatened"), _("There are factors that could become threats in Ohio")),
+    ("SC", _("SC-Species of concern"), _("May become threatened")),
+    ("SI", _("SI-Special interest"), _("Species at edge of distribution")),
+    ("T", _("T-State Threatened"), _("There is a threat to its survival in Ohio")),
+    ("X", _("X-Extirpated"), _("Known to no longer exist in Ohio")),
+    ("Xp", _("XP-Presumed Extirpated"), _("May no longer exist in Ohio"))
+]
+
+mushroom_group = [
+    ("AG", _("Agaric (gills)")),
+    ("BI", _("Bird's Nest (peridioles)")),
+    ("BO", _("Bolete (tubes)")),
+    ("CH", _("Chanterelle (no true gills)")),
+    ("CL", _("Club or Coral (branches)")),
+    ("CR", _("Crust (no pores or teeth)")),
+    ("CU", _("Cup (no peridioles)")),
+    ("EA", _("Earth tongue")),
+    ("FT", _("False truffle (gleba not marbled or labyrinthoid)")),
+    ("FL", _("Flask")),
+    ("JE", _("Jelly (gelatinous)")),
+    ("MO", _("Morel or false morel (elfin saddle)")),
+    ("PO", _("Polypore (pores or gill-like)")),
+    ("PU", _("Puffball (internal spores)")),
+    ("ST", _("Stinkhorn (slimy)")),
+    ("TE", _("Teeth (tooth-like projections)")),
+    ("TR", _("Truffle (marbled or convoluted gleba)"))
+]
+
+marks = [
+    ("1", _("adhesive tag color")),
+    ("2", _("adhesive tag number")),
+    ("3", _("band number")),
+    ("4", _("collar color")),
+    ("5", _("collar number")),
+    ("6", _("colorband pattern")),
+    ("7", _("dot color")),
+    ("8", _("dot pattern")),
+    ("9", _("ear clip")),
+    ("10", _("ear tag")),
+    ("11", _("finclip")),
+    ("12", _("microchip number")),
+    ("13", _("none")),
+    ("14", _("PIT tag")),
+    ("15", _("shell notch")),
+    ("16", _("tail clip")),
+    ("17", _("toe clip")),
+    ("18", _("wing tag color")),
+    ("19", _("wing tag number"))
+]
+
+diseases = [
+    ("1", _("discolorations")),
+    ("2", _("injuries")),
+    ("3", _("evidence of captivity")),
+    ("4", _("deformities")),
+    ("5", _("erosions")),
+    ("6", _("tumors")),
+    ("7", _("fungi")),
+    ("8", _("lamprey scars")),
+    ("9", _("parasites")),
+    ("10", _("ranavirus")),
+    ("11", _("chytrid")),
+    ("12", _("VHS")),
+    ("13", _("other abnormalities")),
+    ("14", _("none"))
+]
+
+aquatic_sampler = [
+    ("1", _("automated sound recording")),
+    ("2", _("D-frame")),
+    ("3", _("dipnet")),
+    ("4", _("electrofishing")),
+    ("5", _("gill net")),
+    ("6", _("hand caught")),
+    ("7", _("Hester-Dendy")),
+    ("8", _("hookline")),
+    ("9", _("leaf bag")),
+    ("10", _("seine")),
+    ("11", _("surber sampler")),
+    ("12", _("sweep net")),
+    ("13", _("trammel net")),
+    ("14", _("N/A"))
+]
+
+
+stream_designated_use = [
+    ("WWH", _("warm water habitat")),
+    ("CWH", _("cold water habitat")),
+    ("EWH", _("exceptional warm water habitat")),
+    ("NODU", _("no designated use"))
+    ]
+
+channel_type = [
+    ("1", _("manmade, managed")),
+    ("2", _("manmade, unmanaged")),
+    ("3", _("natural, altered, not restored")),
+    ("4", _("natural, past restoration, recovered")),
+    ("5", _("natural, past restoration, recovering")),
+    ("6", _("natural, recent restoration")),
+    ("7", _("natural, unaltered"))
+    ]
+
+hmfei_local_abundance = [
+    ("A", _("A- Abundant (10-50 individuals)")),
+    ("C", _("C- Common (3-9 individuals)")),
+    ("R", _("R- Rare (<3 individuals)")),
+    ("V", _("V- Very abundant (>50 individuals)"))
+]
+
+lotic_habitat_type = [
+    ("1", _("rheocrene spring")),
+    ("2", _("primary headwater stream")),
+    ("3", _("headwater stream")),
+    ("4", _("high gradient stream")),
+    ("5", _("low gradient stream")),
+    ("6", _("river/large stream")),
+    ("7", _("ditch")),
+    ("8", _("canal")),
+    ("9", _("unknown"))
+]
+
+water_flow_type = [
+    ("1", _("ephemeral")),
+    ("2", _("intermittent")),
+    ("3", _("interstitial")),
+    ("4", _("perennial"))
+]
+
+terrestrial_location_or_stratum = [
+    ("1", _("air column")),
+    ("2", _("canopy")),
+    ("3", _("cave")),
+    ("4", _("duff")),
+    ("5", _("edge of pond or lake")),
+    ("6", _("edge of stream")),
+    ("7", _("edge of wetland")),
+    ("8", _("habitat edge")),
+    ("9", _("habitat interior")),
+    ("10", _("herbaceous layer")),
+    ("11", _("leaf litter")),
+    ("12", _("mineral soil")),
+    ("13", _("organic soil")),
+    ("14", _("rock outcrop or cliff")),
+    ("15", _("understory, bushes")),
+    ("16", _("understory, saplings")),
+    ("17", _("vine tangle")),
+    ("18", _("woody debris"))
+]
+
+pond_lake_type = [
+    ("1", _("natural")),
+    ("2", _("manmade, stormwater")),
+    ("3", _("manmade, quarry")),
+    ("4", _("manmade, aesthetic")),
+    ("5", _("manmade, impoundment")),
+    ("6", _("manmade, general")),
+    ("7", _("unknown"))
+    ]
+
+pond_lake_use = [
+    ("1", _("fishing")),
+    ("2", _("swimming")),
+    ("3", _("brood stock")),
+    ("4", _("irrigation")),
+    ("5", _("stormwater retention")),
+    ("6", _("reservoir")),
+    ("7", _("boating and kayaking")),
+    ("8", _("ice skating")),
+    ("9", _("aesthetic")),
+    ("10", _("quarry")),
+    ("11", _("grain mill")),
+    ("12", _("mitigation")),
+    ("13", _("wildlife sanctuary")),
+    ("14", _("unknown"))
+]
+
+pond_lake_shoreline = [
+    ("1", _("brush")),
+    ("2", _("cliff")),
+    ("3", _("grass")),
+    ("4", _("gravel")),
+    ("5", _("manmade,concrete")),
+    ("6", _("manmade, riprap")),
+    ("7", _("mud flats")),
+    ("8", _("rock")),
+    ("9", _("sand")),
+    ("10", _("wooded")),
+    ("11", _("woody debris"))
+    ]
+
+pond_lake_microhabitat = [
+    ("1", _("shoreline")),
+    ("2", _("beach")),
+    ("3", _("shallow water")),
+    ("4", _("deep water")),
+    ("5", _("overhanging vegetation")),
+    ("6", _("aquatic vegetation")),
+    ("7", _("muck/sediment")),
+    ("8", _("water column")),
+    ("9", _("near-shore")),
+    ("10", _("breakwall")),
+    ("11", _("marina")),
+    ("12", _("dock")),
+    ("13", _("bay")),
+    ("14", _("intake")),
+    ("15", _("outflow")),
+    ("16", _("surface")),
+    ("17", _("air column")),
+    ("18", _("riparian zone")),
+    ("19", _("bottom")),
+    ("20", _("unknown"))
+]
+
+wetland_type = [
+    ("1", _("natural")),
+    ("2", _("enhanced")),
+    ("3", _("manmade, mitigation")),
+    ("4", _("manmade, stormwater")),
+    ("5", _("restored"))
+    ]
+
+wetland_location = [
+    ("1", _("coastal")),
+    ("2", _("floodplain")),
+    ("3", _("upland"))
+    ]
+
+wetland_connectivity = [
+    ("1", _("isolated")),
+    ("2", _("riparian/floodplain")),
+    ("3", _("upland mosaic"))
+]
+
+water_source = [
+    ("1", _("upland groundwater")),
+    ("2", _("stormwater")),
+    ("3", _("perennial stream")),
+    ("4", _("seasonal stream")),
+    ("5", _("floodplain groundwater")),
+    ("6", _("infrastructure (drain tile, pipe, leak, other)"))
+    ]
+
+wetland_habitat_feature = [
+    ("1", _("air")),
+    ("2", _("boardwalk")),
+    ("3", _("dam ")),
+    ("4", _("edge/margin")),
+    ("5", _("litter")),
+    ("6", _("muck")),
+    ("7", _("open water")),
+    ("8", _("riparian zone")),
+    ("9", _("sediment")),
+    ("10", _("surface")),
+    ("11", _("vegetation, emergent")),
+    ("12", _("vegetation, floating")),
+    ("13", _("vegetation, submerged")),
+    ("14", _("vegetation, terrestrial")),
+    ("15", _("water column")),
+    ("16", _("woody debris"))
+    ]
+
+slime_mold_media = [
+    ("1", _("Decaying wood")),
+    ("2", _("Droppings")),
+    ("3", _("Field or prairie")),
+    ("4", _("Forest soil")),
+    ("5", _("Lawn")),
+    ("6", _("Living plant")),
+    ("7", _("Other")),
+    ("8", _("Under water"))
+    ]
+
+slime_mold_class = [
+    ("1", _("Cellular slime mold"), _("Dictyostelia")),
+    ("2", _("Plasmodial slime mold"), _("Myxogastria")),
+    ("3", _("Slime net"), _("Protostelia"))
+    ]
+
+def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
+    
+    if ifempty:
+        if model_class.objects.all().count()>0:
+            return
+        
+    for entry in values:        
+        c = model_class()
+        c.code = entry[0]
+        c.name = entry[1]
+        c.description = entry[2]
+        c.save()
+
+def _init_dict_table(model_class, values, ifempty=True, clean=False):
+    if clean:
+        model_class.objects.all().delete()
+
+    if ifempty:
+        if model_class.objects.all().count()>0:
+            return
         
     for entry in values:        
         c = model_class()
@@ -179,16 +584,50 @@ def _init_dict_table(model_class, values, clean=True):
         c.name = entry[1]
         c.save()
 
-def init_model(clean=True):
-
-    _init_dict_table(IucnRedListCategory, iucn_redlist, clean)
-    _init_dict_table(UsfwsStatus, usfws_status, clean)
-    _init_dict_table(DayTime, day_time, clean)
-    _init_dict_table(Season, season, clean)
-    _init_dict_table(RecordOrigin, record_origin, clean)
-    _init_dict_table(Preservative, preservative, clean)
-    _init_dict_table(Gender, gender, clean)
-    _init_dict_table(TerrestrialSampler, terrestrial_sampler, clean)
+def init_model(ifempty=True, clean=False):
+    _init_dict_extended_table(CmStatus, cm_status)
+    _init_dict_table(SRank, s_rank)
+    _init_dict_table(NRank, n_rank)
+    _init_dict_table(GRank, g_rank)
+    
+    _init_dict_table(IucnRedListCategory, iucn_redlist, ifempty, clean)
+    _init_dict_table(UsfwsStatus, usfws_status, ifempty, clean)
+    _init_dict_table(RegionalStatus, oh_status)
+    _init_dict_table(MushroomGroup, mushroom_group)
+    
+    _init_dict_table(DayTime, day_time, ifempty, clean)
+    _init_dict_table(Season, season, ifempty, clean)
+    _init_dict_table(RecordOrigin, record_origin, ifempty, clean)
+    _init_dict_table(Preservative, preservative, ifempty, clean)
+    _init_dict_table(Gender, gender, ifempty, clean)
+    _init_dict_table(TerrestrialSampler, terrestrial_sampler, ifempty, clean)
+    
+    
+    _init_dict_table(Storage, storage)
+    _init_dict_table(Marks, marks)
+    _init_dict_table(DiseasesAndAbnormalities, diseases)
+    
+    _init_dict_table(AquaticSampler, aquatic_sampler)
+    _init_dict_table(StreamDesignatedUse, stream_designated_use)
+    _init_dict_table(ChannelType, channel_type)
+    _init_dict_table(HmfeiLocalAbundance, hmfei_local_abundance)
+    _init_dict_table(LoticHabitatType, lotic_habitat_type)
+    _init_dict_table(WaterFlowType, water_flow_type)
+    _init_dict_table(TerrestrialStratum, terrestrial_location_or_stratum)
+    
+    _init_dict_table(PondLakeType, pond_lake_type)
+    _init_dict_table(PondLakeUse, pond_lake_use)
+    _init_dict_table(ShorelineType, pond_lake_shoreline)
+    _init_dict_table(LakeMicrohabitat, pond_lake_microhabitat)
+    
+    _init_dict_table(WetlandType, wetland_type)
+    _init_dict_table(WetlandLocation, wetland_location)
+    _init_dict_table(WetlandConnectivity, wetland_connectivity)
+    _init_dict_table(WaterSource, water_source)
+    _init_dict_table(WetlandHabitatFeature, wetland_habitat_feature)
+    
+    _init_dict_table(SlimeMoldMedia, slime_mold_media)
+    _init_dict_extended_table(SlimeMoldClass, slime_mold_class)
     
     if clean:
         OccurrenceCategory.objects.all().delete()
