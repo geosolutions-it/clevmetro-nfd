@@ -40,8 +40,10 @@ function naturalfeatures(state = {}, action) {
             });
         }
         case UPDATE_SPECIES_FORMS: {
+            let formvalues = assign({}, state.selectedFeature.formvalues, action.feature);
+            let selectedFeature = assign({}, state.selectedFeature, { formvalues: formvalues});
             return assign({}, state, {
-                selectedFeature: assign({}, state.selectedFeature, action.feature)
+                selectedFeature: selectedFeature
             });
         }
         default:

@@ -37,9 +37,15 @@ const Api = {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
         return axios.delete(url).then(function(response) {return response.data; });
     },
-    getFeatureType: function(layerId, nfid) {
-        let url = '/nfdapi/featuretypes/' + layerId + '/' + nfid + '/';
-        return axios.get(url).then(function(response) {return response.data; });
+    getFeatureType: function(ftype, nfid=null) {
+        if (nfid!=null) {
+            let url = '/nfdapi/featuretypes/' + ftype + '/' + nfid + '/';
+            return axios.get(url).then(function(response) {return response.data; });
+        }
+        else {
+            let url = '/nfdapi/featuretypes/' + ftype + '/';
+            return axios.get(url).then(function(response) {return response.data; });
+        }
     },
     getFeatureInfo: function(layerId, nfid) {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';

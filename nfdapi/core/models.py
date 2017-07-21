@@ -183,6 +183,30 @@ class TaxonDetails(models.Model):
     pass
     #habitat = models.ForeignKey(HabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
 
+def get_details_class(category_code):
+    if category_code=='co':
+        return PlantDetails #FIXME
+    elif category_code=='fe':
+        return PlantDetails #FIXME
+    elif category_code=='fl':
+        return PlantDetails #FIXME
+    elif category_code=='pl':
+        return PlantDetails
+    elif category_code=='mo':
+        return PlantDetails # FIXME Moss
+    elif category_code=='fu':
+        return TaxonDetails #FIXME
+    elif category_code=='sl':
+        return SlimeMoldDetails
+    elif category_code=='ln':
+        return LandAnimalDetails
+    elif category_code=='lk':
+        return PondLakeAnimalDetails
+    elif category_code=='st':
+        return StreamAnimalDetails
+    elif category_code=='we':
+        return WetlandAnimalDetails
+
 @reversion.register()
 class OccurrenceTaxon(Occurrence):
     voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
@@ -191,28 +215,7 @@ class OccurrenceTaxon(Occurrence):
             
     def get_details_class(self):
         if self.occurrence_cat:
-            if self.occurrence_cat.code=='co':
-                return PlantDetails #FIXME
-            elif self.occurrence_cat.code=='fe':
-                return PlantDetails #FIXME
-            elif self.occurrence_cat.code=='fl':
-                return PlantDetails #FIXME
-            elif self.occurrence_cat.code=='pl':
-                return PlantDetails
-            elif self.occurrence_cat.code=='mo':
-                return PlantDetails # FIXME Moss
-            elif self.occurrence_cat.code=='fu':
-                return TaxonDetails #FIXME
-            elif self.occurrence_cat.code=='sl':
-                return SlimeMoldDetails
-            elif self.occurrence_cat.code=='ln':
-                return LandAnimalDetails
-            elif self.occurrence_cat.code=='lk':
-                return PondLakeAnimalDetails
-            elif self.occurrence_cat.code=='st':
-                return StreamAnimalDetails
-            elif self.occurrence_cat.code=='we':
-                return WetlandAnimalDetails
+            return get_details_class(self.occurrence_cat.code)
         
     def get_details(self):
         """
@@ -221,8 +224,8 @@ class OccurrenceTaxon(Occurrence):
         of LandAnimalDetails, PondLakeAnimalDetails, etc.
         """
         try:
-            if self.details:
-                return self.get_details_class().objects.get(pk=self.details.id)
+            if self.details and self.occurrence_cat:
+                return get_details_class(self.occurrence_cat.code).objects.get(pk=self.details.id)
         except:
             pass
 
@@ -356,8 +359,8 @@ class WaterFlowType(DictionaryTable):
 @reversion.register()
 class StreamAnimalDetails(AquaticAnimalDetails):
     stream_name_1 = models.TextField()
-    stream_name_2 = models.TextField()
-    pemso_code = models.TextField()
+    stream_name_2 = models.TextField(blank=True, null=True)
+    pemso_code = models.TextField(blank=True, null=True)
     designated_use = models.ForeignKey(StreamDesignatedUse, on_delete=models.SET_NULL, blank=True, null=True)
     channel_type = models.ForeignKey(ChannelType, on_delete=models.SET_NULL, blank=True, null=True)
     hmfei_local_abundance = models.ForeignKey(HmfeiLocalAbundance, on_delete=models.SET_NULL, blank=True, null=True)

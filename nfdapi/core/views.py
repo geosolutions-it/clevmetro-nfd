@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species
+from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
+    OccurrenceCategory
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -72,10 +73,12 @@ class TaxonLayerList(APIView):
         serializer = LayerTaxonSerializer(queryset, many=True)
         return Response(serializer.data)
     def post(self, request, main_cat, format=None):
-        serializer = CreateOccurrenceSerializer(data=request.data)
+        serializer = OccurrenceSerializer(data=request.data)
+        #serializer = CreateOccurrenceSerializer(data=request.data)
+        
         if serializer.is_valid():
-            result = serializer.save()
-            return Response(result, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -137,12 +140,17 @@ class LayerDetail(APIView):
 
 @api_view(['GET'])
 @permission_classes([])
-def get_feature_type(request, occurrence_maincat, feature_id):
-    if occurrence_maincat[0]=='n': # natural areas
-        feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
+def get_feature_type(request, occurrence_maincat, feature_id=None):
+    if feature_id:
+        if occurrence_maincat[0]=='n': # natural areas
+            feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
+        else:
+            feat = OccurrenceTaxon.objects.get(pk=feature_id)
+        serializer = FeatureTypeSerializer(feat.occurrence_cat)
     else:
-        feat = OccurrenceTaxon.objects.get(pk=feature_id)
-    serializer = FeatureTypeSerializer(feat)
+        # in this case we get the category code instead of the main category
+        occurrence_cat = OccurrenceCategory.objects.get(code=occurrence_maincat)
+        serializer = FeatureTypeSerializer(occurrence_cat)
     ftdata = serializer.get_feature_type()
     return Response(ftdata)
 

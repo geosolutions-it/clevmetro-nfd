@@ -23,7 +23,8 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-blue.png",
-                "highlightIconUrl": "./assets/img/marker-icon-blue-highlight.png"
+                "highlightIconUrl": "./assets/img/marker-icon-blue-highlight.png",
+                "iconAnchor": [12, 40]
             },
             "features" : []
         }, {
@@ -37,7 +38,8 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-green.png",
-                "highlightIconUrl": "./assets/img/marker-icon-green-highlight.png"
+                "highlightIconUrl": "./assets/img/marker-icon-green-highlight.png",
+                "iconAnchor": [12, 40]
             },
             "features" : []
         }, {
@@ -51,7 +53,8 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-marine.png",
-                "highlightIconUrl": "./assets/img/marker-icon-marine-highlight.png"
+                "highlightIconUrl": "./assets/img/marker-icon-marine-highlight.png",
+                "iconAnchor": [12, 40]
             },
             "features" : []
         }, {
@@ -65,7 +68,8 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-yellow.png",
-                "highlightIconUrl": "./assets/img/marker-icon-yellow-highlight.png"
+                "highlightIconUrl": "./assets/img/marker-icon-yellow-highlight.png",
+                "iconAnchor": [12, 40]
             },
             "features" : []
         }, {
@@ -79,7 +83,8 @@
             "styleName": "marker",
             "style": {
                 "iconUrl": "./assets/img/marker-icon-purple.png",
-                "highlightIconUrl": "./assets/img/marker-icon-purple-highlight.png"
+                "highlightIconUrl": "./assets/img/marker-icon-purple-highlight.png",
+                "iconAnchor": [12, 40]
             },
             "features" : []
         }]

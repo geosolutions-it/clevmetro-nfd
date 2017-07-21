@@ -22,6 +22,7 @@ from rest_framework.fields import empty, SerializerMethodField
 from rest_framework_gis import serializers as gisserializer
 from django.db.models.fields import NOT_PROVIDED
 from rest_framework.exceptions import ValidationError
+from core.models import get_details_class
 
 def _(message): return message
 
@@ -180,7 +181,6 @@ def get_serializer_fields(form_name, model):
         fdef = None
         
         kwargs = {}
-        #kwargs['required'] = False # set all form fields as not required, as related fields may be missing
         if getattr(f, 'default', NOT_PROVIDED) != NOT_PROVIDED:
             kwargs['default'] = getattr(f, 'default')
         
@@ -189,37 +189,45 @@ def get_serializer_fields(form_name, model):
         elif isinstance(f, CharField) or isinstance(f, TextField):
             kwargs['max_length'] = getattr(f, 'max_length', None)
             kwargs['allow_blank'] = getattr(f, 'blank', False)
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.CharField(**kwargs)
         elif isinstance(f, BooleanField):
             fdef = rest_fields.BooleanField(**kwargs)
         elif isinstance(f, NullBooleanField):
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.NullBooleanField(**kwargs)
         elif isinstance(f, DateTimeField):
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.DateTimeField(**kwargs)
-            kwargs['allow_null'] = True
         elif isinstance(f, DateField):
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.DateField(**kwargs)
         elif isinstance(f, DecimalField):
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             kwargs['max_digits'] = getattr(f, 'max_digits', None)
             kwargs['decimal_places'] = getattr(f, 'decimal_places', None)
             fdef = rest_fields.DecimalField(**kwargs)
         elif isinstance(f, FloatField):
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.FloatField(**kwargs)
         elif isinstance(f, IntegerField):
-            kwargs['allow_null'] = True
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.IntegerField(**kwargs)
         elif getattr(f, 'related_model', False):
+            kwargs['allow_blank'] = getattr(f, 'blank', False)
+            kwargs['allow_null'] = getattr(f, 'null', False)
+            kwargs['required'] = not getattr(f, 'null', False)
             if issubclass(f.related_model, DictionaryTable):
-                kwargs['allow_blank'] = getattr(f, 'blank', False)
-                kwargs['allow_null'] = True
                 fdef = DictionaryField(**kwargs)
-            else:
-                pass
+            elif issubclass(f.related_model, DictionaryTableExtended):
+                fdef = DictionaryExtendedField(**kwargs)
         elif isinstance(f, GeometryField):
             # skip geoms
             pass
@@ -311,35 +319,39 @@ class CustomModelSerializerMixin(object):
 
 class UpdateOccurrenceMixin(object):
     def __init__(self, instance=None, data=empty, **kwargs):
-        if instance.occurrence_cat:
-            if instance.occurrence_cat.code=='co':
-                return None #FIXME
-            elif instance.occurrence_cat.code=='fe':
-                return None #FIXME
-            elif instance.occurrence_cat.code=='fl':
-                return None #FIXME
-            elif instance.occurrence_cat.code=='pl':
-                return None #FIXME
-            elif instance.occurrence_cat.code=='mo':
-                return None # FIXME moss
-            elif instance.occurrence_cat.code=='fu':
-                return None #FIXME
-            elif instance.occurrence_cat.code=='sl':
-                self.forms = SLIMEMOLD_TYPE
-                self._form_dict = SLIMEMOLD_TYPE_DICT
-            elif instance.occurrence_cat.code=='ln':
-                self.forms = LAND_ANIMAL_TYPE
-                self._form_dict = LAND_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='lk':
-                self.forms = PONDLAKE_ANIMAL_TYPE
-                self._form_dict = PONDLAKE_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='st':
-                self.forms = STREAM_ANIMAL_TYPE
-                self._form_dict = STREAM_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='we':
-                self.forms = WETLAND_ANIMAL_TYPE
-                self._form_dict = WETLAND_ANIMAL_TYPE_DICT
+        if instance and instance.occurrence_cat:
+            self._init_forms(instance.occurrence_cat.code)
         super(UpdateOccurrenceMixin, self).__init__(instance, data, **kwargs)
+    
+    def _init_forms(self, category_code):
+        if category_code=='co':
+            return None #FIXME
+        elif category_code=='fe':
+            return None #FIXME
+        elif category_code=='fl':
+            return None #FIXME
+        elif category_code=='pl':
+            return None #FIXME
+        elif category_code=='mo':
+            return None # FIXME moss
+        elif category_code=='fu':
+            return None #FIXME
+        elif category_code=='sl':
+            self.forms = SLIMEMOLD_TYPE
+            self._form_dict = SLIMEMOLD_TYPE_DICT
+        elif category_code=='ln':
+            self.forms = LAND_ANIMAL_TYPE
+            self._form_dict = LAND_ANIMAL_TYPE_DICT
+        elif category_code=='lk':
+            self.forms = PONDLAKE_ANIMAL_TYPE
+            self._form_dict = PONDLAKE_ANIMAL_TYPE_DICT
+        elif category_code=='st':
+            self.forms = STREAM_ANIMAL_TYPE
+            self._form_dict = STREAM_ANIMAL_TYPE_DICT
+        elif category_code=='we':
+            self.forms = WETLAND_ANIMAL_TYPE
+            self._form_dict = WETLAND_ANIMAL_TYPE_DICT
+        
         
     def _get_local_name(self, global_field_name):
         """
@@ -489,18 +501,19 @@ class UpdateOccurrenceMixin(object):
         return self.forms
     
     def update(self, instance, validated_data):
+        formvalues = validated_data['formvalues']
         with reversion.create_revision():
             for (form_name, model_class, children) in self.get_toplevel_forms():
                 if form_name == 'species':
                     try:
-                        species_id = validated_data['species']['id']
+                        species_id = formvalues['species']['id']
                         selected_species = Species.objects.get(pk=species_id)
                         instance.species = selected_species
-                        self._update_form('species.element_species', ElementSpecies, validated_data, selected_species)
+                        self._update_form('species.element_species', ElementSpecies, formvalues, selected_species)
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
-                    self._update_form(form_name, model_class, validated_data, instance, children)
+                    self._update_form(form_name, model_class, formvalues, instance, children)
             
             if isinstance(instance, OccurrenceTaxon):
                 # taxon
@@ -509,9 +522,18 @@ class UpdateOccurrenceMixin(object):
                 # natural area
                 pass
             instance.version = instance.version + 1
-            instance.released = validated_data.get("released", False)
+            instance.released = formvalues.get("released", False)
             instance.save()
         return instance
+    
+    def create(self, validated_data):
+        instance = OccurrenceTaxon()
+        instance.occurrence_cat = OccurrenceCategory.objects.get(code=validated_data.get('featuresubtype'))
+        instance.geom = validated_data.get('geom')
+        instance.version = 0
+        self._init_forms(instance.occurrence_cat.code)
+        return self.update(instance, validated_data)
+
 
 """ -------------------------------------------
 MODEL SERIALIZERs
@@ -569,7 +591,8 @@ class DetailsSerializer(Serializer):
     def to_representation(self, instance):
         if instance:
             self.set_model_class(instance.occurrencetaxon.get_details_class())
-        return super(DetailsSerializer, self).to_representation(self.instance)
+            instance = instance.occurrencetaxon.get_details()
+        return super(DetailsSerializer, self).to_representation(instance)
     
     def get_fields(self):
         """
@@ -629,11 +652,12 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                 rest_fields.api_settings.NON_FIELD_ERRORS_KEY: [message]
             }, code='invalid')
 
-        ret = OrderedDict()
+        result = OrderedDict()
+        validated_formvalues = OrderedDict()
         errors = OrderedDict()
         fields = self._writable_fields
         
-        formvalues = {}
+        formvalues = OrderedDict()
         for global_field_name in plaindata:
             field_parts = global_field_name.split(".")
             if len(field_parts)>1:
@@ -657,6 +681,9 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                     continue
                 if self.instance:
                     field.set_model_class(self.instance.get_details_class())
+                elif data.get('featuresubtype'):
+                    field.set_model_class(get_details_class(data.get('featuresubtype')))
+                    
             elif isinstance(field, ModelSerializer):
                 primitive_value = field.get_value(formvalues)
                 if check_all_null(primitive_value) and not field.required:
@@ -674,12 +701,22 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             except rest_fields.SkipField:
                 pass
             else:
-                rest_fields.set_value(ret, field.source_attrs, validated_value)
+                rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
         if errors:
             raise rest_fields.ValidationError(to_flat_representation(errors))
 
-        return ret
+        result['formvalues'] = validated_formvalues
+        #result['id'] = data.get("id", None)
+        result['featuretype'] = data.get("featuretype")
+        result['featuresubtype'] = data.get("featuresubtype")
+        if not data.get('id'):
+            try:
+                geom_serializer = gisserializer.GeometryField()
+                result['geom'] = geom_serializer.to_internal_value(data.get("geom"))
+            except:
+                raise rest_fields.ValidationError({"geom": [_("Geometry is missing")]})
+        return result
 
 """ -------------------------------------------
 CREATE OCCURRENCES
@@ -764,41 +801,41 @@ class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
 FEATURE TYPES
 ---------------------------------------------- """
 class FeatureTypeSerializer():
-    def __init__(self, instance):
-        self.instance = instance
-        if instance.occurrence_cat:
-            if instance.occurrence_cat.code=='co':
+    def __init__(self, occurrence_cat):
+        self.occurrence_cat = occurrence_cat
+        if occurrence_cat:
+            if occurrence_cat.code=='co':
                 return None #FIXME
-            elif instance.occurrence_cat.code=='fe':
+            elif occurrence_cat.code=='fe':
                 return None #FIXME
-            elif instance.occurrence_cat.code=='fl':
+            elif occurrence_cat.code=='fl':
                 return None #FIXME
-            elif instance.occurrence_cat.code=='pl':
+            elif occurrence_cat.code=='pl':
                 return None #FIXME
-            elif instance.occurrence_cat.code=='mo':
+            elif occurrence_cat.code=='mo':
                 return None # FIXME moss
-            elif instance.occurrence_cat.code=='fu':
+            elif occurrence_cat.code=='fu':
                 return None #FIXME
-            elif instance.occurrence_cat.code=='sl':
+            elif occurrence_cat.code=='sl':
                 self.forms = SLIMEMOLD_TYPE
                 self._form_dict = SLIMEMOLD_TYPE_DICT
-            elif instance.occurrence_cat.code=='ln':
+            elif occurrence_cat.code=='ln':
                 self.forms = LAND_ANIMAL_TYPE
                 self._form_dict = LAND_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='lk':
+            elif occurrence_cat.code=='lk':
                 self.forms = PONDLAKE_ANIMAL_TYPE
                 self._form_dict = PONDLAKE_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='st':
+            elif occurrence_cat.code=='st':
                 self.forms = STREAM_ANIMAL_TYPE
                 self._form_dict = STREAM_ANIMAL_TYPE_DICT
-            elif instance.occurrence_cat.code=='we':
+            elif occurrence_cat.code=='we':
                 self.forms = WETLAND_ANIMAL_TYPE
                 self._form_dict = WETLAND_ANIMAL_TYPE_DICT
     
     def get_feature_type(self):
         result = {}
-        result['featuretype'] = self.instance.occurrence_cat.main_cat
-        result['featuresubtype'] = self.instance.occurrence_cat.code
+        result['featuretype'] = self.occurrence_cat.main_cat
+        result['featuresubtype'] = self.occurrence_cat.code
         forms = []
         for formdef in self.forms:
             form = {}

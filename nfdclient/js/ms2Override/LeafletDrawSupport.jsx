@@ -36,7 +36,7 @@ const LeafletDrawSupport = React.createClass({
         };
     },
     componentWillReceiveProps(newProps) {
-        this.clean();
+        //this.clean();
         let drawingStrings = this.props.messages || (this.context.messages) ? this.context.messages.drawLocal : false;
         if (drawingStrings) {
             L.drawLocal = drawingStrings;
@@ -47,7 +47,6 @@ const LeafletDrawSupport = React.createClass({
                     this.addMobileDrawInteraction(newProps);
                 } else {
                     this.addDrawInteraction(newProps);
-                    // this.addMobileDrawInteraction(newProps);
                 }
                 break;
             case ("stop"):
@@ -66,7 +65,6 @@ const LeafletDrawSupport = React.createClass({
                         this.addMobileDrawInteraction(newProps);
                     } else {
                         this.addDrawInteraction(newProps);
-                        // this.addMobileDrawInteraction(newProps);
                     }
                     break;
                 case ("stop"):
@@ -142,8 +140,8 @@ const LeafletDrawSupport = React.createClass({
         if (newProps.drawMethod === 'Marker') {
             let NaturalFeatureMarker = L.Icon.extend({
                 options: {
-                    iconUrl: newProps.options.icon/*,
-                    iconAnchor: [12, 40]*/
+                    iconUrl: newProps.options.icon,
+                    iconAnchor: [12, 40]
                 }
             });
             this.drawControl = new L.Draw.Marker(this.props.map, {
@@ -163,8 +161,8 @@ const LeafletDrawSupport = React.createClass({
         navigator.geolocation.getCurrentPosition((currentPosition) => {
             this.drawing = false;
             let smallIcon = new L.Icon({
-                iconUrl: newProps.options.icon/*,
-                iconAnchor: [12, 40]*/
+                iconUrl: newProps.options.icon,
+                iconAnchor: [12, 40]
             });
             let marker = L.marker(L.latLng(currentPosition.coords.latitude, currentPosition.coords.longitude), {
                 icon: smallIcon

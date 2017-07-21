@@ -34,36 +34,27 @@ const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
 const {changeDrawingStatus/*, endDrawing*/} = require('../../MapStore2/web/client/actions/draw');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
+const assign = require('object-assign');
 
 const normalizeInfo = (resp) => {
-    const feature = {};
+    const formvalues = {};
     for (let key in resp.formvalues) {
         if (key !== 'id' || key !== 'version') {
-            feature[key] = resp.formvalues[key];
+            formvalues[key] = resp.formvalues[key];
         }
     }
-    return feature;
+    resp.formvalues = formvalues;
+    return resp;
 };
 
-const createEmptyFeature = (featureType) => {
-    const emptyFeature = {};
+const createEmptyFormValues = (featureType) => {
+    const formvalues = {};
     featureType.map((section) => {
         section.formitems.map((item) => {
-            emptyFeature[item.key] = null;
+            formvalues[item.key] = null;
         });
     });
-    return emptyFeature;
-};
-
-const formatFeature = (featuretype, featuresubtype, properties) => {
-    let feature = {
-        id: properties.id,
-        featuretype: featuretype,
-        featuresubtype: featuresubtype,
-        formvalues: properties
-    };
-
-    return feature;
+    return formvalues;
 };
 
 function naturalFeaturesError(error) {
@@ -237,10 +228,9 @@ function naturalFeatureAdded(error) {
     };
 }
 
-function createNaturalFeature(properties) {
+
+function activateFeatureInsert(properties) {
     return (dispatch) => {
-        //dispatch(changeDrawingStatus("start", "CircleMarker", "dockednaturalfeatures", [], {properties: properties}));
-            
         if (properties.featuretype === 'plant') {
             dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-green-highlight.png'}));
         } else if (properties.featuretype === 'animal') {
@@ -255,18 +245,32 @@ function createNaturalFeature(properties) {
     };
 }
 
-function naturalFeatureCreated(featuretype, featuresubtype, id) {
+function naturalFeatureCreated(featuretype, featuresubtype, feature) {
     return (dispatch) => {
-        return Api.getFeatureType(featuretype, id).then((response) => {
-            if (response.forms && response.forms[0]) {
-                let emptyFeat = createEmptyFeature(response.forms);
-                emptyFeat.id = id;
-                emptyFeat.featuretype = featuretype;
-                emptyFeat.featuresubtype = featuresubtype;
-                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "viewedit"));
+        return Api.createNewFeature(feature).then((resp) => {
+            if (resp) {
+                dispatch(reloadFeatureType(resp.featuretype));
+                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
+                dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
-                dispatch(updateNaturalFeatureForm(emptyFeat));
-                dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
+            }
+        }).catch((error) => {
+            dispatch(updateNaturalFeatureError(-1, error));
+        });
+    };
+}
+
+
+function naturalFeatureMarkerAdded(feature) {
+    let newFeat = feature;
+    let featuresubtype = newFeat.featuresubtype;
+    return (dispatch) => {
+        return Api.getFeatureType(featuresubtype).then((response) => {
+            if (response.forms && response.forms[0]) {
+                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));              
+                assign(newFeat, { formvalues: createEmptyFormValues(response.forms)});
+                dispatch(updateNaturalFeatureForm(newFeat));
+                dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
             dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
@@ -274,19 +278,6 @@ function naturalFeatureCreated(featuretype, featuresubtype, id) {
     };
 }
 
-function naturalFeatureMarkerAdded(feature) {
-    return (dispatch) => {
-        dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
-        return Api.createNewFeature(feature).then((resp) => {
-            if (resp) {
-                dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
-            }
-        }).catch((error) => {
-            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
-        });
-    };
-}
 
 function naturalFeaturePolygonAdded(geometry) {
     return {
@@ -361,8 +352,7 @@ function updateNaturalFeatureError(id, error) {
 function updateNaturalFeature(featuretype, featuresubtype, properties) {
     return (dispatch) => {
         // dispatch(updateNaturalFeatureLoading(feature));
-        const feature = formatFeature(featuretype, featuresubtype, properties);
-        return Api.updateNaturalFeature(featuretype, feature).then(() => {
+        return Api.updateNaturalFeature(featuretype, properties).then(() => {
             dispatch(updateNaturalFeatureSuccess(properties.id));
             dispatch(reloadFeatureType(featuretype));
             dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
@@ -423,7 +413,7 @@ module.exports = {
     GET_NATURAL_FEATURE_TYPE, getNaturalFeatureType, reloadFeatureType,
     NATURAL_FEATURE_TYPE_LOADED, naturalFeatureTypeLoaded,
     NATURAL_FEATURE_TYPE_ERROR, naturalFeatureTypeError,
-    CREATE_NATURAL_FEATURE, createNaturalFeature, naturalFeatureCreated, naturalFeatureAdded,
+    naturalFeatureCreated, naturalFeatureAdded,
     SAVE_NATURAL_FEATURE, saveNaturalFeature,
     saveNaturalFeatureLoading, saveNaturalFeatureSuccess,
     saveNaturalFeatureError,
@@ -436,5 +426,5 @@ module.exports = {
     NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
     NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
     getSpecie,
-    updateSpeciesForms, UPDATE_SPECIES_FORMS
+    updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert
 };
