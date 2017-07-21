@@ -35,9 +35,10 @@ var getPointLayer = function(pointToLayer, geojson, latlng, options) {
         return pointToLayer(geojson, latlng);
     }
     if (options && options.style && options.style.iconUrl) {
-        let regularIcon, marker;
-        
-        regularIcon =  L.icon({
+        let regularIcon;
+        let marker;
+
+        regularIcon = L.icon({
                     iconUrl: options.style.iconUrl,
                     shadowUrl: options.style.shadowUrl,
                     iconSize: options.style.iconSize,
@@ -53,7 +54,7 @@ var getPointLayer = function(pointToLayer, geojson, latlng, options) {
             });
         marker.regularIcon = regularIcon;
         if (options.style.highlightIconUrl) {
-            let highlightIcon =  L.icon({
+            let highlightIcon = L.icon({
                     iconUrl: options.style.highlightIconUrl,
                     shadowUrl: options.style.shadowUrl,
                     iconSize: options.style.iconSize,
@@ -219,22 +220,25 @@ let Feature = React.createClass({
     },
     onClick() {
         const {properties, onClick, msId, container} = this.props;
-        let leafletId, layer, newIcon;
-        for (leafletId in this._layer._map._layers) {
-            layer = this._layer._map._layers[leafletId];
-            if (layer.nfid === msId) {
-                if (layer.highlightIcon) {
-                    layer.setIcon(layer.highlightIcon);
-                }
-            }
-            else {
-                if (layer.regularIcon && layer.regularIcon !== layer.options.icon) {
-                    layer.setIcon(layer.regularIcon);
+        let leafletId;
+        let layer;
+        let layers = this._layer._map._layers;
+        for (leafletId in layers) {
+            if (layers.hasOwnProperty(leafletId)) {
+                layer = this._layer._map._layers[leafletId];
+                if (layer.nfid === msId) {
+                    if (layer.highlightIcon) {
+                        layer.setIcon(layer.highlightIcon);
+                    }
+                } else {
+                    if (layer.regularIcon && layer.regularIcon !== layer.options.icon) {
+                        layer.setIcon(layer.regularIcon);
+                    }
                 }
             }
         }
         if (onClick) {
-            onClick(properties, msId, this.props.container.getLayerId(this.props.container));
+            onClick(properties, msId, container.getLayerId(this.props.container));
         }
     },
     render() {

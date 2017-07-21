@@ -76,7 +76,7 @@ const DockedNaturalFeatures = React.createClass({
         };
     },
     componentWillMount: function() {
-        //this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
+        // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onClose: function() {
         this.props.onToggle();
@@ -605,10 +605,9 @@ const DockedNaturalFeatures = React.createClass({
         }
     },
     handleChange(e) {
-        if (e.target.value=='') {
+        if (e.target.value === '') {
             this.props.currentFeature.formvalues[e.target.name] = null;
-        }
-        else {
+        } else {
             this.props.currentFeature.formvalues[e.target.name] = e.target.value;
         }
         if (this.props.mode === 'viewedit') {

@@ -36,7 +36,7 @@ const LeafletDrawSupport = React.createClass({
         };
     },
     componentWillReceiveProps(newProps) {
-        //this.clean();
+        // this.clean();
         let drawingStrings = this.props.messages || (this.context.messages) ? this.context.messages.drawLocal : false;
         if (drawingStrings) {
             L.drawLocal = drawingStrings;

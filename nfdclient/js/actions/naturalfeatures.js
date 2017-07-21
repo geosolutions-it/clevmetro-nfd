@@ -23,7 +23,6 @@ const NATURAL_FEATURE_TYPE_LOADED = 'NATURAL_FEATURE_TYPE_LOADED';
 const NATURAL_FEATURE_ADDED = 'NATURAL_FEATURE_ADDED';
 const NATURAL_FEATURE_TYPE_ERROR = 'NATURAL_FEATURE_TYPE_ERROR';
 const UPDATE_NATURAL_FEATURE = 'UPDATE_NATURAL_FEATURE';
-const CREATE_NATURAL_FEATURE = 'CREATE_NATURAL_FEATURE';
 const SAVE_NATURAL_FEATURE = 'SAVE_NATURAL_FEATURE';
 const DELETE_NATURAL_FEATURE = 'DELETE_NATURAL_FEATURE';
 const NATURAL_FEATURE_MARKER_ADDED = 'NATURAL_FEATURE_MARKER_ADDED';
@@ -194,9 +193,9 @@ function getSpecie(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid, lflid) {
+function naturalFeatureSelected(properties, nfid/*, lflid*/) {
     return (dispatch) => {
-        return Api.getFeatureType(properties.featuretype, nfid).then((resp) => {
+        return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"));
                 dispatch(getFeatureInfo(properties, nfid));
@@ -245,29 +244,13 @@ function activateFeatureInsert(properties) {
     };
 }
 
-function naturalFeatureCreated(featuretype, featuresubtype, feature) {
-    return (dispatch) => {
-        return Api.createNewFeature(feature).then((resp) => {
-            if (resp) {
-                dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
-                dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
-                dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
-            }
-        }).catch((error) => {
-            dispatch(updateNaturalFeatureError(-1, error));
-        });
-    };
-}
-
-
 function naturalFeatureMarkerAdded(feature) {
     let newFeat = feature;
     let featuresubtype = newFeat.featuresubtype;
     return (dispatch) => {
-        return Api.getFeatureType(featuresubtype).then((response) => {
+        return Api.getFeatureSubtype(featuresubtype).then((response) => {
             if (response.forms && response.forms[0]) {
-                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));              
+                dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
                 assign(newFeat, { formvalues: createEmptyFormValues(response.forms)});
                 dispatch(updateNaturalFeatureForm(newFeat));
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
@@ -348,6 +331,22 @@ function updateNaturalFeatureError(id, error) {
         error
     };
 }
+
+function naturalFeatureCreated(featuretype, featuresubtype, feature) {
+    return (dispatch) => {
+        return Api.createNewFeature(feature).then((resp) => {
+            if (resp) {
+                dispatch(reloadFeatureType(resp.featuretype));
+                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
+                dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
+                dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
+            }
+        }).catch((error) => {
+            dispatch(updateNaturalFeatureError(-1, error));
+        });
+    };
+}
+
 
 function updateNaturalFeature(featuretype, featuresubtype, properties) {
     return (dispatch) => {
