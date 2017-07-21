@@ -1,0 +1,550 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-21 15:19+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: core/featuretype.py:39
+msgid "occurrencemanagement"
+msgstr "Management"
+
+#: core/featuretype.py:42
+msgid "id"
+msgstr ""
+
+#: core/featuretype.py:47
+msgid "featuretype"
+msgstr ""
+
+#: core/featuretype.py:52
+msgid "featuresubtype"
+msgstr ""
+
+#: core/featuretype.py:57
+msgid "version"
+msgstr ""
+
+#: core/featuretype.py:62
+msgid "total_versions"
+msgstr ""
+
+#: core/featuretype.py:69 core/featuretype.py:82 core/featuretype.py:96
+#: core/featuretype.py:110 core/featuretype.py:123
+msgid "species"
+msgstr "Species"
+
+#: core/featuretype.py:70 core/featuretype.py:83 core/featuretype.py:97
+#: core/featuretype.py:111 core/featuretype.py:124
+msgid "species.element_species"
+msgstr "Element species"
+
+#: core/featuretype.py:72 core/featuretype.py:85 core/featuretype.py:99
+#: core/featuretype.py:113 core/featuretype.py:126
+msgid "observation"
+msgstr "Observation"
+
+#: core/featuretype.py:73 core/featuretype.py:86 core/featuretype.py:100
+#: core/featuretype.py:114 core/featuretype.py:127
+msgid "observation.reporter"
+msgstr "Observation reporter"
+
+#: core/featuretype.py:74 core/featuretype.py:87 core/featuretype.py:101
+#: core/featuretype.py:115 core/featuretype.py:128
+msgid "observation.verifier"
+msgstr "Observation verifier"
+
+#: core/featuretype.py:75 core/featuretype.py:88 core/featuretype.py:102
+#: core/featuretype.py:116 core/featuretype.py:129
+msgid "observation.recorder"
+msgstr "Observation recorder"
+
+#: core/featuretype.py:76 core/featuretype.py:89 core/featuretype.py:103
+#: core/featuretype.py:117 core/featuretype.py:130
+msgid "voucher"
+msgstr "Voucher"
+
+#: core/featuretype.py:77 core/featuretype.py:90 core/featuretype.py:104
+#: core/featuretype.py:118 core/featuretype.py:131
+msgid "details"
+msgstr "Details"
+
+#: core/featuretype.py:514
+msgid "No species was selected"
+msgstr ""
+
+#: core/featuretype.py:718
+msgid "Geometry is missing"
+msgstr ""
+
+#: core/initmodel.py:26
+msgid "Plant"
+msgstr ""
+
+#: core/initmodel.py:27 core/initmodel.py:39
+msgid "Fungus"
+msgstr ""
+
+#: core/initmodel.py:28 core/initmodel.py:40
+msgid "Slime mold"
+msgstr ""
+
+#: core/initmodel.py:29
+msgid "Animal"
+msgstr ""
+
+#: core/initmodel.py:30 core/initmodel.py:45
+msgid "Natural area"
+msgstr ""
+
+#: core/initmodel.py:34
+msgid "Conifer"
+msgstr ""
+
+#: core/initmodel.py:35
+msgid "Fern"
+msgstr ""
+
+#: core/initmodel.py:36
+msgid "Flowering plant"
+msgstr ""
+
+#: core/initmodel.py:37
+msgid "Plant - generic"
+msgstr ""
+
+#: core/initmodel.py:38
+msgid "Moss"
+msgstr ""
+
+#: core/initmodel.py:41
+msgid "Land animal"
+msgstr ""
+
+#: core/initmodel.py:42
+msgid "Pond lake animal"
+msgstr ""
+
+#: core/initmodel.py:43
+msgid "Stream animal"
+msgstr ""
+
+#: core/initmodel.py:44
+msgid "Wetland animal"
+msgstr ""
+
+#: core/initmodel.py:48
+msgid "CR: Critically endangered"
+msgstr ""
+
+#: core/initmodel.py:49
+msgid "DD: Data deficient"
+msgstr ""
+
+#: core/initmodel.py:50
+msgid "EN: Endangered"
+msgstr ""
+
+#: core/initmodel.py:51
+msgid "LC: Least concern"
+msgstr ""
+
+#: core/initmodel.py:52
+msgid "NA: Not applicable"
+msgstr ""
+
+#: core/initmodel.py:53
+msgid "NE: Not evaluated"
+msgstr ""
+
+#: core/initmodel.py:54
+msgid "NT: Near threatened"
+msgstr ""
+
+#: core/initmodel.py:55
+msgid "VU: Vulnerable"
+msgstr ""
+
+#: core/initmodel.py:57
+msgid "Candidate"
+msgstr ""
+
+#: core/initmodel.py:58
+msgid "Delisted"
+msgstr ""
+
+#: core/initmodel.py:59
+msgid "Emergency endangered"
+msgstr ""
+
+#: core/initmodel.py:60
+msgid "Endangered"
+msgstr ""
+
+#: core/initmodel.py:61
+msgid "Endangered due to similar appearance"
+msgstr ""
+
+#: core/initmodel.py:62
+msgid "Not Listed"
+msgstr ""
+
+#: core/initmodel.py:63
+msgid "Proposed endangered"
+msgstr ""
+
+#: core/initmodel.py:64
+msgid "Proposed threatened"
+msgstr ""
+
+#: core/initmodel.py:65
+msgid "Resolved Taxon"
+msgstr ""
+
+#: core/initmodel.py:66
+msgid "Species of Concern"
+msgstr ""
+
+#: core/initmodel.py:67
+msgid "Threatened"
+msgstr ""
+
+#: core/initmodel.py:68
+msgid "Threatened due to similar appearance"
+msgstr ""
+
+#: core/initmodel.py:69
+msgid "Under Review"
+msgstr ""
+
+#: core/initmodel.py:71
+msgid "Dawn"
+msgstr ""
+
+#: core/initmodel.py:72
+msgid "Early morning"
+msgstr ""
+
+#: core/initmodel.py:73
+msgid "Morning"
+msgstr ""
+
+#: core/initmodel.py:74
+msgid "Late morning"
+msgstr ""
+
+#: core/initmodel.py:75
+msgid "Noon"
+msgstr ""
+
+#: core/initmodel.py:76
+msgid "Early afternoon"
+msgstr ""
+
+#: core/initmodel.py:77
+msgid "Afternoon"
+msgstr ""
+
+#: core/initmodel.py:78
+msgid "Late afternoon"
+msgstr ""
+
+#: core/initmodel.py:79
+msgid "Dusk"
+msgstr ""
+
+#: core/initmodel.py:80
+msgid "Early evening"
+msgstr ""
+
+#: core/initmodel.py:81
+msgid "Evening"
+msgstr ""
+
+#: core/initmodel.py:82
+msgid "Late evening"
+msgstr ""
+
+#: core/initmodel.py:83
+msgid "Late night/after midnight"
+msgstr ""
+
+#: core/initmodel.py:84
+msgid "Unknown"
+msgstr ""
+
+#: core/initmodel.py:88
+msgid "Early spring"
+msgstr ""
+
+#: core/initmodel.py:89
+msgid "Mid spring"
+msgstr ""
+
+#: core/initmodel.py:90
+msgid "Late spring"
+msgstr ""
+
+#: core/initmodel.py:91
+msgid "Early summer"
+msgstr ""
+
+#: core/initmodel.py:92
+msgid "Mid summer"
+msgstr ""
+
+#: core/initmodel.py:93
+msgid "Late summer"
+msgstr ""
+
+#: core/initmodel.py:94
+msgid "Early fall"
+msgstr ""
+
+#: core/initmodel.py:95
+msgid "Mid fall"
+msgstr ""
+
+#: core/initmodel.py:96
+msgid "Late fall"
+msgstr ""
+
+#: core/initmodel.py:97
+msgid "Early winter"
+msgstr ""
+
+#: core/initmodel.py:98
+msgid "Mid winter"
+msgstr ""
+
+#: core/initmodel.py:99
+msgid "Late winter"
+msgstr ""
+
+#: core/initmodel.py:103
+msgid "bioblitz"
+msgstr ""
+
+#: core/initmodel.py:104
+msgid "camera trap"
+msgstr ""
+
+#: core/initmodel.py:105
+msgid "checking casual observer report"
+msgstr ""
+
+#: core/initmodel.py:106
+msgid "checking historical record"
+msgstr ""
+
+#: core/initmodel.py:107
+msgid "incidental"
+msgstr ""
+
+#: core/initmodel.py:108
+msgid "monitoring, census"
+msgstr ""
+
+#: core/initmodel.py:109
+msgid "monitoring, initial"
+msgstr ""
+
+#: core/initmodel.py:110
+msgid "monitoring, long term"
+msgstr ""
+
+#: core/initmodel.py:111
+msgid "monitoring, property assessment"
+msgstr ""
+
+#: core/initmodel.py:112
+msgid "searching"
+msgstr ""
+
+#: core/initmodel.py:116
+msgid "ethanol"
+msgstr ""
+
+#: core/initmodel.py:117
+msgid "formaldehyde"
+msgstr ""
+
+#: core/initmodel.py:118
+msgid "formalin"
+msgstr ""
+
+#: core/initmodel.py:119
+msgid "formalternate"
+msgstr ""
+
+#: core/initmodel.py:120
+msgid "isopropanol"
+msgstr ""
+
+#: core/initmodel.py:121 core/initmodel.py:132
+msgid "N/A"
+msgstr ""
+
+#: core/initmodel.py:125
+msgid "dried egg shell"
+msgstr ""
+
+#: core/initmodel.py:126
+msgid "dried/pressed/mounted"
+msgstr ""
+
+#: core/initmodel.py:127
+msgid "dried skeletal element"
+msgstr ""
+
+#: core/initmodel.py:128
+msgid "dried skeleton"
+msgstr ""
+
+#: core/initmodel.py:129
+msgid "dried skin"
+msgstr ""
+
+#: core/initmodel.py:130
+msgid "frozen"
+msgstr ""
+
+#: core/initmodel.py:131
+msgid "vial"
+msgstr ""
+
+#: core/initmodel.py:136
+msgid "female"
+msgstr ""
+
+#: core/initmodel.py:137
+msgid "female (parthenogenic)"
+msgstr ""
+
+#: core/initmodel.py:138
+msgid "gynandromorphic"
+msgstr ""
+
+#: core/initmodel.py:139
+msgid "hermaphroditic"
+msgstr ""
+
+#: core/initmodel.py:140
+msgid "hermaphroditic (parthenogenic)"
+msgstr ""
+
+#: core/initmodel.py:141
+msgid "male"
+msgstr ""
+
+#: core/initmodel.py:142
+msgid "n/a"
+msgstr ""
+
+#: core/initmodel.py:143
+msgid "unknown"
+msgstr ""
+
+#: core/initmodel.py:147
+msgid "aspirator/vacuum"
+msgstr ""
+
+#: core/initmodel.py:148
+msgid "audio transect"
+msgstr ""
+
+#: core/initmodel.py:149
+msgid "baited box/cage trap"
+msgstr ""
+
+#: core/initmodel.py:150
+msgid "Berlese funnel"
+msgstr ""
+
+#: core/initmodel.py:151
+msgid "fogger"
+msgstr ""
+
+#: core/initmodel.py:152
+msgid "funnel trap"
+msgstr ""
+
+#: core/initmodel.py:153
+msgid "glue trap alone"
+msgstr ""
+
+#: core/initmodel.py:154
+msgid "glue trap with drift fence"
+msgstr ""
+
+#: core/initmodel.py:155
+msgid "hand collecting"
+msgstr ""
+
+#: core/initmodel.py:156
+msgid "harp trap"
+msgstr ""
+
+#: core/initmodel.py:157
+msgid "light trap"
+msgstr ""
+
+#: core/initmodel.py:158
+msgid "line transect"
+msgstr ""
+
+#: core/initmodel.py:159
+msgid "Malaise trap"
+msgstr ""
+
+#: core/initmodel.py:160
+msgid "mist net"
+msgstr ""
+
+#: core/initmodel.py:161
+msgid "mustard soil extraction"
+msgstr ""
+
+#: core/initmodel.py:162
+msgid "pitfall trap alone"
+msgstr ""
+
+#: core/initmodel.py:163
+msgid "pitfall trap with drift fence"
+msgstr ""
+
+#: core/initmodel.py:164
+msgid "snare"
+msgstr ""
+
+#: core/initmodel.py:165
+msgid "sound recording"
+msgstr ""
+
+#: core/initmodel.py:166
+msgid "stovepipe trap"
+msgstr ""
+
+#: core/initmodel.py:167
+msgid "wildlife camera"
+msgstr ""
+
+#: core/initmodel.py:168
+msgid "windowpane trap"
+msgstr ""
+
+#: core/initmodel.py:169
+msgid "yellow pan trap"
+msgstr ""
