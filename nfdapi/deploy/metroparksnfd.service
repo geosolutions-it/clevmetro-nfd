@@ -1,0 +1,19 @@
+[Unit]
+Description=uWSGI instance to serve nfdapi
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/clevmetro-nfd/nfdapi/nfdapi
+Environment="DJANGO_SETTINGS_MODULE=nfdapi.settings" 
+PermissionsStartOnly=true
+#ExecStartPre=-/bin/mkdir /var/run/metroparksnfd | true
+ExecStartPre=/bin/chown -R www-data:www-data /var/run/metroparksnfd
+#ExecStart=/usr/local/bin/uwsgi -t 1800 --master --gevent 1024 --http-socket :3001 --uid www-data --gid www-data --chdir=/opt/clevmetro-nfd/nfdapi --module=nfdapi.wsgi:application --pidfile=/var/run/metroparksnfd/metroparksnfd.pid --logto /var/log/metroparksnfd/metroparksnfd.log
+ExecStart=/usr/local/bin/uwsgi -t 1800 --master --gevent 1024 --http-socket :3001 --uid www-data --gid www-data --chdir=/opt/clevmetro-nfd/nfdapi --module=nfdapi.wsgi:application --pidfile=/var/run/metroparksnfd/metroparksnfd.pid --logto /var/log/metroparksnfd/metroparksnfd.log
+#ExecStart=/usr/local/bin/uwsgi -t 1800 --master --gevent 1024 --socket /var/run/metroparksnfd/metroparksnfd.sock --uid www-data --gid www-data --chdir=/opt/clevmetro-nfd/nfdapi --module=nfdapi.wsgi:application --pidfile=/var/run/metroparksnfd/metroparksnfd.pid --logto /var/log/metroparksnfd/metroparksnfd.log
+ExecStop=/usr/local/bin/uwsgi --stop  /var/run/metroparksnfd/metroparksnfd.pid
+
+[Install]
+WantedBy=multi-user.target
