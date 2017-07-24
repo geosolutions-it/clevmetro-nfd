@@ -54,8 +54,9 @@ on http://localhost:8000/nfdapi/
 
 We use Django Rest Framework, which offers a nice web interface to test and become familiar with the rest API.
 Have a look for instance to the following URLs:
-http://localhost:8000/nfdapi/layers/animal/
-http://localhost:8000/nfdapi/layers/animal/xxx (where xxx is the id of an animal occurrence)
+
+* http://localhost:8000/nfdapi/layers/animal/
+* http://localhost:8000/nfdapi/layers/animal/xxx (where xxx is the id of an animal occurrence)
 
 You may need to adjust [settings.py](nfdapi/settings.py) to properly see the styles of REST web interface:
 ```python
