@@ -195,7 +195,6 @@ def get_serializer_fields(form_name, model):
         elif isinstance(f, BooleanField):
             fdef = rest_fields.BooleanField(**kwargs)
         elif isinstance(f, NullBooleanField):
-            kwargs['allow_null'] = getattr(f, 'null', False)
             kwargs['required'] = not getattr(f, 'null', False)
             fdef = rest_fields.NullBooleanField(**kwargs)
         elif isinstance(f, DateTimeField):
