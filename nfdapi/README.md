@@ -15,7 +15,7 @@ source metroparksnfd/bin/activate
 pip install -r ../clevmetro-nfd/nfdapi/requirements.txt
 ```
 
-Setup a PostgreSQL database and enable the PostGIS extension. Adjust the settings.py file
+Setup a PostgreSQL database and enable the PostGIS extension. Adjust the [settings.py](nfdapi/settings.py) file
 accordingly:
 ```python
 DATABASES = {
