@@ -1,8 +1,8 @@
- #nfdapi
+ # nfdapi
  
  Cleveland Metroparks - Natural Features Database REST API
  
- # Development
+ ## Development
 
 Install Python requirements using a virtual environment:
 ```shell
@@ -66,7 +66,8 @@ STATIC_ROOT = '/var/www/clevmetronfd-static'
 STATIC_URL = '/nfdapi-static/'
 ```
 
- # Deployment
+ ## Deployment
+
 The nfdapi application should be deployed on a WSGI compatible web server such as Apache or Nginx.
 A [systemd script is provided](deploy/metroparksnfd.service) for deploying nfdapi as a system service
 using the uWSGI application
