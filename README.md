@@ -1,36 +1,8 @@
 # clevmetro-nfd
 Cleveland Metroparks - Natural Features Database
 
+# Overview
 
-# Quickstart
-
-Install Python requirements using a virtual environment:
-```shell
-# create a Python virtual env to install dependences
-mkdir venvs ; cd venvs
-virtualenv metroparksnfd
-# activate the virtual env
-source metroparksnfd/bin/activate
-# install requirements
-pip install -r ../clevmetro-nfd/nfdapi/requirements.txt
-```
-
-Create database schema:
-
-```shell
-cd clevmetro-nfd/nfdapi
-$ ./manage.py migrate
-$ ./manage.py createinitialrevisions
-```
-
-Optional: Initialize some dictionary tables (Using `./manage.py shell`. Warning: it will delete existing dict tables):
-```python
-from core import initmodel as i
-i.init_model()
-```
-Optional: Insert some test data (Warning: it will delete existing occurrences):
-```python
-from core import initmodel as i
-i.insert_test_data()
-```
-
+The software is composed of a [client application](nfdclient/README.md) based on MapStore2, React and Redux technologies,
+and a [REST API](nfdapi/README.md) based on Django. Have a look both subprojects for detailed development and
+deployment documentation.
