@@ -392,7 +392,7 @@ const DockedNaturalFeatures = React.createClass({
         });
         return (
             <div className="nf-tab-content">
-                {tabindex<=2?
+                {tabindex <= 2 ?
                     (<AsyncTypeahead
                         {...this.state}
                         labelKey="name"
