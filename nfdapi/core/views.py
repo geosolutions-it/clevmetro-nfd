@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
-    OccurrenceCategory
+    OccurrenceCategory, DictionaryTable, DictionaryTableExtended
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -20,6 +20,8 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView,\
     RetrieveAPIView
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.fields import ModelField
+from featuretype import delete_object_and_children
 
 @api_view(['GET'])
 @permission_classes([])
@@ -133,7 +135,7 @@ class LayerDetail(APIView):
     def delete(self, request, occurrence_maincat, pk, format=None):
         feature = self.get_object(occurrence_maincat, pk)
         with reversion.create_revision():
-            feature.delete()
+            delete_object_and_children(feature)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

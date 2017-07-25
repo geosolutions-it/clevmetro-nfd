@@ -137,6 +137,38 @@ del _
 from django.utils.translation import ugettext_lazy as _
 
 
+def is_deletable_field(f):
+    if not getattr(f, 'related_model', False):
+        return False
+    if getattr(f, 'auto_created', False):
+        return False
+    if issubclass(f.related_model, DictionaryTable):
+        return False
+    if issubclass(f.related_model, DictionaryTableExtended):
+        return False
+    if issubclass(f.related_model, Species):
+        return False
+    return True
+    
+
+def delete_object_and_children(parent_instance):
+    
+    children = []
+    if not getattr(parent_instance, '_meta', None):
+        print parent_instance
+        print type(parent_instance)
+        print repr(parent_instance)
+    for f in parent_instance._meta.get_fields():
+        if is_deletable_field(f):
+            child_instance = getattr(parent_instance, f.name, None)
+            if child_instance:
+                children.append(child_instance)
+    
+    # some children are mandatory for the parent, so we first delete parents
+    parent_instance.delete()
+    for child_instance in children:
+        delete_object_and_children(child_instance)
+
 class DictionaryField(rest_fields.CharField):
     def get_attribute(self, instance):
         entry_instance = super(DictionaryField, self).get_attribute(instance)
@@ -252,7 +284,7 @@ def check_all_null(field_dict):
         if isinstance(value, dict):
             if not check_all_null(value):
                 return False
-        elif value is not None:
+        elif not (value is None or value == ''):
             return False
     return True
 
@@ -388,54 +420,59 @@ class UpdateOccurrenceMixin(object):
                         return None
             return subdict
         
-    def set_form_values(self, form_name, instance, validated_data, force_save=False):
+    def set_form_values(self, form_name, instance, form_validated_data, force_save=False):
         """
         Updates the values of the provided instance using validated data 
         """
-        form_validated_data = self._get_validated_data_form(validated_data, form_name)
-        if instance and form_validated_data:
-            fields = self._get_form_fields(form_name, instance)
-            modified = False
-            for f in fields:
-                if getattr(f, 'primary_key', False):
-                    pass
-                elif isinstance(f, CharField) or isinstance(f, TextField) or \
-                    isinstance(f, BooleanField) or isinstance(f, NullBooleanField)or \
-                    isinstance(f, DateTimeField) or isinstance(f, DateField) or \
-                    isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
-                    new_value = form_validated_data.get(f.name)
-                    old_value =  getattr(instance, f.name, None)
-                    if new_value != None and new_value != old_value:
-                        modified = True
-                        setattr(instance, f.name, new_value)
-                elif getattr(f, 'related_model', False):
-                    if issubclass(f.related_model, DictionaryTable) or issubclass(f.related_model, DictionaryTableExtended):
+        if instance:
+            if form_validated_data:
+                fields = self._get_form_fields(form_name, instance)
+                modified = False
+                for f in fields:
+                    if getattr(f, 'primary_key', False):
+                        pass
+                    elif isinstance(f, CharField) or isinstance(f, TextField) or \
+                        isinstance(f, BooleanField) or isinstance(f, NullBooleanField)or \
+                        isinstance(f, DateTimeField) or isinstance(f, DateField) or \
+                        isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
                         new_value = form_validated_data.get(f.name)
                         old_value =  getattr(instance, f.name, None)
-                        if new_value != None and (old_value == None or new_value != old_value.code): #FIXME: should we allow setting null again to the combo??
-                            try:
-                                dict_entry = f.related_model.objects.get(code=new_value)
-                                modified = True
-                                setattr(instance, f.name, dict_entry)
-                            except Exception as exc:
-                                setattr(instance, f.name, None)
-            if force_save or modified:
-                instance.save()
+                        if new_value != None and new_value != old_value:
+                            modified = True
+                            setattr(instance, f.name, new_value)
+                    elif getattr(f, 'related_model', False):
+                        if issubclass(f.related_model, DictionaryTable) or issubclass(f.related_model, DictionaryTableExtended):
+                            new_value = form_validated_data.get(f.name)
+                            old_value =  getattr(instance, f.name, None)
+                            if new_value != None and (old_value == None or new_value != old_value.code): #FIXME: should we allow setting null again to the combo??
+                                try:
+                                    dict_entry = f.related_model.objects.get(code=new_value)
+                                    modified = True
+                                    setattr(instance, f.name, dict_entry)
+                                except Exception as exc:
+                                    setattr(instance, f.name, None)
+                if force_save or modified:
+                    instance.save()
+                    return True
+            else:
+                # if the form is empty and instance exists, delete instance
+                try: 
+                    instance.delete()
+                except:
+                    pass
                 return True
         return False
     
     def _get_form_model_instance(self, form_name, model_class, parent_instance):
         """
-        Gets the appropriate instance for the provided form name and parent instance.
-        The instance is created if it does not exist
+        Gets the related instance for the provided form name and parent instance.
         """
-        if 'details' in form_name:
-            related_instance = parent_instance.get_details()
-        else:
-            related_instance = getattr(parent_instance, self._get_local_name(form_name), None)
-        if not related_instance:
-            related_instance = model_class()
-        return related_instance
+        if parent_instance is not None:
+            if 'details' in form_name:
+                related_instance = parent_instance.get_details()
+            else:
+                related_instance = getattr(parent_instance, self._get_local_name(form_name), None)
+            return related_instance
     
     def _update_form(self, form_name, model_class, validated_data, parent_instance, child_forms=[]):
         """
@@ -444,21 +481,25 @@ class UpdateOccurrenceMixin(object):
         
         Returns True if the instance has been modified and saved, False if there were no changes. 
         """
+        form_validated_data = self._get_validated_data_form(validated_data, form_name)
+        
         related_instance = self._get_form_model_instance(form_name, model_class, parent_instance)
+        if form_validated_data and not related_instance:
+            related_instance = model_class()
+            
         any_saved = False
         for (child_form_name, child_model_class, child_child_forms) in child_forms:
             saved = self._update_form(child_form_name, child_model_class, validated_data, related_instance, child_child_forms)
             any_saved = any_saved or saved
-            
-        saved = self.set_form_values(form_name, related_instance, validated_data, any_saved)
+        
+        saved = self.set_form_values(form_name, related_instance, form_validated_data, any_saved)
         any_saved = any_saved or saved
         
-        if related_instance:
-            if any_saved:
-                if 'details' in form_name:
-                    setattr(parent_instance, 'details', related_instance)
-                else:
-                    setattr(parent_instance, self._get_local_name(form_name), related_instance)
+        if any_saved:
+            if form_validated_data is None:
+                setattr(parent_instance, self._get_local_name(form_name), None)
+            else:
+                setattr(parent_instance, self._get_local_name(form_name), related_instance)
         return any_saved
     
     def _get_form_dict(self):
@@ -529,7 +570,6 @@ class UpdateOccurrenceMixin(object):
         instance = OccurrenceTaxon()
         instance.occurrence_cat = OccurrenceCategory.objects.get(code=validated_data.get('featuresubtype'))
         instance.geom = validated_data.get('geom')
-        instance.version = 0
         self._init_forms(instance.occurrence_cat.code)
         return self.update(instance, validated_data)
 
@@ -568,8 +608,8 @@ class PointOfContactSerializer(CustomModelSerializerMixin,ModelSerializer):
         exclude = ('id',)
 
 class OccurrenceObservationSerializer(CustomModelSerializerMixin,ModelSerializer):
+    reporter = PointOfContactSerializer(required=True)
     recorder = PointOfContactSerializer(required=False)
-    reporter = PointOfContactSerializer(required=False)
     verifier = PointOfContactSerializer(required=False)
         
     class Meta:
@@ -617,7 +657,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     #geom = gisserializer.GeometryField()
     voucher = VoucherSerializer(required=False)
     species = SpeciesSerializer(required=False)
-    observation = OccurrenceObservationSerializer(required=False)
+    observation = OccurrenceObservationSerializer(required=True)
     details = DetailsSerializer(required=False) 
     
     def to_representation(self, instance):
@@ -702,19 +742,24 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             else:
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
-        if errors:
-            raise rest_fields.ValidationError(to_flat_representation(errors))
-
         result['formvalues'] = validated_formvalues
         #result['id'] = data.get("id", None)
         result['featuretype'] = data.get("featuretype")
         result['featuresubtype'] = data.get("featuresubtype")
+        species_id = data.get('formvalues', {}).get('species.id')
+        if not species_id:
+            errors["species"] = [_("No species was selected")]
         if not data.get('id'):
             try:
                 geom_serializer = gisserializer.GeometryField()
                 result['geom'] = geom_serializer.to_internal_value(data.get("geom"))
             except:
-                raise rest_fields.ValidationError({"geom": [_("Geometry is missing")]})
+                errors["geom"] = [_("Geometry is missing")]
+
+        if errors:
+            raise rest_fields.ValidationError(to_flat_representation(errors))
+
+
         return result
 
 """ -------------------------------------------
