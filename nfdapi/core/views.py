@@ -9,19 +9,19 @@ from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
-from featuretype import FeatureTypeSerializer, CreateOccurrenceSerializer, LayerTaxonSerializer, OccurrenceSerializer
+from core.nfdserializers import FeatureTypeSerializer, CreateOccurrenceSerializer, LayerTaxonSerializer, OccurrenceSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
 from reversion.models import Version
-from core.featuretype import TaxonDetailsSerializer, SpeciesSearchSerializer,\
+from core.nfdserializers import TaxonDetailsSerializer, SpeciesSearchSerializer,\
     SpeciesSearchResultSerializer, SpeciesSerializer
 from rest_framework.generics import ListCreateAPIView, ListAPIView,\
     RetrieveAPIView
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.fields import ModelField
-from featuretype import delete_object_and_children
+from core.nfdserializers import delete_object_and_children
 
 @api_view(['GET'])
 @permission_classes([])
