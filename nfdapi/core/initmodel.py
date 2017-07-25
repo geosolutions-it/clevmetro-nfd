@@ -741,10 +741,15 @@ def insert_test_data(clean=True):
         recorder.name = "I'm the recorder2"
         recorder.save()
         
+        reporter = PointOfContact()
+        reporter.name = "I'm the reporter2"
+        reporter.save()
+        
         observation = OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
+        observation.reporter = reporter
         observation.save()
         
         
@@ -761,10 +766,15 @@ def insert_test_data(clean=True):
         recorder.name = "I'm the recorder"
         recorder.save()
         
+        reporter = PointOfContact()
+        reporter.name = "I'm the reporter"
+        reporter.save()
+        
         observation = OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
+        observation.reporter = reporter
         observation.save()
         
         land_animal_cat = OccurrenceCategory.objects.get(code='ln')
