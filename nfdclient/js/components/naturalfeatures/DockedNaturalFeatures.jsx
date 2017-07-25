@@ -165,7 +165,7 @@ const DockedNaturalFeatures = React.createClass({
         }
         return featuresubtype;
     },
-    renderTabContent(tab) {
+    renderTabContent(tab, tabindex) {
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
             if (item.type === 'string') {
@@ -392,17 +392,21 @@ const DockedNaturalFeatures = React.createClass({
         });
         return (
             <div className="nf-tab-content">
-                <AsyncTypeahead
-                    {...this.state}
-                    labelKey="name"
-                    bsSize="small"
-                    maxResults={20}
-                    onSearch={this._handleSearch}
-                    placeholder="Search for a specie..."
-                    renderMenuItemChildren={this._renderMenuItemChildren}
-                    selected={this.props.selectedSpecie}
-                    onChange={this._handleSpeciesChange}
-                />
+                {tabindex<=2?
+                    (<AsyncTypeahead
+                        {...this.state}
+                        labelKey="name"
+                        bsSize="small"
+                        maxResults={20}
+                        onSearch={this._handleSearch}
+                        placeholder="Search for a specie..."
+                        renderMenuItemChildren={this._renderMenuItemChildren}
+                        selected={this.props.selectedSpecie}
+                        onChange={this._handleSpeciesChange}
+                    />)
+                    :
+                    (<div></div>)
+                }
             <Table style={{width: "100%", marginTop: "10px"}} responsive striped condensed bordered>
                     <caption style={{display: "table-caption", textAlign: "center", backgroundColor: "#ccc", color: "#ffffff"}}>{tabName}</caption>
                     <tbody style={{width: "100%"}}>{items}</tbody>
@@ -418,7 +422,7 @@ const DockedNaturalFeatures = React.createClass({
             let tabIcon = this.getIcon(tab.formname);
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    {this.renderTabContent(tab)}
+                    {this.renderTabContent(tab, i)}
                 </Tab>
             );
         });
