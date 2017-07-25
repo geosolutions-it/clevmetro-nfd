@@ -31,7 +31,7 @@ const UPDATE_NATURAL_FEATURE_ERROR = 'UPDATE_NATURAL_FEATURE_ERROR';
 
 const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
-const {changeDrawingStatus/*, endDrawing*/} = require('../../MapStore2/web/client/actions/draw');
+const {changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 const assign = require('object-assign');
 
@@ -193,12 +193,15 @@ function getSpecie(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid/*, lflid*/) {
+function naturalFeatureSelected(properties, nfid, lflFeat) {
+    let theLflFeat = lflFeat;
     return (dispatch) => {
+        dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"));
                 dispatch(getFeatureInfo(properties, nfid));
+                dispatch(changeDrawingStatus("featureSelected", "Marker", "dockednaturalfeatures", [], {properties: properties, lflFeat: theLflFeat}));
             }
         }).catch((error) => {
             dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));

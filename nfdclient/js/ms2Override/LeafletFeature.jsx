@@ -218,27 +218,11 @@ let Feature = React.createClass({
             this.props.container.removeLayer(this._layer);
         }
     },
-    onClick() {
-        const {properties, onClick, msId, container} = this.props;
-        let leafletId;
-        let layer;
-        let layers = this._layer._map._layers;
-        for (leafletId in layers) {
-            if (layers.hasOwnProperty(leafletId)) {
-                layer = this._layer._map._layers[leafletId];
-                if (layer.nfid === msId) {
-                    if (layer.highlightIcon) {
-                        layer.setIcon(layer.highlightIcon);
-                    }
-                } else {
-                    if (layer.regularIcon && layer.regularIcon !== layer.options.icon) {
-                        layer.setIcon(layer.regularIcon);
-                    }
-                }
-            }
-        }
+    onClick(evt) {
+        const {properties, onClick, msId} = this.props;
+        let leafletLayer = evt.target;
         if (onClick) {
-            onClick(properties, msId, container.getLayerId(this.props.container));
+            onClick(properties, msId, leafletLayer);
         }
     },
     render() {

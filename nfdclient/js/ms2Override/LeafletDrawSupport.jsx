@@ -55,28 +55,15 @@ const LeafletDrawSupport = React.createClass({
             case ("clean"):
                 this.clean();
                 break;
+            case ("featureSelected"):
+                this.selectFeature(newProps.options.lflFeat);
+                break;
+            case ("featureDeselected"):
+                this.deselectFeature();
+                break;
             default :
                 return;
         }
-        /*if (this.props.drawStatus !== newProps.drawStatus || this.props.drawMethod !== newProps.drawMethod) {
-            switch (newProps.drawStatus) {
-                case ("start"):
-                    if (isMobile.any) {
-                        this.addMobileDrawInteraction(newProps);
-                    } else {
-                        this.addDrawInteraction(newProps);
-                    }
-                    break;
-                case ("stop"):
-                    this.removeDrawInteraction();
-                    break;
-                case ("clean"):
-                    this.clean();
-                    break;
-                default :
-                    return;
-            }
-        }*/
     },
     onDraw: {
         drawStart() {
@@ -216,6 +203,18 @@ const LeafletDrawSupport = React.createClass({
     },
     clean: function() {
         this.cleanMarkerLayer();
+        this.deselectFeature();
+    },
+    selectFeature: function(feat) {
+        this.deselectFeature();
+        this.selectedLeafletFeat = feat;
+        feat.setIcon(feat.highlightIcon);
+    },
+    deselectFeature: function() {
+        if (this.selectedLeafletFeat) {
+            this.selectedLeafletFeat.setIcon(this.selectedLeafletFeat.regularIcon);
+            this.selectedLeafletFeat = null;
+        }
     }
 });
 
