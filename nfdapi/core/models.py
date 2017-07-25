@@ -59,17 +59,17 @@ class OccurrenceObservation(models.Model):
     record_origin = models.ForeignKey(RecordOrigin, on_delete=models.SET_NULL, blank=True, null=True)
     #recording_station = models.ForeignKey(RecordingStation, on_delete=models.SET_NULL, blank=True, null=True)
     recording_station = models.TextField(blank=True, null=True, default='')
-    reporter = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='reporter')
+    reporter = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, related_name='reporter')
     recorder = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='recorder')
     verifier = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='verifier')
 
 class Occurrence(models.Model):
     geom = PointField()
-    version = models.IntegerField(default=1)
+    version = models.IntegerField(default=0)
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
-    observation = models.ForeignKey(OccurrenceObservation, on_delete=models.CASCADE, blank=True, null=True)
+    observation = models.ForeignKey(OccurrenceObservation, on_delete=models.CASCADE)
     
     class Meta:
         abstract = True
