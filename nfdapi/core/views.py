@@ -22,6 +22,8 @@ from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.fields import ModelField
 from core.nfdserializers import delete_object_and_children
+from core.permissions import CanUpdateFeatureType
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
 @permission_classes([])
@@ -69,15 +71,12 @@ def test_url3(request):
 
 
 class TaxonLayerList(APIView):
-    permission_classes = [] #FIXME when authentication is implemented
     def get(self, request, main_cat, format=None):
         queryset = OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=main_cat)
         serializer = LayerTaxonSerializer(queryset, many=True)
         return Response(serializer.data)
     def post(self, request, main_cat, format=None):
         serializer = OccurrenceSerializer(data=request.data)
-        #serializer = CreateOccurrenceSerializer(data=request.data)
-        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -85,20 +84,20 @@ class TaxonLayerList(APIView):
 
 
 class NaturalAreaLayerList(APIView):
-    permission_classes = [] #FIXME when authentication is implemented
-    def get(self, request, format=None):
+    def get(self, request, main_cat, format=None):
         queryset = OccurrenceNaturalArea.objects.all()
         serializer = LayerTaxonSerializer(queryset, many=True) #FIXME: should be using a different serializer
         return Response(serializer.data)
-    def post(self, request, format=None):
-        serializer = CreateOccurrenceSerializer(data=request.data)
+    def post(self, request, main_cat, format=None):
+        serializer = OccurrenceSerializer(data=request.data)
         if serializer.is_valid():
-            result = serializer.save()
-            return Response(result, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LayerDetail(APIView):
-    permission_classes = [] #FIXME when authentication is implemented
+    #permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
+    permission_classes = [ CanUpdateFeatureType ]
     """
     Retrieve, update or delete a snippet instance.
     """
@@ -161,8 +160,7 @@ class SpeciesPaginationClass(PageNumberPagination):
     
     def get_paginated_response(self, data):
         return Response(data)
-    
-@permission_classes([])
+
 class SpeciesSearch(ListAPIView):
     queryset = Species.objects.all()
     serializer_class = SpeciesSearchSerializer
@@ -170,7 +168,7 @@ class SpeciesSearch(ListAPIView):
     pagination_class = SpeciesPaginationClass
     search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
 
-@permission_classes([])
+
 class SpeciesDetail(RetrieveAPIView):
     queryset = Species.objects.all()
     serializer_class = SpeciesSearchResultSerializer

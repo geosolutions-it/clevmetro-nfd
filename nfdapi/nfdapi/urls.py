@@ -16,23 +16,28 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from rest_framework.authtoken import views
 from core import views as coreviews
-from core.models import OccurrenceTaxon, OccurrenceNaturalArea
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 from settings import APP_NAME
 
 urlpatterns = [
+    url(r'^'+APP_NAME+r'api-token-auth/', obtain_jwt_token),
+    url(r'^'+APP_NAME+r'api-token-refresh/', refresh_jwt_token),
+    
+    url(r'^'+APP_NAME, include('django.contrib.auth.urls')),
+    # for testing purposes:
     url(r'^'+APP_NAME+r'admin/', admin.site.urls),
-    url(r'^'+APP_NAME+r'rest-auth/', include('rest_auth.urls')),
-    url(r'^'+APP_NAME+r'api-token-auth/', views.obtain_auth_token),
+    # rest auth
+    #    url(r'^'+APP_NAME+r'rest-auth/', include('rest_auth.urls')),
+    #url(r'^'+APP_NAME+r'api-token-auth/', views.obtain_auth_token),
     
     url(r'^'+APP_NAME+r'test/', coreviews.test_url),
     url(r'^'+APP_NAME+r'test2/', coreviews.test_url2),
     url(r'^'+APP_NAME+r'test3/', coreviews.test_url3),
     
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
-    url(r'^'+APP_NAME+r'layers/naturalarea/$', coreviews.NaturalAreaLayerList.as_view(), name='naturalareaList'),
+    url(r'^'+APP_NAME+r'layers/(naturalarea)/$', coreviews.NaturalAreaLayerList.as_view(), name='naturalareaList'),
     
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
     

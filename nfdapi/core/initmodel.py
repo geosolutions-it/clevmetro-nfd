@@ -18,21 +18,22 @@ from reversion.models import Version
 # mark messages for translations but don't translate then right now 
 def _(message): return message
 
-
+"""
 plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
           'plant_flowering_plant', 'plant_moss_or_ally']
 slimemold = ['slimemold']
 fungus = ['fungus']
 animals = ['animal', 'animal_aquatic_animal', 'animal_land_animal',
            'animal_pond_lake_animal', 'animal_stream_animal', 'animal_wetland_animal']
-natural_area = ['natural_area']
+natural_area = ['naturalarea']
+"""
 
 occurrence_cat_dict = {
     'plant': _('Plant'),
     'fungus': _('Fungus'),
     'slimemold': _('Slime mold'),
     'animal': _('Animal'),
-    'natural_area': _('Natural area')
+    'naturalarea': _('Natural area')
     }
 
 
@@ -47,7 +48,7 @@ occurrence_subcat = [('co', _('Conifer'), 'plant'),
                      ('lk', _('Pond lake animal'), 'animal'),
                      ('st', _('Stream animal'), 'animal'),
                      ('we', _('Wetland animal'), 'animal'),
-                     ('na', _('Natural area'), 'natural_area')
+                     ('na', _('Natural area'), 'naturalarea')
     ]
 
 iucn_redlist = [('CR', _('CR: Critically endangered')),

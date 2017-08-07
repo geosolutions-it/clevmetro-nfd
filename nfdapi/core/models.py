@@ -5,6 +5,7 @@ from django.db import models
 import reversion
 from django.contrib.gis.db.models.fields import PointField
 from  django.utils import timezone
+from django.contrib import admin
 
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
@@ -116,6 +117,7 @@ class ElementType(DictionaryTable):
 class MushroomGroup(DictionaryTable):
     pass
 
+@reversion.register()
 class ElementSpecies(Element):
     native = models.NullBooleanField(default=True)
     oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
@@ -424,7 +426,9 @@ class PlantDetails(TaxonDetails):
     """
     pass
 
-    
+
+admin.site.register(Species)
+admin.site.register(ElementSpecies)
 
 plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
           'plant_flowering_plant', 'plant_moss_or_ally']
