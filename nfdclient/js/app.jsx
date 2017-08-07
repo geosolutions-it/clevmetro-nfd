@@ -12,7 +12,7 @@ const appReducers = {
     naturalfeatures: require('./reducers/naturalfeatures'),
     selection: require('../MapStore2/web/client/reducers/selection')
 };
-const {initState, getAnimals, getPlants/*, getNaturalAreas*/, getFungus, getSlimeMolds} = require('./actions/naturalfeatures');
+const {initState} = require('./actions/naturalfeatures');
 const dEpics = require('./epics/naturalfeatures');
 const ConfigUtils = require('../MapStore2/web/client/utils/ConfigUtils');
 // ConfigUtils.setLocalConfigurationFile('/static/js/risksConfig.json');
@@ -42,14 +42,10 @@ const StandardRouter = connect((state) => ({
 }))(require('../MapStore2/web/client/components/app/StandardRouter'));
 
 const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(null, initialState, appReducers, {...dEpics});
+
 const initialActions = init ? [
     () => initState(init)
 ] : [
-    () => getAnimals('/nfdapi/layers/animal/'),
-    () => getPlants('nfdapi/layers/plant/'),
-    // () => getNaturalAreas('/nfdapi/layers/naturalarea/'),
-    () => getFungus('/nfdapi/layers/fungus/'),
-    () => getSlimeMolds('/nfdapi/layers/slimemold/')
 ];
 const appConfig = {
     storeOpts,

@@ -28,12 +28,16 @@ const DELETE_NATURAL_FEATURE = 'DELETE_NATURAL_FEATURE';
 const NATURAL_FEATURE_MARKER_ADDED = 'NATURAL_FEATURE_MARKER_ADDED';
 const NATURAL_FEATURE_POLYGON_ADDED = 'NATURAL_FEATURE_POLYGON_ADDED';
 const UPDATE_NATURAL_FEATURE_ERROR = 'UPDATE_NATURAL_FEATURE_ERROR';
+const NFD_LOGIN_SUCCESS = 'NFD_LOGIN_SUCCESS';
 
 const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
 const {changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
+const {loginFail, logout} = require('../../MapStore2/web/client/actions/security');
+const {loadMaps} = require('../../MapStore2/web/client/actions/maps');
 const assign = require('object-assign');
+const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 
 const normalizeInfo = (resp) => {
     const formvalues = {};
@@ -402,6 +406,51 @@ function deleteNaturalFeature(featuretype, id) {
     };
 }
 
+function getData() {
+    return (dispatch) => {
+        dispatch(getAnimals('/nfdapi/layers/animal/'));
+        dispatch(getPlants('nfdapi/layers/plant/'));
+        // dispatch(getNaturalAreas('/nfdapi/layers/naturalarea/'));
+        dispatch(getFungus('/nfdapi/layers/fungus/'));
+        dispatch(getSlimeMolds('/nfdapi/layers/slimemold/'));
+    };
+}
+
+function loginSuccess(userDetails, username, password, authProvider) {
+    sessionStorage.setItem('nfd-jwt-auth-token', userDetails.token);
+    return {
+        type: NFD_LOGIN_SUCCESS,
+        userDetails: userDetails.user,
+        username: userDetails.user.name,
+        authProvider: authProvider
+    };
+}
+
+function userLoginSubmit(username, password) {
+    return (dispatch) => {
+        Api.jwtLogin(username, password).then((response) => {
+            dispatch(loginSuccess(response, username, password, "django-jwt"));
+            dispatch(loadMaps(false, ConfigUtils.getDefaults().initialMapFilter || "*"));
+        }).catch((e) => {
+            dispatch(loginFail(e));
+        });
+    };
+}
+
+
+function nfdLogout() {
+    sessionStorage.setItem('nfd-jwt-auth-token', null);
+    return (dispatch) => {
+        dispatch(logout(null));
+        dispatch(changeLayerProperties("animal", {features: []}));
+        dispatch(changeLayerProperties("fungus", {features: []}));
+        dispatch(changeLayerProperties("plant", {features: []}));
+        dispatch(changeLayerProperties("slimemold", {features: []}));
+        dispatch(changeLayerProperties("naturalarea", {features: []}));
+    };
+}
+
+
 module.exports = {
     NATURAL_FEATURES_ERROR, naturalFeaturesError,
     NATURAL_FEATURES_LOADING, naturalFeaturesLoading,
@@ -428,5 +477,6 @@ module.exports = {
     NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
     NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
     getSpecie,
-    updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert
+    updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
+    userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData
 };

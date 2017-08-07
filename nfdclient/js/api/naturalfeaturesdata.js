@@ -10,6 +10,14 @@ const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 const assign = require('object-assign');
 const dataCache = {};
 
+let getOptions = () => {
+    const token = sessionStorage.getItem('nfd-jwt-auth-token');
+    if (token !== null) {
+        return {headers: {'Authorization': "JWT " + token}};
+    }
+    return {};
+};
+
 const Api = {
     addBaseUrl: function(options) {
         return assign(options, {baseURL: ConfigUtils.getDefaults().geoStoreUrl});
@@ -21,7 +29,7 @@ const Api = {
                 resolve(cached.data);
             });
         }*/
-        return axios.get(url).then((response) => {
+        return axios.get(url, getOptions()).then((response) => {
             dataCache[url] = {
                 timestamp: new Date().getTime(),
                 data: response.data
@@ -31,31 +39,35 @@ const Api = {
     },
     updateNaturalFeature: function(featuretype, feature) {
         let url = '/nfdapi/layers/' + featuretype + '/' + feature.id + '/';
-        return axios.put(url, feature).then(function(response) {return response.data; });
+        return axios.put(url, feature, getOptions()).then(function(response) {return response.data; });
     },
     deleteNaturalFeature: function(layerId, nfid) {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
-        return axios.delete(url).then(function(response) {return response.data; });
+        return axios.delete(url, getOptions()).then(function(response) {return response.data; });
     },
     getFeatureSubtype: function(featuresubtype) {
         let url = '/nfdapi/featuretypes/' + featuresubtype + '/';
-        return axios.get(url).then(function(response) {return response.data; });
+        return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     getFeatureType: function(ftype, nfid) {
         let url = '/nfdapi/featuretypes/' + ftype + '/' + nfid + '/';
-        return axios.get(url).then(function(response) {return response.data; });
+        return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     getFeatureInfo: function(layerId, nfid) {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
-        return axios.get(url).then(function(response) {return response.data; });
+        return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     getSpecie: function(id) {
         let url = '/nfdapi/species/' + id + '/';
-        return axios.get(url).then(function(response) {return response.data; });
+        return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
         let url = '/nfdapi/layers/' + feature.featuretype + '/';
-        return axios.post(url, feature).then(function(response) {return response.data; });
+        return axios.post(url, getOptions(), feature).then(function(response) {return response.data; });
+    },
+    jwtLogin: function(user, password) {
+        let url = '/nfdapi/api-token-auth/';
+        return axios.post(url, {"username": user, "password": password}).then(function(response) {return response.data; });
     }
 };
 

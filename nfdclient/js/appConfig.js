@@ -15,6 +15,11 @@ module.exports = {
     pluginsDef: require('./plugins.js'),
     initialState: {
         defaultState: {
+            controls: {
+                LoginForm: {
+                    enabled: true
+                }
+            },
             naturalfeatures: {
                 forms: [],
                 featuretype: "",

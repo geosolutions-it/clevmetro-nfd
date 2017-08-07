@@ -15,7 +15,7 @@ module.exports = {
         OmniBarPlugin: require('../MapStore2/web/client/plugins/OmniBar'),
         SearchPlugin: require('../MapStore2/web/client/plugins/Search'),
         BurgerMenuPlugin: require('../MapStore2/web/client/plugins/BurgerMenu'),
-        LoginPlugin: require('../MapStore2/web/client/plugins/Login'),
+        NfdLoginPlugin: require('./plugins/NfdLogin'),
         ToolbarPlugin: require('../MapStore2/web/client/plugins/Toolbar'),
         ExpanderPlugin: require('../MapStore2/web/client/plugins/Expander'),
         LocatePlugin: require('../MapStore2/web/client/plugins/Locate'),

@@ -15,11 +15,18 @@ const {
     GET_NATURAL_AREAS,
     GET_FUNGUS,
     GET_SLIME_MOLDS,
+    NFD_LOGIN_SUCCESS,
+    getData,
     naturalFeaturesLoaded,
     naturalFeaturesLoading,
     naturalFeaturesError,
+    NATURAL_FEATURES_ERROR,
     naturalFeatureMarkerAdded
 } = require('../actions/naturalfeatures');
+
+const {
+    showLogin
+} = require('../plugins/login/index');
 
 const {END_DRAWING} = require('../../MapStore2/web/client/actions/draw');
 
@@ -33,7 +40,6 @@ const getAnimalsEpic = (action$, store) =>
         Rx.Observable.defer(() => Api.getData(action.url))
         .retry(1)
         .map(val => [
-            // changeLayerProperties('animals', {features: val.features.map((f, idx) => (assign({}, f, {id: idx, ftype: 'animals'}))) || []}),
             changeLayerProperties('animal', {features: val.features}),
             naturalFeaturesLoaded(val.features, action.url)
         ])
@@ -114,6 +120,15 @@ const getSlimeMoldsEpic = (action$, store) =>
         .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
     );
 
+const getDataEpic = action$ =>
+    action$.ofType(NFD_LOGIN_SUCCESS)
+    .map(val => getData(val));
+
+const getDataErrorEpic = action$ =>
+    action$.ofType(NATURAL_FEATURES_ERROR)
+    .map(val => showLogin(val));
+
+
 /**
  * @memberof epics.naturalfeatures
  * @param {external:Observable} action$ manages `NATURAL_FEATURE_CREATED`
@@ -126,6 +141,8 @@ const addNaturalFeatureGeometryEpic = (action$) =>
         });
 
 module.exports = {
+    getDataEpic,
+    getDataErrorEpic,
     getAnimalsEpic,
     getPlantsEpic,
     getFungusEpic,
