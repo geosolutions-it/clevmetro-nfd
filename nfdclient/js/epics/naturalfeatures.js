@@ -21,12 +21,11 @@ const {
     naturalFeaturesLoading,
     naturalFeaturesError,
     NATURAL_FEATURES_ERROR,
-    naturalFeatureMarkerAdded
-} = require('../actions/naturalfeatures');
-
-const {
+    naturalFeatureMarkerAdded,
+    USER_NOT_AUTHENTICATED_ERROR,
+    nfdLogout,
     showLogin
-} = require('../plugins/login/index');
+} = require('../actions/naturalfeatures');
 
 const {END_DRAWING} = require('../../MapStore2/web/client/actions/draw');
 
@@ -124,10 +123,10 @@ const getDataEpic = action$ =>
     action$.ofType(NFD_LOGIN_SUCCESS)
     .map(val => getData(val));
 
-const getDataErrorEpic = action$ =>
-    action$.ofType(NATURAL_FEATURES_ERROR)
-    .map(val => showLogin(val));
-
+const unauthorizedUserErrorEpic = action$ =>
+    action$.ofType(USER_NOT_AUTHENTICATED_ERROR)
+    .map(() => 
+        showLogin());
 
 /**
  * @memberof epics.naturalfeatures
@@ -142,7 +141,7 @@ const addNaturalFeatureGeometryEpic = (action$) =>
 
 module.exports = {
     getDataEpic,
-    getDataErrorEpic,
+    unauthorizedUserErrorEpic,
     getAnimalsEpic,
     getPlantsEpic,
     getFungusEpic,

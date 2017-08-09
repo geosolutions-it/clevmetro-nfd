@@ -29,6 +29,7 @@ const NATURAL_FEATURE_MARKER_ADDED = 'NATURAL_FEATURE_MARKER_ADDED';
 const NATURAL_FEATURE_POLYGON_ADDED = 'NATURAL_FEATURE_POLYGON_ADDED';
 const UPDATE_NATURAL_FEATURE_ERROR = 'UPDATE_NATURAL_FEATURE_ERROR';
 const NFD_LOGIN_SUCCESS = 'NFD_LOGIN_SUCCESS';
+const USER_NOT_AUTHENTICATED_ERROR = 'USER_NOT_AUTHENTICATED_ERROR';
 
 const Api = require('../api/naturalfeaturesdata');
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
@@ -180,7 +181,9 @@ function getFeatureInfo(properties, nfid) {
                 dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
-            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
 }
@@ -192,7 +195,9 @@ function getSpecie(id) {
                 dispatch(updateSpeciesForms(resp));
             }
         }).catch((error) => {
-            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
 }
@@ -208,7 +213,9 @@ function naturalFeatureSelected(properties, nfid, lflFeat) {
                 dispatch(changeDrawingStatus("featureSelected", "Marker", "dockednaturalfeatures", [], {properties: properties, lflFeat: theLflFeat}));
             }
         }).catch((error) => {
-            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
 }
@@ -263,7 +270,9 @@ function naturalFeatureMarkerAdded(feature) {
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
-            dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
 }
@@ -308,7 +317,9 @@ function saveNaturalFeature(feature) {
             return Api.saveNaturalFeature(feature).then((resp) => {
                 dispatch(saveNaturalFeatureSuccess(resp));
             }).catch((error) => {
-                dispatch(saveNaturalFeatureError(feature, error));
+                if (error.status==401)
+                    return dispatch(userNotAuthenticatedError(error));
+                return dispatch(saveNaturalFeatureError(feature, error));
             });
         }
     };
@@ -349,7 +360,9 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
             }
         }).catch((error) => {
-            dispatch(updateNaturalFeatureError(-1, error));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(updateNaturalFeatureError(-1, error));
         });
     };
 }
@@ -363,7 +376,9 @@ function updateNaturalFeature(featuretype, featuresubtype, properties) {
             dispatch(reloadFeatureType(featuretype));
             dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
         }).catch((error) => {
-            dispatch(updateNaturalFeatureError(properties.id, error));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(updateNaturalFeatureError(properties.id, error));
         });
     };
 }
@@ -401,7 +416,9 @@ function deleteNaturalFeature(featuretype, id) {
             dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
             dispatch(deleteNaturalFeatureSuccess(id));
         }).catch((error) => {
-            dispatch(deleteNaturalFeatureError(id, error));
+            if (error.status==401)
+                return dispatch(userNotAuthenticatedError(error));
+            return dispatch(deleteNaturalFeatureError(id, error));
         });
     };
 }
@@ -437,6 +454,11 @@ function userLoginSubmit(username, password) {
     };
 }
 
+function showLogin() {
+    return (dispatch) => {
+        dispatch(setControlProperty('LoginForm', 'enabled', true));
+    };
+}
 
 function nfdLogout() {
     sessionStorage.setItem('nfd-jwt-auth-token', null);
@@ -447,6 +469,14 @@ function nfdLogout() {
         dispatch(changeLayerProperties("plant", {features: []}));
         dispatch(changeLayerProperties("slimemold", {features: []}));
         dispatch(changeLayerProperties("naturalarea", {features: []}));
+    };
+}
+
+function userNotAuthenticatedError(error) {
+    return {
+        type: USER_NOT_AUTHENTICATED_ERROR,
+        status: "error",
+        error
     };
 }
 
@@ -478,5 +508,7 @@ module.exports = {
     NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
     getSpecie,
     updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
-    userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData
+    userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData,
+    USER_NOT_AUTHENTICATED_ERROR,
+    showLogin
 };

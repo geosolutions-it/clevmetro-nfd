@@ -19,12 +19,6 @@ const closeLogin = () => {
     };
 };
 
-const showLogin = () => {
-    return (dispatch) => {
-        dispatch(setControlProperty('LoginForm', 'enabled', false));
-    };
-};
-
 const UserMenu = connect((state) => ({
     user: state.security && state.security.user
 }), {
@@ -71,6 +65,5 @@ module.exports = {
     UserDetails,
     UserMenu,
     Login,
-    LoginNav,
-    showLogin
+    LoginNav
 };
