@@ -217,7 +217,7 @@ AUTH_LDAP_GROUP_TYPE = NestedActiveDirectoryGroupType()
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
     "is_staff": "cn=nfdadmins,ou=Groups,dc=Metroparks,dc=local",
-    #"is_superuser": "cn=nfdadmins,ou=Groups,dc=Metroparks,dc=local"
+    "is_superuser": "cn=nfdadmins,ou=Groups,dc=Metroparks,dc=local"
 }
 
 AUTH_LDAP_USER_ATTR_MAP = {

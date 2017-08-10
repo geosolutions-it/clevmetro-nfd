@@ -53,6 +53,43 @@ MANAGEMENT_FORM_ITEMS = [{
         "type": "string",
         'readonly': True
     },{
+        "key": "released",
+        "label": _("released"),
+        "type": "boolean",
+        'readonly': True
+    },{
+        "key": "version",
+        "label": _("version"),
+        "type": "integer",
+        'readonly': True
+    },{
+        "key": "total_versions",
+        "label": _("total_versions"),
+        "type": "integer",
+        'readonly': True
+    }]
+
+MANAGEMENT_FORM_ITEMS_PUBLISHER = [{
+        "key": "id",
+        "label": _("id"),
+        "type": "integer",
+        'readonly': True
+    },{
+        "key": "featuretype",
+        "label": _("featuretype"),
+        "type": "string",
+        'readonly': True
+    },{
+        "key": "featuresubtype",
+        "label": _("featuresubtype"),
+        "type": "string",
+        'readonly': True
+    },{
+        "key": "released",
+        "label": _("released"),
+        "type": "boolean",
+        'readonly': False
+    },{
         "key": "version",
         "label": _("version"),
         "type": "integer",
@@ -349,7 +386,9 @@ class CustomModelSerializerMixin(object):
 
 
 class UpdateOccurrenceMixin(object):
-    def __init__(self, instance=None, data=empty, **kwargs):
+    def __init__(self, instance=None, data=empty, is_writer=False, is_publisher=False, **kwargs):
+        self.is_writer = is_writer
+        self.is_publisher = is_publisher
         if instance and instance.occurrence_cat:
             self._init_forms(instance.occurrence_cat.code)
         super(UpdateOccurrenceMixin, self).__init__(instance, data, **kwargs)
@@ -562,7 +601,10 @@ class UpdateOccurrenceMixin(object):
                 # natural area
                 pass
             instance.version = instance.version + 1
-            instance.released = formvalues.get("released", False)
+            if self.is_publisher:
+                instance.released = formvalues.get("released", False)
+            else:
+                instance.released = False
             instance.save()
         return instance
     
@@ -650,8 +692,9 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     Manages serialization/deserialization of Occurrences
     """
     id = rest_fields.IntegerField(required=False, read_only=True)
-    featuretype = DictionaryField(required=False, read_only=True)
-    featuresubtype = DictionaryField(read_only=True)
+    featuretype = rest_fields.CharField(required=False, read_only=True)
+    featuresubtype = rest_fields.CharField(read_only=True)
+    released = rest_fields.BooleanField(required=False, read_only=False)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = TotalVersionsField(required=False, read_only=True)
     #geom = gisserializer.GeometryField()
@@ -670,10 +713,13 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result["formvalues"] = to_flat_representation(r)
         #result["geom"] = r.get("geom")
         #del result["formvalues"]["geom"]
-        result["version"] = r["version"]
+        result["released"] = instance.released
+        result["version"] = instance.version
         result["total_versions"] = r["total_versions"]
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
+        result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
+        result["formvalues"]['featuresubtype'] = instance.occurrence_cat.code
         return result
     
     def to_internal_value(self, data):
@@ -743,6 +789,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
         result['formvalues'] = validated_formvalues
+        result["released"] = data.get("released")
         #result['id'] = data.get("id", None)
         result['featuretype'] = data.get("featuretype")
         result['featuresubtype'] = data.get("featuresubtype")
@@ -758,7 +805,6 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
 
         if errors:
             raise rest_fields.ValidationError(to_flat_representation(errors))
-
 
         return result
 
@@ -801,6 +847,7 @@ class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
     featuretype = rest_fields.CharField(required=False, read_only=True)
     featuresubtype = rest_fields.CharField()
+    released = rest_fields.BooleanField(required=False, read_only=True)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
     
@@ -811,13 +858,14 @@ class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
         result['version'] = instance.version
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
+        result['released'] = instance.released
         result['id'] = instance.id
         return result
     
     class Meta:
         model = OccurrenceTaxon
         geo_field = "geom"
-        fields = ('id', 'featuretype', 'featuresubtype', 'version', 'total_versions')
+        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'version', 'total_versions')
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.
 
@@ -828,6 +876,7 @@ class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
         versions = Version.objects.get_for_object(instance)
         result['total_versions'] = len(versions)
         result['version'] = instance.version
+        result['released'] = instance.released
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
         result['id'] = instance.id
@@ -836,7 +885,7 @@ class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
     class Meta:
         model = OccurrenceNaturalArea
         geo_field = "geom"
-        fields = ('id', 'featuretype', 'featuresubtype', 'version', 'total_versions')
+        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'version', 'total_versions')
 
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.
@@ -845,7 +894,9 @@ class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
 FEATURE TYPES
 ---------------------------------------------- """
 class FeatureTypeSerializer():
-    def __init__(self, occurrence_cat):
+    def __init__(self, occurrence_cat, is_writer=False, is_publisher=False):
+        self.is_writer = is_writer
+        self.is_publisher = is_publisher
         self.occurrence_cat = occurrence_cat
         if occurrence_cat:
             if occurrence_cat.code=='co':
@@ -889,7 +940,10 @@ class FeatureTypeSerializer():
             if form_name != MANAGEMENT_FORM_NAME:
                 form['formitems'] = self.get_form_featuretype(form_name, formdef[1])
             else:
-                form['formitems'] = MANAGEMENT_FORM_ITEMS
+                if self.is_publisher:
+                    form['formitems'] = MANAGEMENT_FORM_ITEMS_PUBLISHER
+                else:
+                    form['formitems'] = MANAGEMENT_FORM_ITEMS
             forms.append(form)
         result['forms'] = forms
         return result
@@ -936,7 +990,8 @@ class FeatureTypeSerializer():
                 
             if 'type' in fdef:
                 fdef['mandatory'] = (not getattr(f, "null", True) and not getattr(f, "blank", True))
-                fdef['readonly'] = False
+                if not (self.is_writer or self.is_publisher):
+                    fdef['readonly'] = True
                 fdef['key'] = form_name + "." + f.name
                 fdef['label'] = _(f.name) 
                 result.append(fdef)
