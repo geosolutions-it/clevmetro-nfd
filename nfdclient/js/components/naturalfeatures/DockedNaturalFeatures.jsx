@@ -17,6 +17,7 @@ const _ = require('lodash');
 // const isMobile = require('ismobilejs');
 require('react-selectize/themes/index.css');
 require('./DockedNaturalFeatures.css');
+const Api = require('../../api/naturalfeaturesdata');
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
@@ -47,7 +48,7 @@ const DockedNaturalFeatures = React.createClass({
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
         photos: React.PropTypes.array,
-        getSpecie: React.PropTypes.func,
+        getSpecies: React.PropTypes.func,
         selectedSpecie: React.PropTypes.number
     },
     getDefaultProps() {
@@ -68,7 +69,7 @@ const DockedNaturalFeatures = React.createClass({
             onSave: () => {},
             onUpdate: () => {},
             onDelete: () => {},
-            getSpecie: () => {},
+            getSpecies: () => {},
             previousVersion: () => {},
             nextVersion: () => {},
             onChangeDrawingStatus: () => {},
@@ -166,6 +167,7 @@ const DockedNaturalFeatures = React.createClass({
         return featuresubtype;
     },
     renderTabContent(tab, tabindex) {
+        let searchDiv;
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
             if (item.type === 'string') {
@@ -354,9 +356,12 @@ const DockedNaturalFeatures = React.createClass({
                 }
             }
         });
+        
+        searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher);
+        
         return (
             <div className="nf-tab-content">
-                {tabindex <= 2 ?
+                {searchDiv ?
                     (<AsyncTypeahead
                         {...this.state}
                         labelKey="name"
@@ -371,7 +376,7 @@ const DockedNaturalFeatures = React.createClass({
                     :
                     (<div></div>)
                 }
-            <Table style={{width: "100%", marginTop: "10px"}} responsive striped condensed bordered>
+                <Table style={{width: "100%", marginTop: "10px"}} responsive striped condensed bordered>
                     <caption style={{display: "table-caption", textAlign: "center", backgroundColor: "#ccc", color: "#ffffff"}}>{tabName}</caption>
                     <tbody style={{width: "100%"}}>{items}</tbody>
                 </Table>
@@ -417,30 +422,35 @@ const DockedNaturalFeatures = React.createClass({
         return tabs;
     },
     renderButtons() {
-        return (this.props.mode === 'viewedit') ? [
-            <Button key="delete" bsSize="small"
-                bsStyle="primary"
-                onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.formvalues.id)}
-                style={{marginRight: "10px"}}
-                disabled={false}>
-                <Message msgId="naturalfeatures.delete" />
-            </Button>,
-            <Button key="update" bsSize="small"
-                bsStyle="primary"
-                onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
-                disabled={false}>
-                <Message msgId="naturalfeatures.update" />
-            </Button>
+        if (this.props.isWriter || this.props.isPublisher) {
+            return (this.props.mode === 'viewedit') ? [
+                <Button key="delete" bsSize="small"
+                    bsStyle="primary"
+                    onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.formvalues.id)}
+                    style={{marginRight: "10px"}}
+                    disabled={false}>
+                    <Message msgId="naturalfeatures.delete" />
+                </Button>,
+                <Button key="update" bsSize="small"
+                    bsStyle="primary"
+                    onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
+                    disabled={false}>
+                    <Message msgId="naturalfeatures.update" />
+                </Button>
 
-        ] : [
-            <Button key="save" bsSize="small"
-                bsStyle="primary"
-                onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
-                disabled={false}>
-                <Message msgId="naturalfeatures.save" />
-            </Button>
+            ] : [
+                <Button key="save" bsSize="small"
+                    bsStyle="primary"
+                    onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
+                    disabled={false}>
+                    <Message msgId="naturalfeatures.save" />
+                </Button>
 
-        ];
+            ];
+        }
+        else {
+            return [];
+        }
     },
     renderHistoric() {
         /*return (
@@ -543,15 +553,14 @@ const DockedNaturalFeatures = React.createClass({
     },
     _handleSpeciesChange(e) {
         if (e.length === 1) {
-            this.props.getSpecie(e[0].id);
+            this.props.getSpecies(e[0].id);
         }
     },
     _handleSearch(query) {
         if (!query) {
             return;
         }
-        fetch(`/nfdapi/species/?search=${query}`)
-            .then(resp => resp.json())
+        Api.searchSpecies(query)
             .then(json => this.setState({options: json}));
     },
     handleVisibility(index, label) {

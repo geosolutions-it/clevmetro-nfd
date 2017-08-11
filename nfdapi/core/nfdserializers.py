@@ -29,6 +29,8 @@ from PIL import Image
 from nfdapi import settings
 import os
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models.query import QuerySet
 
 def _(message): return message
 
@@ -197,15 +199,20 @@ def is_deletable_field(f):
 def delete_object_and_children(parent_instance):
     
     children = []
+
     if not getattr(parent_instance, '_meta', None):
         print parent_instance
         print type(parent_instance)
         print repr(parent_instance)
-    for f in parent_instance._meta.get_fields():
-        if is_deletable_field(f):
-            child_instance = getattr(parent_instance, f.name, None)
-            if child_instance:
-                children.append(child_instance)
+    if not isinstance(parent_instance, QuerySet):
+        for f in parent_instance._meta.get_fields():
+            if is_deletable_field(f):
+                child_instance = getattr(parent_instance, f.name, None)
+                if isinstance(f, GenericRelation):
+                    # for generic related objects such as photographs, we get the related QuerySet
+                    child_instance = child_instance.all()
+                if child_instance:
+                    children.append(child_instance)
     
     # some children are mandatory for the parent, so we first delete parents
     parent_instance.delete()
@@ -608,7 +615,7 @@ class UpdateOccurrenceMixin(object):
                 pass
             instance.version = instance.version + 1
             if self.is_publisher:
-                instance.released = formvalues.get("released", False)
+                instance.released = formvalues.get("released", False) or False
             else:
                 instance.released = False
             instance.save()
@@ -760,7 +767,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
     featuretype = rest_fields.CharField(required=False, read_only=True)
     featuresubtype = rest_fields.CharField(read_only=True)
-    released = rest_fields.BooleanField(required=False, read_only=False)
+    released = rest_fields.NullBooleanField(required=False, read_only=False)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = TotalVersionsField(required=False, read_only=True)
     #geom = gisserializer.GeometryField()
@@ -788,6 +795,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result["formvalues"]['featuresubtype'] = instance.occurrence_cat.code
         photo_serializer = PhotographSerializer(instance.photographs, many=True)
         result['images'] = photo_serializer.data
+        result['is_writer'] = self.is_writer
+        result['is_publisher'] = self.is_publisher
         return result
     
     def to_internal_value(self, data):
@@ -857,7 +866,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
         result['formvalues'] = validated_formvalues
-        result["released"] = data.get("released")
+        result["released"] = data.get("released", False)
         #result['id'] = data.get("id", None)
         result['featuretype'] = data.get("featuretype")
         result['featuresubtype'] = data.get("featuresubtype")

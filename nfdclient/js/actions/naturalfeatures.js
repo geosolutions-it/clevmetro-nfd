@@ -188,9 +188,9 @@ function getFeatureInfo(properties, nfid) {
     };
 }
 
-function getSpecie(id) {
+function getSpecies(id) {
     return (dispatch) => {
-        return Api.getSpecie(id).then((resp) => {
+        return Api.getSpecies(id).then((resp) => {
             if (resp) {
                 dispatch(updateSpeciesForms(resp));
             }
@@ -506,7 +506,7 @@ module.exports = {
     deleteNaturalFeatureError,
     NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
     NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
-    getSpecie,
+    getSpecies,
     updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
     userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData,
     USER_NOT_AUTHENTICATED_ERROR,

@@ -14,15 +14,6 @@ const {
 const assign = require('object-assign');
 
 function getAttribute(details) {
-    /*
-    for (
-    console.log(Object.keys(details).map(key => {
-        return {"name": key, "value": details[key]};
-    }));
-    return Object.keys(details).map(key => {
-        return {"name": key, "value": details[key]};
-    });
-    */
     return [{"name": "name", "value": details.name}];
 }
 

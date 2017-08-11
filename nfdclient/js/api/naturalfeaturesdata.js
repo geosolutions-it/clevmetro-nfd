@@ -57,13 +57,17 @@ const Api = {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
-    getSpecie: function(id) {
+    getSpecies: function(id) {
         let url = '/nfdapi/species/' + id + '/';
+        return axios.get(url, getOptions()).then(function(response) {return response.data; });
+    },
+    searchSpecies: function(query) {
+        let url = '/nfdapi/species/?search=' + query;
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
         let url = '/nfdapi/layers/' + feature.featuretype + '/';
-        return axios.post(url, getOptions(), feature).then(function(response) {return response.data; });
+        return axios.post(url, feature, getOptions()).then(function(response) {return response.data; });
     },
     jwtLogin: function(user, password) {
         let url = '/nfdapi/api-token-auth/';

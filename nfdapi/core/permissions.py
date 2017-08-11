@@ -20,15 +20,15 @@ def get_permissions(user, featuretype_name):
     return (False, False)
 
 def can_create_feature_type(user, featuretype_name):
-    if featuretype_name=="a":
+    if featuretype_name[0]=="a":
         return user.is_animal_writer
-    if featuretype_name=="s":
+    if featuretype_name[0]=="s":
         return user.is_slimemold_writer
-    if featuretype_name=="p":
+    if featuretype_name[0]=="p":
         return user.is_plant_writer
-    if featuretype_name=="f":
+    if featuretype_name[0]=="f":
         return user.is_fungus_writer
-    if featuretype_name=="n":
+    if featuretype_name[0]=="n":
         return user.is_naturalarea_writer
     return False
 
