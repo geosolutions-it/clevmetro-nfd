@@ -187,26 +187,15 @@ const DockedNaturalFeatures = React.createClass({
                             <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    value={value}
-                                    readOnly={readOnly}
-                                    onChange={this.handleChange}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    type="text"/>)
-                                :
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    readOnly
-                                    value={value}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    type="text"/>)
-                            }
+                            <FormControl
+                                style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                value={value}
+                                readOnly={readOnly}
+                                onChange={this.handleChange}
+                                key={item.key}
+                                name={item.key}
+                                componentClass="input"
+                                type="text"/>
                         </td>
                     </tr>
                 );
@@ -225,13 +214,13 @@ const DockedNaturalFeatures = React.createClass({
                             <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<select style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={value || ""} onChange={this.handleChange}>
-                                    <option value="">---</option>
+                            {item.readonly ?
+                                (<select disabled style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" bsSize="small" value={value || ""}>
                                     {this.getOptions(item.values)}
                                 </select>)
                                 :
-                                (<select disabled style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" bsSize="small" value={value || ""}>
+                                (<select style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={value || ""} onChange={this.handleChange}>
+                                    <option value="">---</option>
                                     {this.getOptions(item.values)}
                                 </select>)
                             }
@@ -257,30 +246,17 @@ const DockedNaturalFeatures = React.createClass({
                             <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    value={value}
-                                    readOnly={readOnly}
-                                    onChange={this.handleChange}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    min="0"
-                                    step="1"
-                                    type="number"/>)
-                                :
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    readOnly
-                                    value={value}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    min="0"
-                                    step="1"
-                                    type="number"/>)
-                            }
+                            <FormControl
+                                style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                value={value}
+                                readOnly={readOnly}
+                                onChange={this.handleChange}
+                                key={item.key}
+                                name={item.key}
+                                componentClass="input"
+                                min="0"
+                                step="1"
+                                type="number"/>
                         </td>
                     </tr>
                 );
@@ -303,30 +279,17 @@ const DockedNaturalFeatures = React.createClass({
                             <ControlLabel>{label}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            {this.props.isAdmin ?
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    value={value}
-                                    readOnly={readOnly}
-                                    onChange={this.handleChange}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    min="0"
-                                    step="any"
-                                    type="number"/>)
-                                :
-                                (<FormControl
-                                    style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                    readOnly
-                                    value={value}
-                                    key={item.key}
-                                    name={item.key}
-                                    componentClass="input"
-                                    min="0"
-                                    step="any"
-                                    type="number"/>)
-                            }
+                            <FormControl
+                                style={{width: "100%", height: "24px", fontSize: "12px"}}
+                                value={value}
+                                readOnly={readOnly}
+                                onChange={this.handleChange}
+                                key={item.key}
+                                name={item.key}
+                                componentClass="input"
+                                min="0"
+                                step="any"
+                                type="number"/>
                         </td>
                     </tr>
                 );
@@ -350,10 +313,10 @@ const DockedNaturalFeatures = React.createClass({
                                 <ControlLabel>{label}</ControlLabel>
                             </td>
                             <td style={{width: "60%"}}>
-                                {this.props.isAdmin ?
-                                    (<Checkbox name={item.key} checked={value} onChange={handleBooleanChange}/>)
-                                    :
+                                {item.readonly ?
                                     (<Checkbox name={item.key} checked={value} disabled/>)
+                                    :
+                                    (<Checkbox name={item.key} checked={value} onChange={handleBooleanChange}/>)
                                 }
                             </td>
                         </tr>
@@ -379,10 +342,11 @@ const DockedNaturalFeatures = React.createClass({
                                 <ControlLabel>{label}</ControlLabel>
                             </td>
                             <td style={{width: "60%"}}>
-                                {this.props.isAdmin ?
-                                    (<DatePicker dateFormat="YYYY-MM-DD" style={{height: "24px"}} value={value} onChange={handleDateChange} />)
-                                    :
+                                {item.readonly ?
                                     (<DatePicker dateFormat="YYYY-MM-DD" disabled style={{height: "24px"}} value={value} />)
+                                    :
+                                    (<DatePicker dateFormat="YYYY-MM-DD" style={{height: "24px"}} value={value} onChange={handleDateChange} />)
+                                    
                                 }
                             </td>
                         </tr>
