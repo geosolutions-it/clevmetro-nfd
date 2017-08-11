@@ -14,6 +14,7 @@ from core.models import TerrestrialSampler, LandAnimalDetails,\
 from django.utils import timezone
 import reversion
 from reversion.models import Version
+from core.nfdserializers import delete_object_and_children
 
 # mark messages for translations but don't translate then right now 
 def _(message): return message
@@ -639,14 +640,50 @@ def init_model(ifempty=True, clean=False):
         c.main_cat = entry[2]
         c.save()
 
+def clean_model():
+    for feat in OccurrenceTaxon.objects.all():
+        delete_object_and_children(feat)
+    Species.objects.all().delete()
+    ElementSpecies.objects.all().delete()
+
+def insert_test_species():
+    iucn_cat = IucnRedListCategory.objects.get(code='LC')
+    with reversion.create_revision():
+        element_species = ElementSpecies()
+        element_species.other_code = "lontra_cnd"
+        element_species.iucn_red_list_category = iucn_cat
+        element_species.save()
+        
+        species = Species()
+        species.tsn = 180549
+        species.first_common = 'North American river otter'
+        species.name_sci = 'Lontra canadensis'
+        species.element_species = element_species
+        species.family = 'Mustelidae'
+        species.family_common = 'Mustelids'
+        species.phylum = 'Chordata'
+        species.phylum_common = 'Chordates'
+        species.save()
+
+        element_species = ElementSpecies()
+        element_species.other_code = "bl_bear"
+        element_species.iucn_red_list_category = iucn_cat
+        element_species.save()
+        
+        species = Species()
+        species.tsn = 180544
+        species.first_common = 'American black bear'
+        species.name_sci = 'Ursus americanus'
+        species.element_species = element_species
+        species.family = 'Ursidae'
+        species.family_common = 'Bears'
+        species.phylum = 'Chordata'
+        species.phylum_common = 'Chordate'
+        species.save()    
+
 def insert_test_data(clean=True):
     if clean:
-        OccurrenceTaxon.objects.all().delete()
-        TaxonDetails.objects.all().delete()
-        Species.objects.all().delete()
-        ElementSpecies.objects.all().delete()
-        OccurrenceObservation.objects.all().delete()
-        Voucher.objects.all().delete()
+        clean_model()
     
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     """    
@@ -688,24 +725,7 @@ def insert_test_data(clean=True):
         t.save()
     """
     stream_animal_cat = OccurrenceCategory.objects.get(code='st')    
-    
-    with reversion.create_revision():
-        element_species = ElementSpecies()
-        element_species.other_code = "lontra_cnd"
-        element_species.iucn_red_list_category = iucn_cat
-        element_species.save()
-        
-        species = Species()
-        species.tsn = 180549
-        species.first_common = 'North American river otter'
-        species.name_sci = 'Lontra canadensis'
-        species.element_species = element_species
-        species.family = 'Mustelidae'
-        species.family_common = 'Mustelids'
-        species.phylum = 'Chordata'
-        species.phylum_common = 'Chordates'
-        species.save()
-    
+    species = Species.objects.get(tsn=180549)    
     gender = Gender.objects.get(code='fe')
     
     with reversion.create_revision():
@@ -784,22 +804,8 @@ def insert_test_data(clean=True):
         land_animal_details.sampler = sound_recording        
         land_animal_details.gender = gender
         land_animal_details.save()
-            
-        element_species = ElementSpecies()
-        element_species.other_code = "bl_bear"
-        element_species.iucn_red_list_category = iucn_cat
-        element_species.save()
         
-        species = Species()
-        species.tsn = 180544
-        species.first_common = 'American black bear'
-        species.name_sci = 'Ursus americanus'
-        species.element_species = element_species
-        species.family = 'Ursidae'
-        species.family_common = 'Bears'
-        species.phylum = 'Chordata'
-        species.phylum_common = 'Chordate'
-        species.save()
+        species = Species.objects.get(tsn=180544)    
         
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.526814 41.366602 )'
@@ -814,6 +820,16 @@ def insert_test_data(clean=True):
         land_animal_details.sampler = camera        
         land_animal_details.gender = gender
         land_animal_details.save()
+
+        reporter = PointOfContact()
+        reporter.name = "I'm the reporter 4"
+        reporter.save()
+
+        observation = OccurrenceObservation()
+        observation.observation_date = timezone.now()
+        observation.recording_datetime = timezone.now()
+        observation.reporter = reporter
+        observation.save()
         
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.226814 41.166602 )'

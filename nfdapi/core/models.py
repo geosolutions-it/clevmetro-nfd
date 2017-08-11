@@ -6,6 +6,16 @@ import reversion
 from django.contrib.gis.db.models.fields import PointField
 from  django.utils import timezone
 from django.contrib import admin
+from django.db.models.fields.files import ImageField
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models.fields import PositiveIntegerField
+from PIL import Image
+import os, time
+from datetime import datetime
+from nfdapi.settings import MEDIA_ROOT
 
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
@@ -64,13 +74,80 @@ class OccurrenceObservation(models.Model):
     recorder = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='recorder')
     verifier = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='verifier')
 
+PHOTO_UPLOAD_TO = 'images/%Y/%m/'
+PHOTO_THUMB_SIZE=300
+
+def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_SIZE, PHOTO_THUMB_SIZE)):
+    """
+    Create a thumbnail of an existing image
+    :param input_image:
+    :param thumbnail_size:
+    :return:
+    """
+    if not input_image or input_image == "":
+        return
+
+    image = Image.open(input_image)
+    date = None
+    try:
+        if image._getexif:
+            for (exif_key, exif_value) in image._getexif().iteritems():
+                if exif_key == 0x9003: # "DateTimeOriginal", decimal: 36867
+                    date = datetime.strptime(exif_value, "%Y:%m:%d %H:%M:%S") # 2016:08:01 00:15:47 format
+                    break
+                elif exif_key == 0x0132: # "DateTime", decimal: 306
+                    if not date:
+                        date = datetime.strptime(exif_value, "%Y:%m:%d %H:%M:%S")
+    except:
+        pass
+    if not date:
+        date = timezone.now()
+    image.thumbnail(thumbnail_size)
+    basename = os.path.basename(input_path)
+    name, ext = os.path.splitext(basename)
+    thumb_filename = name + "_thumb" + ext
+    thumb_fullpath = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO), thumb_filename)
+    image.save(thumb_fullpath)
+    return (thumb_fullpath  , date)
+
+class Photograph(models.Model):
+    image = ImageField(upload_to=PHOTO_UPLOAD_TO, height_field='image_height', width_field='image_width', max_length=1000)
+    thumbnail = ImageField(upload_to=PHOTO_UPLOAD_TO, height_field='thumb_height', width_field='thumb_width', max_length=1000, blank=True)
+    image_width = PositiveIntegerField()
+    image_height = PositiveIntegerField()
+    thumb_width = PositiveIntegerField(null=True)
+    thumb_height = PositiveIntegerField(null=True)
+    description = models.TextField(blank=True, null=True, default='')
+    date = models.DateTimeField(default=timezone.now)
+    notes = models.TextField(blank=True, null=True, default='')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    occurrence_fk = models.PositiveIntegerField()
+    occurrence = GenericForeignKey('content_type', 'occurrence_fk')
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        try:
+            (thumb, date) = get_thumbnail_and_date(self.image, self.image.path)
+            self.thumbnail = thumb
+            self.date = date
+        except:
+            pass
+        super(Photograph, self).save(force_insert=False, force_update=False, using=None, update_fields=None)
+
+def get_occurrence_model(occurrence_maincat):
+    try:
+        if occurrence_maincat[0]=='n': # natural areas
+            return OccurrenceNaturalArea
+    except:
+        pass
+    return OccurrenceTaxon
+
 class Occurrence(models.Model):
     geom = PointField()
     version = models.IntegerField(default=0)
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
-    observation = models.ForeignKey(OccurrenceObservation, on_delete=models.CASCADE)
+    observation = models.OneToOneField(OccurrenceObservation, on_delete=models.CASCADE)
     
     class Meta:
         abstract = True
@@ -133,6 +210,7 @@ class ElementSpecies(Element):
     epa_numeric_code = models.TextField(blank=True, default='')
     mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
 
+@reversion.register()
 class Species(models.Model):
     first_common = models.TextField()
     name_sci = models.TextField()
@@ -145,7 +223,8 @@ class Species(models.Model):
     phylum = models.TextField(blank=True, default='')
     phylum_common = models.TextField(blank=True, default='')
     element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
-    
+
+@reversion.register()
 class ElementNaturalAreas(Element):
     natural_area_code_nac = models.TextField(blank=True, default='')
     general_description = models.TextField(blank=True, default='')
@@ -211,9 +290,10 @@ def get_details_class(category_code):
 
 @reversion.register()
 class OccurrenceTaxon(Occurrence):
-    voucher = models.ForeignKey(Voucher, blank=True, null=True, on_delete=models.CASCADE)
+    voucher = models.OneToOneField(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.OneToOneField(TaxonDetails, on_delete=models.CASCADE, null=True)
+    photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
             
     def get_details_class(self):
         if self.occurrence_cat:
@@ -234,6 +314,7 @@ class OccurrenceTaxon(Occurrence):
 @reversion.register()
 class OccurrenceNaturalArea(Occurrence):
     natural_area_element = models.ForeignKey(ElementNaturalAreas, on_delete=models.SET_NULL, blank=True, null=True)
+    photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
 
 class Gender(DictionaryTable):
     pass
@@ -280,13 +361,12 @@ class AnimalLifestages(models.Model):
 class AnimalDetails(TaxonDetails):
     gender = models.ForeignKey(Gender, on_delete=models.SET_NULL, blank=True, null=True)
     marks = models.ForeignKey(Marks, on_delete=models.SET_NULL, blank=True, null=True)
-    lifestages = models.ForeignKey(AnimalLifestages, on_delete=models.CASCADE, blank=True, null=True)
+    lifestages = models.OneToOneField(AnimalLifestages, on_delete=models.CASCADE, blank=True, null=True)
     diseases_and_abnormalities = models.ForeignKey(DiseasesAndAbnormalities, on_delete=models.SET_NULL, blank=True, null=True)
     #id_marks_description #FIXME
     class Meta:
         abstract = True
 
-@reversion.register()
 class AquaticAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(AquaticSampler, on_delete=models.SET_NULL, blank=True, null=True)
     class Meta:
@@ -310,6 +390,8 @@ class LakeMicrohabitat(DictionaryTable):
     pass
 
 class LenticSize(models.Model):
+    # FIXME: should we include it as additional tab instead of
+    # integrating it on the PondLakeAnimalDetails tab??
     lentic_size_acres_aprox = models.IntegerField()
     lentic_size_squaremeters_aprox = models.IntegerField()
     lentic_size_acres_exact = models.DecimalField(max_digits=6, decimal_places=1)
@@ -400,7 +482,7 @@ class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
     active_management = models.NullBooleanField(blank=True, null=True)
     wetland_location = models.ForeignKey(WetlandLocation, on_delete=models.SET_NULL, blank=True, null=True)
-    vegetation = models.ForeignKey(WetlandVetegationStructure, on_delete=models.CASCADE, blank=True, null=True)
+    vegetation = models.OneToOneField(WetlandVetegationStructure, on_delete=models.CASCADE, blank=True, null=True)
     connectivity = models.ForeignKey(WetlandConnectivity, on_delete=models.SET_NULL, blank=True, null=True)
     water_source = models.ForeignKey(WaterSource, on_delete=models.SET_NULL, blank=True, null=True)
     habitat_feature = models.ForeignKey(WetlandHabitatFeature, on_delete=models.SET_NULL, blank=True, null=True)

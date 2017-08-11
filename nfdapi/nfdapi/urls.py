@@ -20,6 +20,10 @@ from core import views as coreviews
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 from settings import APP_NAME
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register('images', coreviews.PhotoViewSet, 'images')
 
 urlpatterns = [
     url(r'^'+APP_NAME+r'api-token-auth/', obtain_jwt_token),
@@ -37,6 +41,7 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/$', coreviews.get_feature_type),
     url(r'^'+APP_NAME+r'species/$', coreviews.SpeciesSearch.as_view()),
     url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', coreviews.SpeciesDetail.as_view()),
-    
+    url(r'^'+APP_NAME, include(router.urls)),
+    url(r'^'+APP_NAME+r'image/(plant|animal|slimemold|fungus)/$', coreviews.PhotoViewSet.as_view({'post': 'create'})),
     
 ] 

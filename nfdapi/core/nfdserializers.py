@@ -8,21 +8,27 @@ from django.contrib.gis.db.models.fields import GeometryField
 from core.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetails,\
     StreamAnimalDetails, LandAnimalDetails, ElementSpecies, Species,\
     PondLakeAnimalDetails, WetlandAnimalDetails, SlimeMoldDetails,\
-    OccurrenceNaturalArea, OccurrenceCategory, DictionaryTableExtended
+    OccurrenceNaturalArea, OccurrenceCategory, DictionaryTableExtended,\
+    Photograph, get_occurrence_model
 from core.models import AnimalLifestages, OccurrenceObservation, PointOfContact
 from rest_framework.serializers import Serializer, ModelSerializer
 from django.db import models as db_models
 from rest_framework import fields as rest_fields
 from rest_framework import relations as rest_rels
+from rest_framework import serializers
 from collections import Mapping, OrderedDict
 from rest_framework.serializers import Field
 import reversion
 from reversion.models import Version
-from rest_framework.fields import empty, SerializerMethodField
+from rest_framework.fields import empty, SerializerMethodField, ImageField
 from rest_framework_gis import serializers as gisserializer
 from django.db.models.fields import NOT_PROVIDED
 from rest_framework.exceptions import ValidationError
 from core.models import get_details_class
+from PIL import Image
+from nfdapi import settings
+import os
+from django.contrib.contenttypes.models import ContentType
 
 def _(message): return message
 
@@ -683,6 +689,66 @@ class DetailsSerializer(Serializer):
             return get_serializer_fields(None, self._details_model_class)
         return {}
 
+""" --------------------------------------------
+PHOTOGRAPHS
+------------------------------------------------ """
+
+class PhotographPublishSerializer(Serializer):
+    """
+    Used to publish new photographs
+    """ 
+    image = serializers.ListField(
+        child=ImageField(max_length=1000,
+            allow_empty_file=False,
+            use_url=True))
+    featuretype = rest_fields.CharField()
+    occurrence_fk = rest_fields.IntegerField()
+    image_id = rest_fields.IntegerField(required=False, read_only=True)
+    thumbnail = rest_fields.CharField(required=False, read_only=True)
+    description = rest_fields.CharField(required=False, allow_blank=True)
+    notes = rest_fields.CharField(required=False, allow_blank=True)
+    
+    def validate(self, data):
+        try:
+            ft = data.get("featuretype")
+            fk = data.get("occurrence_fk")
+            ft_model = get_occurrence_model(ft)
+            ft_model.objects.get(pk=fk)
+        except:
+            raise serializers.ValidationError(_("occurrence_fk: Not a valid occurrence"))
+        return data
+                      
+    class Meta:
+        model = Photograph
+        fields = ('image', 'featuretype', 'occurrence_fk')
+
+    def create(self, validated_data):
+        image=validated_data.pop('image')
+        ft = validated_data.pop("featuretype")
+        ft_model = get_occurrence_model(ft)
+        content_type = ContentType.objects.get_for_model(ft_model)
+        response = {
+            "image": [],
+            "featuretype": ft,
+            "occurrence_fk": validated_data.get("occurrence_fk")
+            }
+        for img in image:
+            photo = Photograph.objects.create(image=img, content_type_id=content_type.id, **validated_data)
+            #photo.thumbnail = create_thumbnail(img, photo.image.path)
+            response['image'].append(photo.image)
+        if len(response['image'])==1:
+            response['image_id'] = photo.id
+            response['thumbnail'] = photo.thumbnail.url
+        return response
+
+class PhotographSerializer(ModelSerializer):
+    """
+    Used to list photographs
+    """
+    class Meta:
+        model = Photograph
+        fields = '__all__'
+        #exclude = ('occurrence_fk', 'occurrence', 'content_type') 
 
 """ -------------------------------------------
 OCCURRENCE SERIALIZER
@@ -720,6 +786,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result['featuresubtype'] = instance.occurrence_cat.code
         result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
         result["formvalues"]['featuresubtype'] = instance.occurrence_cat.code
+        photo_serializer = PhotographSerializer(instance.photographs, many=True)
+        result['images'] = photo_serializer.data
         return result
     
     def to_internal_value(self, data):
@@ -1073,3 +1141,4 @@ class SpeciesSearchResultSerializer(ModelSerializer):
     def to_representation(self, instance):
         r = super(SpeciesSearchResultSerializer, self).to_representation(instance)
         return to_flat_representation(r, 'species')
+

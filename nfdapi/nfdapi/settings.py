@@ -19,6 +19,15 @@ import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+MEDIA_ROOT = '/var/www/media'
+MEDIA_URL = '/media/'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+# we need to run django-admin collectstatic whenever dependences are modified or updated
+STATIC_ROOT = '/var/www/clevmetronfd-static'
+STATIC_URL = '/nfdapi-static/'
+
+
 #APP_NAME = ""
 #APP_NAME = "/"
 APP_NAME = "nfdapi/"
@@ -255,14 +264,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-# we need to run django-admin collectstatic whenever dependences are modified or updated
-STATIC_ROOT = '/var/www/clevmetronfd-static'
-STATIC_URL = '/nfdapi-static/'
-
-
+"""
 import logging
 
 LOGGING = {
@@ -289,3 +291,4 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_DEBUG_LEVEL: 1,
     ldap.OPT_REFERRALS: 0,
 }
+"""

@@ -2,28 +2,31 @@
 from __future__ import unicode_literals
 
 from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
-    OccurrenceCategory
+    OccurrenceCategory, Photograph,\
+    get_occurrence_model
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
-from core.nfdserializers import FeatureTypeSerializer, LayerTaxonSerializer, OccurrenceSerializer
+from core.nfdserializers import FeatureTypeSerializer, LayerTaxonSerializer, OccurrenceSerializer,\
+    PhotographPublishSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
 from reversion.models import Version
-from core.nfdserializers import TaxonDetailsSerializer, SpeciesSearchSerializer,\
-    SpeciesSearchResultSerializer, SpeciesSerializer
-from rest_framework.generics import ListCreateAPIView, ListAPIView,\
+from core.nfdserializers import SpeciesSearchSerializer,\
+    SpeciesSearchResultSerializer
+from rest_framework.generics import ListAPIView,\
     RetrieveAPIView
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.fields import ModelField
 from core.nfdserializers import delete_object_and_children
 from core.permissions import CanUpdateFeatureType, get_permissions,\
     CanCreateFeatureType
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.viewsets import ModelViewSet
 
 class NfdLayerList(APIView):
     permission_classes = [ IsAuthenticated, CanCreateFeatureType ]
@@ -63,11 +66,9 @@ class LayerDetail(APIView):
     Retrieve, update or delete an occurrence instance.
     """
     def get_object(self, occurrence_maincat, pk):
+        
         try:
-            if occurrence_maincat[0]=='n': # natural areas
-                return OccurrenceNaturalArea.objects.get(pk=pk)
-            else:
-                return OccurrenceTaxon.objects.get(pk=pk)
+            return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
         except ObjectDoesNotExist:
             raise Http404
 
@@ -100,7 +101,15 @@ class LayerDetail(APIView):
             delete_object_and_children(feature)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+class PhotoViewSet(ModelViewSet):
+    serializer_class = PhotographPublishSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+    queryset=Photograph.objects.all()
+    
+    def pre_save(self, obj):
+        print "hola"
+        pass
+        #self.request
 
 @api_view(['GET'])
 def get_feature_type(request, occurrence_subcat, feature_id=None):   
