@@ -1,6 +1,6 @@
 import reversion
-from core.models import Voucher, OccurrenceTaxon, OccurrenceNaturalArea
-from core.models import ElementSpecies, SRank
+from nfdcore.models import Voucher, OccurrenceTaxon, OccurrenceNaturalArea
+from nfdcore.models import ElementSpecies, SRank
 from reversion.models import Version
 
 with reversion.create_revision():

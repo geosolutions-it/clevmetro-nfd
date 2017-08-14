@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from core.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
+from nfdcore.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
     OccurrenceCategory, Photograph,\
     get_occurrence_model
 from rest_framework.views import APIView
@@ -9,20 +9,20 @@ from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
-from core.nfdserializers import FeatureTypeSerializer, LayerTaxonSerializer, OccurrenceSerializer,\
+from nfdcore.nfdserializers import FeatureTypeSerializer, LayerTaxonSerializer, OccurrenceSerializer,\
     PhotographPublishSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
 from reversion.models import Version
-from core.nfdserializers import SpeciesSearchSerializer,\
+from nfdcore.nfdserializers import SpeciesSearchSerializer,\
     SpeciesSearchResultSerializer
 from rest_framework.generics import ListAPIView,\
     RetrieveAPIView
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from core.nfdserializers import delete_object_and_children
-from core.permissions import CanUpdateFeatureType, get_permissions,\
+from nfdcore.nfdserializers import delete_object_and_children
+from nfdcore.permissions import CanUpdateFeatureType, get_permissions,\
     CanCreateFeatureType
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser

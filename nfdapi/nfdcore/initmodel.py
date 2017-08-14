@@ -3,7 +3,7 @@ from models import IucnRedListCategory, UsfwsStatus
 from models import ElementSpecies, DayTime, Species
 from models import Season, RecordOrigin, Preservative, Storage, Repository
 from models import Gender
-from core.models import TerrestrialSampler, LandAnimalDetails,\
+from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
     StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact,\
     Voucher, CmStatus, SRank, NRank, GRank, MushroomGroup, RegionalStatus, Marks,\
     DiseasesAndAbnormalities, AquaticSampler, StreamDesignatedUse, ChannelType,\
@@ -14,7 +14,7 @@ from core.models import TerrestrialSampler, LandAnimalDetails,\
 from django.utils import timezone
 import reversion
 from reversion.models import Version
-from core.nfdserializers import delete_object_and_children
+from nfdcore.nfdserializers import delete_object_and_children
 
 # mark messages for translations but don't translate then right now 
 def _(message): return message

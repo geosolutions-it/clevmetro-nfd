@@ -1,8 +1,8 @@
- # nfdapi
+# nfdapi
  
  Cleveland Metroparks - Natural Features Database REST API
  
- ## Development
+## Development
 
 Install Python requirements using a virtual environment:
 ```shell
@@ -40,18 +40,18 @@ $ ./manage.py createinitialrevisions
 
 Initialize the dictionary tables (using `./manage.py shell`):
 ```python
-from core import initmodel as i
+from nfdcore import initmodel as i
 i.init_model()
 ```
 Optional: Insert some test species:
 ```python
-from core import initmodel as i
-i.insert_test_data()
+from nfdcore import initmodel as i
+i.insert_test_species()
 ```
 
 Optional: Insert some test occurrences (Warning: it will delete existing occurrences):
 ```python
-from core import initmodel as i
+from nfdcore import initmodel as i
 i.insert_test_data()
 ```
 
@@ -77,3 +77,21 @@ match your HTTP server file layout:
 STATIC_ROOT = '/var/www/clevmetronfd-static'
 STATIC_URL = '/nfdapi-static/'
 ```
+
+## Translations
+
+Whenever new translations strings are added to the application, the translation
+keys on the .po files must be updated using `django-admin makemessages`.
+
+When the translations are completed, the .po files have to be compiled using
+`django-admin compilemessages`.
+
+## Migrations and versioned models
+
+Whenever the data model is modified, Django migrations have to be generated using
+`./manage.py makemigrations nfdcore`. The generated migration files have to be commited to the
+repository, as they will need to be applied on servers (and the dev environments
+of the rest of developers) using `./manage.py migrate`.
+
+In addition, if the new models use versioning, they must be initialized using
+`./manage.py createinitialrevisions nfdcore.YourNewModel` command.

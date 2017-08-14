@@ -5,12 +5,12 @@ from django.db.models.fields import IntegerField, DecimalField, FloatField
 from django.db.models.fields.related import ForeignKey, OneToOneField
 from django.contrib.gis.db.models.fields import GeometryField
 
-from core.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetails,\
+from nfdcore.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetails,\
     StreamAnimalDetails, LandAnimalDetails, ElementSpecies, Species,\
     PondLakeAnimalDetails, WetlandAnimalDetails, SlimeMoldDetails,\
     OccurrenceNaturalArea, OccurrenceCategory, DictionaryTableExtended,\
     Photograph, get_occurrence_model
-from core.models import AnimalLifestages, OccurrenceObservation, PointOfContact
+from nfdcore.models import AnimalLifestages, OccurrenceObservation, PointOfContact
 from rest_framework.serializers import Serializer, ModelSerializer
 from django.db import models as db_models
 from rest_framework import fields as rest_fields
@@ -24,7 +24,7 @@ from rest_framework.fields import empty, SerializerMethodField, ImageField
 from rest_framework_gis import serializers as gisserializer
 from django.db.models.fields import NOT_PROVIDED
 from rest_framework.exceptions import ValidationError
-from core.models import get_details_class
+from nfdcore.models import get_details_class
 from PIL import Image
 from nfdapi import settings
 import os

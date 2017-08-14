@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from core import views as coreviews
+from nfdcore import views as coreviews
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 from settings import APP_NAME
