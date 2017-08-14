@@ -18,4 +18,8 @@ Start the development application locally:
 
 The application runs at `http://localhost:8081` afterwards.
 
-Read more on the [wiki](https://github.com/geosolutions-it/clevmetro-nfd.git/wiki).
+Deployment
+------------
+
+Use `build.sh` script to generate the compiled javascript files used for
+deployment.

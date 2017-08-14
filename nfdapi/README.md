@@ -38,12 +38,18 @@ $ ./manage.py migrate
 $ ./manage.py createinitialrevisions
 ```
 
-Optional: Initialize some dictionary tables (Using `./manage.py shell`. Warning: it will delete existing dict tables):
+Initialize the dictionary tables (using `./manage.py shell`):
 ```python
 from core import initmodel as i
 i.init_model()
 ```
-Optional: Insert some test data (Warning: it will delete existing occurrences):
+Optional: Insert some test species:
+```python
+from core import initmodel as i
+i.insert_test_data()
+```
+
+Optional: Insert some test occurrences (Warning: it will delete existing occurrences):
 ```python
 from core import initmodel as i
 i.insert_test_data()
@@ -58,7 +64,12 @@ Have a look for instance to the following URLs:
 * http://localhost:8000/nfdapi/layers/animal/
 * http://localhost:8000/nfdapi/layers/animal/xxx (where xxx is the id of an animal occurrence)
 
-You may need to adjust [settings.py](nfdapi/settings.py) to properly see the styles of REST web interface:
+The nfdapi static files have to be generated (using `django-admin collectstatic`)
+and copied to
+/var/www/clevmetronfd-static to properly see the styles of REST web interface
+
+In addition, you may need to adjust [settings.py](nfdapi/settings.py) to
+match your HTTP server file layout:
 ```python
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -66,35 +77,3 @@ You may need to adjust [settings.py](nfdapi/settings.py) to properly see the sty
 STATIC_ROOT = '/var/www/clevmetronfd-static'
 STATIC_URL = '/nfdapi-static/'
 ```
-
- ## Deployment
-
-The nfdapi application should be deployed on a WSGI compatible web server such as Apache or Nginx.
-A [systemd script is provided](deploy/metroparksnfd.service) for deploying nfdapi as a system service
-using the uWSGI application
-container. uWSGI can be integrated
-with Apache or Nginx [using different approaches](http://uwsgi-docs.readthedocs.io/en/latest/WebServers.html).
-For the dev server, a simple proxy configuration was used to integrate Apache with uWSGI:
-
-```
-# /etc/apache2/conf-enabled/nfdapi.conf 
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-Alias /static /opt/clevmetro-nfd/nfdclient
-<Directory "/opt/clevmetro-nfd/nfdclient">
-      Order allow,deny
-      Allow from all
-      Require all granted
-</Directory>
-
-Alias /nfdapi-static /var/www/clevmetronfd-static
-<Directory "/var/www/clevmetronfd-static">
-      Order allow,deny
-      Allow from all
-      Require all granted
-</Directory>
-
-ProxyPass /nfdapi http://localhost:3001/nfdapi
-ProxyPassReverse /nfdapi http://localhost:3001/nfdapi
-```
-
