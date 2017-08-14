@@ -4,6 +4,14 @@
  
 ## Development
 
+Install native requirements (required for Python LDAP modules):
+```shell
+#Debian/Ubuntu:
+sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+RedHat/CentOS:
+sudo yum install python-devel openldap-devel
+```
+
 Install Python requirements using a virtual environment:
 ```shell
 # create a Python virtual env to install dependences
