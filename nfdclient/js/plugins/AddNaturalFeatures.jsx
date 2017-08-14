@@ -18,7 +18,7 @@ const Message = require('../../MapStore2/web/client/components/I18N/Message');
 
 const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
 
-const {is_writer, is_publisher} = require('./naturalfeatures/securityutils.js');
+const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
 const SmartDockedNaturalFeatures = connect((state) => ({
     isVisible: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
@@ -30,8 +30,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     isAdmin: state.naturalfeatures.is_admin || false,
-    isWriter: is_writer(state),
-    isPublisher: is_publisher(state)
+    isWriter: isWriter(state),
+    isPublisher: isPublisher(state)
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
     onUpdate: naturalFeatureCreated.bind(null),
@@ -56,7 +56,7 @@ const AddNaturalFeatures = React.createClass({
         animal_writer: React.PropTypes.bool,
         slimemold_writer: React.PropTypes.bool,
         fungus_writer: React.PropTypes.bool,
-        naturalarea_writer: React.PropTypes.bool,
+        naturalarea_writer: React.PropTypes.bool
     },
     getDefaultProps() {
         return {
@@ -71,7 +71,7 @@ const AddNaturalFeatures = React.createClass({
             animal_writer: false,
             slimemold_writer: false,
             fungus_writer: false,
-            naturalarea_writer: false,
+            naturalarea_writer: false
         };
     },
     render() {
@@ -131,7 +131,7 @@ module.exports = {
         animal_writer: state.security.user && state.security.user.animal_writer,
         slimemold_writer: state.security.user && state.security.user.slimemold_writer,
         fungus_writer: state.security.user && state.security.user.fungus_writer,
-        naturalarea_writer: state.security.user && state.security.user.naturalarea_writer,
+        naturalarea_writer: state.security.user && state.security.user.naturalarea_writer
     }), {
         onToggleNewNaturalFeature: activateFeatureInsert
     })(AddNaturalFeatures), {

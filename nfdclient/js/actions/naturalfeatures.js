@@ -155,6 +155,14 @@ function updateSpeciesForms(feature) {
     };
 }
 
+function userNotAuthenticatedError(error) {
+    return {
+        type: USER_NOT_AUTHENTICATED_ERROR,
+        status: "error",
+        error
+    };
+}
+
 function reloadFeatureType(featuretype) {
     return (dispatch) => {
         if (featuretype === 'plant') {
@@ -181,8 +189,9 @@ function getFeatureInfo(properties, nfid) {
                 dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
@@ -195,8 +204,9 @@ function getSpecies(id) {
                 dispatch(updateSpeciesForms(resp));
             }
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
@@ -213,8 +223,9 @@ function naturalFeatureSelected(properties, nfid, lflFeat) {
                 dispatch(changeDrawingStatus("featureSelected", "Marker", "dockednaturalfeatures", [], {properties: properties, lflFeat: theLflFeat}));
             }
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
@@ -270,8 +281,9 @@ function naturalFeatureMarkerAdded(feature) {
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
         });
     };
@@ -317,8 +329,9 @@ function saveNaturalFeature(feature) {
             return Api.saveNaturalFeature(feature).then((resp) => {
                 dispatch(saveNaturalFeatureSuccess(resp));
             }).catch((error) => {
-                if (error.status==401)
+                if (error.status === 401) {
                     return dispatch(userNotAuthenticatedError(error));
+                }
                 return dispatch(saveNaturalFeatureError(feature, error));
             });
         }
@@ -360,8 +373,9 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
             }
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(updateNaturalFeatureError(-1, error));
         });
     };
@@ -376,8 +390,9 @@ function updateNaturalFeature(featuretype, featuresubtype, properties) {
             dispatch(reloadFeatureType(featuretype));
             dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(updateNaturalFeatureError(properties.id, error));
         });
     };
@@ -416,8 +431,9 @@ function deleteNaturalFeature(featuretype, id) {
             dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
             dispatch(deleteNaturalFeatureSuccess(id));
         }).catch((error) => {
-            if (error.status==401)
+            if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
+            }
             return dispatch(deleteNaturalFeatureError(id, error));
         });
     };
@@ -469,14 +485,6 @@ function nfdLogout() {
         dispatch(changeLayerProperties("plant", {features: []}));
         dispatch(changeLayerProperties("slimemold", {features: []}));
         dispatch(changeLayerProperties("naturalarea", {features: []}));
-    };
-}
-
-function userNotAuthenticatedError(error) {
-    return {
-        type: USER_NOT_AUTHENTICATED_ERROR,
-        status: "error",
-        error
     };
 }
 

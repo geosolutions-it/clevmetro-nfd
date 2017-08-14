@@ -40,6 +40,8 @@ const DockedNaturalFeatures = React.createClass({
         nextVersion: React.PropTypes.func,
         mode: React.PropTypes.string,
         isAdmin: React.PropTypes.bool,
+        isWriter: React.PropTypes.bool,
+        isPublisher: React.PropTypes.bool,
         addPointGlyph: React.PropTypes.string,
         addPointEnabled: React.PropTypes.bool,
         addPolygonGlyph: React.PropTypes.string,
@@ -348,7 +350,7 @@ const DockedNaturalFeatures = React.createClass({
                                     (<DatePicker dateFormat="YYYY-MM-DD" disabled style={{height: "24px"}} value={value} />)
                                     :
                                     (<DatePicker dateFormat="YYYY-MM-DD" style={{height: "24px"}} value={value} onChange={handleDateChange} />)
-                                    
+
                                 }
                             </td>
                         </tr>
@@ -356,9 +358,9 @@ const DockedNaturalFeatures = React.createClass({
                 }
             }
         });
-        
+
         searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher);
-        
+
         return (
             <div className="nf-tab-content">
                 {searchDiv ?
@@ -448,9 +450,7 @@ const DockedNaturalFeatures = React.createClass({
 
             ];
         }
-        else {
-            return [];
-        }
+        return [];
     },
     renderHistoric() {
         /*return (

@@ -20,10 +20,8 @@ const {
     naturalFeaturesLoaded,
     naturalFeaturesLoading,
     naturalFeaturesError,
-    NATURAL_FEATURES_ERROR,
     naturalFeatureMarkerAdded,
     USER_NOT_AUTHENTICATED_ERROR,
-    nfdLogout,
     showLogin
 } = require('../actions/naturalfeatures');
 
@@ -125,7 +123,7 @@ const getDataEpic = action$ =>
 
 const unauthorizedUserErrorEpic = action$ =>
     action$.ofType(USER_NOT_AUTHENTICATED_ERROR)
-    .map(() => 
+    .map(() =>
         showLogin());
 
 /**
