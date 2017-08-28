@@ -190,7 +190,7 @@ AUTH_LDAP_MIRROR_GROUPS = True
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
     "is_staff": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
-    #"is_superuser": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local"
+    "is_superuser": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
     "is_plant_writer": "cn=plant_writer,ou=groups,dc=Metroparks,dc=local",
     "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=Metroparks,dc=local",
     "is_animal_writer": "cn=animal_writer,ou=groups,dc=Metroparks,dc=local",

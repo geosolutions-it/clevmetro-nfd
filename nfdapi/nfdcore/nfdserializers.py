@@ -483,15 +483,6 @@ class UpdateOccurrenceMixin(object):
                 for f in fields:
                     if getattr(f, 'primary_key', False):
                         pass
-                    elif isinstance(f, CharField) or isinstance(f, TextField) or \
-                        isinstance(f, BooleanField) or isinstance(f, NullBooleanField)or \
-                        isinstance(f, DateTimeField) or isinstance(f, DateField) or \
-                        isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
-                        new_value = form_validated_data.get(f.name)
-                        old_value =  getattr(instance, f.name, None)
-                        if new_value != None and new_value != old_value:
-                            modified = True
-                            setattr(instance, f.name, new_value)
                     elif getattr(f, 'related_model', False):
                         if issubclass(f.related_model, DictionaryTable) or issubclass(f.related_model, DictionaryTableExtended):
                             new_value = form_validated_data.get(f.name)
@@ -503,6 +494,23 @@ class UpdateOccurrenceMixin(object):
                                     setattr(instance, f.name, dict_entry)
                                 except Exception as exc:
                                     setattr(instance, f.name, None)
+                    else:
+                        if isinstance(f, CharField) or isinstance(f, TextField):
+                            new_value = form_validated_data.get(f.name, '')
+                            if new_value is None:
+                                new_value = ''
+                            old_value =  getattr(instance, f.name, '')
+                            if old_value is None:
+                                old_value = ''
+                        if isinstance(f, BooleanField) or isinstance(f, NullBooleanField) or \
+                        isinstance(f, DateTimeField) or isinstance(f, DateField) or \
+                        isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
+                            new_value = form_validated_data.get(f.name)
+                            old_value =  getattr(instance, f.name, None)
+                        if new_value != None and new_value != old_value:
+                            modified = True
+                            setattr(instance, f.name, new_value)
+
                 if force_save or modified:
                     instance.save()
                     return True
@@ -601,6 +609,7 @@ class UpdateOccurrenceMixin(object):
                         species_id = formvalues['species']['id']
                         selected_species = Species.objects.get(pk=species_id)
                         instance.species = selected_species
+                        self._update_form('species', Species, formvalues, instance)
                         self._update_form('species.element_species', ElementSpecies, formvalues, selected_species)
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})

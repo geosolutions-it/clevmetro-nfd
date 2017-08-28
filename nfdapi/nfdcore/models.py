@@ -16,19 +16,28 @@ from PIL import Image
 import os, time
 from datetime import datetime
 from nfdapi.settings import MEDIA_ROOT
+from django.utils.encoding import python_2_unicode_compatible
 
+@python_2_unicode_compatible
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
     name = models.TextField()
     
+    def __str__(self):
+        return "{0}-{1}".format(self.code, self.name) 
+    
     class Meta:
         abstract = True
-    
+
+@python_2_unicode_compatible    
 class DictionaryTableExtended(models.Model):
     code = models.TextField(unique=True)
     name = models.TextField()
     description = models.TextField()
     
+    def __str__(self):
+        return "{0}-{1}".format(self.code, self.name)
+       
     class Meta:
         abstract = True
 
@@ -215,9 +224,9 @@ class Species(models.Model):
     first_common = models.TextField()
     name_sci = models.TextField()
     tsn = models.PositiveIntegerField(null=True)
-    synonym = models.TextField(blank=True, default='')
-    second_common = models.TextField(blank=True, default='')
-    third_common = models.TextField(blank=True, default='')
+    synonym = models.TextField(blank=True, default='', null=True)
+    second_common = models.TextField(blank=True, default='', null=True)
+    third_common = models.TextField(blank=True, default='', null=True)
     family = models.TextField(blank=True, default='')
     family_common = models.TextField(blank=True, default='')
     phylum = models.TextField(blank=True, default='')
@@ -508,9 +517,6 @@ class PlantDetails(TaxonDetails):
     """
     pass
 
-
-admin.site.register(Species)
-admin.site.register(ElementSpecies)
 
 plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
           'plant_flowering_plant', 'plant_moss_or_ally']
