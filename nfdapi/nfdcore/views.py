@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 
 from nfdcore.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
     OccurrenceCategory, Photograph,\
-    get_occurrence_model
+    get_occurrence_model, OccurrenceObservation
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
-from nfdcore.nfdserializers import FeatureTypeSerializer, LayerTaxonSerializer, OccurrenceSerializer,\
-    PhotographPublishSerializer
+from nfdcore.nfdserializers import FeatureTypeSerializer, LayerSerializer, OccurrenceSerializer,\
+    PhotographPublishSerializer, OccurrenceVersionSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
@@ -34,9 +34,10 @@ class NfdLayerList(APIView):
     def get(self, request, main_cat, format=None):
         (is_writer, is_publisher) = get_permissions(request.user, main_cat)    
         queryset = self.get_base_queryset(main_cat)
-        if not (is_writer or is_publisher):
+        is_writer_or_publisher = (is_writer or is_publisher)
+        if not is_writer_or_publisher:
             queryset = queryset.filter(released=True)
-        serializer = self.get_list_serializer(queryset)
+        serializer = LayerSerializer(queryset, many=True, is_writer_or_publisher=is_writer_or_publisher)
         return Response(serializer.data)
     def post(self, request, main_cat, format=None):
         (is_writer, is_publisher) = get_permissions(request.user, main_cat)
@@ -46,19 +47,16 @@ class NfdLayerList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class TaxonLayerList(NfdLayerList):
     def get_base_queryset(self, main_cat):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=main_cat)
-    
-    def get_list_serializer(self, queryset):
-        return LayerTaxonSerializer(queryset, many=True)
+
 
 class NaturalAreaLayerList(NfdLayerList):
     def get_base_queryset(self, main_cat):
         return OccurrenceNaturalArea.objects.all()
-    
-    def get_list_serializer(self, queryset):
-        return LayerTaxonSerializer(queryset, many=True) #FIXME: should be using a different serializer
+
 
 class LayerDetail(APIView):
     permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
@@ -100,6 +98,27 @@ class LayerDetail(APIView):
         with reversion.create_revision():
             delete_object_and_children(feature)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LayerVersionDetail(APIView):
+    permission_classes = [ IsAuthenticated ]
+
+    def get(self, request, occurrence_maincat, pk, version, format=None):
+        try:
+            (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
+            instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+            serializer = OccurrenceVersionSerializer()
+            excude_unreleased = not (is_writer or is_publisher)
+            serialized_feature = serializer.get_version(instance, version, excude_unreleased)
+            if serialized_feature.get('released', False) == False and excude_unreleased:
+                return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN) 
+            if isinstance(serialized_feature, OccurrenceNaturalArea):
+                return Response({"error": "not supported yet"})
+            print serialized_feature
+            return Response(serialized_feature)
+        except ObjectDoesNotExist:
+            raise
+            #raise Http404
 
 class PhotoViewSet(ModelViewSet):
     serializer_class = PhotographPublishSerializer

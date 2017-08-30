@@ -153,6 +153,7 @@ def get_occurrence_model(occurrence_maincat):
 class Occurrence(models.Model):
     geom = PointField()
     version = models.IntegerField(default=0)
+    released_versions = models.IntegerField(default=0)
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
@@ -269,6 +270,7 @@ class HabitatCategory(DictionaryTable):
 class AquaticHabitatCategory(DictionaryTable):
     pass
 
+@reversion.register()
 class TaxonDetails(models.Model):
     pass
     #habitat = models.ForeignKey(HabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
@@ -381,7 +383,7 @@ class AquaticAnimalDetails(AnimalDetails):
     class Meta:
         abstract = True
 
-@reversion.register()
+@reversion.register(follow=['taxondetails_ptr'])
 class LandAnimalDetails(AnimalDetails):
     sampler = models.ForeignKey(TerrestrialSampler, on_delete=models.SET_NULL, blank=True, null=True)
     stratum = models.ForeignKey(TerrestrialStratum, on_delete=models.SET_NULL, blank=True, null=True)

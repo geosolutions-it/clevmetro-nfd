@@ -28,14 +28,19 @@ router.register('images', coreviews.PhotoViewSet, 'images')
 urlpatterns = [
     url(r'^'+APP_NAME+r'api-token-auth/', obtain_jwt_token),
     url(r'^'+APP_NAME+r'api-token-refresh/', refresh_jwt_token),
+
     # for testing purposes:
     #url(r'^'+APP_NAME, include('django.contrib.auth.urls')),
+    #url(r'^'+APP_NAME+r'rest-auth/', include('rest_auth.urls')),
     
-    url(r'^'+APP_NAME+r'admin/', admin.site.urls),        
+    url(r'^'+APP_NAME+r'admin/', admin.site.urls),
+    
+            
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
     url(r'^'+APP_NAME+r'layers/(naturalarea)/$', coreviews.NaturalAreaLayerList.as_view(), name='naturalareaList'),
     
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
+    url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/version/([0-9]+)/$', coreviews.LayerVersionDetail.as_view()),
     
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/([0-9]+)/$', coreviews.get_feature_type),
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/$', coreviews.get_feature_type),

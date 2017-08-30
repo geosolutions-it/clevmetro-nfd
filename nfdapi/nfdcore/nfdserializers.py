@@ -9,7 +9,7 @@ from nfdcore.models import DictionaryTable, Voucher, OccurrenceTaxon, PlantDetai
     StreamAnimalDetails, LandAnimalDetails, ElementSpecies, Species,\
     PondLakeAnimalDetails, WetlandAnimalDetails, SlimeMoldDetails,\
     OccurrenceNaturalArea, OccurrenceCategory, DictionaryTableExtended,\
-    Photograph, get_occurrence_model
+    Photograph, get_occurrence_model, TaxonDetails
 from nfdcore.models import AnimalLifestages, OccurrenceObservation, PointOfContact
 from rest_framework.serializers import Serializer, ModelSerializer
 from django.db import models as db_models
@@ -251,10 +251,10 @@ class DictionaryExtendedField(rest_fields.CharField):
 
 class TotalVersionsField(rest_fields.IntegerField):
     def get_attribute(self, instance):
-        versions = Version.objects.get_for_object(instance)
+        versions = Version.objects.get_for_object(instance).count()
         if versions<1:
             versions = 1
-        return len(versions)
+        return versions
 
 def get_serializer_fields(form_name, model):
     fields = model._meta.get_fields()
@@ -622,9 +622,12 @@ class UpdateOccurrenceMixin(object):
             else:
                 # natural area
                 pass
+
             instance.version = instance.version + 1
             if self.is_publisher:
                 instance.released = formvalues.get("released", False) or False
+                if instance.released:
+                    instance.released_versions = instance.released_versions + 1
             else:
                 instance.released = False
             instance.save()
@@ -797,7 +800,10 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         #del result["formvalues"]["geom"]
         result["released"] = instance.released
         result["version"] = instance.version
-        result["total_versions"] = r["total_versions"]
+        if self.is_writer or self.is_publisher:
+            result["total_versions"] = r["total_versions"]
+        else:
+            result["total_versions"] = instance.released_versions
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
         result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
@@ -929,7 +935,7 @@ class CreateOccurrenceSerializer(Serializer):
 LAYERS
 ---------------------------------------------- """
 
-class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
+class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
     featuretype = rest_fields.CharField(required=False, read_only=True)
     featuresubtype = rest_fields.CharField()
@@ -937,10 +943,16 @@ class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
     
+    def __init__(self, *args, **kwargs):
+        self.is_writer_or_publisher = kwargs.pop('is_writer_or_publisher', False)
+        super(LayerSerializer, self).__init__(*args, **kwargs)
+    
     def get_properties(self, instance, fields):
         result = {}
-        versions = Version.objects.get_for_object(instance)
-        result['total_versions'] = len(versions)
+        if self.is_writer_or_publisher:
+            result['total_versions'] = instance.version
+        else:
+            result['total_versions'] = instance.released_versions
         result['version'] = instance.version
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
@@ -952,27 +964,6 @@ class LayerTaxonSerializer(gisserializer.GeoFeatureModelSerializer):
         model = OccurrenceTaxon
         geo_field = "geom"
         fields = ('id', 'featuretype', 'featuresubtype', 'released', 'version', 'total_versions')
-        # you can also explicitly declare which fields you want to include
-        # as with a ModelSerializer.
-
-class LayerNaturalAreaSerializer(gisserializer.GeoFeatureModelSerializer):
-    def get_properties(self, instance, fields):
-        # This is a PostgreSQL HStore field, which django maps to a dict
-        result = {}
-        versions = Version.objects.get_for_object(instance)
-        result['total_versions'] = len(versions)
-        result['version'] = instance.version
-        result['released'] = instance.released
-        result['featuretype'] = instance.occurrence_cat.main_cat
-        result['featuresubtype'] = instance.occurrence_cat.code
-        result['id'] = instance.id
-        return result
-    
-    class Meta:
-        model = OccurrenceNaturalArea
-        geo_field = "geom"
-        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'version', 'total_versions')
-
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.
 
@@ -1084,6 +1075,82 @@ class FeatureTypeSerializer():
         return result
 
 
+class OccurrenceVersionSerializer():
+    def is_related_field(self, f):
+        if not getattr(f, 'related_model', False):
+            return False
+        if getattr(f, 'auto_created', False):
+            return False
+        if issubclass(f.related_model, DictionaryTable):
+            return False
+        if issubclass(f.related_model, DictionaryTableExtended):
+            return False
+        return True
+    
+    def get_related_fields(self, model_meta):
+        rel_fields = []
+        for f in model_meta.get_fields():
+            if self.is_related_field(f):
+                rel_fields.append((f.name, f.attname, f.related_model))
+        return rel_fields
+    
+    def add_related_values(self, obj_dict, model_meta, revision_date):
+        for (rel_field_name, rel_attname, rel_field_model) in self.get_related_fields(model_meta):
+            if obj_dict.get(rel_attname):
+                rel_id = obj_dict.get(rel_attname)
+                rel_field_model = self.get_instance_model(obj_dict, rel_field_model)
+                obj_dict[rel_field_name] = self.get_version_from_model(rel_field_model, rel_id, revision_date)
+                del obj_dict[rel_attname]
+        return obj_dict
+        
+    def get_version_from_model(self, model, id, revision_date):
+        obj_versions = Version.objects.get_for_object_reference(model, id).filter(revision__date_created__lte=revision_date)
+        #try:
+        requested_version = obj_versions[0]
+        requested_obj = requested_version.field_dict
+        return self.add_related_values(requested_obj, model._meta, revision_date)
+        #except:
+        #    pass
+    
+    def get_instance_model(self, parent_instance, model):
+        if issubclass(model, TaxonDetails):
+            category_id = parent_instance.get('occurrence_cat_id')
+            category = OccurrenceCategory.objects.get(id=category_id)
+            return get_details_class(category.code)
+        return model 
+    
+    def get_version(self, instance, version, exclude_unreleased=False):
+        """
+        Gets a dict representing a particular version of the occurrence
+        
+        instance: an instance of the last version of the occurrence
+        version: the requested version 
+        """
+        versions = Version.objects.get_for_object(instance)
+        if exclude_unreleased:
+            total_versions = instance.released_versions
+            version_internal = total_versions - int(version) + 1
+            num_released_version = 0
+            for version in versions:
+                if version.field_dict.get('released', False):
+                    num_released_version = num_released_version + 1
+                    if num_released_version == version_internal:
+                        requested_version = version
+                        break
+        else:
+            total_versions = instance.version
+            version_internal = total_versions - int(version)
+            requested_version = versions[version_internal]
+            print requested_version
+        
+        print total_versions
+        revision_date = requested_version.revision.date_created
+        
+        result = self.add_related_values(requested_version.field_dict, instance._meta, revision_date)
+        result['geom'] = {'type': 'Point', 'coordinates': result['geom'].coords}
+        print result
+        return to_flat_representation(result)
+    
 
 """ -------------------------------------------
 OCCURRENCE SERIALIZER - OLD APPROACH. TO BE REMOVED
