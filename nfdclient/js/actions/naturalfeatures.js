@@ -488,6 +488,30 @@ function nfdLogout() {
     };
 }
 
+function getVersion(featureType, featId, version) {
+    return (dispatch) => {
+        return Api.getVersion(featureType, featId, version).then((feature) => {
+            if (feature) {
+                // disptach(getVersionSuccess());
+                dispatch(updateNaturalFeatureForm(feature));
+            }
+        }).catch((error) => {
+            if (error.status === 401) {
+                return dispatch(userNotAuthenticatedError(error));
+            }
+            // return dispatch(getVersionError(featureType, featId, error));
+        });
+    };
+}
+
+function nextVersion(featureType, featId, currentVersion) {
+    return getVersion(featureType, featId, currentVersion + 1);
+}
+
+function previousVersion(featureType, featId, currentVersion) {
+    return getVersion(featureType, featId, currentVersion - 1);
+}
+
 
 module.exports = {
     NATURAL_FEATURES_ERROR, naturalFeaturesError,
@@ -518,5 +542,6 @@ module.exports = {
     updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
     userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData,
     USER_NOT_AUTHENTICATED_ERROR,
-    showLogin
+    showLogin,
+    nextVersion, previousVersion
 };

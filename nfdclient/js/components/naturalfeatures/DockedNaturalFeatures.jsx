@@ -453,24 +453,24 @@ const DockedNaturalFeatures = React.createClass({
         return [];
     },
     renderHistoric() {
-        /*return (
+        return (
             <div className="nf-historic">
                 <Button key="previous" bsSize="small"
                     bsStyle="primary"
-                    onClick={() => this.props.previousVersion()}
-                    disabled={true}>
+                    type="button"
+                    onClick={() => {this.props.previousVersion(this.props.featuretype, this.props.currentFeature.id, this.props.currentFeature.version); document.activeElement.blur(); } }
+                    disabled={ (this.props.currentFeature.version <= 1) }>
                     <Glyphicon glyph={"menu-left"}/>
                 </Button>
-                <span className="nf-historic-date">17-5-2017</span>
+                <span className="nf-historic-date">Version {this.props.currentFeature.version} / {this.props.currentFeature.total_versions}</span>
                 <Button key="next" bsSize="small"
                     bsStyle="primary"
-                    onClick={() => this.props.nextVersion(this.props.currentFeature.formvalues)}
-                    disabled={false}>
+                    onClick={() => {this.props.nextVersion(this.props.featuretype, this.props.currentFeature.id, this.props.currentFeature.version); document.activeElement.blur(); } }
+                    disabled={ (this.props.currentFeature.version >= this.props.currentFeature.total_versions) }>
                     <Glyphicon glyph={"menu-right"}/>
                 </Button>
             </div>
-        );*/
-        return null;
+        );
     },
     renderDrawTools() {
         return (
