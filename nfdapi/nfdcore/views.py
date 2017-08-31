@@ -109,12 +109,13 @@ class LayerVersionDetail(APIView):
             instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
             serializer = OccurrenceVersionSerializer()
             excude_unreleased = not (is_writer or is_publisher)
-            serialized_feature = serializer.get_version(instance, version, excude_unreleased)
+            serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
             if serialized_feature.get('released', False) == False and excude_unreleased:
                 return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN) 
             if isinstance(serialized_feature, OccurrenceNaturalArea):
                 return Response({"error": "not supported yet"})
-            print serialized_feature
+            serialized_feature['featuretype'] = occurrence_maincat
+            serialized_feature['featuresubtype'] = instance.occurrence_cat.code
             return Response(serialized_feature)
         except ObjectDoesNotExist:
             raise

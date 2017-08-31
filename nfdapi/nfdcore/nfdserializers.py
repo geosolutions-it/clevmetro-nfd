@@ -31,6 +31,7 @@ import os
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
+from django.template.context_processors import request
 
 def _(message): return message
 
@@ -66,14 +67,14 @@ MANAGEMENT_FORM_ITEMS = [{
         "type": "boolean",
         'readonly': True
     },{
-        "key": "version",
-        "label": _("version"),
-        "type": "integer",
+        "key": "inclusion_date",
+        "label": _("inclusion_date"),
+        "type": "string",
         'readonly': True
     },{
-        "key": "total_versions",
-        "label": _("total_versions"),
-        "type": "integer",
+        "key": "version_date",
+        "label": _("version_date"),
+        "type": "string",
         'readonly': True
     }]
 
@@ -98,14 +99,14 @@ MANAGEMENT_FORM_ITEMS_PUBLISHER = [{
         "type": "boolean",
         'readonly': False
     },{
-        "key": "version",
-        "label": _("version"),
-        "type": "integer",
+        "key": "inclusion_date",
+        "label": _("inclusion_date"),
+        "type": "string",
         'readonly': True
     },{
-        "key": "total_versions",
-        "label": _("total_versions"),
-        "type": "integer",
+        "key": "version_date",
+        "label": _("version_date"),
+        "type": "string",
         'readonly': True
     }]
     
@@ -487,9 +488,12 @@ class UpdateOccurrenceMixin(object):
                         if issubclass(f.related_model, DictionaryTable) or issubclass(f.related_model, DictionaryTableExtended):
                             new_value = form_validated_data.get(f.name)
                             old_value =  getattr(instance, f.name, None)
-                            if new_value != None and (old_value == None or new_value != old_value.code): #FIXME: should we allow setting null again to the combo??
+                            if old_value != new_value and (old_value is None or new_value != old_value.code):
                                 try:
-                                    dict_entry = f.related_model.objects.get(code=new_value)
+                                    if new_value != None:
+                                        dict_entry = f.related_model.objects.get(code=new_value)
+                                    else:
+                                        dict_entry = None
                                     modified = True
                                     setattr(instance, f.name, dict_entry)
                                 except Exception as exc:
@@ -782,6 +786,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     released = rest_fields.NullBooleanField(required=False, read_only=False)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = TotalVersionsField(required=False, read_only=True)
+    inclusion_date = rest_fields.DateTimeField(required=False, read_only=True)
+    version_date = rest_fields.DateTimeField(required=False, read_only=True)
     #geom = gisserializer.GeometryField()
     voucher = VoucherSerializer(required=False)
     species = SpeciesSerializer(required=False)
@@ -808,6 +814,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result['featuresubtype'] = instance.occurrence_cat.code
         result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
         result["formvalues"]['featuresubtype'] = instance.occurrence_cat.code
+        result['version_date'] = instance.inclusion_date
+        result["formvalues"]['version_date'] = instance.inclusion_date
         photo_serializer = PhotographSerializer(instance.photographs, many=True)
         result['images'] = photo_serializer.data
         result['is_writer'] = self.is_writer
@@ -1081,11 +1089,14 @@ class OccurrenceVersionSerializer():
             return False
         if getattr(f, 'auto_created', False):
             return False
-        if issubclass(f.related_model, DictionaryTable):
-            return False
-        if issubclass(f.related_model, DictionaryTableExtended):
-            return False
         return True
+    
+    def is_dict_model(self, related_model):
+        if issubclass(related_model, DictionaryTable):
+            return True
+        if issubclass(related_model, DictionaryTableExtended):
+            return True
+        return False
     
     def get_related_fields(self, model_meta):
         rel_fields = []
@@ -1099,7 +1110,10 @@ class OccurrenceVersionSerializer():
             if obj_dict.get(rel_attname):
                 rel_id = obj_dict.get(rel_attname)
                 rel_field_model = self.get_instance_model(obj_dict, rel_field_model)
-                obj_dict[rel_field_name] = self.get_version_from_model(rel_field_model, rel_id, revision_date)
+                if self.is_dict_model(rel_field_model):
+                    obj_dict[rel_field_name] = rel_field_model.objects.get(pk=rel_id).code
+                else:
+                    obj_dict[rel_field_name] = self.get_version_from_model(rel_field_model, rel_id, revision_date)
                 del obj_dict[rel_attname]
         return obj_dict
         
@@ -1114,8 +1128,8 @@ class OccurrenceVersionSerializer():
     
     def get_instance_model(self, parent_instance, model):
         if issubclass(model, TaxonDetails):
-            category_id = parent_instance.get('occurrence_cat_id')
-            category = OccurrenceCategory.objects.get(id=category_id)
+            category_code = parent_instance.get('occurrence_cat')
+            category = OccurrenceCategory.objects.get(code=category_code)
             return get_details_class(category.code)
         return model 
     
@@ -1129,26 +1143,26 @@ class OccurrenceVersionSerializer():
         versions = Version.objects.get_for_object(instance)
         if exclude_unreleased:
             total_versions = instance.released_versions
-            version_internal = total_versions - int(version) + 1
+            version_internal = total_versions - version + 1
             num_released_version = 0
-            for version in versions:
-                if version.field_dict.get('released', False):
+            for v in versions:
+                if v.field_dict.get('released', False):
                     num_released_version = num_released_version + 1
                     if num_released_version == version_internal:
-                        requested_version = version
+                        requested_version = v
                         break
         else:
             total_versions = instance.version
-            version_internal = total_versions - int(version)
+            version_internal = total_versions - version
             requested_version = versions[version_internal]
-            print requested_version
-        
-        print total_versions
+
         revision_date = requested_version.revision.date_created
         
         result = self.add_related_values(requested_version.field_dict, instance._meta, revision_date)
         result['geom'] = {'type': 'Point', 'coordinates': result['geom'].coords}
-        print result
+        result['total_versions'] = total_versions
+        result['version'] = version
+        result['version_date'] = revision_date
         return to_flat_representation(result)
     
 
