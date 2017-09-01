@@ -220,6 +220,7 @@ const DockedNaturalFeatures = React.createClass({
                         <td style={{width: "60%"}}>
                             {item.readonly ?
                                 (<select disabled style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" bsSize="small" value={value || ""}>
+                                    <option value="">---</option>
                                     {this.getOptions(item.values)}
                                 </select>)
                                 :
@@ -528,7 +529,7 @@ const DockedNaturalFeatures = React.createClass({
                     <span className="nfd-form-title">{title}</span>
                 </div>
                 <div>
-                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs">
+                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
                         {this.renderTabs()}
                     </Tabs>
                     <div className="nf-errors">

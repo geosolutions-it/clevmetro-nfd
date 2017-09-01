@@ -506,12 +506,15 @@ class UpdateOccurrenceMixin(object):
                             old_value =  getattr(instance, f.name, '')
                             if old_value is None:
                                 old_value = ''
-                        if isinstance(f, BooleanField) or isinstance(f, NullBooleanField) or \
-                        isinstance(f, DateTimeField) or isinstance(f, DateField) or \
-                        isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
+                        elif isinstance(f, DateTimeField) or isinstance(f, DateField):
+                            new_value = form_validated_data.get(f.name, '')
+                            old_value =  getattr(instance, f.name, None)
+                        elif isinstance(f, BooleanField) or isinstance(f, NullBooleanField) or \
+                                isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
                             new_value = form_validated_data.get(f.name)
                             old_value =  getattr(instance, f.name, None)
-                        if new_value != None and new_value != old_value:
+                        #if new_value != None and new_value != old_value:
+                        if new_value != old_value:
                             modified = True
                             setattr(instance, f.name, new_value)
 
@@ -808,8 +811,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         if self.is_writer or self.is_publisher:
             result["version"] = instance.version
             result["formvalues"]["version"] = instance.version
-            result["total_versions"] = r["total_versions"]
-            result["formvalues"]["total_versions"] = r["total_versions"]
+            result["total_versions"] = instance.version
+            result["formvalues"]["total_versions"] = instance.version
         else:
             result["version"] = instance.released_versions
             result["formvalues"]["version"] = instance.released_versions
@@ -1083,7 +1086,7 @@ class FeatureTypeSerializer():
                 if not (self.is_writer or self.is_publisher):
                     fdef['readonly'] = True
                 fdef['key'] = form_name + "." + f.name
-                fdef['label'] = _(f.name) 
+                fdef['label'] = _(f.name)
                 result.append(fdef)
         return result
 
