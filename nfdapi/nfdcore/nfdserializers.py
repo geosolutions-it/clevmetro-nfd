@@ -805,11 +805,16 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         #result["geom"] = r.get("geom")
         #del result["formvalues"]["geom"]
         result["released"] = instance.released
-        result["version"] = instance.version
         if self.is_writer or self.is_publisher:
+            result["version"] = instance.version
+            result["formvalues"]["version"] = instance.version
             result["total_versions"] = r["total_versions"]
+            result["formvalues"]["total_versions"] = r["total_versions"]
         else:
+            result["version"] = instance.released_versions
+            result["formvalues"]["version"] = instance.released_versions
             result["total_versions"] = instance.released_versions
+            result["formvalues"]["total_versions"] = instance.released_versions
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
         result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
@@ -1107,14 +1112,15 @@ class OccurrenceVersionSerializer():
     
     def add_related_values(self, obj_dict, model_meta, revision_date):
         for (rel_field_name, rel_attname, rel_field_model) in self.get_related_fields(model_meta):
-            if obj_dict.get(rel_attname):
-                rel_id = obj_dict.get(rel_attname)
-                rel_field_model = self.get_instance_model(obj_dict, rel_field_model)
-                if self.is_dict_model(rel_field_model):
-                    obj_dict[rel_field_name] = rel_field_model.objects.get(pk=rel_id).code
-                else:
-                    obj_dict[rel_field_name] = self.get_version_from_model(rel_field_model, rel_id, revision_date)
-                del obj_dict[rel_attname]
+            rel_id = obj_dict.get(rel_attname)
+            rel_field_model = self.get_instance_model(obj_dict, rel_field_model)
+            if rel_id is None:
+                obj_dict[rel_field_name] = None
+            elif self.is_dict_model(rel_field_model):
+                obj_dict[rel_field_name] = rel_field_model.objects.get(pk=rel_id).code
+            else:
+                obj_dict[rel_field_name] = self.get_version_from_model(rel_field_model, rel_id, revision_date)
+            del obj_dict[rel_attname]
         return obj_dict
         
     def get_version_from_model(self, model, id, revision_date):
@@ -1143,12 +1149,12 @@ class OccurrenceVersionSerializer():
         versions = Version.objects.get_for_object(instance)
         if exclude_unreleased:
             total_versions = instance.released_versions
-            version_internal = total_versions - version + 1
-            num_released_version = 0
+            num_released_version = total_versions
             for v in versions:
                 if v.field_dict.get('released', False):
-                    num_released_version = num_released_version + 1
-                    if num_released_version == version_internal:
+                    if num_released_version != version:
+                        num_released_version = num_released_version - 1
+                    else:
                         requested_version = v
                         break
         else:

@@ -411,7 +411,7 @@ class LenticSize(models.Model):
     class Meta:
         abstract = True
 
-@reversion.register()
+@reversion.register(follow=['taxondetails_ptr'])
 class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
     pond_lake_name = models.TextField()
     pond_lake_type = models.ForeignKey(PondLakeType, on_delete=models.SET_NULL, blank=True, null=True)
@@ -451,7 +451,7 @@ class StreamSubstracte(models.Model):
 class WaterFlowType(DictionaryTable):
     pass
 
-@reversion.register()
+@reversion.register(follow=['taxondetails_ptr'])
 class StreamAnimalDetails(AquaticAnimalDetails):
     stream_name_1 = models.TextField()
     stream_name_2 = models.TextField(blank=True, null=True)
@@ -487,7 +487,7 @@ class WaterSource(DictionaryTable):
 class WetlandHabitatFeature(DictionaryTable):
     pass
 
-@reversion.register()  
+@reversion.register(follow=['taxondetails_ptr'])
 class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     wetland_name = models.TextField()
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
@@ -507,7 +507,7 @@ class SlimeMoldClass(DictionaryTableExtended):
 class SlimeMoldMedia(DictionaryTable):
     pass
 
-@reversion.register()
+@reversion.register(follow=['taxondetails_ptr'])
 class SlimeMoldDetails(TaxonDetails):
     #lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_class = models.ForeignKey(SlimeMoldClass, on_delete=models.SET_NULL, blank=True, null=True)
