@@ -44,7 +44,8 @@ const LeafletDrawSupport = React.createClass({
         switch (newProps.drawStatus) {
             case ("start"):
                 if (isMobile.any) {
-                    this.addMobileDrawInteraction(newProps);
+                    // this.addMobileDrawInteraction(newProps);
+                    this.addDrawInteraction(newProps);
                 } else {
                     this.addDrawInteraction(newProps);
                 }
