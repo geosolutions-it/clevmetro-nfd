@@ -148,7 +148,7 @@ service slapd start
 
 ### PHPLdapAdmin installation
 
-PHPLdapAdmin is a convinient web GUI to configure LDAP users and groups. Installation:
+PHPLdapAdmin is a convenient web GUI to configure LDAP users and groups. Installation:
 
 ```shell
 apt-get install slapd phpldapadmin
