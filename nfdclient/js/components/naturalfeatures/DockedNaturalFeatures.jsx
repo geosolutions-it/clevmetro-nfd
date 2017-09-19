@@ -174,7 +174,7 @@ const DockedNaturalFeatures = React.createClass({
         } else if (fst === 'we') {
             featuresubtype = ' (Wetland animal)';
         } else {
-          featuresubtype = ' (Natural area)';
+            featuresubtype = ' (Natural area)';
         }
         return featuresubtype;
     },
