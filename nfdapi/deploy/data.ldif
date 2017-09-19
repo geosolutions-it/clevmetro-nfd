@@ -1,0 +1,293 @@
+dn: dc=Metroparks,dc=local
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Metroparks
+dc: Metroparks
+structuralObjectClass: organization
+entryUUID: 41d3a27c-0b1b-1037-9dc0-fb51897d422a
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170801153849Z
+entryCSN: 20170801153849.049692Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170801153849Z
+
+dn: cn=admin,dc=Metroparks,dc=local
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword:: e1NTSEF9MjVXVENnVllRbjlvKzQ3b2lhTjNJY0tYYXZMSXo5aXA=
+structuralObjectClass: organizationalRole
+entryUUID: 41e9ce80-0b1b-1037-9dc1-fb51897d422a
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170801153849Z
+entryCSN: 20170801153849.195034Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170801153849Z
+
+dn: ou=groups,dc=Metroparks,dc=local
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+structuralObjectClass: organizationalUnit
+entryUUID: 7e44193c-0bb4-1037-9fb7-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095543Z
+entryCSN: 20170802095543.449696Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802095543Z
+
+dn: cn=plant_writer,ou=groups,dc=Metroparks,dc=local
+gidNumber: 501
+cn: plant_writer
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 99db0f7a-0bb4-1037-9fb8-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095629Z
+memberUid: user_004
+memberUid: user_002
+entryCSN: 20170918165300.074338Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170918165300Z
+
+dn: cn=slimemold_writer,ou=groups,dc=Metroparks,dc=local
+gidNumber: 502
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: dd6ac820-0bb4-1037-9fb9-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095823Z
+memberUid: user_001
+cn: slimemold_writer
+entryCSN: 20170804122219.542476Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170804122219Z
+
+dn: cn=animal_writer,ou=groups,dc=Metroparks,dc=local
+gidNumber: 504
+cn: animal_writer
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: ee1d5250-0bb4-1037-9fbb-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095851Z
+memberUid: user_002
+memberUid: user_004
+entryCSN: 20170802102803.040198Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802102803Z
+
+dn: cn=animal_publisher,ou=groups,dc=Metroparks,dc=local
+gidNumber: 503
+cn: animal_publisher
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: f8a933ba-0bb4-1037-9fbc-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095908Z
+memberUid: user_003
+memberUid: user_004
+entryCSN: 20170802102817.070904Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802102817Z
+
+dn: cn=plant_publisher,ou=groups,dc=Metroparks,dc=local
+gidNumber: 505
+cn: plant_publisher
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 009c7d3e-0bb5-1037-9fbd-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802095922Z
+memberUid: user_003
+memberUid: user_004
+entryCSN: 20170918165325.538831Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170918165325Z
+
+dn: cn=slimemold_publisher,ou=groups,dc=Metroparks,dc=local
+gidNumber: 506
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 1d58f3ee-0bb5-1037-9fbe-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802100010Z
+memberUid: user_002
+cn: slimemold_publisher
+entryCSN: 20170804122208.951532Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170804122208Z
+
+dn: uid=user_001,dc=Metroparks,dc=local
+cn: User
+mail: cesar.izq@gmail.com
+mobile: 768687564
+objectClass: inetOrgPerson
+objectClass: top
+postalAddress: Carrer Sense nom
+sn: 001
+street: Carrer sense nom street
+telephoneNumber: 23423423424
+uid: user_001
+structuralObjectClass: inetOrgPerson
+entryUUID: 98318a94-0bb6-1037-9fbf-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802101045Z
+userPassword:: e01ENX0xR0h3RThLYUUzSUFaTnJhRHlFdzBRPT0=
+userPassword:: e1NTSEF9UkZCSjlZK0NsYUl3dkpDamNKWnc4QVhMdXdvMDF6TlY=
+userPassword:: e1NIQX1haDh3MHBJWDIvMTg2ZDNkM08ybVU4NUJzaFk9
+entryCSN: 20170802161029.362992Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802161029Z
+
+dn: cn=fungus_writer,ou=groups,dc=Metroparks,dc=local
+gidNumber: 507
+cn: fungus_writer
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: afdc118c-0bb6-1037-9fc0-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802101125Z
+memberUid: user_001
+entryCSN: 20170802101456.851709Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802101456Z
+
+dn: cn=fungus_publisher,ou=groups,dc=Metroparks,dc=local
+gidNumber: 508
+cn: fungus_publisher
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: bb00ccd8-0bb6-1037-9fc1-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802101144Z
+memberUid: user_002
+entryCSN: 20170802102534.700874Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802102534Z
+
+dn: uid=user_002,dc=Metroparks,dc=local
+cn: User
+mail: cmartinez@scolab.es
+mobile: 23423242
+objectClass: inetOrgPerson
+objectClass: top
+postalAddress: Carrer sense nom postal address
+sn: 002
+street: Carrer sense nom street
+telephoneNumber: 23423423432
+uid: user_002
+structuralObjectClass: inetOrgPerson
+entryUUID: d17c790c-0bb7-1037-9fc2-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802101931Z
+userPassword:: e01ENX04ZGs2MFNQR0pEZ1g5OERob1VTN1ZBPT0=
+userPassword:: e1NIQX1IMDcxUWNkZm9ZdDEyR3JKTlZmQlZvcVVIOGc9
+entryCSN: 20170802161318.629337Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802161318Z
+
+dn: uid=user_003,dc=Metroparks,dc=local
+cn: User
+mail: cesarizq@gmail.com
+mobile: 4353452442342
+objectClass: inetOrgPerson
+objectClass: top
+postalAddress: Carrer sense nom postalAddress
+sn: 003
+street: Carrer sense nom street
+telephoneNumber: 54646546
+uid: user_003
+structuralObjectClass: inetOrgPerson
+entryUUID: ff895b4e-0bb7-1037-9fc3-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802102048Z
+userPassword:: e1NIQX1KVnhSVFVUSFltTTFZOENhK1Y2V1k0YS9IaTQ9
+entryCSN: 20170802161412.902572Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802161412Z
+
+dn: uid=user_004,dc=Metroparks,dc=local
+cn: User
+mail: ces.ar.izq@gmail.com
+mobile: 233422134
+objectClass: inetOrgPerson
+objectClass: top
+postalAddress: Carrer sense nom PostalAddress
+sn: 004
+street: Carrer sense nom street
+telephoneNumber: 345342342
+uid: user_004
+structuralObjectClass: inetOrgPerson
+entryUUID: f629e1da-0bb8-1037-9fc4-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802102742Z
+userPassword:: e01ENX00Z2hpSmUxV0ZPRTJZMWd5NDkzLzZBPT0=
+userPassword:: e1NIQX1QUTVpMElQSlBPbk56b2JWVE5tK2xFME0wazg9
+userPassword:: e1NTSEF9TkdDZDdzMkhXYk1xVlVqb0k1TmhNNzVrTEg3Y1ppYWQ=
+entryCSN: 20170802162958.441994Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802162958Z
+
+dn: ou=users,dc=Metroparks,dc=local
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+structuralObjectClass: organizationalUnit
+entryUUID: abbc33d2-0bbd-1037-9fc5-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802110125Z
+entryCSN: 20170802110125.204848Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802110125Z
+
+dn: cn=nfdadmins,ou=groups,dc=Metroparks,dc=local
+gidNumber: 509
+cn: nfdadmins
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 8625b554-0be9-1037-9fc6-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170802161519Z
+memberUid: user_004
+entryCSN: 20170802161538.714688Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170802161538Z
+
+dn: cn=naturalarea_writer,ou=groups,dc=Metroparks,dc=local
+gidNumber: 510
+cn: naturalarea_writer
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 635ed866-0d5b-1037-9fc7-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170804122255Z
+entryCSN: 20170804122255.443120Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170804122255Z
+
+dn: cn=naturalarea_publisher,ou=groups,dc=Metroparks,dc=local
+gidNumber: 511
+cn: naturalarea_publisher
+objectClass: posixGroup
+objectClass: top
+structuralObjectClass: posixGroup
+entryUUID: 70d7d83a-0d5b-1037-9fc8-e5589efb3bcf
+creatorsName: cn=admin,dc=Metroparks,dc=local
+createTimestamp: 20170804122318Z
+entryCSN: 20170804122318.046480Z#000000#000#000000
+modifiersName: cn=admin,dc=Metroparks,dc=local
+modifyTimestamp: 20170804122318Z
+

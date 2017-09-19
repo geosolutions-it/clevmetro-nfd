@@ -225,8 +225,18 @@ AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=Metroparks,dc=local",
 AUTH_LDAP_GROUP_TYPE = NestedActiveDirectoryGroupType()
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_staff": "cn=nfdadmins,ou=Groups,dc=Metroparks,dc=local",
-    "is_superuser": "cn=nfdadmins,ou=Groups,dc=Metroparks,dc=local"
+    "is_staff": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
+    "is_superuser": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
+    "is_plant_writer": "cn=plant_writer,ou=groups,dc=Metroparks,dc=local",
+    "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=Metroparks,dc=local",
+    "is_animal_writer": "cn=animal_writer,ou=groups,dc=Metroparks,dc=local",
+    "is_animal_publisher": "cn=animal_publisher,ou=groups,dc=Metroparks,dc=local",
+    "is_slimemold_writer": "cn=slimemold_writer,ou=groups,dc=Metroparks,dc=local",
+    "is_slimemold_publisher": "cn=slimemold_publisher,ou=groups,dc=Metroparks,dc=local",
+    "is_fungus_writer": "cn=fungus_writer,ou=groups,dc=Metroparks,dc=local",
+    "is_fungus_publisher": "cn=fungus_publisher,ou=groups,dc=Metroparks,dc=local",
+    "is_naturalarea_writer": "cn=naturalarea_writer,ou=groups,dc=Metroparks,dc=local",
+    "is_naturalarea_publisher": "cn=naturalarea_publisher,ou=groups,dc=Metroparks,dc=local"
 }
 
 AUTH_LDAP_USER_ATTR_MAP = {
