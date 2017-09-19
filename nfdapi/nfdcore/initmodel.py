@@ -10,7 +10,10 @@ from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
     LoticHabitatType, HmfeiLocalAbundance, WaterFlowType, TerrestrialStratum,\
     PondLakeType, PondLakeUse, LakeMicrohabitat, ShorelineType, WetlandType,\
     WetlandLocation, WetlandConnectivity, WetlandHabitatFeature, WaterSource,\
-    SlimeMoldMedia, SlimeMoldClass
+    SlimeMoldMedia, SlimeMoldClass, ConiferLifestages, FernLifestages,\
+    MossLifestages, FloweringPlantLifestages, PlantCount, MoistureRegime,\
+    GroundSurface, CanopyCover, GeneralHabitatCategory, LandscapePosition,\
+    Aspect, Slope
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -557,6 +560,112 @@ slime_mold_class = [
     ("3", _("Slime net"), _("Protostelia"))
     ]
 
+conifer_lifestages = [
+    ("1", _("vegetative")),
+    ("2", _("immature ovulate cones")),
+    ("3", _("mature ovulate cones")),
+    ("4", _("spent ovulate cones")),
+    ("5", _("immature pollen cones")),
+    ("6", _("mature pollen cones")),
+    ("7", _("spent pollen cones"))
+    ]
+
+fern_lifestages = [
+    ("1", _("Growing gametophyte")),
+    ("2", _("Reproductive fronds, immature")),
+    ("3", _("Reproductive fronds, mature")),
+    ("4", _("Rhizome")),
+    ("5", _("Vegetative fronds"))
+    ]
+
+flowring_plant_lifestages = [
+    ("1", _("Buds")),
+    ("2", _("Dispersed fruit/seed")),
+    ("3", _("Flowers")),
+    ("4", _("Maturing fruit")),
+    ("5", _("Saplings")),
+    ("6", _("Seedlings")),
+    ("7", _("Vegetative growth"))
+    ]
+
+moss_lifestages = [
+    ("1", _("sporophyte")),
+    ("2", _("gametophyte"))
+    ]
+
+plant_count = [
+    ("1", _("100-200")),
+    ("2", _("10-20")),
+    ("3", _(">200")),
+    ("4", _("20-50")),
+    ("5", _("<5")),
+    ("6", _("50-100")),
+    ("7", _("5-10"))
+    ]
+
+moisture_regime = [
+    ("1", _("N/A")),
+    ("2", _("mesic")),
+    ("3", _("wet")),
+    ("4", _("wet-mesic"))
+    ]
+
+ground_surface = [
+    ("1", _("bare soil")),
+    ("2", _("deep but patchy litter")),
+    ("3", _("deep litter")),
+    ("4", _("exposed bedrock")),
+    ("5", _("loose litter")),
+    ("6", _("sand and gravel")),
+    ("7", _("standing water"))
+    ]
+
+tree_canopy = [
+    ("1", _("closed canopy")),
+    ("2", _("distinct gap")),
+    ("3", _("open - no canopy")),
+    ("4", _("patchy canopy"))
+    ]
+
+general_habitat_category = [
+    ("1", _("lentic-pond or lake")),
+    ("2", _("lentic-wetland")),
+    ("3", _("lotic")),
+    ("4", _("terrestrial"))
+    ]
+
+landscape_position = [
+    ("1", _("Midslope")),
+    ("2", _("Other")),
+    ("3", _("Plateau")),
+    ("4", _("Ridge")),
+    ("5,", _("Ridgetop")),
+    ("6", _("Toeslope")),
+    ("7", _("U-shaped valley bottom")),
+    ("8", _("V-shaped valley bottom"))
+    ]
+
+aspect = [
+    ("1", _("east")),
+    ("2", _("N/A")),
+    ("3", _("north")),
+    ("4", _("northeast")),
+    ("5", _("northwest")),
+    ("6", _("south")),
+    ("7", _("southeast")),
+    ("8", _("southwest")),
+    ("9", _("west"))
+]
+
+slope = [
+    ("1", _("10 - 20")),
+    ("2", _("20 - 30")),
+    ("3", _("30 - 40")),
+    ("4", _("40 - 50 ")),
+    ("5", _("Less than 10")),
+    ("6", _("Over 50"))
+]
+
 def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
@@ -605,48 +714,70 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(TerrestrialSampler, terrestrial_sampler, ifempty, clean)
     
     
-    _init_dict_table(Storage, storage)
-    _init_dict_table(Marks, marks)
-    _init_dict_table(DiseasesAndAbnormalities, diseases)
+    _init_dict_table(Storage, storage, ifempty, clean)
+    _init_dict_table(Marks, marks, ifempty, clean)
+    _init_dict_table(DiseasesAndAbnormalities, diseases, ifempty, clean)
     
-    _init_dict_table(AquaticSampler, aquatic_sampler)
-    _init_dict_table(StreamDesignatedUse, stream_designated_use)
-    _init_dict_table(ChannelType, channel_type)
-    _init_dict_table(HmfeiLocalAbundance, hmfei_local_abundance)
-    _init_dict_table(LoticHabitatType, lotic_habitat_type)
-    _init_dict_table(WaterFlowType, water_flow_type)
-    _init_dict_table(TerrestrialStratum, terrestrial_location_or_stratum)
+    _init_dict_table(AquaticSampler, aquatic_sampler, ifempty, clean)
+    _init_dict_table(StreamDesignatedUse, stream_designated_use, ifempty, clean)
+    _init_dict_table(ChannelType, channel_type, ifempty, clean)
+    _init_dict_table(HmfeiLocalAbundance, hmfei_local_abundance, ifempty, clean)
+    _init_dict_table(LoticHabitatType, lotic_habitat_type, ifempty, clean)
+    _init_dict_table(WaterFlowType, water_flow_type, ifempty, clean)
+    _init_dict_table(TerrestrialStratum, terrestrial_location_or_stratum, ifempty, clean)
     
-    _init_dict_table(PondLakeType, pond_lake_type)
-    _init_dict_table(PondLakeUse, pond_lake_use)
-    _init_dict_table(ShorelineType, pond_lake_shoreline)
-    _init_dict_table(LakeMicrohabitat, pond_lake_microhabitat)
+    _init_dict_table(PondLakeType, pond_lake_type, ifempty, clean)
+    _init_dict_table(PondLakeUse, pond_lake_use, ifempty, clean)
+    _init_dict_table(ShorelineType, pond_lake_shoreline, ifempty, clean)
+    _init_dict_table(LakeMicrohabitat, pond_lake_microhabitat, ifempty, clean)
     
-    _init_dict_table(WetlandType, wetland_type)
-    _init_dict_table(WetlandLocation, wetland_location)
-    _init_dict_table(WetlandConnectivity, wetland_connectivity)
-    _init_dict_table(WaterSource, water_source)
-    _init_dict_table(WetlandHabitatFeature, wetland_habitat_feature)
+    _init_dict_table(WetlandType, wetland_type, ifempty, clean)
+    _init_dict_table(WetlandLocation, wetland_location, ifempty, clean)
+    _init_dict_table(WetlandConnectivity, wetland_connectivity, ifempty, clean)
+    _init_dict_table(WaterSource, water_source, ifempty, clean)
+    _init_dict_table(WetlandHabitatFeature, wetland_habitat_feature, ifempty, clean)
     
-    _init_dict_table(SlimeMoldMedia, slime_mold_media)
-    _init_dict_extended_table(SlimeMoldClass, slime_mold_class)
+    _init_dict_table(SlimeMoldMedia, slime_mold_media, ifempty, clean)
+    _init_dict_extended_table(SlimeMoldClass, slime_mold_class, ifempty, clean)
+    
+    #_init_dict_table(ConiferLifestages, conifer_lifestages, ifempty, clean)
+    _init_dict_table(FernLifestages, fern_lifestages, ifempty, clean)
+    _init_dict_table(FloweringPlantLifestages, flowring_plant_lifestages, ifempty, clean)
+    _init_dict_table(MossLifestages, moss_lifestages, ifempty, clean)
+    _init_dict_table(PlantCount, plant_count, ifempty, clean)
+    _init_dict_table(MoistureRegime, moisture_regime, ifempty, clean)
+    _init_dict_table(GroundSurface, ground_surface, ifempty, clean)
+    _init_dict_table(CanopyCover, tree_canopy, ifempty, clean)
+    _init_dict_table(GeneralHabitatCategory, general_habitat_category, ifempty, clean)
+    _init_dict_table(LandscapePosition, landscape_position, ifempty, clean)
+    _init_dict_table(Aspect, aspect, ifempty, clean)
+    _init_dict_table(Slope, slope, ifempty, clean)
     
     if clean:
         OccurrenceCategory.objects.all().delete()
-    for entry in occurrence_subcat:        
+    
+    if ifempty:
+        if OccurrenceCategory.objects.count() > 0:
+            return
+    for entry in occurrence_subcat:
         c = OccurrenceCategory()
         c.code = entry[0]
         c.name = entry[1]
         c.main_cat = entry[2]
         c.save()
 
-def clean_model():
+def clean_occurrences():
     for feat in OccurrenceTaxon.objects.all():
         delete_object_and_children(feat)
+
+def clean_species():
     Species.objects.all().delete()
     ElementSpecies.objects.all().delete()
 
-def insert_test_species():
+def insert_test_species(clean=False):
+    if clean:
+        clean_species()
+    
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     with reversion.create_revision():
         element_species = ElementSpecies()
@@ -683,7 +814,7 @@ def insert_test_species():
 
 def insert_test_data(clean=True):
     if clean:
-        clean_model()
+        clean_occurrences()
     
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     """    

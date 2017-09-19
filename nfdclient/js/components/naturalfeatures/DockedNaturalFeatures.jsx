@@ -100,9 +100,9 @@ const DockedNaturalFeatures = React.createClass({
             icon = 'question-sign';
         } else if (formname === 'species.element_species') {
             icon = 'star';
-        } else if (formname.includes("details")) {
+        } else if (formname === 'details') {
             icon = 'th-list';
-        } else if (formname.includes("lifestages")) {
+        } else if (formname === 'details.lifestages') {
             icon = 'refresh';
         } else if (formname === 'occurrencemanagement') {
             icon = 'cog';
@@ -120,6 +120,14 @@ const DockedNaturalFeatures = React.createClass({
             icon = 'question-sign';
         } else if (formname === 'location') {
             icon = 'question-sign';
+        } else if (formname === 'details.vegetation') {
+            icon = 'uniE103';
+        } else if (formname === 'details.substrate') {
+            icon = 'uniE135';
+        } else if (formname.includes('earthworm')) {
+            icon = 'uniE232';
+        } else if (formname.includes('disturbance')) {
+            icon = 'uniE162';
         }
         return icon;
     },
@@ -165,6 +173,8 @@ const DockedNaturalFeatures = React.createClass({
             featuresubtype = ' (Stream animal)';
         } else if (fst === 'we') {
             featuresubtype = ' (Wetland animal)';
+        } else {
+          featuresubtype = ' (Natural area)';
         }
         return featuresubtype;
     },

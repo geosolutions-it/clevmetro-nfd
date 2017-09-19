@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-21 15:19+0200\n"
+"POT-Creation-Date: 2017-09-19 17:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,534 +17,2150 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nfdcore/featuretype.py:39
-msgid "occurrencemanagement"
-msgstr "Management"
-
-#: nfdcore/featuretype.py:42
-msgid "id"
-msgstr ""
-
-#: nfdcore/featuretype.py:47
-msgid "featuretype"
-msgstr ""
-
-#: nfdcore/featuretype.py:52
-msgid "featuresubtype"
-msgstr ""
-
-#: nfdcore/featuretype.py:57
-msgid "version"
-msgstr ""
-
-#: nfdcore/featuretype.py:62
-msgid "total_versions"
-msgstr ""
-
-#: nfdcore/featuretype.py:69 nfdcore/featuretype.py:82 nfdcore/featuretype.py:96
-#: nfdcore/featuretype.py:110 nfdcore/featuretype.py:123
-msgid "species"
-msgstr "Species"
-
-#: nfdcore/featuretype.py:70 nfdcore/featuretype.py:83 nfdcore/featuretype.py:97
-#: nfdcore/featuretype.py:111 nfdcore/featuretype.py:124
-msgid "species.element_species"
-msgstr "Element species"
-
-#: nfdcore/featuretype.py:72 nfdcore/featuretype.py:85 nfdcore/featuretype.py:99
-#: nfdcore/featuretype.py:113 nfdcore/featuretype.py:126
-msgid "observation"
-msgstr "Observation"
-
-#: nfdcore/featuretype.py:73 nfdcore/featuretype.py:86 nfdcore/featuretype.py:100
-#: nfdcore/featuretype.py:114 nfdcore/featuretype.py:127
-msgid "observation.reporter"
-msgstr "Observation reporter"
-
-#: nfdcore/featuretype.py:74 nfdcore/featuretype.py:87 nfdcore/featuretype.py:101
-#: nfdcore/featuretype.py:115 nfdcore/featuretype.py:128
-msgid "observation.verifier"
-msgstr "Observation verifier"
-
-#: nfdcore/featuretype.py:75 nfdcore/featuretype.py:88 nfdcore/featuretype.py:102
-#: nfdcore/featuretype.py:116 nfdcore/featuretype.py:129
-msgid "observation.recorder"
-msgstr "Observation recorder"
-
-#: nfdcore/featuretype.py:76 nfdcore/featuretype.py:89 nfdcore/featuretype.py:103
-#: nfdcore/featuretype.py:117 nfdcore/featuretype.py:130
-msgid "voucher"
-msgstr "Voucher"
-
-#: nfdcore/featuretype.py:77 nfdcore/featuretype.py:90 nfdcore/featuretype.py:104
-#: nfdcore/featuretype.py:118 nfdcore/featuretype.py:131
-msgid "details"
-msgstr "Details"
-
-#: nfdcore/featuretype.py:514
-msgid "No species was selected"
-msgstr ""
-
-#: nfdcore/featuretype.py:718
-msgid "Geometry is missing"
-msgstr ""
-
-#: nfdcore/initmodel.py:26
+#: nfdcore/initmodel.py:36
 msgid "Plant"
 msgstr ""
 
-#: nfdcore/initmodel.py:27 nfdcore/initmodel.py:39
+#: nfdcore/initmodel.py:37 nfdcore/initmodel.py:49
 msgid "Fungus"
 msgstr ""
 
-#: nfdcore/initmodel.py:28 nfdcore/initmodel.py:40
+#: nfdcore/initmodel.py:38 nfdcore/initmodel.py:50
 msgid "Slime mold"
 msgstr ""
 
-#: nfdcore/initmodel.py:29
+#: nfdcore/initmodel.py:39
 msgid "Animal"
 msgstr ""
 
-#: nfdcore/initmodel.py:30 nfdcore/initmodel.py:45
+#: nfdcore/initmodel.py:40 nfdcore/initmodel.py:55
 msgid "Natural area"
 msgstr ""
 
-#: nfdcore/initmodel.py:34
+#: nfdcore/initmodel.py:44
 msgid "Conifer"
 msgstr ""
 
-#: nfdcore/initmodel.py:35
+#: nfdcore/initmodel.py:45
 msgid "Fern"
 msgstr ""
 
-#: nfdcore/initmodel.py:36
+#: nfdcore/initmodel.py:46
 msgid "Flowering plant"
 msgstr ""
 
-#: nfdcore/initmodel.py:37
+#: nfdcore/initmodel.py:47
 msgid "Plant - generic"
 msgstr ""
 
-#: nfdcore/initmodel.py:38
+#: nfdcore/initmodel.py:48
 msgid "Moss"
 msgstr ""
 
-#: nfdcore/initmodel.py:41
+#: nfdcore/initmodel.py:51
 msgid "Land animal"
 msgstr ""
 
-#: nfdcore/initmodel.py:42
+#: nfdcore/initmodel.py:52
 msgid "Pond lake animal"
 msgstr ""
 
-#: nfdcore/initmodel.py:43
+#: nfdcore/initmodel.py:53
 msgid "Stream animal"
 msgstr ""
 
-#: nfdcore/initmodel.py:44
+#: nfdcore/initmodel.py:54
 msgid "Wetland animal"
 msgstr ""
 
-#: nfdcore/initmodel.py:48
+#: nfdcore/initmodel.py:58
 msgid "CR: Critically endangered"
 msgstr ""
 
-#: nfdcore/initmodel.py:49
+#: nfdcore/initmodel.py:59
 msgid "DD: Data deficient"
 msgstr ""
 
-#: nfdcore/initmodel.py:50
+#: nfdcore/initmodel.py:60
 msgid "EN: Endangered"
 msgstr ""
 
-#: nfdcore/initmodel.py:51
+#: nfdcore/initmodel.py:61
 msgid "LC: Least concern"
 msgstr ""
 
-#: nfdcore/initmodel.py:52
+#: nfdcore/initmodel.py:62
 msgid "NA: Not applicable"
 msgstr ""
 
-#: nfdcore/initmodel.py:53
+#: nfdcore/initmodel.py:63
 msgid "NE: Not evaluated"
 msgstr ""
 
-#: nfdcore/initmodel.py:54
+#: nfdcore/initmodel.py:64
 msgid "NT: Near threatened"
 msgstr ""
 
-#: nfdcore/initmodel.py:55
+#: nfdcore/initmodel.py:65
 msgid "VU: Vulnerable"
 msgstr ""
 
-#: nfdcore/initmodel.py:57
+#: nfdcore/initmodel.py:67
 msgid "Candidate"
 msgstr ""
 
-#: nfdcore/initmodel.py:58
+#: nfdcore/initmodel.py:68
 msgid "Delisted"
 msgstr ""
 
-#: nfdcore/initmodel.py:59
+#: nfdcore/initmodel.py:69
 msgid "Emergency endangered"
 msgstr ""
 
-#: nfdcore/initmodel.py:60
+#: nfdcore/initmodel.py:70
 msgid "Endangered"
 msgstr ""
 
-#: nfdcore/initmodel.py:61
+#: nfdcore/initmodel.py:71
 msgid "Endangered due to similar appearance"
 msgstr ""
 
-#: nfdcore/initmodel.py:62
+#: nfdcore/initmodel.py:72
 msgid "Not Listed"
 msgstr ""
 
-#: nfdcore/initmodel.py:63
+#: nfdcore/initmodel.py:73
 msgid "Proposed endangered"
 msgstr ""
 
-#: nfdcore/initmodel.py:64
+#: nfdcore/initmodel.py:74
 msgid "Proposed threatened"
 msgstr ""
 
-#: nfdcore/initmodel.py:65
+#: nfdcore/initmodel.py:75
 msgid "Resolved Taxon"
 msgstr ""
 
-#: nfdcore/initmodel.py:66
+#: nfdcore/initmodel.py:76
 msgid "Species of Concern"
 msgstr ""
 
-#: nfdcore/initmodel.py:67
+#: nfdcore/initmodel.py:77
 msgid "Threatened"
 msgstr ""
 
-#: nfdcore/initmodel.py:68
+#: nfdcore/initmodel.py:78
 msgid "Threatened due to similar appearance"
 msgstr ""
 
-#: nfdcore/initmodel.py:69
+#: nfdcore/initmodel.py:79
 msgid "Under Review"
 msgstr ""
 
-#: nfdcore/initmodel.py:71
+#: nfdcore/initmodel.py:81
 msgid "Dawn"
 msgstr ""
 
-#: nfdcore/initmodel.py:72
+#: nfdcore/initmodel.py:82
 msgid "Early morning"
 msgstr ""
 
-#: nfdcore/initmodel.py:73
+#: nfdcore/initmodel.py:83
 msgid "Morning"
 msgstr ""
 
-#: nfdcore/initmodel.py:74
+#: nfdcore/initmodel.py:84
 msgid "Late morning"
 msgstr ""
 
-#: nfdcore/initmodel.py:75
+#: nfdcore/initmodel.py:85
 msgid "Noon"
 msgstr ""
 
-#: nfdcore/initmodel.py:76
+#: nfdcore/initmodel.py:86
 msgid "Early afternoon"
 msgstr ""
 
-#: nfdcore/initmodel.py:77
+#: nfdcore/initmodel.py:87
 msgid "Afternoon"
 msgstr ""
 
-#: nfdcore/initmodel.py:78
+#: nfdcore/initmodel.py:88
 msgid "Late afternoon"
 msgstr ""
 
-#: nfdcore/initmodel.py:79
+#: nfdcore/initmodel.py:89
 msgid "Dusk"
 msgstr ""
 
-#: nfdcore/initmodel.py:80
+#: nfdcore/initmodel.py:90
 msgid "Early evening"
 msgstr ""
 
-#: nfdcore/initmodel.py:81
+#: nfdcore/initmodel.py:91
 msgid "Evening"
 msgstr ""
 
-#: nfdcore/initmodel.py:82
+#: nfdcore/initmodel.py:92
 msgid "Late evening"
 msgstr ""
 
-#: nfdcore/initmodel.py:83
+#: nfdcore/initmodel.py:93
 msgid "Late night/after midnight"
 msgstr ""
 
-#: nfdcore/initmodel.py:84
+#: nfdcore/initmodel.py:94
 msgid "Unknown"
 msgstr ""
 
-#: nfdcore/initmodel.py:88
+#: nfdcore/initmodel.py:98
 msgid "Early spring"
 msgstr ""
 
-#: nfdcore/initmodel.py:89
+#: nfdcore/initmodel.py:99
 msgid "Mid spring"
 msgstr ""
 
-#: nfdcore/initmodel.py:90
+#: nfdcore/initmodel.py:100
 msgid "Late spring"
 msgstr ""
 
-#: nfdcore/initmodel.py:91
+#: nfdcore/initmodel.py:101
 msgid "Early summer"
 msgstr ""
 
-#: nfdcore/initmodel.py:92
+#: nfdcore/initmodel.py:102
 msgid "Mid summer"
 msgstr ""
 
-#: nfdcore/initmodel.py:93
+#: nfdcore/initmodel.py:103
 msgid "Late summer"
 msgstr ""
 
-#: nfdcore/initmodel.py:94
+#: nfdcore/initmodel.py:104
 msgid "Early fall"
 msgstr ""
 
-#: nfdcore/initmodel.py:95
+#: nfdcore/initmodel.py:105
 msgid "Mid fall"
 msgstr ""
 
-#: nfdcore/initmodel.py:96
+#: nfdcore/initmodel.py:106
 msgid "Late fall"
 msgstr ""
 
-#: nfdcore/initmodel.py:97
+#: nfdcore/initmodel.py:107
 msgid "Early winter"
 msgstr ""
 
-#: nfdcore/initmodel.py:98
+#: nfdcore/initmodel.py:108
 msgid "Mid winter"
 msgstr ""
 
-#: nfdcore/initmodel.py:99
+#: nfdcore/initmodel.py:109
 msgid "Late winter"
 msgstr ""
 
-#: nfdcore/initmodel.py:103
+#: nfdcore/initmodel.py:113
 msgid "bioblitz"
 msgstr ""
 
-#: nfdcore/initmodel.py:104
+#: nfdcore/initmodel.py:114
 msgid "camera trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:105
+#: nfdcore/initmodel.py:115
 msgid "checking casual observer report"
 msgstr ""
 
-#: nfdcore/initmodel.py:106
+#: nfdcore/initmodel.py:116
 msgid "checking historical record"
 msgstr ""
 
-#: nfdcore/initmodel.py:107
+#: nfdcore/initmodel.py:117
 msgid "incidental"
 msgstr ""
 
-#: nfdcore/initmodel.py:108
+#: nfdcore/initmodel.py:118
 msgid "monitoring, census"
 msgstr ""
 
-#: nfdcore/initmodel.py:109
+#: nfdcore/initmodel.py:119
 msgid "monitoring, initial"
 msgstr ""
 
-#: nfdcore/initmodel.py:110
+#: nfdcore/initmodel.py:120
 msgid "monitoring, long term"
 msgstr ""
 
-#: nfdcore/initmodel.py:111
+#: nfdcore/initmodel.py:121
 msgid "monitoring, property assessment"
 msgstr ""
 
-#: nfdcore/initmodel.py:112
+#: nfdcore/initmodel.py:122
 msgid "searching"
 msgstr ""
 
-#: nfdcore/initmodel.py:116
+#: nfdcore/initmodel.py:126
 msgid "ethanol"
 msgstr ""
 
-#: nfdcore/initmodel.py:117
+#: nfdcore/initmodel.py:127
 msgid "formaldehyde"
 msgstr ""
 
-#: nfdcore/initmodel.py:118
+#: nfdcore/initmodel.py:128
 msgid "formalin"
 msgstr ""
 
-#: nfdcore/initmodel.py:119
+#: nfdcore/initmodel.py:129
 msgid "formalternate"
 msgstr ""
 
-#: nfdcore/initmodel.py:120
+#: nfdcore/initmodel.py:130
 msgid "isopropanol"
 msgstr ""
 
-#: nfdcore/initmodel.py:121 nfdcore/initmodel.py:132
+#: nfdcore/initmodel.py:131 nfdcore/initmodel.py:142 nfdcore/initmodel.py:366
+#: nfdcore/initmodel.py:607 nfdcore/initmodel.py:650
 msgid "N/A"
 msgstr ""
 
-#: nfdcore/initmodel.py:125
+#: nfdcore/initmodel.py:135
 msgid "dried egg shell"
 msgstr ""
 
-#: nfdcore/initmodel.py:126
+#: nfdcore/initmodel.py:136
 msgid "dried/pressed/mounted"
 msgstr ""
 
-#: nfdcore/initmodel.py:127
+#: nfdcore/initmodel.py:137
 msgid "dried skeletal element"
 msgstr ""
 
-#: nfdcore/initmodel.py:128
+#: nfdcore/initmodel.py:138
 msgid "dried skeleton"
 msgstr ""
 
-#: nfdcore/initmodel.py:129
+#: nfdcore/initmodel.py:139
 msgid "dried skin"
 msgstr ""
 
-#: nfdcore/initmodel.py:130
+#: nfdcore/initmodel.py:140
 msgid "frozen"
 msgstr ""
 
-#: nfdcore/initmodel.py:131
+#: nfdcore/initmodel.py:141
 msgid "vial"
 msgstr ""
 
-#: nfdcore/initmodel.py:136
+#: nfdcore/initmodel.py:146
 msgid "female"
 msgstr ""
 
-#: nfdcore/initmodel.py:137
+#: nfdcore/initmodel.py:147
 msgid "female (parthenogenic)"
 msgstr ""
 
-#: nfdcore/initmodel.py:138
+#: nfdcore/initmodel.py:148
 msgid "gynandromorphic"
 msgstr ""
 
-#: nfdcore/initmodel.py:139
+#: nfdcore/initmodel.py:149
 msgid "hermaphroditic"
 msgstr ""
 
-#: nfdcore/initmodel.py:140
+#: nfdcore/initmodel.py:150
 msgid "hermaphroditic (parthenogenic)"
 msgstr ""
 
-#: nfdcore/initmodel.py:141
+#: nfdcore/initmodel.py:151
 msgid "male"
 msgstr ""
 
-#: nfdcore/initmodel.py:142
+#: nfdcore/initmodel.py:152
 msgid "n/a"
 msgstr ""
 
-#: nfdcore/initmodel.py:143
+#: nfdcore/initmodel.py:153 nfdcore/initmodel.py:403 nfdcore/initmodel.py:441
+#: nfdcore/initmodel.py:458 nfdcore/initmodel.py:495
 msgid "unknown"
 msgstr ""
 
-#: nfdcore/initmodel.py:147
+#: nfdcore/initmodel.py:157
 msgid "aspirator/vacuum"
 msgstr ""
 
-#: nfdcore/initmodel.py:148
+#: nfdcore/initmodel.py:158
 msgid "audio transect"
 msgstr ""
 
-#: nfdcore/initmodel.py:149
+#: nfdcore/initmodel.py:159
 msgid "baited box/cage trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:150
+#: nfdcore/initmodel.py:160
 msgid "Berlese funnel"
 msgstr ""
 
-#: nfdcore/initmodel.py:151
+#: nfdcore/initmodel.py:161
 msgid "fogger"
 msgstr ""
 
-#: nfdcore/initmodel.py:152
+#: nfdcore/initmodel.py:162
 msgid "funnel trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:153
+#: nfdcore/initmodel.py:163
 msgid "glue trap alone"
 msgstr ""
 
-#: nfdcore/initmodel.py:154
+#: nfdcore/initmodel.py:164
 msgid "glue trap with drift fence"
 msgstr ""
 
-#: nfdcore/initmodel.py:155
+#: nfdcore/initmodel.py:165
 msgid "hand collecting"
 msgstr ""
 
-#: nfdcore/initmodel.py:156
+#: nfdcore/initmodel.py:166
 msgid "harp trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:157
+#: nfdcore/initmodel.py:167
 msgid "light trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:158
+#: nfdcore/initmodel.py:168
 msgid "line transect"
 msgstr ""
 
-#: nfdcore/initmodel.py:159
+#: nfdcore/initmodel.py:169
 msgid "Malaise trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:160
+#: nfdcore/initmodel.py:170
 msgid "mist net"
 msgstr ""
 
-#: nfdcore/initmodel.py:161
+#: nfdcore/initmodel.py:171
 msgid "mustard soil extraction"
 msgstr ""
 
-#: nfdcore/initmodel.py:162
+#: nfdcore/initmodel.py:172
 msgid "pitfall trap alone"
 msgstr ""
 
-#: nfdcore/initmodel.py:163
+#: nfdcore/initmodel.py:173
 msgid "pitfall trap with drift fence"
 msgstr ""
 
-#: nfdcore/initmodel.py:164
+#: nfdcore/initmodel.py:174
 msgid "snare"
 msgstr ""
 
-#: nfdcore/initmodel.py:165
+#: nfdcore/initmodel.py:175
 msgid "sound recording"
 msgstr ""
 
-#: nfdcore/initmodel.py:166
+#: nfdcore/initmodel.py:176
 msgid "stovepipe trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:167
+#: nfdcore/initmodel.py:177
 msgid "wildlife camera"
 msgstr ""
 
-#: nfdcore/initmodel.py:168
+#: nfdcore/initmodel.py:178
 msgid "windowpane trap"
 msgstr ""
 
-#: nfdcore/initmodel.py:169
+#: nfdcore/initmodel.py:179
 msgid "yellow pan trap"
+msgstr ""
+
+#: nfdcore/initmodel.py:183
+msgid "Extirpated"
+msgstr ""
+
+#: nfdcore/initmodel.py:183
+msgid "No longer found in Cleveland Metroparks or its watersheds"
+msgstr ""
+
+#: nfdcore/initmodel.py:184
+msgid "Unique"
+msgstr ""
+
+#: nfdcore/initmodel.py:184
+msgid "Single occurrence in Park System or its watersheds"
+msgstr ""
+
+#: nfdcore/initmodel.py:185
+msgid "Exclusive"
+msgstr ""
+
+#: nfdcore/initmodel.py:185
+msgid "Several occurrences but in a single watershed"
+msgstr ""
+
+#: nfdcore/initmodel.py:186
+msgid "Restricted"
+msgstr ""
+
+#: nfdcore/initmodel.py:186
+msgid ""
+"Several occurrences, more than one watershed, but all east, west or south"
+msgstr ""
+
+#: nfdcore/initmodel.py:187
+msgid "Occassional"
+msgstr ""
+
+#: nfdcore/initmodel.py:187
+msgid "Several occurrences, more than one watershed, any area"
+msgstr ""
+
+#: nfdcore/initmodel.py:188
+msgid "Common"
+msgstr ""
+
+#: nfdcore/initmodel.py:188
+msgid "Common in Cleveland Metroparks but rare elsewhere"
+msgstr ""
+
+#: nfdcore/initmodel.py:189
+msgid "Special interest"
+msgstr ""
+
+#: nfdcore/initmodel.py:189
+msgid "Tracked for specific purposes"
+msgstr ""
+
+#: nfdcore/initmodel.py:193
+msgid "Element extant only in cultivation/captivity"
+msgstr ""
+
+#: nfdcore/initmodel.py:194
+msgid "Globally unranked"
+msgstr ""
+
+#: nfdcore/initmodel.py:195
+msgid "Globally critically imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:196
+msgid "Globally imperiled/critically imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:197
+msgid "Globally imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:198
+msgid "Globally vulnerable/imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:199
+msgid "Globally vulnerable"
+msgstr ""
+
+#: nfdcore/initmodel.py:200
+msgid "Globally vulnerable/apparently secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:201
+msgid "Globally apparently secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:202
+msgid "Globally secure/apparently secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:203
+msgid "Globally demonstrably secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:204
+msgid "Historically known, hoping to rediscover"
+msgstr ""
+
+#: nfdcore/initmodel.py:205
+msgid "Globally unrankable"
+msgstr ""
+
+#: nfdcore/initmodel.py:209
+msgid "Critically imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:210
+msgid ""
+"Breeding population critically imperiled, non-breeding population imperiled "
+"in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:211 nfdcore/initmodel.py:217
+msgid ""
+"Breeding population imperiled, non-breeding population rare or uncommon in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:212
+msgid ""
+"Breeding population critically imperiled, non-breeding population apparently "
+"secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:213
+msgid ""
+"Breeding population critically imperiled, non-breeding population "
+"demonstrably secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:214
+msgid "Between imperiled and critically imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:215
+msgid "Imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:216
+msgid ""
+"Breeding population imperiled, non-breeding population critically imperiled "
+"in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:218
+msgid ""
+"Breeding population imperiled, non-breeding population apparently secure in "
+"US"
+msgstr ""
+
+#: nfdcore/initmodel.py:219
+msgid ""
+"Breeding population imperiled, non-breeding population demonstrably secure "
+"in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:220
+msgid "Between imperiled and rare in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:221
+msgid "Rare or uncommon in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:222
+msgid ""
+"Breeding population rare or uncommon, non-breeding population critically "
+"imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:223
+msgid ""
+"Breeding population rare or uncommon, non-breeding population imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:224
+msgid ""
+"Breeding population rare or uncommon, non-breeding population apparently "
+"secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:225
+msgid ""
+"Breeding population rare or uncommon, non-breeding population demonstrably "
+"secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:226
+msgid "Between uncommon and common in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:227
+msgid "Widespread, abundant, apparently secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:228
+msgid ""
+"Breeding population apparently secure, non-breeding population criticaly "
+"imperiled in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:229
+msgid ""
+"Breeding population apparently secure, non-breeding population imperiled in "
+"US"
+msgstr ""
+
+#: nfdcore/initmodel.py:230
+msgid ""
+"Breeding population apparently secure, non-breeding population rae or "
+"uncommon in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:231
+msgid ""
+"Breeding population apparently secure, non-breeding population demonstrably "
+"secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:232
+msgid "Assumed secure to demonstrably secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:233
+msgid "Demonstrably widespread,abundant and secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:234
+msgid ""
+"Breeding population demonstrably secure, non-breeding population imperiled "
+"in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:235
+msgid ""
+"Breeding population demonstrably secure, non-breeding population rare or "
+"uncommon in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:236
+msgid ""
+"Breeding population demonstrably secure, non-breeding population apparently "
+"secure in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:237
+msgid "Accidental in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:238
+msgid "Exotic species established in the US"
+msgstr ""
+
+#: nfdcore/initmodel.py:239
+msgid "Historical occurrences only but it is suspected of still being in US"
+msgstr ""
+
+#: nfdcore/initmodel.py:240 nfdcore/initmodel.py:277
+msgid "Unrankable, more information needed"
+msgstr ""
+
+#: nfdcore/initmodel.py:241
+msgid "Not a conservation concern in the US"
+msgstr ""
+
+#: nfdcore/initmodel.py:245
+msgid "Critically imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:246
+msgid ""
+"Breeding population criticaly imperiled, non-breeding population imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:247 nfdcore/initmodel.py:253
+msgid "Breeding population imperiled, non-breeding population rare or uncommon"
+msgstr ""
+
+#: nfdcore/initmodel.py:248
+msgid ""
+"Breeding population critically imperiled, non-breeding population apparently "
+"secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:249
+msgid ""
+"Breeding population criticaly imperiled, non-breeding population "
+"demonstrably secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:250
+msgid "Almost critically imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:251
+msgid "Imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:252
+msgid ""
+"Breeding population imperiled, non-breeding population critically imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:254
+msgid ""
+"Breeding population imperiled, non-breeding population apparently secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:255
+msgid ""
+"Breeding population imperiled, non-breeding population demonstrably secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:256
+msgid "Rare to almost imperiled in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:257
+msgid "Vulnerable because of rarity"
+msgstr ""
+
+#: nfdcore/initmodel.py:258
+msgid ""
+"Breeding population rare or uncommon, non-breeding population critically "
+"imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:259
+msgid "Breeding population rare or uncommon, non-breeding population imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:260
+msgid ""
+"Breeding population rare or uncommon, non-breeding population apparently "
+"secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:261
+msgid ""
+"Breeding population rare or uncommon, non-breeding population demonstrably "
+"secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:262
+msgid "Between uncommon and common in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:263
+msgid "Widespread, abundant, apparently secure in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:264
+msgid ""
+"Breeding population apparently secure, non-breeding population criticaly "
+"imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:265
+msgid ""
+"Breeding population apparently secure, non-breeding population imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:266
+msgid ""
+"Breeding population apparently secure, non-breeding population rae or "
+"uncommon"
+msgstr ""
+
+#: nfdcore/initmodel.py:267
+msgid ""
+"Breeding population apparently secure, non-breeding population demonstrably "
+"secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:268
+msgid "Almost completely demonstrably secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:269
+msgid "Demonstrably widespread,abundant and secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:270
+msgid ""
+"Breeding population demonstrably secure, non-breeding population imperiled"
+msgstr ""
+
+#: nfdcore/initmodel.py:271
+msgid ""
+"Breeding population demonstrably secure, non-breeding population rare or "
+"uncommon"
+msgstr ""
+
+#: nfdcore/initmodel.py:272
+msgid ""
+"Breeding population demonstrably secure, non-breeding population apparently "
+"secure"
+msgstr ""
+
+#: nfdcore/initmodel.py:273
+msgid "Accidental in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:274
+msgid "Exotic species established in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:275
+msgid ""
+"Historical occurrences only but it is suspected of still being in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:276
+msgid "Reported in the state but occurrence(s) not documented"
+msgstr ""
+
+#: nfdcore/initmodel.py:278
+msgid "Not a conservation concern in the state"
+msgstr ""
+
+#: nfdcore/initmodel.py:282
+msgid "A-Added"
+msgstr ""
+
+#: nfdcore/initmodel.py:282
+msgid "Recently added for review"
+msgstr ""
+
+#: nfdcore/initmodel.py:283
+msgid "E-State Endangered"
+msgstr ""
+
+#: nfdcore/initmodel.py:283
+msgid "Threatened with extirpation in Ohio"
+msgstr ""
+
+#: nfdcore/initmodel.py:284
+msgid "ET-Extinct"
+msgstr ""
+
+#: nfdcore/initmodel.py:284
+msgid "No longer exists anywhere"
+msgstr ""
+
+#: nfdcore/initmodel.py:285
+msgid "P-Potentially Threatened"
+msgstr ""
+
+#: nfdcore/initmodel.py:285
+msgid "There are factors that could become threats in Ohio"
+msgstr ""
+
+#: nfdcore/initmodel.py:286
+msgid "SC-Species of concern"
+msgstr ""
+
+#: nfdcore/initmodel.py:286
+msgid "May become threatened"
+msgstr ""
+
+#: nfdcore/initmodel.py:287
+msgid "SI-Special interest"
+msgstr ""
+
+#: nfdcore/initmodel.py:287
+msgid "Species at edge of distribution"
+msgstr ""
+
+#: nfdcore/initmodel.py:288
+msgid "T-State Threatened"
+msgstr ""
+
+#: nfdcore/initmodel.py:288
+msgid "There is a threat to its survival in Ohio"
+msgstr ""
+
+#: nfdcore/initmodel.py:289
+msgid "X-Extirpated"
+msgstr ""
+
+#: nfdcore/initmodel.py:289
+msgid "Known to no longer exist in Ohio"
+msgstr ""
+
+#: nfdcore/initmodel.py:290
+msgid "XP-Presumed Extirpated"
+msgstr ""
+
+#: nfdcore/initmodel.py:290
+msgid "May no longer exist in Ohio"
+msgstr ""
+
+#: nfdcore/initmodel.py:294
+msgid "Agaric (gills)"
+msgstr ""
+
+#: nfdcore/initmodel.py:295
+msgid "Bird's Nest (peridioles)"
+msgstr ""
+
+#: nfdcore/initmodel.py:296
+msgid "Bolete (tubes)"
+msgstr ""
+
+#: nfdcore/initmodel.py:297
+msgid "Chanterelle (no true gills)"
+msgstr ""
+
+#: nfdcore/initmodel.py:298
+msgid "Club or Coral (branches)"
+msgstr ""
+
+#: nfdcore/initmodel.py:299
+msgid "Crust (no pores or teeth)"
+msgstr ""
+
+#: nfdcore/initmodel.py:300
+msgid "Cup (no peridioles)"
+msgstr ""
+
+#: nfdcore/initmodel.py:301
+msgid "Earth tongue"
+msgstr ""
+
+#: nfdcore/initmodel.py:302
+msgid "False truffle (gleba not marbled or labyrinthoid)"
+msgstr ""
+
+#: nfdcore/initmodel.py:303
+msgid "Flask"
+msgstr ""
+
+#: nfdcore/initmodel.py:304
+msgid "Jelly (gelatinous)"
+msgstr ""
+
+#: nfdcore/initmodel.py:305
+msgid "Morel or false morel (elfin saddle)"
+msgstr ""
+
+#: nfdcore/initmodel.py:306
+msgid "Polypore (pores or gill-like)"
+msgstr ""
+
+#: nfdcore/initmodel.py:307
+msgid "Puffball (internal spores)"
+msgstr ""
+
+#: nfdcore/initmodel.py:308
+msgid "Stinkhorn (slimy)"
+msgstr ""
+
+#: nfdcore/initmodel.py:309
+msgid "Teeth (tooth-like projections)"
+msgstr ""
+
+#: nfdcore/initmodel.py:310
+msgid "Truffle (marbled or convoluted gleba)"
+msgstr ""
+
+#: nfdcore/initmodel.py:314
+msgid "adhesive tag color"
+msgstr ""
+
+#: nfdcore/initmodel.py:315
+msgid "adhesive tag number"
+msgstr ""
+
+#: nfdcore/initmodel.py:316
+msgid "band number"
+msgstr ""
+
+#: nfdcore/initmodel.py:317
+msgid "collar color"
+msgstr ""
+
+#: nfdcore/initmodel.py:318
+msgid "collar number"
+msgstr ""
+
+#: nfdcore/initmodel.py:319
+msgid "colorband pattern"
+msgstr ""
+
+#: nfdcore/initmodel.py:320
+msgid "dot color"
+msgstr ""
+
+#: nfdcore/initmodel.py:321
+msgid "dot pattern"
+msgstr ""
+
+#: nfdcore/initmodel.py:322
+msgid "ear clip"
+msgstr ""
+
+#: nfdcore/initmodel.py:323
+msgid "ear tag"
+msgstr ""
+
+#: nfdcore/initmodel.py:324
+msgid "finclip"
+msgstr ""
+
+#: nfdcore/initmodel.py:325
+msgid "microchip number"
+msgstr ""
+
+#: nfdcore/initmodel.py:326 nfdcore/initmodel.py:349
+msgid "none"
+msgstr ""
+
+#: nfdcore/initmodel.py:327
+msgid "PIT tag"
+msgstr ""
+
+#: nfdcore/initmodel.py:328
+msgid "shell notch"
+msgstr ""
+
+#: nfdcore/initmodel.py:329
+msgid "tail clip"
+msgstr ""
+
+#: nfdcore/initmodel.py:330
+msgid "toe clip"
+msgstr ""
+
+#: nfdcore/initmodel.py:331
+msgid "wing tag color"
+msgstr ""
+
+#: nfdcore/initmodel.py:332
+msgid "wing tag number"
+msgstr ""
+
+#: nfdcore/initmodel.py:336
+msgid "discolorations"
+msgstr ""
+
+#: nfdcore/initmodel.py:337
+msgid "injuries"
+msgstr ""
+
+#: nfdcore/initmodel.py:338
+msgid "evidence of captivity"
+msgstr ""
+
+#: nfdcore/initmodel.py:339
+msgid "deformities"
+msgstr ""
+
+#: nfdcore/initmodel.py:340
+msgid "erosions"
+msgstr ""
+
+#: nfdcore/initmodel.py:341
+msgid "tumors"
+msgstr ""
+
+#: nfdcore/initmodel.py:342
+msgid "fungi"
+msgstr ""
+
+#: nfdcore/initmodel.py:343
+msgid "lamprey scars"
+msgstr ""
+
+#: nfdcore/initmodel.py:344
+msgid "parasites"
+msgstr ""
+
+#: nfdcore/initmodel.py:345
+msgid "ranavirus"
+msgstr ""
+
+#: nfdcore/initmodel.py:346
+msgid "chytrid"
+msgstr ""
+
+#: nfdcore/initmodel.py:347
+msgid "VHS"
+msgstr ""
+
+#: nfdcore/initmodel.py:348
+msgid "other abnormalities"
+msgstr ""
+
+#: nfdcore/initmodel.py:353
+msgid "automated sound recording"
+msgstr ""
+
+#: nfdcore/initmodel.py:354
+msgid "D-frame"
+msgstr ""
+
+#: nfdcore/initmodel.py:355
+msgid "dipnet"
+msgstr ""
+
+#: nfdcore/initmodel.py:356
+msgid "electrofishing"
+msgstr ""
+
+#: nfdcore/initmodel.py:357
+msgid "gill net"
+msgstr ""
+
+#: nfdcore/initmodel.py:358
+msgid "hand caught"
+msgstr ""
+
+#: nfdcore/initmodel.py:359
+msgid "Hester-Dendy"
+msgstr ""
+
+#: nfdcore/initmodel.py:360
+msgid "hookline"
+msgstr ""
+
+#: nfdcore/initmodel.py:361
+msgid "leaf bag"
+msgstr ""
+
+#: nfdcore/initmodel.py:362
+msgid "seine"
+msgstr ""
+
+#: nfdcore/initmodel.py:363
+msgid "surber sampler"
+msgstr ""
+
+#: nfdcore/initmodel.py:364
+msgid "sweep net"
+msgstr ""
+
+#: nfdcore/initmodel.py:365
+msgid "trammel net"
+msgstr ""
+
+#: nfdcore/initmodel.py:371
+msgid "warm water habitat"
+msgstr ""
+
+#: nfdcore/initmodel.py:372
+msgid "cold water habitat"
+msgstr ""
+
+#: nfdcore/initmodel.py:373
+msgid "exceptional warm water habitat"
+msgstr ""
+
+#: nfdcore/initmodel.py:374
+msgid "no designated use"
+msgstr ""
+
+#: nfdcore/initmodel.py:378
+msgid "manmade, managed"
+msgstr ""
+
+#: nfdcore/initmodel.py:379
+msgid "manmade, unmanaged"
+msgstr ""
+
+#: nfdcore/initmodel.py:380
+msgid "natural, altered, not restored"
+msgstr ""
+
+#: nfdcore/initmodel.py:381
+msgid "natural, past restoration, recovered"
+msgstr ""
+
+#: nfdcore/initmodel.py:382
+msgid "natural, past restoration, recovering"
+msgstr ""
+
+#: nfdcore/initmodel.py:383
+msgid "natural, recent restoration"
+msgstr ""
+
+#: nfdcore/initmodel.py:384
+msgid "natural, unaltered"
+msgstr ""
+
+#: nfdcore/initmodel.py:388
+msgid "A- Abundant (10-50 individuals)"
+msgstr ""
+
+#: nfdcore/initmodel.py:389
+msgid "C- Common (3-9 individuals)"
+msgstr ""
+
+#: nfdcore/initmodel.py:390
+msgid "R- Rare (<3 individuals)"
+msgstr ""
+
+#: nfdcore/initmodel.py:391
+msgid "V- Very abundant (>50 individuals)"
+msgstr ""
+
+#: nfdcore/initmodel.py:395
+msgid "rheocrene spring"
+msgstr ""
+
+#: nfdcore/initmodel.py:396
+msgid "primary headwater stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:397
+msgid "headwater stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:398
+msgid "high gradient stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:399
+msgid "low gradient stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:400
+msgid "river/large stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:401
+msgid "ditch"
+msgstr ""
+
+#: nfdcore/initmodel.py:402
+msgid "canal"
+msgstr ""
+
+#: nfdcore/initmodel.py:407
+msgid "ephemeral"
+msgstr ""
+
+#: nfdcore/initmodel.py:408
+msgid "intermittent"
+msgstr ""
+
+#: nfdcore/initmodel.py:409
+msgid "interstitial"
+msgstr ""
+
+#: nfdcore/initmodel.py:410
+msgid "perennial"
+msgstr ""
+
+#: nfdcore/initmodel.py:414 nfdcore/initmodel.py:492
+msgid "air column"
+msgstr ""
+
+#: nfdcore/initmodel.py:415
+msgid "canopy"
+msgstr ""
+
+#: nfdcore/initmodel.py:416
+msgid "cave"
+msgstr ""
+
+#: nfdcore/initmodel.py:417
+msgid "duff"
+msgstr ""
+
+#: nfdcore/initmodel.py:418
+msgid "edge of pond or lake"
+msgstr ""
+
+#: nfdcore/initmodel.py:419
+msgid "edge of stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:420
+msgid "edge of wetland"
+msgstr ""
+
+#: nfdcore/initmodel.py:421
+msgid "habitat edge"
+msgstr ""
+
+#: nfdcore/initmodel.py:422
+msgid "habitat interior"
+msgstr ""
+
+#: nfdcore/initmodel.py:423
+msgid "herbaceous layer"
+msgstr ""
+
+#: nfdcore/initmodel.py:424
+msgid "leaf litter"
+msgstr ""
+
+#: nfdcore/initmodel.py:425
+msgid "mineral soil"
+msgstr ""
+
+#: nfdcore/initmodel.py:426
+msgid "organic soil"
+msgstr ""
+
+#: nfdcore/initmodel.py:427
+msgid "rock outcrop or cliff"
+msgstr ""
+
+#: nfdcore/initmodel.py:428
+msgid "understory, bushes"
+msgstr ""
+
+#: nfdcore/initmodel.py:429
+msgid "understory, saplings"
+msgstr ""
+
+#: nfdcore/initmodel.py:430
+msgid "vine tangle"
+msgstr ""
+
+#: nfdcore/initmodel.py:431 nfdcore/initmodel.py:472 nfdcore/initmodel.py:543
+msgid "woody debris"
+msgstr ""
+
+#: nfdcore/initmodel.py:435 nfdcore/initmodel.py:499
+msgid "natural"
+msgstr ""
+
+#: nfdcore/initmodel.py:436 nfdcore/initmodel.py:502
+msgid "manmade, stormwater"
+msgstr ""
+
+#: nfdcore/initmodel.py:437
+msgid "manmade, quarry"
+msgstr ""
+
+#: nfdcore/initmodel.py:438
+msgid "manmade, aesthetic"
+msgstr ""
+
+#: nfdcore/initmodel.py:439
+msgid "manmade, impoundment"
+msgstr ""
+
+#: nfdcore/initmodel.py:440
+msgid "manmade, general"
+msgstr ""
+
+#: nfdcore/initmodel.py:445
+msgid "fishing"
+msgstr ""
+
+#: nfdcore/initmodel.py:446
+msgid "swimming"
+msgstr ""
+
+#: nfdcore/initmodel.py:447
+msgid "brood stock"
+msgstr ""
+
+#: nfdcore/initmodel.py:448
+msgid "irrigation"
+msgstr ""
+
+#: nfdcore/initmodel.py:449
+msgid "stormwater retention"
+msgstr ""
+
+#: nfdcore/initmodel.py:450
+msgid "reservoir"
+msgstr ""
+
+#: nfdcore/initmodel.py:451
+msgid "boating and kayaking"
+msgstr ""
+
+#: nfdcore/initmodel.py:452
+msgid "ice skating"
+msgstr ""
+
+#: nfdcore/initmodel.py:453
+msgid "aesthetic"
+msgstr ""
+
+#: nfdcore/initmodel.py:454
+msgid "quarry"
+msgstr ""
+
+#: nfdcore/initmodel.py:455
+msgid "grain mill"
+msgstr ""
+
+#: nfdcore/initmodel.py:456
+msgid "mitigation"
+msgstr ""
+
+#: nfdcore/initmodel.py:457
+msgid "wildlife sanctuary"
+msgstr ""
+
+#: nfdcore/initmodel.py:462
+msgid "brush"
+msgstr ""
+
+#: nfdcore/initmodel.py:463
+msgid "cliff"
+msgstr ""
+
+#: nfdcore/initmodel.py:464
+msgid "grass"
+msgstr ""
+
+#: nfdcore/initmodel.py:465
+msgid "gravel"
+msgstr ""
+
+#: nfdcore/initmodel.py:466
+msgid "manmade,concrete"
+msgstr ""
+
+#: nfdcore/initmodel.py:467
+msgid "manmade, riprap"
+msgstr ""
+
+#: nfdcore/initmodel.py:468
+msgid "mud flats"
+msgstr ""
+
+#: nfdcore/initmodel.py:469
+msgid "rock"
+msgstr ""
+
+#: nfdcore/initmodel.py:470
+msgid "sand"
+msgstr ""
+
+#: nfdcore/initmodel.py:471
+msgid "wooded"
+msgstr ""
+
+#: nfdcore/initmodel.py:476
+msgid "shoreline"
+msgstr ""
+
+#: nfdcore/initmodel.py:477
+msgid "beach"
+msgstr ""
+
+#: nfdcore/initmodel.py:478
+msgid "shallow water"
+msgstr ""
+
+#: nfdcore/initmodel.py:479
+msgid "deep water"
+msgstr ""
+
+#: nfdcore/initmodel.py:480
+msgid "overhanging vegetation"
+msgstr ""
+
+#: nfdcore/initmodel.py:481
+msgid "aquatic vegetation"
+msgstr ""
+
+#: nfdcore/initmodel.py:482
+msgid "muck/sediment"
+msgstr ""
+
+#: nfdcore/initmodel.py:483 nfdcore/initmodel.py:542
+msgid "water column"
+msgstr ""
+
+#: nfdcore/initmodel.py:484
+msgid "near-shore"
+msgstr ""
+
+#: nfdcore/initmodel.py:485
+msgid "breakwall"
+msgstr ""
+
+#: nfdcore/initmodel.py:486
+msgid "marina"
+msgstr ""
+
+#: nfdcore/initmodel.py:487
+msgid "dock"
+msgstr ""
+
+#: nfdcore/initmodel.py:488
+msgid "bay"
+msgstr ""
+
+#: nfdcore/initmodel.py:489
+msgid "intake"
+msgstr ""
+
+#: nfdcore/initmodel.py:490
+msgid "outflow"
+msgstr ""
+
+#: nfdcore/initmodel.py:491 nfdcore/initmodel.py:537
+msgid "surface"
+msgstr ""
+
+#: nfdcore/initmodel.py:493 nfdcore/initmodel.py:535
+msgid "riparian zone"
+msgstr ""
+
+#: nfdcore/initmodel.py:494
+msgid "bottom"
+msgstr ""
+
+#: nfdcore/initmodel.py:500
+msgid "enhanced"
+msgstr ""
+
+#: nfdcore/initmodel.py:501
+msgid "manmade, mitigation"
+msgstr ""
+
+#: nfdcore/initmodel.py:503
+msgid "restored"
+msgstr ""
+
+#: nfdcore/initmodel.py:507
+msgid "coastal"
+msgstr ""
+
+#: nfdcore/initmodel.py:508
+msgid "floodplain"
+msgstr ""
+
+#: nfdcore/initmodel.py:509
+msgid "upland"
+msgstr ""
+
+#: nfdcore/initmodel.py:513
+msgid "isolated"
+msgstr ""
+
+#: nfdcore/initmodel.py:514
+msgid "riparian/floodplain"
+msgstr ""
+
+#: nfdcore/initmodel.py:515
+msgid "upland mosaic"
+msgstr ""
+
+#: nfdcore/initmodel.py:519
+msgid "upland groundwater"
+msgstr ""
+
+#: nfdcore/initmodel.py:520
+msgid "stormwater"
+msgstr ""
+
+#: nfdcore/initmodel.py:521
+msgid "perennial stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:522
+msgid "seasonal stream"
+msgstr ""
+
+#: nfdcore/initmodel.py:523
+msgid "floodplain groundwater"
+msgstr ""
+
+#: nfdcore/initmodel.py:524
+msgid "infrastructure (drain tile, pipe, leak, other)"
+msgstr ""
+
+#: nfdcore/initmodel.py:528
+msgid "air"
+msgstr ""
+
+#: nfdcore/initmodel.py:529
+msgid "boardwalk"
+msgstr ""
+
+#: nfdcore/initmodel.py:530
+msgid "dam "
+msgstr ""
+
+#: nfdcore/initmodel.py:531
+msgid "edge/margin"
+msgstr ""
+
+#: nfdcore/initmodel.py:532
+msgid "litter"
+msgstr ""
+
+#: nfdcore/initmodel.py:533
+msgid "muck"
+msgstr ""
+
+#: nfdcore/initmodel.py:534
+msgid "open water"
+msgstr ""
+
+#: nfdcore/initmodel.py:536
+msgid "sediment"
+msgstr ""
+
+#: nfdcore/initmodel.py:538
+msgid "vegetation, emergent"
+msgstr ""
+
+#: nfdcore/initmodel.py:539
+msgid "vegetation, floating"
+msgstr ""
+
+#: nfdcore/initmodel.py:540
+msgid "vegetation, submerged"
+msgstr ""
+
+#: nfdcore/initmodel.py:541
+msgid "vegetation, terrestrial"
+msgstr ""
+
+#: nfdcore/initmodel.py:547
+msgid "Decaying wood"
+msgstr ""
+
+#: nfdcore/initmodel.py:548
+msgid "Droppings"
+msgstr ""
+
+#: nfdcore/initmodel.py:549
+msgid "Field or prairie"
+msgstr ""
+
+#: nfdcore/initmodel.py:550
+msgid "Forest soil"
+msgstr ""
+
+#: nfdcore/initmodel.py:551
+msgid "Lawn"
+msgstr ""
+
+#: nfdcore/initmodel.py:552
+msgid "Living plant"
+msgstr ""
+
+#: nfdcore/initmodel.py:553 nfdcore/initmodel.py:639
+msgid "Other"
+msgstr ""
+
+#: nfdcore/initmodel.py:554
+msgid "Under water"
+msgstr ""
+
+#: nfdcore/initmodel.py:558
+msgid "Cellular slime mold"
+msgstr ""
+
+#: nfdcore/initmodel.py:558
+msgid "Dictyostelia"
+msgstr ""
+
+#: nfdcore/initmodel.py:559
+msgid "Plasmodial slime mold"
+msgstr ""
+
+#: nfdcore/initmodel.py:559
+msgid "Myxogastria"
+msgstr ""
+
+#: nfdcore/initmodel.py:560
+msgid "Slime net"
+msgstr ""
+
+#: nfdcore/initmodel.py:560
+msgid "Protostelia"
+msgstr ""
+
+#: nfdcore/initmodel.py:564
+msgid "vegetative"
+msgstr ""
+
+#: nfdcore/initmodel.py:565
+msgid "immature ovulate cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:566
+msgid "mature ovulate cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:567
+msgid "spent ovulate cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:568
+msgid "immature pollen cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:569
+msgid "mature pollen cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:570
+msgid "spent pollen cones"
+msgstr ""
+
+#: nfdcore/initmodel.py:574
+msgid "Growing gametophyte"
+msgstr ""
+
+#: nfdcore/initmodel.py:575
+msgid "Reproductive fronds, immature"
+msgstr ""
+
+#: nfdcore/initmodel.py:576
+msgid "Reproductive fronds, mature"
+msgstr ""
+
+#: nfdcore/initmodel.py:577
+msgid "Rhizome"
+msgstr ""
+
+#: nfdcore/initmodel.py:578
+msgid "Vegetative fronds"
+msgstr ""
+
+#: nfdcore/initmodel.py:582
+msgid "Buds"
+msgstr ""
+
+#: nfdcore/initmodel.py:583
+msgid "Dispersed fruit/seed"
+msgstr ""
+
+#: nfdcore/initmodel.py:584
+msgid "Flowers"
+msgstr ""
+
+#: nfdcore/initmodel.py:585
+msgid "Maturing fruit"
+msgstr ""
+
+#: nfdcore/initmodel.py:586
+msgid "Saplings"
+msgstr ""
+
+#: nfdcore/initmodel.py:587
+msgid "Seedlings"
+msgstr ""
+
+#: nfdcore/initmodel.py:588
+msgid "Vegetative growth"
+msgstr ""
+
+#: nfdcore/initmodel.py:592
+msgid "sporophyte"
+msgstr ""
+
+#: nfdcore/initmodel.py:593
+msgid "gametophyte"
+msgstr ""
+
+#: nfdcore/initmodel.py:597
+msgid "100-200"
+msgstr ""
+
+#: nfdcore/initmodel.py:598
+msgid "10-20"
+msgstr ""
+
+#: nfdcore/initmodel.py:599
+msgid ">200"
+msgstr ""
+
+#: nfdcore/initmodel.py:600
+msgid "20-50"
+msgstr ""
+
+#: nfdcore/initmodel.py:601
+msgid "<5"
+msgstr ""
+
+#: nfdcore/initmodel.py:602
+msgid "50-100"
+msgstr ""
+
+#: nfdcore/initmodel.py:603
+msgid "5-10"
+msgstr ""
+
+#: nfdcore/initmodel.py:608
+msgid "mesic"
+msgstr ""
+
+#: nfdcore/initmodel.py:609
+msgid "wet"
+msgstr ""
+
+#: nfdcore/initmodel.py:610
+msgid "wet-mesic"
+msgstr ""
+
+#: nfdcore/initmodel.py:614
+msgid "bare soil"
+msgstr ""
+
+#: nfdcore/initmodel.py:615
+msgid "deep but patchy litter"
+msgstr ""
+
+#: nfdcore/initmodel.py:616
+msgid "deep litter"
+msgstr ""
+
+#: nfdcore/initmodel.py:617
+msgid "exposed bedrock"
+msgstr ""
+
+#: nfdcore/initmodel.py:618
+msgid "loose litter"
+msgstr ""
+
+#: nfdcore/initmodel.py:619
+msgid "sand and gravel"
+msgstr ""
+
+#: nfdcore/initmodel.py:620
+msgid "standing water"
+msgstr ""
+
+#: nfdcore/initmodel.py:624
+msgid "closed canopy"
+msgstr ""
+
+#: nfdcore/initmodel.py:625
+msgid "distinct gap"
+msgstr ""
+
+#: nfdcore/initmodel.py:626
+msgid "open - no canopy"
+msgstr ""
+
+#: nfdcore/initmodel.py:627
+msgid "patchy canopy"
+msgstr ""
+
+#: nfdcore/initmodel.py:631
+msgid "lentic-pond or lake"
+msgstr ""
+
+#: nfdcore/initmodel.py:632
+msgid "lentic-wetland"
+msgstr ""
+
+#: nfdcore/initmodel.py:633
+msgid "lotic"
+msgstr ""
+
+#: nfdcore/initmodel.py:634
+msgid "terrestrial"
+msgstr ""
+
+#: nfdcore/initmodel.py:638
+msgid "Midslope"
+msgstr ""
+
+#: nfdcore/initmodel.py:640
+msgid "Plateau"
+msgstr ""
+
+#: nfdcore/initmodel.py:641
+msgid "Ridge"
+msgstr ""
+
+#: nfdcore/initmodel.py:642
+msgid "Ridgetop"
+msgstr ""
+
+#: nfdcore/initmodel.py:643
+msgid "Toeslope"
+msgstr ""
+
+#: nfdcore/initmodel.py:644
+msgid "U-shaped valley bottom"
+msgstr ""
+
+#: nfdcore/initmodel.py:645
+msgid "V-shaped valley bottom"
+msgstr ""
+
+#: nfdcore/initmodel.py:649
+msgid "east"
+msgstr ""
+
+#: nfdcore/initmodel.py:651
+msgid "north"
+msgstr ""
+
+#: nfdcore/initmodel.py:652
+msgid "northeast"
+msgstr ""
+
+#: nfdcore/initmodel.py:653
+msgid "northwest"
+msgstr ""
+
+#: nfdcore/initmodel.py:654
+msgid "south"
+msgstr ""
+
+#: nfdcore/initmodel.py:655
+msgid "southeast"
+msgstr ""
+
+#: nfdcore/initmodel.py:656
+msgid "southwest"
+msgstr ""
+
+#: nfdcore/initmodel.py:657
+msgid "west"
+msgstr ""
+
+#: nfdcore/initmodel.py:661
+msgid "10 - 20"
+msgstr ""
+
+#: nfdcore/initmodel.py:662
+msgid "20 - 30"
+msgstr ""
+
+#: nfdcore/initmodel.py:663
+msgid "30 - 40"
+msgstr ""
+
+#: nfdcore/initmodel.py:664
+msgid "40 - 50 "
+msgstr ""
+
+#: nfdcore/initmodel.py:665
+msgid "Less than 10"
+msgstr ""
+
+#: nfdcore/initmodel.py:666
+msgid "Over 50"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:51
+msgid "occurrencemanagement"
+msgstr "Management"
+
+#: nfdcore/nfdserializers.py:54 nfdcore/nfdserializers.py:91
+msgid "id"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:59 nfdcore/nfdserializers.py:96
+msgid "featuretype"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:64 nfdcore/nfdserializers.py:101
+msgid "featuresubtype"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:69 nfdcore/nfdserializers.py:106
+msgid "released"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:74 nfdcore/nfdserializers.py:111
+msgid "verified"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:79 nfdcore/nfdserializers.py:116
+msgid "inclusion_date"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:84 nfdcore/nfdserializers.py:121
+msgid "version_date"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:128 nfdcore/nfdserializers.py:142
+#: nfdcore/nfdserializers.py:158 nfdcore/nfdserializers.py:173
+#: nfdcore/nfdserializers.py:188 nfdcore/nfdserializers.py:202
+#: nfdcore/nfdserializers.py:218 nfdcore/nfdserializers.py:233
+#: nfdcore/nfdserializers.py:248
+msgid "species"
+msgstr "Species"
+
+#: nfdcore/nfdserializers.py:129 nfdcore/nfdserializers.py:143
+#: nfdcore/nfdserializers.py:159 nfdcore/nfdserializers.py:174
+#: nfdcore/nfdserializers.py:189 nfdcore/nfdserializers.py:203
+#: nfdcore/nfdserializers.py:219 nfdcore/nfdserializers.py:234
+#: nfdcore/nfdserializers.py:249
+msgid "species.element_species"
+msgstr "Element species"
+
+#: nfdcore/nfdserializers.py:131 nfdcore/nfdserializers.py:145
+#: nfdcore/nfdserializers.py:161 nfdcore/nfdserializers.py:176
+#: nfdcore/nfdserializers.py:191 nfdcore/nfdserializers.py:205
+#: nfdcore/nfdserializers.py:221 nfdcore/nfdserializers.py:236
+#: nfdcore/nfdserializers.py:251
+msgid "observation"
+msgstr "Observation"
+
+#: nfdcore/nfdserializers.py:132 nfdcore/nfdserializers.py:146
+#: nfdcore/nfdserializers.py:162 nfdcore/nfdserializers.py:177
+#: nfdcore/nfdserializers.py:192 nfdcore/nfdserializers.py:206
+#: nfdcore/nfdserializers.py:222 nfdcore/nfdserializers.py:237
+#: nfdcore/nfdserializers.py:252
+msgid "observation.reporter"
+msgstr "Observation reporter"
+
+#: nfdcore/nfdserializers.py:133 nfdcore/nfdserializers.py:147
+#: nfdcore/nfdserializers.py:163 nfdcore/nfdserializers.py:178
+#: nfdcore/nfdserializers.py:193 nfdcore/nfdserializers.py:207
+#: nfdcore/nfdserializers.py:223 nfdcore/nfdserializers.py:238
+#: nfdcore/nfdserializers.py:253
+msgid "observation.verifier"
+msgstr "Observation verifier"
+
+#: nfdcore/nfdserializers.py:134 nfdcore/nfdserializers.py:148
+#: nfdcore/nfdserializers.py:164 nfdcore/nfdserializers.py:179
+#: nfdcore/nfdserializers.py:194 nfdcore/nfdserializers.py:208
+#: nfdcore/nfdserializers.py:224 nfdcore/nfdserializers.py:239
+#: nfdcore/nfdserializers.py:254
+msgid "observation.recorder"
+msgstr "Observation recorder"
+
+#: nfdcore/nfdserializers.py:135 nfdcore/nfdserializers.py:149
+#: nfdcore/nfdserializers.py:165 nfdcore/nfdserializers.py:180
+#: nfdcore/nfdserializers.py:195 nfdcore/nfdserializers.py:209
+#: nfdcore/nfdserializers.py:225 nfdcore/nfdserializers.py:240
+#: nfdcore/nfdserializers.py:255
+msgid "voucher"
+msgstr "Voucher"
+
+#: nfdcore/nfdserializers.py:136 nfdcore/nfdserializers.py:150
+#: nfdcore/nfdserializers.py:166 nfdcore/nfdserializers.py:181
+#: nfdcore/nfdserializers.py:196 nfdcore/nfdserializers.py:210
+#: nfdcore/nfdserializers.py:226 nfdcore/nfdserializers.py:241
+#: nfdcore/nfdserializers.py:256
+msgid "details"
+msgstr "Details"
+
+#: nfdcore/nfdserializers.py:137 nfdcore/nfdserializers.py:151
+#: nfdcore/nfdserializers.py:167 nfdcore/nfdserializers.py:182
+#: nfdcore/nfdserializers.py:197 nfdcore/nfdserializers.py:211
+msgid "details.lifestages"
+msgstr "Lifestages"
+
+#: nfdcore/nfdserializers.py:152
+msgid "details.substrate"
+msgstr "Substrate"
+
+#: nfdcore/nfdserializers.py:183
+msgid "details.vegetation"
+msgstr "Vegetation"
+
+#: nfdcore/nfdserializers.py:212 nfdcore/nfdserializers.py:227
+#: nfdcore/nfdserializers.py:242 nfdcore/nfdserializers.py:257
+msgid "details.earthworm_evidence"
+msgstr "Earthworm evidence"
+
+#: nfdcore/nfdserializers.py:213 nfdcore/nfdserializers.py:228
+#: nfdcore/nfdserializers.py:243 nfdcore/nfdserializers.py:258
+msgid "details.disturbance_type"
+msgstr "Disturbance type"
+
+#: nfdcore/nfdserializers.py:729 nfdcore/nfdserializers.py:1115
+msgid "No species was selected"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:950
+msgid "occurrence_fk: Not a valid occurrence"
+msgstr ""
+
+#: nfdcore/nfdserializers.py:1121
+msgid "Geometry is missing"
+msgstr ""
+
+#: nfdcore/views.py:77 nfdcore/views.py:114
+msgid "error"
+msgstr ""
+
+#: nfdcore/views.py:77 nfdcore/views.py:114
+msgid "You don't have permissions to access the occurrence"
 msgstr ""

@@ -156,8 +156,10 @@ class Occurrence(models.Model):
     released_versions = models.IntegerField(default=0)
     occurrence_cat = models.ForeignKey(OccurrenceCategory, on_delete=models.SET_NULL, blank=True, null=True)
     released = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
     observation = models.OneToOneField(OccurrenceObservation, on_delete=models.CASCADE)
+    
     
     class Meta:
         abstract = True
@@ -262,11 +264,6 @@ class Voucher(models.Model):
     repository = models.TextField(null=True, blank=True, default='')
 
 
-"""
-class HabitatCategory(DictionaryTable):
-    pass
-"""
-
 class AquaticHabitatCategory(DictionaryTable):
     pass
 
@@ -277,15 +274,15 @@ class TaxonDetails(models.Model):
 
 def get_details_class(category_code):
     if category_code=='co':
-        return PlantDetails #FIXME
+        return ConiferDetails
     elif category_code=='fe':
-        return PlantDetails #FIXME
+        return FernDetails
     elif category_code=='fl':
-        return PlantDetails #FIXME
+        return FloweringPlantDetails
     elif category_code=='pl':
-        return PlantDetails
+        return TaxonDetails #FIXME
     elif category_code=='mo':
-        return PlantDetails # FIXME Moss
+        return MossDetails
     elif category_code=='fu':
         return TaxonDetails #FIXME
     elif category_code=='sl':
@@ -348,26 +345,26 @@ class TerrestrialStratum(DictionaryTable):
 
 @reversion.register()
 class AnimalLifestages(models.Model):
-    egg = models.IntegerField()
-    egg_mass = models.IntegerField()
-    nest = models.IntegerField()
-    early_instar_larva = models.IntegerField()
-    larva = models.IntegerField()
-    late_instar_larva = models.IntegerField()
-    early_instar_nymph = models.IntegerField()
-    nymph = models.IntegerField()
-    late_instar_nymph = models.IntegerField()
-    early_pupa = models.IntegerField()
-    pupa = models.IntegerField()
-    late_pupa = models.IntegerField()
-    juvenile = models.IntegerField()
-    immature = models.IntegerField()
-    subadult = models.IntegerField()
-    adult = models.IntegerField()
-    adult_pregnant_or_young = models.IntegerField()
-    senescent = models.IntegerField()
-    unknown = models.IntegerField()
-    na = models.IntegerField()
+    egg = models.FloatField(default=0.0, blank=True, null=True)
+    egg_mass = models.FloatField(default=0.0, blank=True, null=True)
+    nest = models.FloatField(default=0.0, blank=True, null=True)
+    early_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
+    larva = models.FloatField(default=0.0, blank=True, null=True)
+    late_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
+    early_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
+    nymph = models.FloatField(default=0.0, blank=True, null=True)
+    late_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
+    early_pupa = models.FloatField(default=0.0, blank=True, null=True)
+    pupa = models.FloatField(default=0.0, blank=True, null=True)
+    late_pupa = models.FloatField(default=0.0, blank=True, null=True)
+    juvenile = models.FloatField(default=0.0, blank=True, null=True)
+    immature = models.FloatField(default=0.0, blank=True, null=True)
+    subadult = models.FloatField(default=0.0, blank=True, null=True)
+    adult = models.FloatField(default=0.0, blank=True, null=True)
+    adult_pregnant_or_young = models.FloatField(default=0.0, blank=True, null=True)
+    senescent = models.FloatField(default=0.0, blank=True, null=True)
+    unknown = models.FloatField(default=0.0, blank=True, null=True)
+    na = models.FloatField(default=0.0, blank=True, null=True)
 
 class AnimalDetails(TaxonDetails):
     gender = models.ForeignKey(Gender, on_delete=models.SET_NULL, blank=True, null=True)
@@ -403,22 +400,22 @@ class LakeMicrohabitat(DictionaryTable):
 class LenticSize(models.Model):
     # FIXME: should we include it as additional tab instead of
     # integrating it on the PondLakeAnimalDetails tab??
-    lentic_size_acres_aprox = models.IntegerField()
-    lentic_size_squaremeters_aprox = models.IntegerField()
-    lentic_size_acres_exact = models.DecimalField(max_digits=6, decimal_places=1)
-    lentic_size_squaremeters_exact = models.DecimalField(max_digits=8, decimal_places=1)
+    lentic_size_acres_aprox = models.IntegerField(blank=True, null=True)
+    lentic_size_squaremeters_aprox = models.IntegerField(blank=True, null=True)
+    lentic_size_acres_exact = models.DecimalField(blank=True, null=True,max_digits=6, decimal_places=1)
+    lentic_size_squaremeters_exact = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=1)
 
     class Meta:
         abstract = True
 
 @reversion.register(follow=['taxondetails_ptr'])
 class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
-    pond_lake_name = models.TextField()
+    pond_lake_name = models.TextField(blank=True, null=True)
     pond_lake_type = models.ForeignKey(PondLakeType, on_delete=models.SET_NULL, blank=True, null=True)
     pond_lake_use = models.ForeignKey(PondLakeUse, on_delete=models.SET_NULL, blank=True, null=True)
     shoreline_type = models.ForeignKey(ShorelineType, on_delete=models.SET_NULL, blank=True, null=True)
     microhabitat = models.ForeignKey(LakeMicrohabitat, on_delete=models.SET_NULL, blank=True, null=True)
-    microhabitat_comments = models.TextField()
+    microhabitat_comments = models.TextField(default='', blank=True, null=True)
     
 
 class StreamDesignatedUse(DictionaryTable):
@@ -434,33 +431,33 @@ class LoticHabitatType(DictionaryTable):
     pass
 
 @reversion.register()
-class StreamSubstracte(models.Model):
-    artificial = models.FloatField()
-    bedrock = models.FloatField()
-    boulder = models.FloatField()
-    boulder_slab = models.FloatField()
-    clay_hardpan = models.FloatField()
-    cobble = models.FloatField()
-    fine_detritus = models.FloatField()
-    gravel = models.FloatField()
-    leafpack_woody_debris = models.FloatField()
-    muck = models.FloatField()
-    sand = models.FloatField()
-    silt = models.FloatField()
+class StreamSubstrate(models.Model):
+    artificial = models.FloatField(default=0.0, blank=True, null=True)
+    bedrock = models.FloatField(default=0.0, blank=True, null=True)
+    boulder = models.FloatField(default=0.0, blank=True, null=True)
+    boulder_slab = models.FloatField(default=0.0, blank=True, null=True)
+    clay_hardpan = models.FloatField(default=0.0, blank=True, null=True)
+    cobble = models.FloatField(default=0.0, blank=True, null=True)
+    fine_detritus = models.FloatField(default=0.0, blank=True, null=True)
+    gravel = models.FloatField(default=0.0, blank=True, null=True)
+    leafpack_woody_debris = models.FloatField(default=0.0, blank=True, null=True)
+    muck = models.FloatField(default=0.0, blank=True, null=True)
+    sand = models.FloatField(default=0.0, blank=True, null=True)
+    silt = models.FloatField(default=0.0, blank=True, null=True)
 
 class WaterFlowType(DictionaryTable):
     pass
 
 @reversion.register(follow=['taxondetails_ptr'])
 class StreamAnimalDetails(AquaticAnimalDetails):
-    stream_name_1 = models.TextField()
+    stream_name_1 = models.TextField(blank=True, null=True)
     stream_name_2 = models.TextField(blank=True, null=True)
     pemso_code = models.TextField(blank=True, null=True)
     designated_use = models.ForeignKey(StreamDesignatedUse, on_delete=models.SET_NULL, blank=True, null=True)
     channel_type = models.ForeignKey(ChannelType, on_delete=models.SET_NULL, blank=True, null=True)
     hmfei_local_abundance = models.ForeignKey(HmfeiLocalAbundance, on_delete=models.SET_NULL, blank=True, null=True)
     lotic_habitat_type = models.ForeignKey(LoticHabitatType, on_delete=models.SET_NULL, blank=True, null=True)
-    substrate = models.ForeignKey(StreamSubstracte, on_delete=models.CASCADE, blank=True, null=True)
+    substrate = models.ForeignKey(StreamSubstrate, on_delete=models.CASCADE, blank=True, null=True)
     water_flow_type = models.ForeignKey(WaterFlowType, on_delete=models.SET_NULL, blank=True, null=True)
 
 class WetlandType(DictionaryTable):
@@ -471,12 +468,12 @@ class WetlandLocation(DictionaryTable):
 
 @reversion.register()
 class WetlandVetegationStructure(models.Model):
-    buttonbush = models.FloatField()
-    cattail = models.FloatField()
-    ferns = models.FloatField()
-    forbs = models.FloatField()
-    phragmites = models.FloatField()
-    sedges = models.FloatField()
+    buttonbush = models.FloatField(default=0.0, blank=True, null=True)
+    cattail = models.FloatField(default=0.0, blank=True, null=True)
+    ferns = models.FloatField(default=0.0, blank=True, null=True)
+    forbs = models.FloatField(default=0.0, blank=True, null=True)
+    phragmites = models.FloatField(default=0.0, blank=True, null=True)
+    sedges = models.FloatField(default=0.0, blank=True, null=True)
 
 class WetlandConnectivity(DictionaryTable):
     pass
@@ -489,7 +486,7 @@ class WetlandHabitatFeature(DictionaryTable):
 
 @reversion.register(follow=['taxondetails_ptr'])
 class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
-    wetland_name = models.TextField()
+    wetland_name = models.TextField(blank=True, null=True)
     wetland_type = models.ForeignKey(WetlandType, on_delete=models.SET_NULL, blank=True, null=True)
     active_management = models.NullBooleanField(blank=True, null=True)
     wetland_location = models.ForeignKey(WetlandLocation, on_delete=models.SET_NULL, blank=True, null=True)
@@ -498,8 +495,14 @@ class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     water_source = models.ForeignKey(WaterSource, on_delete=models.SET_NULL, blank=True, null=True)
     habitat_feature = models.ForeignKey(WetlandHabitatFeature, on_delete=models.SET_NULL, blank=True, null=True)
 
-class SlimeMoldLifestages(DictionaryTable):
-    pass
+@reversion.register()
+class SlimeMoldLifestages(models.Model):
+    sclerotium_color = models.TextField(blank=True, null=True)
+    sclerotium_size = models.FloatField(default=0.0, blank=True, null=True)
+    sporangia_color = models.TextField(blank=True, null=True)
+    sporangia_size = models.FloatField(default=0.0, blank=True, null=True)
+    streaming_body_color = models.TextField(blank=True, null=True)
+    streaming_body_size = models.FloatField(default=0.0, blank=True, null=True)
 
 class SlimeMoldClass(DictionaryTableExtended):
     pass
@@ -509,21 +512,125 @@ class SlimeMoldMedia(DictionaryTable):
 
 @reversion.register(follow=['taxondetails_ptr'])
 class SlimeMoldDetails(TaxonDetails):
-    #lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+    lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_class = models.ForeignKey(SlimeMoldClass, on_delete=models.SET_NULL, blank=True, null=True)
     slime_mold_media = models.ForeignKey(SlimeMoldMedia, on_delete=models.SET_NULL, blank=True, null=True)
 
-class PlantDetails(TaxonDetails):
-    """
-    AQUI ME QUEDO: HAY QUE DEFINIR MODELO PARA PlaintDetails y sus subclases
-    """
+@reversion.register()
+class ConiferLifestages(models.Model):
+    vegetative = models.FloatField(default=0.0, blank=True, null=True)
+    immature_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
+    mature_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
+    spent_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
+    immature_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
+    mature_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
+    spent_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
+
+class FernLifestages(DictionaryTable): # FIXME: probably is not a dict table
     pass
 
+class FloweringPlantLifestages(DictionaryTable): # FIXME: probably is not a dict table
+    pass
 
-plants = ['plant', 'plant_conifer_or_ally', 'plant_fern_or_ally',
-          'plant_flowering_plant', 'plant_moss_or_ally']
-slime_mold = ['slime_mold']
-fungus = ['fungus']
-animals = ['animal', 'animal_aquatic_animal', 'animal_land_animal',
-           'animal_pond_lake_animal', 'animal_stream_animal', 'animal_wetland_animal']
-natural_area = ['natural_area']
+class MossLifestages(DictionaryTable): # FIXME: probably is not a dict table
+    pass
+
+class PlantCount(DictionaryTable):
+    pass
+
+"""
+class SoilType(DictionaryTable):
+    # FIXME: probably is not a dict table
+    pass
+"""
+
+class MoistureRegime(DictionaryTable):
+    pass
+
+class GroundSurface(DictionaryTable):
+    pass
+
+class CanopyCover(DictionaryTable):
+    pass
+"""
+class CommonTreesAndBushes(DictionaryTable):
+    # FIXME: probably is not a dict table
+    pass
+
+class CommonGroundVegetation(DictionaryTable):
+    # FIXME: probably is not a dict table
+    pass
+"""
+class GeneralHabitatCategory(DictionaryTable):
+    pass
+
+@reversion.register()
+class DisturbanceType(models.Model):
+    browse = models.FloatField(default=0.0, blank=True, null=True)
+    collecting = models.FloatField(default=0.0, blank=True, null=True)
+    disease_pest = models.FloatField(default=0.0, blank=True, null=True)
+    mowing = models.FloatField(default=0.0, blank=True, null=True)
+    trampling = models.FloatField(default=0.0, blank=True, null=True)
+    vehicle_traffic = models.FloatField(default=0.0, blank=True, null=True)
+    woody_plant_removal = models.FloatField(default=0.0, blank=True, null=True)
+
+"""
+class InvasivePlants(DictionaryTable):
+    # FIXME: probably is not a dict table
+    pass
+"""
+
+@reversion.register()
+class EarthwormEvidence(models.Model):
+    casting_piles = models.FloatField(default=0.0, blank=True, null=True)
+    compacted_soil = models.FloatField(default=0.0, blank=True, null=True)
+    individuals = models.FloatField(default=0.0, blank=True, null=True)
+    layered_castings = models.FloatField(default=0.0, blank=True, null=True)
+    middens = models.FloatField(default=0.0, blank=True, null=True)
+    no_evidence = models.FloatField(default=0.0, blank=True, null=True)
+
+class LandscapePosition(DictionaryTable):
+    pass
+
+class Aspect(DictionaryTable):
+    pass
+
+class Slope(DictionaryTable):
+    pass
+
+class PlantDetails(TaxonDetails):
+    plant_count = models.ForeignKey(PlantCount, on_delete=models.SET_NULL, blank=True, null=True)
+    area_ranges = models.TextField(blank=True, null=True)
+    #soil_type = models.ForeignKey(SoilType, on_delete=models.SET_NULL, blank=True, null=True)
+    moisture_regime = models.ForeignKey(MoistureRegime, on_delete=models.SET_NULL, blank=True, null=True)
+    ground_surface = models.ForeignKey(GroundSurface, on_delete=models.SET_NULL, blank=True, null=True)
+    tree_canopy_cover = models.ForeignKey(CanopyCover, on_delete=models.SET_NULL, blank=True, null=True)
+    #common_trees_and_bushes = models.ForeignKey(CommonTreesAndBushes, on_delete=models.SET_NULL, blank=True, null=True)
+    #common_ground_vegetation = models.ForeignKey(CommonGroundVegetation, on_delete=models.SET_NULL, blank=True, null=True)
+    general_habitat_category = models.ForeignKey(GeneralHabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    leap_land_cover_category = models.TextField(blank=True, null=True)
+    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.SET_NULL, blank=True, null=True)
+    #invasive_plants = models.ForeignKey(InvasivePlants, on_delete=models.SET_NULL, blank=True, null=True)
+    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.SET_NULL, blank=True, null=True)
+    landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
+    aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
+    slope = models.ForeignKey(Slope, on_delete=models.SET_NULL, blank=True, null=True)
+    
+    class Meta:
+        abstract = True
+        
+@reversion.register(follow=['taxondetails_ptr'])
+class ConiferDetails(PlantDetails):
+    lifestages = models.ForeignKey(ConiferLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+    
+@reversion.register(follow=['taxondetails_ptr'])
+class FernDetails(PlantDetails):
+    lifestages = models.ForeignKey(FernLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+
+@reversion.register(follow=['taxondetails_ptr'])
+class FloweringPlantDetails(PlantDetails):
+    lifestages = models.ForeignKey(FloweringPlantLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+
+@reversion.register(follow=['taxondetails_ptr'])
+class MossDetails(PlantDetails):
+    lifestages = models.ForeignKey(MossLifestages, on_delete=models.SET_NULL, blank=True, null=True)
