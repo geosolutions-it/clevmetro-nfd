@@ -1,6 +1,11 @@
 # nfdapi
  
  Cleveland Metroparks - Natural Features Database REST API
+
+## API operations
+
+The API operations are documented on the
+ [project WIKI](https://github.com/geosolutions-it/clevmetro-nfd/wiki/API-operations).
  
 ## Development
 
@@ -167,4 +172,3 @@ $servers->setValue('login','bind_id','cn=admin,dc=Metroparks,dc=local');
 ...
 $config->custom->appearance['hide_template_warning'] = true;
 ```
-
