@@ -76,17 +76,7 @@ const Api = {
     getVersion: function(layerId, nfid, version) {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/version/' + version + '/';
         return axios.get(url, getOptions()).then((response) => {
-            return {
-                formvalues: response.data,
-                version: response.data.version,
-                total_versions: response.data.total_versions,
-                released: response.data.relesed,
-                featuretype: response.data.featuretype,
-                featuresubtype: response.data.featuresubtype,
-                id: response.data.id,
-                is_writer: response.data.is_writer,
-                is_publisher: response.data.is_publisher
-            };
+            return response.data;
         });
     }
 };

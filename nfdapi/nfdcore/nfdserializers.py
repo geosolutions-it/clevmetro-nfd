@@ -715,20 +715,19 @@ class UpdateOccurrenceMixin(object):
         return self.forms
     
     def update(self, instance, validated_data):
-        formvalues = validated_data['formvalues']
         with reversion.create_revision():
             for (form_name, model_class, children) in self.get_toplevel_forms():
                 if form_name == 'species':
                     try:
-                        species_id = formvalues['species']['id']
+                        species_id = validated_data['species']['id']
                         selected_species = Species.objects.get(pk=species_id)
                         instance.species = selected_species
-                        self._update_form('species', Species, formvalues, instance)
-                        self._update_form('species.element_species', ElementSpecies, formvalues, selected_species)
+                        self._update_form('species', Species, validated_data, instance)
+                        self._update_form('species.element_species', ElementSpecies, validated_data, selected_species)
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
-                    self._update_form(form_name, model_class, formvalues, instance, children)
+                    self._update_form(form_name, model_class, validated_data, instance, children)
             
             if isinstance(instance, OccurrenceTaxon):
                 # taxon
@@ -738,9 +737,9 @@ class UpdateOccurrenceMixin(object):
                 pass
 
             instance.version = instance.version + 1
-            instance.verified = formvalues.get("verified", False) or False
+            instance.verified = validated_data.get("verified", False) or False
             if self.is_publisher:
-                instance.released = formvalues.get("released", False) or False
+                instance.released = validated_data.get("released", False) or False
                 if instance.released:
                     instance.released_versions = instance.released_versions + 1
             else:
@@ -1006,29 +1005,18 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         setattr(instance, details_name, instance.get_details())
         r = Serializer.to_representation(self, instance)
 
-        result = {}
+        result = to_flat_representation(r)
         result["id"] = r["id"]
-        result["formvalues"] = to_flat_representation(r)
-        #result["geom"] = r.get("geom")
-        #del result["formvalues"]["geom"]
-        result["released"] = instance.released
-        result["verified"] = instance.verified
+        
         if self.is_writer or self.is_publisher:
             result["version"] = instance.version
-            result["formvalues"]["version"] = instance.version
             result["total_versions"] = instance.version
-            result["formvalues"]["total_versions"] = instance.version
         else:
             result["version"] = instance.released_versions
-            result["formvalues"]["version"] = instance.released_versions
             result["total_versions"] = instance.released_versions
-            result["formvalues"]["total_versions"] = instance.released_versions
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
-        result["formvalues"]['featuretype'] = instance.occurrence_cat.main_cat
-        result["formvalues"]['featuresubtype'] = instance.occurrence_cat.code
         result['version_date'] = instance.inclusion_date
-        result["formvalues"]['version_date'] = instance.inclusion_date
         photo_serializer = PhotographSerializer(instance.photographs, many=True)
         result['images'] = photo_serializer.data
         result['is_writer'] = self.is_writer
@@ -1036,8 +1024,6 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         return result
     
     def to_internal_value(self, data):
-        plaindata = data['formvalues']
-        #plaindata['geom'] = data.get('geom')
         
         """
         Dict of native values <- Dict of primitive datatypes.
@@ -1050,14 +1036,13 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                 rest_fields.api_settings.NON_FIELD_ERRORS_KEY: [message]
             }, code='invalid')
 
-        result = OrderedDict()
         validated_formvalues = OrderedDict()
         errors = OrderedDict()
         self.featuresubtype = data.get("featuresubtype")
         fields = self._writable_fields
         
         formvalues = OrderedDict()
-        for global_field_name in plaindata:
+        for global_field_name in data: # transform the flat object to a set of dictionaries of forms
             field_parts = global_field_name.split(".")
             if len(field_parts)>1:
                 base = formvalues
@@ -1066,13 +1051,13 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
                     if base[local_field_name] is None:
                         base[local_field_name] = {}
                     base = base[local_field_name]
-                if not (isinstance(base.get(field_parts[-1]), dict) and plaindata[global_field_name] is None):  # avoid overwritting new values with old empty forms
-                    base[field_parts[-1]] = plaindata[global_field_name]
+                if not (isinstance(base.get(field_parts[-1]), dict) and data[global_field_name] is None):  # avoid overwritting new values with old empty forms
+                    base[field_parts[-1]] = data[global_field_name]
             else:
-                if not (isinstance(formvalues.get(global_field_name), dict) and plaindata[global_field_name] is None): # avoid overwritting new values with old empty forms 
-                    formvalues[global_field_name] = plaindata[global_field_name]
+                if not (isinstance(formvalues.get(global_field_name), dict) and data[global_field_name] is None): # avoid overwritting new values with old empty forms 
+                    formvalues[global_field_name] = data[global_field_name]
 
-        for field in fields:
+        for field in fields: # validate values
             validate_method = getattr(self, 'validate_' + field.field_name, None)
             if isinstance(field, ModelSerializer):
                 primitive_value = field.get_value(formvalues)
@@ -1093,13 +1078,13 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             else:
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
-        result['formvalues'] = validated_formvalues
+        result = validated_formvalues
         result["released"] = data.get("released", False)
         result["verified"] = data.get("verified", False)
         #result['id'] = data.get("id", None)
         result['featuretype'] = data.get("featuretype")
         result['featuresubtype'] = data.get("featuresubtype")
-        species_id = data.get('formvalues', {}).get('species.id')
+        species_id = data.get('species.id')
         if not species_id:
             errors["species"] = [_("No species was selected")]
         if not data.get('id'):
@@ -1115,7 +1100,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         return result
 
 """ -------------------------------------------
-CREATE OCCURRENCES
+CREATE OCCURRENCES -- OLD APPROACH - TO BE REMOVED
 ---------------------------------------------- """
 class CreateOccurrenceSerializer(Serializer):
     """

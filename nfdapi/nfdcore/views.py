@@ -127,7 +127,7 @@ class PhotoViewSet(ModelViewSet):
     queryset=Photograph.objects.all()
     
     def pre_save(self, obj):
-        print "hola"
+        #print "hola"
         pass
         #self.request
 

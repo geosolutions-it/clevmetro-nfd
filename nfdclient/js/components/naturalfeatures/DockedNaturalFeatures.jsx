@@ -192,8 +192,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
@@ -219,8 +219,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
@@ -252,8 +252,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
@@ -285,8 +285,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
@@ -314,8 +314,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 {
                     let self = this;
@@ -343,8 +343,8 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature.formvalues) && this.props.currentFeature.formvalues[item.key]) {
-                    value = this.props.currentFeature.formvalues[item.key];
+                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                    value = this.props.currentFeature[item.key];
                 }
                 {
                     let self = this;
@@ -439,7 +439,7 @@ const DockedNaturalFeatures = React.createClass({
             return (this.props.mode === 'viewedit') ? [
                 <Button key="delete" bsSize="small"
                     bsStyle="primary"
-                    onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.formvalues.id)}
+                    onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.id)}
                     style={{marginRight: "10px"}}
                     disabled={false}>
                     <Message msgId="naturalfeatures.delete" />
@@ -594,9 +594,9 @@ const DockedNaturalFeatures = React.createClass({
     },
     handleChange(e) {
         if (e.target.value === '') {
-            this.props.currentFeature.formvalues[e.target.name] = null;
+            this.props.currentFeature[e.target.name] = null;
         } else {
-            this.props.currentFeature.formvalues[e.target.name] = e.target.value;
+            this.props.currentFeature[e.target.name] = e.target.value;
         }
         if (this.props.mode === 'viewedit') {
             this.setState({selectedFeature: this.props.currentFeature});

@@ -41,13 +41,6 @@ const assign = require('object-assign');
 const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 
 const normalizeInfo = (resp) => {
-    const formvalues = {};
-    for (let key in resp.formvalues) {
-        if (key !== 'id' || key !== 'version') {
-            formvalues[key] = resp.formvalues[key];
-        }
-    }
-    resp.formvalues = formvalues;
     return resp;
 };
 
@@ -276,7 +269,7 @@ function naturalFeatureMarkerAdded(feature) {
         return Api.getFeatureSubtype(featuresubtype).then((response) => {
             if (response.forms && response.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
-                assign(newFeat, { formvalues: createEmptyFormValues(response.forms)});
+                newFeat = assign(createEmptyFormValues(response.forms), newFeat);
                 dispatch(updateNaturalFeatureForm(newFeat));
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
             }
