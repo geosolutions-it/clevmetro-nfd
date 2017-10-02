@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 import reversion
-from django.contrib.gis.db.models.fields import PointField
+from django.contrib.gis.db.models.fields import PointField, PolygonField
 from  django.utils import timezone
 from django.contrib import admin
 from django.db.models.fields.files import ImageField
@@ -150,6 +150,33 @@ def get_occurrence_model(occurrence_maincat):
         pass
     return OccurrenceTaxon
 
+class Reservation(DictionaryTable):
+    pass
+
+class Watershed(DictionaryTable):
+    pass
+
+class Location(models.Model):
+    site_description = models.TextField(blank=True, null=True, default='')
+    reservation = models.ForeignKey(Reservation, on_delete=models.SET_NULL, blank=True, null=True)
+    watershed = models.ForeignKey(Watershed, on_delete=models.SET_NULL, blank=True, null=True)
+    directions = models.TextField(blank=True, null=True, default='')
+    polygon = PolygonField(null=True)
+    class Meta:
+        abstract = True
+
+@reversion.register()
+class NaturalAreaLocation(Location):
+    pass
+
+@reversion.register()
+class TaxonLocation(Location):
+    parcel = models.TextField(blank=True, null=True, default='')
+    city_township = models.TextField(blank=True, null=True, default='')
+    county = models.TextField(blank=True, null=True, default='')
+    quad_name = models.TextField(blank=True, null=True, default='')
+    quad_number = models.TextField(blank=True, null=True, default='')
+
 class Occurrence(models.Model):
     geom = PointField()
     version = models.IntegerField(default=0)
@@ -159,8 +186,6 @@ class Occurrence(models.Model):
     verified = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
     observation = models.OneToOneField(OccurrenceObservation, on_delete=models.CASCADE)
-    
-    
     class Meta:
         abstract = True
 
@@ -301,6 +326,7 @@ class OccurrenceTaxon(Occurrence):
     voucher = models.OneToOneField(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
     details = models.OneToOneField(TaxonDetails, on_delete=models.CASCADE, null=True)
+    location = models.OneToOneField(TaxonLocation, on_delete=models.CASCADE, null=True)
     photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
             
     def get_details_class(self):
@@ -323,6 +349,7 @@ class OccurrenceTaxon(Occurrence):
 class OccurrenceNaturalArea(Occurrence):
     natural_area_element = models.ForeignKey(ElementNaturalAreas, on_delete=models.SET_NULL, blank=True, null=True)
     photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
+    location = models.OneToOneField(NaturalAreaLocation, on_delete=models.CASCADE, null=True)
 
 class Gender(DictionaryTable):
     pass

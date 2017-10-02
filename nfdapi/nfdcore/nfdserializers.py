@@ -1,10 +1,10 @@
 from django.db.models.fields import BooleanField, TextField, CharField, DateTimeField,\
     DateField, NullBooleanField
 from django.db.models.fields import IntegerField, DecimalField, FloatField
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.fields import GeometryField, PolygonField
 
 from nfdcore.models import get_details_class, EarthwormEvidence, DisturbanceType,\
-    SlimeMoldLifestages
+    SlimeMoldLifestages, TaxonLocation, NaturalAreaLocation
 
 from nfdcore.models import DictionaryTable
 from nfdcore.models import Voucher, OccurrenceTaxon, PlantDetails,\
@@ -35,6 +35,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
 from django.template.context_processors import request
+from django.contrib.gis.geos import Point, Polygon
 
 def _(message): return message
 
@@ -134,7 +135,8 @@ LAND_ANIMAL_TYPE = [
     (_('observation.recorder'), PointOfContact, []),
     (_('voucher'), Voucher, []),
     (_('details'), LandAnimalDetails, ['details.lifestages']),
-    (_('details.lifestages'), AnimalLifestages, [])
+    (_('details.lifestages'), AnimalLifestages, []),
+    (_('location'), TaxonLocation, []),
     ]
 LAND_ANIMAL_TYPE_DICT = get_form_dict(LAND_ANIMAL_TYPE)
 
@@ -150,6 +152,7 @@ STREAM_ANIMAL_TYPE = [
     (_('details'), StreamAnimalDetails, ['details.lifestages', 'details.substrate']),
     (_('details.lifestages'), AnimalLifestages, []),
     (_('details.substrate'), StreamSubstrate, []),
+    (_('location'), TaxonLocation, []),
     ]
 
 STREAM_ANIMAL_TYPE_DICT = get_form_dict(STREAM_ANIMAL_TYPE)
@@ -164,7 +167,8 @@ PONDLAKE_ANIMAL_TYPE = [
     (_('observation.recorder'), PointOfContact, []),
     (_('voucher'), Voucher, []),
     (_('details'), PondLakeAnimalDetails, ['details.lifestages']),
-    (_('details.lifestages'), AnimalLifestages, [])
+    (_('details.lifestages'), AnimalLifestages, []),
+    (_('location'), TaxonLocation, []),
     ]
 PONDLAKE_ANIMAL_TYPE_DICT = get_form_dict(PONDLAKE_ANIMAL_TYPE)
 
@@ -180,7 +184,8 @@ WETLAND_ANIMAL_TYPE = [
     (_('voucher'), Voucher, []),
     (_('details'), WetlandAnimalDetails, ['details.lifestages', 'details.vegetation']),
     (_('details.lifestages'), AnimalLifestages, []),
-    (_('details.vegetation'), WetlandVetegationStructure, [])
+    (_('details.vegetation'), WetlandVetegationStructure, []),
+    (_('location'), TaxonLocation, []),
     ]
 WETLAND_ANIMAL_TYPE_DICT = get_form_dict(WETLAND_ANIMAL_TYPE)
 
@@ -195,6 +200,7 @@ SLIMEMOLD_TYPE = [
     (_('voucher'), Voucher, []),
     (_('details'), SlimeMoldDetails, ['details.lifestages']),
     (_('details.lifestages'), SlimeMoldLifestages, []),
+    (_('location'), TaxonLocation, []),
     ]
 SLIMEMOLD_TYPE_DICT = get_form_dict(SLIMEMOLD_TYPE)
 
@@ -211,6 +217,7 @@ CONIFER_PLANT_TYPE = [
     (_('details.lifestages'), ConiferLifestages, []),
     (_('details.earthworm_evidence'), EarthwormEvidence, []),
     (_('details.disturbance_type'), DisturbanceType, []),
+    (_('location'), TaxonLocation, []),
     ]
 CONIFER_PLANT_TYPE_DICT = get_form_dict(CONIFER_PLANT_TYPE)
 
@@ -226,6 +233,7 @@ FERN_PLANT_TYPE = [
     (_('details'), FernDetails, ['details.earthworm_evidence', 'details.disturbance_type']),
     (_('details.earthworm_evidence'), EarthwormEvidence, []),
     (_('details.disturbance_type'), DisturbanceType, []),
+    (_('location'), TaxonLocation, []),
     ]
 FERN_PLANT_TYPE_DICT = get_form_dict(FERN_PLANT_TYPE)
 
@@ -241,6 +249,7 @@ FLOWERING_PLANT_TYPE = [
     (_('details'), FloweringPlantDetails, ['details.earthworm_evidence', 'details.disturbance_type']),
     (_('details.earthworm_evidence'), EarthwormEvidence, []),
     (_('details.disturbance_type'), DisturbanceType, []),
+    (_('location'), TaxonLocation, []),
     ]
 FLOWERING_PLANT_TYPE_DICT = get_form_dict(FLOWERING_PLANT_TYPE)
 
@@ -256,6 +265,7 @@ MOSS_PLANT_TYPE = [
     (_('details'), MossDetails, ['details.earthworm_evidence', 'details.disturbance_type']),
     (_('details.earthworm_evidence'), EarthwormEvidence, []),
     (_('details.disturbance_type'), DisturbanceType, []),
+    (_('location'), TaxonLocation, []),
     ]
 MOSS_PLANT_TYPE_DICT = get_form_dict(MOSS_PLANT_TYPE)
 
@@ -620,6 +630,9 @@ class UpdateOccurrenceMixin(object):
                                 isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
                             new_value = form_validated_data.get(f.name)
                             old_value =  getattr(instance, f.name, None)
+                        elif isinstance(f, PolygonField):
+                            new_value = form_validated_data.get(f.name)
+                            old_value =  getattr(instance, f.name, None)
                         #if new_value != None and new_value != old_value:
                         if new_value != old_value:
                             modified = True
@@ -736,6 +749,7 @@ class UpdateOccurrenceMixin(object):
                 # natural area
                 pass
 
+            instance.geom = validated_data.get("geom") or instance.geom
             instance.version = instance.version + 1
             instance.verified = validated_data.get("verified", False) or False
             if self.is_publisher:
@@ -987,6 +1001,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     inclusion_date = rest_fields.DateTimeField(required=False, read_only=True)
     version_date = rest_fields.DateTimeField(required=False, read_only=True)
     #geom = gisserializer.GeometryField()
+    polygon = gisserializer.GeometryField(required=False)
     voucher = VoucherSerializer(required=False)
     species = SpeciesSerializer(required=False)
     observation = OccurrenceObservationSerializer(required=True)
@@ -1021,6 +1036,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result['images'] = photo_serializer.data
         result['is_writer'] = self.is_writer
         result['is_publisher'] = self.is_publisher
+        if instance.location and isinstance(instance.location.polygon, Polygon):
+            result['polygon'] = instance.location.polygon.geojson
         return result
     
     def to_internal_value(self, data):
@@ -1087,17 +1104,39 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         species_id = data.get('species.id')
         if not species_id:
             errors["species"] = [_("No species was selected")]
-        if not data.get('id'):
-            try:
-                geom_serializer = gisserializer.GeometryField()
-                result['geom'] = geom_serializer.to_internal_value(data.get("geom"))
-            except:
+            
+        if isinstance(result.get('polygon'), Polygon):
+            location = result.get('location', {})
+            location['polygon'] = result.pop('polygon')
+            result['location'] = location
+        
+        try:
+            geom_serializer = gisserializer.GeometryField()
+            result['geom'] = geom_serializer.to_internal_value(data.get("geom"))
+        except:
+            if not data.get('id'):
                 errors["geom"] = [_("Geometry is missing")]
 
         if errors:
             raise rest_fields.ValidationError(to_flat_representation(errors))
 
         return result
+
+class TaxonLocationSerializer(CustomModelSerializerMixin, ModelSerializer):
+    class Meta:
+        model = TaxonLocation
+        exclude = ('id', 'polygon')
+
+class NaturalAreaLocationSerializer(CustomModelSerializerMixin, ModelSerializer):
+    class Meta:
+        model = NaturalAreaLocation
+        exclude = ('id', 'polygon')
+
+class TaxonOccurrenceSerializer(OccurrenceSerializer, Serializer):
+    location = TaxonLocationSerializer(required=False)
+
+class NaturalAreaOccurrenceSerializer(OccurrenceSerializer, Serializer):
+    location = NaturalAreaLocationSerializer(required=False)
 
 """ -------------------------------------------
 CREATE OCCURRENCES -- OLD APPROACH - TO BE REMOVED
@@ -1156,13 +1195,14 @@ class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
         result['featuretype'] = instance.occurrence_cat.main_cat
         result['featuresubtype'] = instance.occurrence_cat.code
         result['released'] = instance.released
+        result['verified'] = instance.verified
         result['id'] = instance.id
         return result
     
     class Meta:
         model = OccurrenceTaxon
         geo_field = "geom"
-        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'version', 'total_versions')
+        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'verified', 'version', 'total_versions')
         # you can also explicitly declare which fields you want to include
         # as with a ModelSerializer.
 
@@ -1285,10 +1325,11 @@ class OccurrenceVersionSerializer():
         
     def get_version_from_model(self, model, id, revision_date):
         obj_versions = Version.objects.get_for_object_reference(model, id).filter(revision__date_created__lte=revision_date)
+        if len(obj_versions)>0: 
         #try:
-        requested_version = obj_versions[0]
-        requested_obj = requested_version.field_dict
-        return self.add_related_values(requested_obj, model._meta, revision_date)
+            requested_version = obj_versions[0]
+            requested_obj = requested_version.field_dict
+            return self.add_related_values(requested_obj, model._meta, revision_date)
         #except:
         #    pass
     
@@ -1325,6 +1366,8 @@ class OccurrenceVersionSerializer():
         revision_date = requested_version.revision.date_created
         
         result = self.add_related_values(requested_version.field_dict, instance._meta, revision_date)
+        if result.get('location') and isinstance(result.get('location').get('polygon'), Polygon):
+            result['polygon'] = result.get('location').pop('polygon').geojson
         result['geom'] = {'type': 'Point', 'coordinates': result['geom'].coords}
         result['total_versions'] = total_versions
         result['version'] = version

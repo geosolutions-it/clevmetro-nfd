@@ -10,7 +10,8 @@ from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
 from nfdcore.nfdserializers import FeatureTypeSerializer, LayerSerializer, OccurrenceSerializer,\
-    PhotographPublishSerializer, OccurrenceVersionSerializer
+    PhotographPublishSerializer, OccurrenceVersionSerializer,\
+    TaxonOccurrenceSerializer, NaturalAreaOccurrenceSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
@@ -41,7 +42,8 @@ class NfdLayerList(APIView):
         return Response(serializer.data)
     def post(self, request, main_cat, format=None):
         (is_writer, is_publisher) = get_permissions(request.user, main_cat)
-        serializer = OccurrenceSerializer(data=request.data, is_writer=is_writer, is_publisher=is_publisher)
+        get_occurrence_model(main_cat)
+        serializer = self.get_serializer(data=request.data, is_writer=is_writer, is_publisher=is_publisher)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -49,11 +51,16 @@ class NfdLayerList(APIView):
 
 
 class TaxonLayerList(NfdLayerList):
+    def get_serializer(self, data, is_writer, is_publisher):
+        return TaxonOccurrenceSerializer(data=data, is_writer=is_writer, is_publisher=is_publisher)
+    
     def get_base_queryset(self, main_cat):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=main_cat)
 
 
 class NaturalAreaLayerList(NfdLayerList):
+    def get_serializer(self, data, is_writer, is_publisher):
+        return NaturalAreaOccurrenceSerializer(data=data, is_writer=is_writer, is_publisher=is_publisher)
     def get_base_queryset(self, main_cat):
         return OccurrenceNaturalArea.objects.all()
 
@@ -76,18 +83,19 @@ class LayerDetail(APIView):
         if feature.released == False and not (is_writer or is_publisher):
             return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN) 
         if isinstance(feature, OccurrenceNaturalArea):
-            return Response({"error": "not supported yet"})
+            serializer = NaturalAreaOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
         else:
-            serializer = OccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
+            serializer = TaxonOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
         return Response(serializer.data)
 
     def put(self, request, occurrence_maincat, pk, format=None):
         (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)    
         feature = self.get_object(occurrence_maincat, pk)
         if isinstance(feature, OccurrenceNaturalArea):
+            serializer = NaturalAreaOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
             return Response({"error": "not supported yet"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            serializer = OccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)         
+            serializer = TaxonOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)         
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -13,7 +13,7 @@ from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
     SlimeMoldMedia, SlimeMoldClass, ConiferLifestages, FernLifestages,\
     MossLifestages, FloweringPlantLifestages, PlantCount, MoistureRegime,\
     GroundSurface, CanopyCover, GeneralHabitatCategory, LandscapePosition,\
-    Aspect, Slope
+    Aspect, Slope, Watershed, Reservation
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -666,6 +666,115 @@ slope = [
     ("6", _("Over 50"))
 ]
 
+reservation = [
+    ("AC", _("Acacia")),
+    ("BE", _("Bedford")),
+    ("BC", _("Big Creek")),
+    ("BW", _("Bradley Woods")),
+    ("BR", _("Brecksville")),
+    ("BK", _("Brookside")),
+    ("EC", _("Euclid Creek")),
+    ("GA", _("Garfield Park")),
+    ("HI", _("Hinckley")),
+    ("HU", _("Huntington")),
+    ("LA", _("Lakefront")),
+    ("MS", _("Mill Stream Run")),
+    ("NA", _("N/A")),
+    ("NC", _("North Chagrin")),
+    ("CA", _("Ohio & Erie Canal")),
+    ("RR", _("Rocky River")),
+    ("SC", _("South Chagrin")),
+    ("WA", _("Washington")),
+    ("WC", _("West Creek"))
+    ]
+
+watershed = [
+    ("1", _("Allardale Creek, East Branch, Rocky River")),
+	("2", _("Aurora Branch, Chagrin River")),
+	("3", _("Bain Creek, Main Stem, Rocky River")),
+	("4", _("Baldwin Creek, East Branch, Rocky River")),
+	("5", _("Beaver Meadows Creek, Tinkers Creek, Cuyahoga River")),
+	("6", _("Beechers Brook, Main Branch, Chagrin River")),
+	("7", _("Big Creek, Cuyahoga River")),
+	("8", _("Blodgett Creek, West Branch, Rocky River")),
+	("9", _("Burk Branch, Cuyahoga River")),
+	("10", _("Buttermilk Creek, Main Branch, Chagrin River")),
+	("11", _("Cahoon Creek")),
+	("12", _("Center Creek, Big Creek, Cuyahoga River")),
+	("13", _("Chagrin River")),
+	("14", _("Chardon Run, Main Branch, Chagrin River")),
+	("15", _("Chevy Run, Big Creek, Cuyahoga River")),
+	("16", _("Chippewa Creek, Cuyahoga River")),
+	("17", _("Claribel Creek, East Branch, Euclid Creek")),
+	("18", _("Colleda Branch, Big Creek, Cuyahoga River")),
+	("19", _("Creek Chub Run, Main Branch, Chagrin River")),
+	("20", _("Cuyahoga River")),
+	("21", _("Deerlick Run, Tinkers Creek, Cuyahoga River")),
+	("22", _("Doan Brook")),
+	("23", _("Dugway Brook")),
+	("24", _("East Branch, Big Creek, Cuyahoga River")),
+	("25", _("East Branch, Euclid Creek")),
+	("26", _("East Branch, Rocky River")),
+	("27", _("Euclid Creek")),
+	("28", _("Fosters Run, Main Branch, Chagrin River")),
+	("29", _("French Creek, Black River")),
+	("30", _("Furnace Run, Cuyahoga River")),
+	("31", _("Griswold Creek, Main Branch, Chagrin River")),
+	("32", _("Gully Brook, Main Branch, Chagrin River")),
+	("33", _("Hawthorne Creek, Tinkers Creek-Walton Hills, Cuyahoga River")),
+	("34", _("Healy Creek, East Branch, Rocky River")),
+	("35", _("Hemlock Creek-Independence, Cuyahoga River")),
+	("36", _("Hemlock Creek, Tinkers Creek, Cuyahoga River")),
+	("37", _("Hollows Run, Chippewa Creek, Cuyahoga River")),
+	("38", _("Johnsons Creek, East Branch, Rocky River")),
+	("39", _("Kinsbury Run, Cuyahoga River")),
+	("40", _("Main Stem, Rocky River")),
+	("41", _("Meadows Run, Chippewa Creek, Cuyahoga River")),
+	("42", _("Middle Fork, Sulphur Spring, Chagrin River")),
+	("43", _("Mill Creek, Cuyahoga River")),
+	("44", _("Mills Creek, French Creek, Black River")),
+	("45", _("Minnie Creek, West Branch, Rocky River")),
+	("46", _("Morgana Run, Cuyahoga River")),
+	("47", _("Nine Mile Brook")),
+	("48", _("none")),
+	("49", _("None")),
+	("50", _("North Fork, Sulphur Springs, Chagrin River")),
+	("51", _("Pepper/Luce Creek, Main Branch, Chagrin River")),
+	("52", _("Porter Creek")),
+	("53", _("Redstone Run, East Branch, Euclid Creek")),
+	("54", _("Rice Ridge Run, Cuyahoga River")),
+	("55", _("Rocky River")),
+	("56", _("South Fork, Sulphur springs, Chagrin River")),
+	("57", _("Sperry Creek")),
+	("58", _("Spring Fork, Sulphur Springs, Chagrin River")),
+	("59", _("Stevenson Creek, East Branch, Euclid Creek")),
+	("60", _("Stickney Creek, East Branch, Big Creek, Cuyahoga River")),
+	("61", _("Strawberry Creek, Buttermilk Creek, Main Branch, Chagrin River")),
+	("62", _("Sulphur Springs, Chagrin River")),
+	("63", _("Tinkers Creek, Cuyahoga River")),
+	("64", _("Treadway Creek, Big Creek, Cuyahoga River")),
+	("65", _("Trout Creek, East Branch, Rocky River")),
+	("66", _("Tuttle Creek")),
+	("67", _("Unnamed tributary, Chagrin River")),
+	("68", _("Unnamed tributary, Cuyahoga River")),
+	("69", _("Unnamed tributary, Doan Brook")),
+	("70", _("Unnamed tributary, East Branch, Rocky River")),
+	("71", _("Unnamed tributary, Euclid Creek")),
+	("72", _("Unnamed tributary, Main Stem, Rocky River")),
+	("73", _("Unnamed tributary, West Branch, Rocky River")),
+	("74", _("Upper East Branch, Rocky River")),
+	("75", _("Upper Euclid Creek, at Acacia")),
+	("76", _("Upper Main Brach, Chagrin River")),
+	("77", _("Versbky Creek, East Branch, Euclid Creek")),
+	("78", _("Wadworth Run, Cuyahoga River")),
+	("79", _("Wallin Creek, Chippewa Creek, Cuyahoga River")),
+	("80", _("West Branch, Rocky River")),
+	("81", _("West Creek, Cuyahoga River")),
+	("82", _("Wiley Creek, Main Branch, Chagrin River")),
+	("83", _("Wischmeyer Creek")),
+	("84", _("Wolf Creek, Mill Creek, Cuyahoga River"))
+    ]
+
 def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
@@ -752,6 +861,9 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(LandscapePosition, landscape_position, ifempty, clean)
     _init_dict_table(Aspect, aspect, ifempty, clean)
     _init_dict_table(Slope, slope, ifempty, clean)
+    
+    _init_dict_table(Watershed, watershed, ifempty, clean)
+    _init_dict_table(Reservation, reservation, ifempty, clean)
     
     if clean:
         OccurrenceCategory.objects.all().delete()
