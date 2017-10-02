@@ -86,13 +86,31 @@ const DockedNaturalFeatures = React.createClass({
         this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onAddPointClick: function() {
-        this.props.onChangeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {icon: '../../assets/img/marker-icon-green.png'});
+        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: this.getMarkerIcon()});
     },
     onAddPolygonClick: function() {
-        this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
+        this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
     },
     onGetMyLocationClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
+    },
+    getMarkerIcon() {
+        if (this.props.featuretype === 'plant') {
+            return '../../assets/img/marker-icon-green-highlight.png';
+        }
+        if (this.props.featuretype === 'animal') {
+            return '../../assets/img/marker-icon-purple-highlight.png';
+        }
+        if (this.props.featuretype === 'fungus') {
+            return '../../assets/img/marker-icon-yellow-highlight.png';
+        }
+        if (this.props.featuretype === 'slimemold') {
+            return '../../assets/img/marker-icon-marine-highlight.png';
+        }
+        if (this.props.featuretype === 'naturalarea') {
+            return '../../assets/img/marker-icon-blue-highlight.png';
+        }
+
     },
     getIcon(formname) {
         let icon = 'question-sign';
@@ -116,10 +134,8 @@ const DockedNaturalFeatures = React.createClass({
             icon = 'verifier';
         } else if (formname === 'voucher') {
             icon = 'tag';
-        } else if (formname === 'photograh') {
-            icon = 'question-sign';
         } else if (formname === 'location') {
-            icon = 'question-sign';
+            icon = 'uniE062';
         } else if (formname === 'details.vegetation') {
             icon = 'uniE103';
         } else if (formname === 'details.substrate') {
@@ -398,6 +414,7 @@ const DockedNaturalFeatures = React.createClass({
     },
     renderTabs() {
         let tabs = [];
+
         this.props.forms.map((tab, index) => {
             let i = index + 1;
             let key = "tab-" + i;
@@ -405,6 +422,7 @@ const DockedNaturalFeatures = React.createClass({
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     {this.renderTabContent(tab, i)}
+                    {(tab.formname === 'location') ? this.renderDrawTools() : null}
                 </Tab>
             );
         });
@@ -420,9 +438,8 @@ const DockedNaturalFeatures = React.createClass({
             );
         }*/
         if (this.props.mode === 'add') {
-            let lastIndex = tabs.length + 1;
             tabs.push(
-                <Tab eventKey={lastIndex} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
+                <Tab eventKey={(tabs.length + 1)} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     <div className="nf-tab-content">
                         <span className="btn btn-default btn-file">
                             Select or capture images <input type="file" accept="image/*" id="captured-images" multiple="multiple" onChange={this.handleImageChange}/>
@@ -432,6 +449,12 @@ const DockedNaturalFeatures = React.createClass({
                 </Tab>
             );
         }
+        /*
+        tabs.push(
+            <Tab eventKey={tabs.length + 1} key="location" title={<Glyphicon glyph="uniE062" style={{cursor: "pointer", fontSize: "24px"}}/>}>
+                {this.renderDrawTools()}
+            </Tab>
+        );*/
         return tabs;
     },
     renderButtons() {
@@ -498,11 +521,11 @@ const DockedNaturalFeatures = React.createClass({
                       style={{marginRight: "10px", padding: "9px"}}
                       pressed={this.props.addPolygonEnabled}
                       onClick={this.onAddPolygonClick} />
-                  <ToggleButton
+                  {/*<ToggleButton
                       text={<Message msgId="naturalfeatures.get_my_loc" />}
                       style={{}}
                       pressed={this.props.getMyLocationEnabled}
-                      onClick={this.onGetMyLocationClick} />
+                      onClick={this.onGetMyLocationClick} />*/}
               </div>
           </div>
         );
@@ -517,7 +540,6 @@ const DockedNaturalFeatures = React.createClass({
         }
         return (<ul>{errorItems}</ul>);
     },
-    // {(this.props.mode === 'add') ? this.renderDrawTools() : null}
     // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
         let title = this.getPrettyFeatureType(this.props.featuretype) + this.getPrettyFeatureSubType(this.props.featuresubtype);

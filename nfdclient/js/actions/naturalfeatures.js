@@ -23,11 +23,13 @@ const NATURAL_FEATURE_TYPE_LOADED = 'NATURAL_FEATURE_TYPE_LOADED';
 const NATURAL_FEATURE_ADDED = 'NATURAL_FEATURE_ADDED';
 const NATURAL_FEATURE_TYPE_ERROR = 'NATURAL_FEATURE_TYPE_ERROR';
 const UPDATE_NATURAL_FEATURE = 'UPDATE_NATURAL_FEATURE';
-const SAVE_NATURAL_FEATURE = 'SAVE_NATURAL_FEATURE';
+const CREATE_NATURAL_FEATURE = 'CREATE_NATURAL_FEATURE';
 const DELETE_NATURAL_FEATURE = 'DELETE_NATURAL_FEATURE';
 const NATURAL_FEATURE_MARKER_ADDED = 'NATURAL_FEATURE_MARKER_ADDED';
-const NATURAL_FEATURE_POLYGON_ADDED = 'NATURAL_FEATURE_POLYGON_ADDED';
+const NATURAL_FEATURE_POLYGON_REPLACED = 'NATURAL_FEATURE_POLYGON_REPLACED';
+const NATURAL_FEATURE_MARKER_REPLACED = 'NATURAL_FEATURE_MARKER_REPLACED';
 const UPDATE_NATURAL_FEATURE_ERROR = 'UPDATE_NATURAL_FEATURE_ERROR';
+const CREATE_NATURAL_FEATURE_ERROR = 'CREATE_NATURAL_FEATURE_ERROR';
 const NFD_LOGIN_SUCCESS = 'NFD_LOGIN_SUCCESS';
 const USER_NOT_AUTHENTICATED_ERROR = 'USER_NOT_AUTHENTICATED_ERROR';
 
@@ -180,6 +182,7 @@ function getFeatureInfo(properties, nfid) {
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
                 dispatch(updateNaturalFeatureForm(feature));
                 dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
+                dispatch(changeDrawingStatus("selectionGeomLoaded", "Marker", "dockednaturalfeatures", [], {properties: resp}));
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -282,52 +285,34 @@ function naturalFeatureMarkerAdded(feature) {
     };
 }
 
-
-function naturalFeaturePolygonAdded(geometry) {
+function naturalFeaturePolygonReplaced(geometry) {
     return {
-        type: NATURAL_FEATURE_POLYGON_ADDED,
+        type: NATURAL_FEATURE_POLYGON_REPLACED,
         geometry
     };
 }
 
-function saveNaturalFeatureLoading(feature) {
+function naturalFeatureMarkerReplaced(geometry) {
     return {
-        type: SAVE_NATURAL_FEATURE,
-        status: "loading",
-        feature
+        type: NATURAL_FEATURE_MARKER_REPLACED,
+        geometry
     };
 }
 
-function saveNaturalFeatureSuccess(feature) {
-    return {
-        type: SAVE_NATURAL_FEATURE,
-        status: "success",
-        feature
-    };
-}
-
-function saveNaturalFeatureError(feature, error) {
-    return {
-        type: SAVE_NATURAL_FEATURE,
-        status: "error",
-        feature,
-        error
-    };
-}
-
-function saveNaturalFeature(feature) {
+function naturalFeatureGeomAdded(feature) {
+    let newFeat = feature;
+    if (feature.drawMethod === 'Marker') {
+        return (dispatch) => {
+            dispatch(naturalFeatureMarkerAdded(newFeat));
+        };
+    }
+    if (feature.drawMethod === 'Polygon') {
+        return (dispatch) => {
+            dispatch(naturalFeaturePolygonReplaced(newFeat.geom));
+        };
+    }
     return (dispatch) => {
-        if (feature) {
-            dispatch(saveNaturalFeatureLoading(feature));
-            return Api.saveNaturalFeature(feature).then((resp) => {
-                dispatch(saveNaturalFeatureSuccess(resp));
-            }).catch((error) => {
-                if (error.status === 401) {
-                    return dispatch(userNotAuthenticatedError(error));
-                }
-                return dispatch(saveNaturalFeatureError(feature, error));
-            });
-        }
+        dispatch(naturalFeatureMarkerReplaced(newFeat.geom));
     };
 }
 
@@ -356,12 +341,38 @@ function updateNaturalFeatureError(id, error) {
     };
 }
 
+function createNaturalFeatureLoading(id) {
+    return {
+        type: CREATE_NATURAL_FEATURE,
+        status: "loading",
+        id
+    };
+}
+
+function createNaturalFeatureSuccess(id) {
+    return {
+        type: CREATE_NATURAL_FEATURE,
+        status: "success",
+        id
+    };
+}
+
+function createNaturalFeatureError(feature, error) {
+    return {
+        type: CREATE_NATURAL_FEATURE_ERROR,
+        status: "error",
+        feature,
+        error
+    };
+}
+
 function naturalFeatureCreated(featuretype, featuresubtype, feature) {
     return (dispatch) => {
+        dispatch(createNaturalFeatureLoading(feature));
         return Api.createNewFeature(feature).then((resp) => {
             if (resp) {
+                dispatch(createNaturalFeatureSuccess(resp.id));
                 dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(naturalFeatureCreated(resp.featuretype, resp.featuresubtype, resp.id));
                 dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
                 dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
             }
@@ -369,7 +380,7 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
             if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
             }
-            return dispatch(updateNaturalFeatureError(-1, error));
+            return dispatch(createNaturalFeatureError(-1, error));
         });
     };
 }
@@ -377,7 +388,7 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
 
 function updateNaturalFeature(featuretype, featuresubtype, properties) {
     return (dispatch) => {
-        // dispatch(updateNaturalFeatureLoading(feature));
+        dispatch(updateNaturalFeatureLoading(properties));
         return Api.updateNaturalFeature(featuretype, properties).then(() => {
             dispatch(updateNaturalFeatureSuccess(properties.id));
             dispatch(reloadFeatureType(featuretype));
@@ -487,6 +498,7 @@ function getVersion(featureType, featId, version) {
             if (feature) {
                 // disptach(getVersionSuccess());
                 dispatch(updateNaturalFeatureForm(feature));
+                dispatch(changeDrawingStatus("selectionGeomLoaded", "MarkerReplace", "dockednaturalfeatures", [], {properties: feature}));
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -520,21 +532,18 @@ module.exports = {
     NATURAL_FEATURE_TYPE_LOADED, naturalFeatureTypeLoaded,
     NATURAL_FEATURE_TYPE_ERROR, naturalFeatureTypeError,
     naturalFeatureCreated, naturalFeatureAdded,
-    SAVE_NATURAL_FEATURE, saveNaturalFeature,
-    saveNaturalFeatureLoading, saveNaturalFeatureSuccess,
-    saveNaturalFeatureError,
     UPDATE_NATURAL_FEATURE, updateNaturalFeature,
-    updateNaturalFeatureLoading, updateNaturalFeatureSuccess,
-    UPDATE_NATURAL_FEATURE_ERROR, updateNaturalFeatureError,
+    UPDATE_NATURAL_FEATURE_ERROR,
+    CREATE_NATURAL_FEATURE_ERROR,
     DELETE_NATURAL_FEATURE, deleteNaturalFeature,
     deleteNaturalFeatureLoading, deleteNaturalFeatureSuccess,
     deleteNaturalFeatureError,
-    NATURAL_FEATURE_MARKER_ADDED, naturalFeatureMarkerAdded,
-    NATURAL_FEATURE_POLYGON_ADDED, naturalFeaturePolygonAdded,
+    NATURAL_FEATURE_MARKER_ADDED, NATURAL_FEATURE_MARKER_REPLACED,
+    NATURAL_FEATURE_POLYGON_REPLACED,
     getSpecies,
     updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
     userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData,
     USER_NOT_AUTHENTICATED_ERROR,
     showLogin,
-    nextVersion, previousVersion
+    nextVersion, previousVersion, naturalFeatureGeomAdded
 };

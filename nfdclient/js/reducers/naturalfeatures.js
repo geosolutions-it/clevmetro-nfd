@@ -10,7 +10,10 @@ const {
     NATURAL_FEATURE_TYPE_LOADED,
     UPDATE_NATURAL_FEATURE_FORM,
     UPDATE_NATURAL_FEATURE_ERROR,
-    UPDATE_SPECIES_FORMS
+    CREATE_NATURAL_FEATURE_ERROR,
+    UPDATE_SPECIES_FORMS,
+    NATURAL_FEATURE_POLYGON_REPLACED,
+    NATURAL_FEATURE_MARKER_REPLACED
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -29,6 +32,7 @@ function naturalfeatures(state = {}, action) {
                 errors: {}
             });
         }
+        case CREATE_NATURAL_FEATURE_ERROR:
         case UPDATE_NATURAL_FEATURE_ERROR: {
             if (action.error.status >= 500) {
                 return assign({}, state, {
@@ -40,7 +44,19 @@ function naturalfeatures(state = {}, action) {
             });
         }
         case UPDATE_SPECIES_FORMS: {
-            let selectedFeature = assign({}, state.selectedFeature, action.feature);
+            const selectedFeature = assign({}, state.selectedFeature, action.feature);
+            return assign({}, state, {
+                selectedFeature: selectedFeature
+            });
+        }
+        case NATURAL_FEATURE_POLYGON_REPLACED: {
+            const selectedFeature = assign({}, state.selectedFeature, {polygon: action.geometry});
+            return assign({}, state, {
+                selectedFeature: selectedFeature
+            });
+        }
+        case NATURAL_FEATURE_MARKER_REPLACED: {
+            const selectedFeature = assign({}, state.selectedFeature, {geom: action.geometry});
             return assign({}, state, {
                 selectedFeature: selectedFeature
             });

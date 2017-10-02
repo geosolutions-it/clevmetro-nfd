@@ -20,7 +20,7 @@ const {
     naturalFeaturesLoaded,
     naturalFeaturesLoading,
     naturalFeaturesError,
-    naturalFeatureMarkerAdded,
+    naturalFeatureGeomAdded,
     USER_NOT_AUTHENTICATED_ERROR,
     showLogin
 } = require('../actions/naturalfeatures');
@@ -134,7 +134,7 @@ const unauthorizedUserErrorEpic = action$ =>
 const addNaturalFeatureGeometryEpic = (action$) =>
     action$.ofType(END_DRAWING)
         .switchMap((action) => {
-            return Rx.Observable.from([naturalFeatureMarkerAdded(action.geometry)]);
+            return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)]);
         });
 
 module.exports = {

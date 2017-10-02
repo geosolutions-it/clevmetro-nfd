@@ -62,6 +62,10 @@ const LeafletDrawSupport = React.createClass({
             case ("featureDeselected"):
                 this.deselectFeature();
                 break;
+            case ("selectionGeomLoaded"):
+                this.drawMarker(newProps.options.properties);
+                this.drawPolygon(newProps.options.properties);
+                break;
             default :
                 return;
         }
@@ -71,53 +75,101 @@ const LeafletDrawSupport = React.createClass({
             this.drawing = true;
         }
     },
+    getSelectionIconUrl() {
+        try {
+            return this.selectionHighlightIcon.options.iconUrl;
+        } catch (e) {
+            console.log(e);
+        }
+        return null;
+    },
     render() {
         return null;
     },
-    addMarkerLayer: function(newProps) {
-        // this.cleanMarkerLayer();
-
-        let smallIcon = new L.Icon({
-            iconUrl: newProps.options.icon,
-            iconAnchor: [12, 40]
-        });
+    addMarkerLayer: function(iconUrl) {
+        var smallIcon;
+        if (this.drawMarkerLayer) {
+            return;
+        }
+        if (iconUrl) {
+            smallIcon = new L.Icon({
+                iconUrl: iconUrl,
+                iconAnchor: [12, 40]
+            });
+        }
         let vector = L.geoJson(null, {
             pointToLayer: function(feature, latLng) {
+                var marker;
                 let center = CoordinatesUtils.reproject({x: latLng.lng, y: latLng.lat}, feature.projection, "EPSG:4326");
-                let marker = L.marker(L.latLng(center.y, center.x), {
-                    icon: smallIcon
-                });
+                if (smallIcon) {
+                    marker = L.marker(L.latLng(center.y, center.x), {
+                        icon: smallIcon
+                    });
+                } else {
+                    marker = L.circleMarker(L.latLng(center.y, center.x), {
+                        color: '#ff0000',
+                        opacity: 0.6,
+                        weight: 2,
+                        fillColor: '#ff0000',
+                        fillOpacity: 0.2
+                    });
+                }
                 return marker;
             }
         });
         this.props.map.addLayer(vector);
         this.drawMarkerLayer = vector;
     },
+    addPolygonLayer: function() {
+        if (this.drawPolygonLayer) {
+            return;
+        }
+        let vector = L.geoJson();
+        this.props.map.addLayer(vector);
+        this.drawPolygonLayer = vector;
+    },
     addDrawInteraction: function(newProps) {
-        if (!this.drawMarkerLayer) {
-            this.addMarkerLayer(newProps);
+        const drawMethod = newProps.drawMethod;
+        if (drawMethod.includes("Marker")) {
+            this.addMarkerLayer(newProps.options.icon);
+        }
+        if (drawMethod === "Polygon") {
+            this.addPolygonLayer();
         }
 
         this.removeDrawInteraction();
         const customProps = newProps.options.properties;
         this.props.map.on('draw:created', function(evt) {
+            let geomType;
             this.drawing = false;
             const layer = evt.layer;
             // let drawn geom stay on the map
-            let geoJesonFt = layer.toGeoJSON();
+            let geoJsonFt = layer.toGeoJSON();
             if (evt.layerType === "marker") {
-                geoJesonFt.projection = "EPSG:4326";
-                geoJesonFt.radius = layer.getRadius ? layer.getRadius() : 0;
-                geoJesonFt.properties.featuretype = customProps.featuretype;
-                geoJesonFt.properties.featuresubtype = customProps.featuresubtype;
-                this.drawMarkerLayer.addData(geoJesonFt);
+                if (drawMethod === "MarkerReplace") {
+                    this.deselectFeature();
+                    this.drawMarkerLayer.clearLayers();
+                }
+                geoJsonFt.projection = "EPSG:4326";
+                geoJsonFt.radius = layer.getRadius ? layer.getRadius() : 0;
+                geoJsonFt.properties.featuretype = customProps.featuretype;
+                geoJsonFt.properties.featuresubtype = customProps.featuresubtype;
+                this.drawMarkerLayer.addData(geoJsonFt);
+                geomType = "Point";
+            } else if (evt.layerType === "polygon") {
+                geoJsonFt.projection = "EPSG:4326";
+                geoJsonFt.properties.featuretype = customProps.featuretype;
+                geoJsonFt.properties.featuresubtype = customProps.featuresubtype;
+                this.drawPolygon(geoJsonFt);
+                geomType = "Polygon";
             }
             let newFeature = {
                 featuretype: customProps.featuretype,
                 featuresubtype: customProps.featuresubtype,
+                drawMethod: drawMethod,
                 geom: {
-                    type: "Point",
-                    coordinates: geoJesonFt.geometry.coordinates
+                    type: geomType,
+                    coordinates: geoJsonFt.geometry.coordinates
                 }
             };
             this.props.onChangeDrawingStatus('stop', this.props.drawMethod, this.props.drawOwner);
@@ -125,7 +177,7 @@ const LeafletDrawSupport = React.createClass({
         }, this);
         this.props.map.on('draw:drawstart', this.onDraw.drawStart, this);
 
-        if (newProps.drawMethod === 'Marker') {
+        if (newProps.drawMethod === 'Marker' || newProps.drawMethod === 'MarkerReplace') {
             let NaturalFeatureMarker = L.Icon.extend({
                 options: {
                     iconUrl: newProps.options.icon,
@@ -136,6 +188,18 @@ const LeafletDrawSupport = React.createClass({
                 icon: new NaturalFeatureMarker(),
                 repeatMode: false
             });
+        } else if (newProps.drawMethod === 'Polygon') {
+            this.drawControl = new L.Draw.Polygon(this.props.map, {
+                shapeOptions: {
+                    color: '#000000',
+                    weight: 2,
+                    fillColor: '#ffffff',
+                    fillOpacity: 0.2,
+                    dashArray: [5, 5],
+                    guidelineDistance: 5
+                },
+                repeatMode: true
+            });
         }
 
         // start the draw control
@@ -143,7 +207,7 @@ const LeafletDrawSupport = React.createClass({
     },
     addMobileDrawInteraction: function(newProps) {
         if (!this.drawMarkerLayer) {
-            this.addMarkerLayer(newProps);
+            this.addMarkerLayer(newProps.options.icon);
         }
         this.removeMobileDrawInteraction();
         navigator.geolocation.getCurrentPosition((currentPosition) => {
@@ -201,6 +265,11 @@ const LeafletDrawSupport = React.createClass({
             this.props.map.removeLayer(this.drawMarkerLayer);
             this.drawMarkerLayer = null;
         }
+        if (this.drawPolygonLayer) {
+            this.drawPolygonLayer.clearLayers();
+            this.props.map.removeLayer(this.drawPolygonLayer);
+            this.drawPolygonLayer = null;
+        }
     },
     clean: function() {
         this.cleanMarkerLayer();
@@ -210,11 +279,39 @@ const LeafletDrawSupport = React.createClass({
         this.deselectFeature();
         this.selectedLeafletFeat = feat;
         feat.setIcon(feat.highlightIcon);
+        this.selectionHighlightIcon = feat.highlightIcon;
     },
     deselectFeature: function() {
         if (this.selectedLeafletFeat) {
             this.selectedLeafletFeat.setIcon(this.selectedLeafletFeat.regularIcon);
             this.selectedLeafletFeat = null;
+        }
+    },
+    drawMarker: function(props) {
+        if (props.geom) {
+            try {
+                let feature = {geometry: props.geom, properties: props, type: "Feature", projection: "EPSG:4326"};
+                this.addMarkerLayer(this.getSelectionIconUrl());
+                this.drawMarkerLayer.clearLayers();
+                this.deselectFeature();
+                this.drawMarkerLayer.addData(feature);
+            } catch(e) {
+                console.log(e);
+            }
+        }
+    },
+    drawPolygon: function(props) {
+        this.addPolygonLayer();
+        this.drawPolygonLayer.clearLayers();
+        if (props.polygon) {
+            try {
+                let feature = {geometry: JSON.parse(props.polygon), properties: props, type: "Feature", projection: "EPSG:4326"};
+                this.drawPolygonLayer.addData(feature);
+            } catch(e) {
+                console.log(e);
+            }
+        } else if (props.geometry) {
+            this.drawPolygonLayer.addData(props);
         }
     }
 });
