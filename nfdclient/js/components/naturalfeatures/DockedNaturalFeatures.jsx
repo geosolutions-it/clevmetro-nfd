@@ -51,6 +51,7 @@ const DockedNaturalFeatures = React.createClass({
         onEndDrawing: React.PropTypes.func,
         photos: React.PropTypes.array,
         getSpecies: React.PropTypes.func,
+        cancel: React.PropTypes.func,
         selectedSpecie: React.PropTypes.number
     },
     getDefaultProps() {
@@ -75,7 +76,8 @@ const DockedNaturalFeatures = React.createClass({
             previousVersion: () => {},
             nextVersion: () => {},
             onChangeDrawingStatus: () => {},
-            onEndDrawing: () => {}
+            onEndDrawing: () => {},
+            cancel: () => {}
         };
     },
     componentWillMount: function() {
@@ -83,7 +85,7 @@ const DockedNaturalFeatures = React.createClass({
     },
     onClose: function() {
         this.props.onToggle();
-        this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
+        // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onAddPointClick: function() {
         this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: this.getMarkerIcon()});
@@ -437,7 +439,7 @@ const DockedNaturalFeatures = React.createClass({
                 </Tab>
             );
         }*/
-        if (this.props.mode === 'add') {
+        if (this.props.mode === 'ADD') {
             tabs.push(
                 <Tab eventKey={(tabs.length + 1)} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     <div className="nf-tab-content">
@@ -458,12 +460,19 @@ const DockedNaturalFeatures = React.createClass({
         return tabs;
     },
     renderButtons() {
+        const cancel = (<Button key="cancel" bsSize="small"
+                    bsStyle="primary"
+                    onClick={this.props.cancel}
+                    disabled={false}
+                    style={{marginRight: "2px"}}>
+                    <Message msgId="cancel" />
+                </Button>);
         if (this.props.isWriter || this.props.isPublisher) {
-            return (this.props.mode === 'viewedit') ? [
+            return (this.props.mode === 'EDIT') ? [cancel,
                 <Button key="delete" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.id)}
-                    style={{marginRight: "10px"}}
+                    style={{marginRight: "2px"}}
                     disabled={false}>
                     <Message msgId="naturalfeatures.delete" />
                 </Button>,
@@ -474,7 +483,7 @@ const DockedNaturalFeatures = React.createClass({
                     <Message msgId="naturalfeatures.update" />
                 </Button>
 
-            ] : [
+            ] : [cancel,
                 <Button key="save" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
@@ -570,7 +579,7 @@ const DockedNaturalFeatures = React.createClass({
                 </div>
                 <div className="dock-panel-footer">
                     <div className="dock-panel-footer-buttons">
-                        {(this.props.mode === 'viewedit') ? this.renderHistoric() : null}
+                        {(this.props.mode === 'EDIT') ? this.renderHistoric() : null}
                         {this.renderButtons()}
                     </div>
                 </div>
@@ -597,7 +606,7 @@ const DockedNaturalFeatures = React.createClass({
             .then(json => this.setState({options: json}));
     },
     handleVisibility(index, label) {
-        if (this.props.mode === 'add') {
+        if (this.props.mode === 'ADD') {
             if (label.target.className === "glyphicon glyphicon-camera") {
                 document.getElementById("nfdraw-tools").style.display = "none";
             } else {
@@ -620,9 +629,9 @@ const DockedNaturalFeatures = React.createClass({
         } else {
             this.props.currentFeature[e.target.name] = e.target.value;
         }
-        if (this.props.mode === 'viewedit') {
+        if (this.props.mode === 'EDIT') {
             this.setState({selectedFeature: this.props.currentFeature});
-        } else if (this.props.mode === 'add') {
+        } else if (this.props.mode === 'ADD') {
             this.setState({selectedFeature: this.props.currentFeature});
         }
     },
