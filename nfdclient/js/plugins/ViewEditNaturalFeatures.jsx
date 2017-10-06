@@ -9,7 +9,7 @@ const React = require('react');
 const {connect} = require('react-redux');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion} = require('../actions/naturalfeatures');
+const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion, cancel} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
@@ -34,7 +34,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing,
     previousVersion: previousVersion,
-    nextVersion: nextVersion
+    nextVersion: nextVersion,
+    cancel
 })(DockedNaturalFeatures);
 
 const ViewEditNaturalFeaturesPlugin = React.createClass({

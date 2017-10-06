@@ -11,7 +11,7 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {naturalFeatureCreated, getSpecies, activateFeatureInsert} = require('../actions/naturalfeatures');
+const {naturalFeatureCreated, getSpecies, addFeature, cancel} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
@@ -37,7 +37,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     onUpdate: naturalFeatureCreated.bind(null),
     getSpecies: getSpecies.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
-    onEndDrawing: endDrawing
+    onEndDrawing: endDrawing,
+    cancel
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
 require('../components/naturalfeatures/DockedNaturalFeatures.css');
 
@@ -78,7 +79,7 @@ const AddNaturalFeatures = React.createClass({
         return (
             this.props.visible ?
             (<div>
-                <DropdownButton id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
+                <DropdownButton disabled={this.props.disabled} id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
                     {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
                     }
@@ -125,7 +126,7 @@ const AddNaturalFeatures = React.createClass({
 module.exports = {
     AddNaturalFeaturesPlugin: assign(connect((state) => ({
         active: state.controls && state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.active,
-        disabled: state.controls && state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.disabled,
+        disabled: state.naturalfeatures && state.naturalfeatures.mode !== 'VIEW' && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id),
         visible: true,
         plant_writer: state.security.user && state.security.user.plant_writer,
         animal_writer: state.security.user && state.security.user.animal_writer,
@@ -133,7 +134,7 @@ module.exports = {
         fungus_writer: state.security.user && state.security.user.fungus_writer,
         naturalarea_writer: state.security.user && state.security.user.naturalarea_writer
     }), {
-        onToggleNewNaturalFeature: activateFeatureInsert
+        onToggleNewNaturalFeature: addFeature
     })(AddNaturalFeatures), {
         OmniBar: {
             name: "addnf",

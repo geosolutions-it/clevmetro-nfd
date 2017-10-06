@@ -8,7 +8,7 @@
 const Rx = require('rxjs');
 const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
-
+const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 const {
     GET_ANIMALS,
     GET_PLANTS,
@@ -16,16 +16,23 @@ const {
     GET_FUNGUS,
     GET_SLIME_MOLDS,
     NFD_LOGIN_SUCCESS,
+    ADD_FEATURE,
     getData,
     naturalFeaturesLoaded,
     naturalFeaturesLoading,
     naturalFeaturesError,
     naturalFeatureGeomAdded,
     USER_NOT_AUTHENTICATED_ERROR,
-    showLogin
+    showLogin,
+    END_EDITING,
+    NF_CLICKED,
+    naturalFeatureSelected,
+    viewFeature,
+    editFeature
 } = require('../actions/naturalfeatures');
-
-const {END_DRAWING} = require('../../MapStore2/web/client/actions/draw');
+const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
+const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
+const Utils = require('../utils/nfdUtils');
 
 const getAnimalsEpic = (action$, store) =>
     action$.ofType(GET_ANIMALS)
@@ -117,6 +124,7 @@ const getSlimeMoldsEpic = (action$, store) =>
         .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
     );
 
+// Load features for all reatureTypes
 const getDataEpic = action$ =>
     action$.ofType(NFD_LOGIN_SUCCESS)
     .map(val => getData(val));
@@ -136,7 +144,34 @@ const addNaturalFeatureGeometryEpic = (action$) =>
         .switchMap((action) => {
             return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)]);
         });
-
+const activateFeatureInsert = (action$) =>
+    action$.ofType(ADD_FEATURE)
+    .switchMap(({properties}) => {
+        return Rx.Observable.of(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties, icon: Utils.getIconUrl(properties.featuretype)}));
+    });
+const cleanDraw = (action$, store) =>
+        action$.ofType(END_EDITING)
+        .switchMap(() => {
+            const {controls} = store.getState();
+            const control = controls.addnaturalfeatures && controls.addnaturalfeatures.enabled ? 'addnaturalfeatures' : 'vieweditnaturalfeatures';
+            return Rx.Observable.from([changeDrawingStatus("clean", null, "dockednaturalfeatures", [], {}), toggleControl(control)]);
+        });
+const activeFeatureEdit = (action$, store) =>
+     action$.ofType(NF_CLICKED)
+        .filter(() => {
+            const {naturalfeatures} = store.getState();
+            return naturalfeatures.mode !== 'ADD' && naturalfeatures.mode !== 'EDIT';
+        })
+        .switchMap((a) => {
+            // TODO: Recover the json geom form the layer and add to props
+            // const {flat: layers} = (store.getState()).layers;
+            // const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
+            // const feature = (layer && layer.features || []).filter(f => f.id === a.properties.id).pop();
+            // const geom = feature && feature.geometry;
+            // const props = {...a.properties, geom};
+            const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature() : viewFeature();
+            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, a.layer), modeAction]);
+        });
 module.exports = {
     getDataEpic,
     unauthorizedUserErrorEpic,
@@ -145,5 +180,8 @@ module.exports = {
     getFungusEpic,
     getNaturalAreasEpic,
     getSlimeMoldsEpic,
-    addNaturalFeatureGeometryEpic
+    addNaturalFeatureGeometryEpic,
+    activateFeatureInsert,
+    cleanDraw,
+    activeFeatureEdit
 };

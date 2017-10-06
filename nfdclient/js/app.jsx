@@ -12,23 +12,19 @@ const appReducers = {
     naturalfeatures: require('./reducers/naturalfeatures'),
     selection: require('../MapStore2/web/client/reducers/selection')
 };
-const {initState} = require('./actions/naturalfeatures');
+
 const dEpics = require('./epics/naturalfeatures');
 const ConfigUtils = require('../MapStore2/web/client/utils/ConfigUtils');
-// ConfigUtils.setLocalConfigurationFile('/static/js/risksConfig.json');
+
 // Set one hour cache
 ConfigUtils.setConfigProp("cacheDataExpire", 3600);
 
 const StandardApp = require('../MapStore2/web/client/components/app/StandardApp');
-const url = require('url');
-const urlQuery = url.parse(window.location.href, true).query;
-const init = urlQuery && urlQuery.init && JSON.parse(decodeURIComponent(urlQuery.init));
 
 const {pages, pluginsDef, initialState, storeOpts} = require('./appConfig');
 const axios = require('../MapStore2/web/client/libs/ajax');
 const Cookies = require('cookies-js');
-// test cookies local setting
-// Cookies.set('csrftoken', 'zR1gzO836hVjqoKIzSZuxtPCyTP3Jtho', { expires: Infinity });
+
 if (Cookies.get('csrftoken')) {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
 }
@@ -43,10 +39,8 @@ const StandardRouter = connect((state) => ({
 
 const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(null, initialState, appReducers, {...dEpics});
 
-const initialActions = init ? [
-    () => initState(init)
-] : [
-];
+const initialActions = [];
+
 const appConfig = {
     storeOpts,
     appStore,
