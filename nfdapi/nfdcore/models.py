@@ -261,13 +261,6 @@ class Species(models.Model):
     phylum_common = models.TextField(blank=True, default='')
     element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
 
-@reversion.register()
-class ElementNaturalAreas(Element):
-    natural_area_code_nac = models.TextField(blank=True, default='')
-    general_description = models.TextField(blank=True, default='')
-    area = models.FloatField(null=True)
-    landscape_position =  models.TextField(blank=True, default='') #FIXME
-
 class Preservative(DictionaryTable):
     pass
 
@@ -320,6 +313,8 @@ def get_details_class(category_code):
         return StreamAnimalDetails
     elif category_code=='we':
         return WetlandAnimalDetails
+    elif category_code=='na':
+        return ElementNaturalAreas
 
 @reversion.register()
 class OccurrenceTaxon(Occurrence):
@@ -344,12 +339,6 @@ class OccurrenceTaxon(Occurrence):
                 return get_details_class(self.occurrence_cat.code).objects.get(pk=self.details.id)
         except:
             pass
-
-@reversion.register()
-class OccurrenceNaturalArea(Occurrence):
-    natural_area_element = models.ForeignKey(ElementNaturalAreas, on_delete=models.SET_NULL, blank=True, null=True)
-    photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
-    location = models.OneToOneField(NaturalAreaLocation, on_delete=models.CASCADE, null=True)
 
 class Gender(DictionaryTable):
     pass
@@ -636,9 +625,9 @@ class PlantDetails(TaxonDetails):
     #common_ground_vegetation = models.ForeignKey(CommonGroundVegetation, on_delete=models.SET_NULL, blank=True, null=True)
     general_habitat_category = models.ForeignKey(GeneralHabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
     leap_land_cover_category = models.TextField(blank=True, null=True)
-    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.SET_NULL, blank=True, null=True)
+    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
     #invasive_plants = models.ForeignKey(InvasivePlants, on_delete=models.SET_NULL, blank=True, null=True)
-    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.SET_NULL, blank=True, null=True)
+    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
     landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
     aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
     slope = models.ForeignKey(Slope, on_delete=models.SET_NULL, blank=True, null=True)
@@ -661,3 +650,56 @@ class FloweringPlantDetails(PlantDetails):
 @reversion.register(follow=['taxondetails_ptr'])
 class MossDetails(PlantDetails):
     lifestages = models.ForeignKey(MossLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+
+class CMSensitivity(DictionaryTable):
+    pass
+
+class NaturalAreaCondition(DictionaryTable):
+    pass
+
+class GlacialDepositPleistoceneAge(DictionaryTable):
+    pass
+
+class GlacialDeposit(DictionaryTable):
+    pass
+
+class NaturalAreaType(DictionaryTable):
+    pass
+
+class LeapLandCover(DictionaryTable):
+    pass
+
+class BedrockAndOutcrops(DictionaryTable):
+    pass
+
+class RegionalFrequency(DictionaryTable):
+    pass
+
+@reversion.register()
+class ElementNaturalAreas(Element):
+    natural_area_code_nac = models.TextField(blank=True, null=True, default='')
+    general_description = models.TextField(blank=True, null=True, default='')
+    type = models.ForeignKey(NaturalAreaType, on_delete=models.SET_NULL, blank=True, null=True)
+    notable_features = models.TextField(blank=True, null=True)
+    area = models.FloatField(null=True)
+    aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
+    slope = models.ForeignKey(Slope, on_delete=models.SET_NULL, blank=True, null=True)
+    sensitivity = models.ForeignKey(CMSensitivity, on_delete=models.SET_NULL, blank=True, null=True)
+    condition = models.ForeignKey(NaturalAreaCondition, on_delete=models.SET_NULL, blank=True, null=True)
+    leap_land_cover_category = models.ForeignKey(LeapLandCover, on_delete=models.SET_NULL, blank=True, null=True)
+    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
+    #invasive_plants = models.ForeignKey(InvasivePlants, on_delete=models.SET_NULL, blank=True, null=True) # FIXME
+    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
+    landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
+    glaciar_diposit = models.ForeignKey(GlacialDeposit, on_delete=models.SET_NULL, blank=True, null=True)
+    pleistocene_glaciar_diposit = models.ForeignKey(GlacialDepositPleistoceneAge, on_delete=models.SET_NULL, blank=True, null=True)
+    bedrock_and_outcrops = models.ForeignKey(BedrockAndOutcrops, on_delete=models.SET_NULL, blank=True, null=True)
+    regional_frequency = models.ForeignKey(RegionalFrequency, on_delete=models.SET_NULL, blank=True, null=True)
+    # soils_ssurgo_wrap # FIXME
+
+@reversion.register()
+class OccurrenceNaturalArea(Occurrence):
+    #details = models.OneToOneField(NaturalAreaDetails, on_delete=models.CASCADE, null=True)
+    element = models.ForeignKey(ElementNaturalAreas, on_delete=models.CASCADE, blank=True, null=True)
+    photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
+    location = models.OneToOneField(NaturalAreaLocation, on_delete=models.CASCADE, null=True)

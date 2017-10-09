@@ -75,3 +75,33 @@ class CanCreateFeatureType(permissions.BasePermission):
     
     def has_object_permission(self, request, view, obj):
         return True
+
+class CanCreateAnimals(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='POST':
+            return request.user.is_animal_writer
+        return True
+    
+class CanCreatePlants(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='POST':
+            return request.user.is_plant_writer
+        return True
+
+class CanCreateFungus(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='POST':
+            return request.user.is_fungus_writer
+        return True
+
+class CanCreateSlimeMold(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='POST':
+            return request.user.is_slimemold_writer
+        return True
+
+class CanCreateNaturalAreas(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method=='POST':
+            return request.user.is_naturalarea_writer
+        return True
