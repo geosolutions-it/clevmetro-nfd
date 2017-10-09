@@ -185,23 +185,23 @@ class TaxonList(NfdList):
     def get_base_queryset(self):
         return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
 
-class PlantList(NfdList):
+class PlantList(TaxonList):
     permission_classes = [ IsAuthenticated, CanCreatePlants ]
     def get_main_cat(self):
         return "plant"
 
-class AnimalList(NfdList):
+class AnimalList(TaxonList):
     permission_classes = [ IsAuthenticated, CanCreateAnimals ]
     def get_main_cat(self):
         return "animal"
 
 
-class FungusList(NfdList):
+class FungusList(TaxonList):
     permission_classes = [ IsAuthenticated, CanCreateFungus ]
     def get_main_cat(self):
         return "fungus"
 
-class SlimeMoldList(NfdList):
+class SlimeMoldList(TaxonList):
     permission_classes = [ IsAuthenticated, CanCreateSlimeMold ]
     
     def get_main_cat(self):

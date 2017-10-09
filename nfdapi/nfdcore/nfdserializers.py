@@ -1231,7 +1231,7 @@ class ListSerializer(gisserializer.GeoFeatureModelSerializer):
     
     def __init__(self, *args, **kwargs):
         self.is_writer_or_publisher = kwargs.pop('is_writer_or_publisher', False)
-        super(TaxonListSerializer, self).__init__(*args, **kwargs)
+        super(ListSerializer, self).__init__(*args, **kwargs)
     
     
     class Meta:
@@ -1240,7 +1240,7 @@ class ListSerializer(gisserializer.GeoFeatureModelSerializer):
         fields = ('id', 'featuretype', 'featuresubtype', 'inclusion_date', 'released', 'verified', 'version', 'total_versions')
 
 
-class TaxonListSerializer(gisserializer.GeoFeatureModelSerializer):    
+class TaxonListSerializer(ListSerializer):    
     def get_properties(self, instance, fields):
         result = {}
         if self.is_writer_or_publisher:
@@ -1261,7 +1261,7 @@ class TaxonListSerializer(gisserializer.GeoFeatureModelSerializer):
         return result
 
 
-class NaturalAreaListSerializer(gisserializer.GeoFeatureModelSerializer):    
+class NaturalAreaListSerializer(ListSerializer):    
     def get_properties(self, instance, fields):
         result = {}
         if self.is_writer_or_publisher:
