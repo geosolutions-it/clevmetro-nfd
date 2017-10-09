@@ -114,7 +114,7 @@ const AddNaturalFeatures = React.createClass({
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "animal", "featuresubtype": "we"})}><Message msgId="naturalfeatures.wetland_animal"/></MenuItem>
                     }
                     {this.props.naturalarea_writer &&
-                        <MenuItem disabled={true} onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
+                        <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
                     }
                 </DropdownButton>
                 <SmartDockedNaturalFeatures mode="add"/>

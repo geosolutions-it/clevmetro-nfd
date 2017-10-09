@@ -388,7 +388,7 @@ const DockedNaturalFeatures = React.createClass({
             }
         });
 
-        searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher);
+        searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher) && this.props.featuresubtype !== 'na';
 
         return (
             <div className="nf-tab-content">
