@@ -38,9 +38,45 @@ const {setControlProperty} = require('../../MapStore2/web/client/actions/control
 const {changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 const {loginFail, logout} = require('../../MapStore2/web/client/actions/security');
-const {loadMaps} = require('../../MapStore2/web/client/actions/maps');
 const assign = require('object-assign');
-const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
+
+const ADD_FEATURE = 'ADD_FEATURE';
+const EDIT_FEATURE = 'EDIT_FEATURE';
+const VIEW_FEATURE = 'VIEW_FEATURE';
+const END_EDITING = 'END_EDITING';
+const NF_CLICKED = 'NF_CLICKED';
+
+function viewFeature() {
+    return {
+        type: VIEW_FEATURE
+    };
+}
+function onNfClick(properties, nfId, layer) {
+    return {
+        type: NF_CLICKED,
+        properties,
+        nfId,
+        layer
+    };
+}
+function cancel() {
+    return {
+        type: END_EDITING
+    };
+}
+function editFeature() {
+    return {
+        type: EDIT_FEATURE
+    };
+}
+
+function addFeature(properties) {
+    return {
+        type: ADD_FEATURE,
+        properties
+    };
+}
+
 
 const normalizeInfo = (resp) => {
     return resp;
@@ -179,7 +215,6 @@ function getFeatureInfo(properties, nfid) {
         return Api.getFeatureInfo(properties.featuretype, nfid).then((resp) => {
             if (resp) {
                 let feature = normalizeInfo(resp);
-                dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
                 dispatch(updateNaturalFeatureForm(feature));
                 dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
                 dispatch(changeDrawingStatus("selectionGeomLoaded", "Marker", "dockednaturalfeatures", [], {properties: resp}));
@@ -208,8 +243,8 @@ function getSpecies(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid, lflFeat) {
-    let theLflFeat = lflFeat;
+function naturalFeatureSelected(properties, nfid, fature) {
+    const theLflFeat = fature;
     return (dispatch) => {
         dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
@@ -245,23 +280,6 @@ function naturalFeatureAdded(error) {
     return {
         type: NATURAL_FEATURE_ADDED,
         error
-    };
-}
-
-
-function activateFeatureInsert(properties) {
-    return (dispatch) => {
-        if (properties.featuretype === 'plant') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-green-highlight.png'}));
-        } else if (properties.featuretype === 'animal') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-purple-highlight.png'}));
-        } else if (properties.featuretype === 'fungus') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-yellow-highlight.png'}));
-        } else if (properties.featuretype === 'slimemold') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-marine-highlight.png'}));
-        } else if (properties.featuretype === 'naturalarea') {
-            dispatch(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties: properties, icon: '../../assets/img/marker-icon-blue-highlight.png'}));
-        }
     };
 }
 
@@ -373,8 +391,7 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
             if (resp) {
                 dispatch(createNaturalFeatureSuccess(resp.id));
                 dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
-                dispatch(setControlProperty('addnaturalfeatures', 'enabled', false));
+                dispatch(cancel());
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -467,7 +484,6 @@ function userLoginSubmit(username, password) {
     return (dispatch) => {
         Api.jwtLogin(username, password).then((response) => {
             dispatch(loginSuccess(response, username, password, "django-jwt"));
-            dispatch(loadMaps(false, ConfigUtils.getDefaults().initialMapFilter || "*"));
         }).catch((e) => {
             dispatch(loginFail(e));
         });
@@ -541,9 +557,14 @@ module.exports = {
     NATURAL_FEATURE_MARKER_ADDED, NATURAL_FEATURE_MARKER_REPLACED,
     NATURAL_FEATURE_POLYGON_REPLACED,
     getSpecies,
-    updateSpeciesForms, UPDATE_SPECIES_FORMS, activateFeatureInsert,
+    updateSpeciesForms, UPDATE_SPECIES_FORMS,
     userLoginSubmit, NFD_LOGIN_SUCCESS, nfdLogout, getData,
     USER_NOT_AUTHENTICATED_ERROR,
     showLogin,
-    nextVersion, previousVersion, naturalFeatureGeomAdded
+    nextVersion, previousVersion, naturalFeatureGeomAdded,
+    addFeature, ADD_FEATURE,
+    editFeature, EDIT_FEATURE,
+    cancel, END_EDITING,
+    onNfClick, NF_CLICKED,
+    viewFeature, VIEW_FEATURE
 };

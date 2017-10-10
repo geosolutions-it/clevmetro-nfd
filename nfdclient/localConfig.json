@@ -61,7 +61,8 @@
         "ZoomIn",
         "ZoomOut",
         "ViewEditNaturalFeatures",
-        "AddNaturalFeatures"
+        "AddNaturalFeatures",
+        "ToggleAddEditPanel"
       ],
       "mobile": [{
           "name": "Map",
@@ -85,7 +86,8 @@
       "ZoomIn",
       "ZoomOut",
       "ViewEditNaturalFeatures",
-      "AddNaturalFeatures"
+      "AddNaturalFeatures",
+      "ToggleAddEditPanel"
     ]
 	}
 }

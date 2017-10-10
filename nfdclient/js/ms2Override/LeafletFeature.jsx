@@ -10,7 +10,7 @@ var React = require('react');
 var {connect} = require('react-redux');
 var L = require('leaflet');
 const {isEqual} = require('lodash');
-const {naturalFeatureSelected} = require('../actions/naturalfeatures');
+const {onNfClick} = require('../actions/naturalfeatures');
 
 var coordsToLatLngF = function(coords) {
     return new L.LatLng(coords[1], coords[0], coords[2]);
@@ -218,11 +218,10 @@ let Feature = React.createClass({
             this.props.container.removeLayer(this._layer);
         }
     },
-    onClick(evt) {
+    onClick() {
         const {properties, onClick, msId} = this.props;
-        let leafletLayer = evt.target;
         if (onClick) {
-            onClick(properties, msId, leafletLayer);
+            onClick(properties, msId, this._layer);
         }
     },
     render() {
@@ -236,4 +235,4 @@ let Feature = React.createClass({
     }
 });
 
-module.exports = connect(()=> ({}), {onClick: naturalFeatureSelected})(Feature);
+module.exports = connect(()=> ({}), {onClick: onNfClick})(Feature);

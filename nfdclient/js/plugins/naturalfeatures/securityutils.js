@@ -6,44 +6,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const isWriter = (state) => {
+const isWriter = (state, featureType) => {
+    const ft = featureType || state.naturalfeatures.featuretype;
     if (state.security.user) {
-        if (state.naturalfeatures.featuretype === 'animal') {
-            return state.security.user.animal_writer;
-        }
-        if (state.naturalfeatures.featuretype === 'plant') {
-            return state.security.user.plant_writer;
-        }
-        if (state.naturalfeatures.featuretype === 'slimemold') {
-            return state.security.user.slimemold_writer;
-        }
-        if (state.naturalfeatures.featuretype === 'fungus') {
-            return state.security.user.fungus_writer;
-        }
-        if (state.naturalfeatures.featuretype === 'naturalarea') {
-            return state.security.user.naturalarea_writer;
-        }
+        return state.security.user[`${ft}_writer`];
     }
     return false;
 };
 
-const isPublisher = (state) => {
+const isPublisher = (state, featureType) => {
+    const ft = featureType || state.naturalfeatures.featuretype;
     if (state.security.user) {
-        if (state.naturalfeatures.featuretype === 'animal') {
-            return state.security.user.animal_publisher;
-        }
-        if (state.naturalfeatures.featuretype === 'plant') {
-            return state.security.user.plant_publisher;
-        }
-        if (state.naturalfeatures.featuretype === 'slimemold') {
-            return state.security.user.slimemold_publisher;
-        }
-        if (state.naturalfeatures.featuretype === 'fungus') {
-            return state.security.user.fungus_publisher;
-        }
-        if (state.naturalfeatures.featuretype === 'naturalarea') {
-            return state.security.user.naturalarea_publisher;
-        }
+        return state.security.user[`${ft}_publisher`];
     }
     return false;
 };

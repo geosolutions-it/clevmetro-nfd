@@ -13,7 +13,9 @@ from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
     SlimeMoldMedia, SlimeMoldClass, ConiferLifestages, FernLifestages,\
     MossLifestages, FloweringPlantLifestages, PlantCount, MoistureRegime,\
     GroundSurface, CanopyCover, GeneralHabitatCategory, LandscapePosition,\
-    Aspect, Slope, Watershed, Reservation
+    Aspect, Slope, Watershed, Reservation, CMSensitivity, LeapLandCover,\
+    GlacialDepositPleistoceneAge, GlacialDeposit, NaturalAreaCondition,\
+    NaturalAreaType, BedrockAndOutcrops, RegionalFrequency
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -775,6 +777,117 @@ watershed = [
 	("84", _("Wolf Creek, Mill Creek, Cuyahoga River"))
     ]
 
+cm_sensitivity = [
+    ("H", _("H - High")),
+    ("MH", _("M/H - Medium/High")),
+    ("ML", _("M/L - Medium/Low")),
+    ("M", _("M - Medium")),
+    ("VH", _("VH - Very high"))
+    ]
+
+leap_land_cover = [
+	("1", _("IA1 - Dry Oak forest and Woodland")),
+	("2", _("IA2 - Dry-Mesic Oak Forest and Woodland")),
+	("3", _("IB1 -  Appalachian (Hemlock)-Hardwood Forest")),
+	("4", _("IB2 - Hemlock Ravine")),
+	("5", _("IC1 - Beech-Maple Forest")),
+	("6", _("IC2 - Mixed Hardwood - red oak, tulip, sugar maple, little to no beech")),
+	("7", _("IC3 - Rich Mesophytic Forest - New York")),
+	("8", _("ID - Oak Savanna/Barrens")),
+	("9", _("IE1 - Non-Calcareous Cliff and Talus")),
+	("10", _("IE2 - Calcareous Cliff and Talus")),
+	("11", _("IF - Great Lakes Rocky Shore and Cliff_Alkaline")),
+	("12", _("IIA1 - Floodplain Low gradient- equal or above 3rd order streams and rivers")),
+	("13", _("IIA2 - Floodplain High gradient - 1st and 2nd order streams")),
+	("14", _("IIB1 - Floodplain Emergent Herbaceous - Marsh")),
+	("15", _("IIB2 - Floodplain Emergent Herbaceous - Wet Meadow")),
+	("16", _("IIC1 - Bog")),
+	("17", _("IIC - Floodplain Scrub-Shrub")),
+	("18", _("IIIA1 - Forested Flat not on floodplain, including vernal pools")),
+	("19", _("IIIA2 - Forest Seeps, not on floodplain, ground-water driven communities")),
+	("20", _("IIIA3 - Bog Forests, on peat soils")),
+	("21", _("IIIB1a - Coastal Marsh -lakeshore marsh systems-, emergent herbaceous")),
+	("22", _("IIIB1b - Inland Freshwater Marsh - emergent herbaceous")),
+	("23", _("IIIC2a - Rich fen")),
+	("24", _("IIIC2b - Poor fen")),
+	("25", _("IVA1 - Lakeshore - Beach")),
+	("26", _("IVa2 - Lakeshore - Wooded Dune")),
+	("27", _("IVB1 - Submersed bed")),
+	("28", _("IVB2 - Riverine sand bar")),
+	("29", _("N/A - Not applicable ")),
+	("30", _("Old Field - Ruderal Upland")),
+	("31", _("Open water - Lakes, Ponds and Reservoirs")),
+	("32", _("Other Shrub Swamp")),
+	("33", _("VA1 - Active Farming - Cultivated Crops and Irrigated Agriculture")),
+	("34", _("VA2 - Pasture/Hay")),
+	("35", _("VA4 - Post Clearcut Communities - Successional Shrub/Scrub")),
+	("36", _("VA5 - Tree Plantations")),
+	("37", _("VB - Atypical Successional Woody Communities - Ruderal Forest")),
+	("38", _("VC - Disturbed Soil Communities - Quarries/Strip Mines/Gravel Pits")),
+	("39", _("VF1 - Development - Open Space")),
+	("40", _("VF2 - Development - Low Intensity")),
+	("41", _("VF3 - Development - Medium Intensity")),
+	("42", _("VF4 - Development - High Intensity")),
+    ]
+
+pleistocene_glaciar_diposits = [
+    ("1", _("Illinoian")),
+    ("2", _("Pre-Illinoian")),
+    ("3", _("Wisconsinan"))
+    ]
+
+glaciar_diposits = [
+    ("1", _("Colluvium")),
+    ("2", _("Dissected ground moraine")),
+    ("3", _("Ground moraine")),
+    ("4", _("Hummocky moraine")),
+    ("5", _("Kames/eskers")),
+    ("6", _("Lake deposits")),
+    ("7", _("Outwash")),
+    ("8", _("Peat")),
+    ("9", _("Ridge moraine")),
+    ("10", _("Wave-planed ground moraine"))
+    ]
+
+natural_area_condition = [
+    ("EX", _("Excellent")),
+    ("GO", _("Good")),
+    ("PO", _("Poor")),
+    ("VG", _("Very good"))
+    ]
+
+natural_area_type = [
+    ("1", _("floodplain natural community")),
+    ("2", _("geologic formation")),
+    ("3", _("lake/pond natural community")),
+    ("4", _("other")),
+    ("5", _("plant association")),
+    ("6", _("potential diversity stage")),
+    ("7", _("stream natural community")),
+    ("8", _("upland natural community")),
+    ("9", _("wetland natural community"))
+    ]
+
+bedrock_and_outcrops = [
+    ("1", _("Bedford shale"), _("Mississippian")),
+    ("2", _("Berea Sandstone"), _("Mississippian")),
+    ("3", _("Black Hand Sandstone Member Cuyahoga Formation"), _("Mississippian")),
+    ("4", _("Chagrin Member Ohio Shale"), _("Devonian")),
+    ("5", _("Cleveland Member Ohio Shale"), _("Devonian")),
+    ("6", _("Huron Member Ohio Shale"), _("Devonian")),
+    ("7", _("Logan Formation"), _("Mississippian")),
+    ("8", _("Other Member Cuyahoga Formation"), _("Mississippian")),
+    ("9", _("Pottsville Group"), _("Pennsylvanian")),
+    ("10", _("Sunbury Shale"), _("Mississippian"))
+    ]
+
+regional_frequency = [
+    ("AB", _("Abundant")),
+    ("CO", _("Common")),
+    ("UN", _("Uncommon")),
+    ("VR", _("Very rare"))
+    ]
+
 def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
@@ -864,6 +977,15 @@ def init_model(ifempty=True, clean=False):
     
     _init_dict_table(Watershed, watershed, ifempty, clean)
     _init_dict_table(Reservation, reservation, ifempty, clean)
+    
+    _init_dict_table(CMSensitivity, cm_sensitivity, ifempty, clean)
+    _init_dict_table(LeapLandCover, leap_land_cover, ifempty, clean)
+    _init_dict_table(GlacialDepositPleistoceneAge, pleistocene_glaciar_diposits, ifempty, clean)
+    _init_dict_table(GlacialDeposit, glaciar_diposits, ifempty, clean)
+    _init_dict_table(NaturalAreaCondition, natural_area_condition, ifempty, clean)
+    _init_dict_table(NaturalAreaType, natural_area_type, ifempty, clean)
+    _init_dict_table(BedrockAndOutcrops, bedrock_and_outcrops, ifempty, clean)
+    _init_dict_table(RegionalFrequency, regional_frequency, ifempty, clean)
     
     if clean:
         OccurrenceCategory.objects.all().delete()

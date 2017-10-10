@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from nfdcore.nfdserializers import FeatureTypeSerializer, LayerSerializer, OccurrenceSerializer,\
     PhotographPublishSerializer, OccurrenceVersionSerializer,\
-    TaxonOccurrenceSerializer, NaturalAreaOccurrenceSerializer
+    TaxonOccurrenceSerializer, NaturalAreaOccurrenceSerializer,\
+    TaxonListSerializer, NaturalAreaListSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 import reversion
@@ -19,51 +20,205 @@ from reversion.models import Version
 from nfdcore.nfdserializers import SpeciesSearchSerializer,\
     SpeciesSearchResultSerializer
 from rest_framework.generics import ListAPIView,\
-    RetrieveAPIView
+    RetrieveAPIView, ListCreateAPIView
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from nfdcore.nfdserializers import delete_object_and_children
 from nfdcore.permissions import CanUpdateFeatureType, get_permissions,\
-    CanCreateFeatureType
+    CanCreateFeatureType, CanCreatePlants, CanCreateAnimals,\
+    CanCreateNaturalAreas, CanCreateSlimeMold, CanCreateFungus
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import FilterSet
+import django_filters
+from django_filters.filters import DateFromToRangeFilter
+from rest_framework.fields import empty
 
-class NfdLayerList(APIView):
-    permission_classes = [ IsAuthenticated, CanCreateFeatureType ]
-    
-    def get(self, request, main_cat, format=None):
-        (is_writer, is_publisher) = get_permissions(request.user, main_cat)    
-        queryset = self.get_base_queryset(main_cat)
+class NfdLayer(ListCreateAPIView):
+    def get_queryset(self):
+        (is_writer, is_publisher) = get_permissions(self.request.user, self.get_main_cat())
+        queryset = self.get_base_queryset()
         is_writer_or_publisher = (is_writer or is_publisher)
         if not is_writer_or_publisher:
             queryset = queryset.filter(released=True)
-        serializer = LayerSerializer(queryset, many=True, is_writer_or_publisher=is_writer_or_publisher)
-        return Response(serializer.data)
-    def post(self, request, main_cat, format=None):
-        (is_writer, is_publisher) = get_permissions(request.user, main_cat)
-        get_occurrence_model(main_cat)
-        serializer = self.get_serializer(data=request.data, is_writer=is_writer, is_publisher=is_publisher)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TaxonLayerList(NfdLayerList):
-    def get_serializer(self, data, is_writer, is_publisher):
-        return TaxonOccurrenceSerializer(data=data, is_writer=is_writer, is_publisher=is_publisher)
+        return queryset
     
-    def get_base_queryset(self, main_cat):
-        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=main_cat)
+    def get_serializer_class(self):
+        return LayerSerializer
+    
+    def get_serializer(self, instance=None, data=empty, many=False, partial=False):
+        #return super(NfdLayerListNew, self).get_serializer(instance=instance, data=data, many=many, partial=partial)
+        (is_writer, is_publisher) = get_permissions(self.request.user, self.get_main_cat())
+        if self.request.method == 'POST':
+            if data is not empty:
+                serializer_class = self.get_post_serializer_class() 
+                return serializer_class(data=data, is_writer=is_writer, is_publisher=is_publisher)
+            else:
+                is_writer_or_publisher = (is_writer or is_publisher)
+                return LayerSerializer(data=data, many=many, is_writer_or_publisher=is_writer_or_publisher)
+        else:
+            is_writer_or_publisher = (is_writer or is_publisher)
+            serializer_class = self.get_serializer_class()
+            return serializer_class(instance, many=many, is_writer_or_publisher=is_writer_or_publisher)
+
+class TaxonFilter(FilterSet):
+    #inclusion_date = DateFromToRangeFilter() # ?inclusion_date_0=2017-10-01&inclusion_date_1=2017-10-03
+    min_inclusion_date = django_filters.filters.DateFilter(name="inclusion_date", lookup_expr='gte') #?min_inclusion_date=2017-10-01
+    max_inclusion_date = django_filters.filters.DateFilter(name="inclusion_date", lookup_expr='lte') #?max_inclusion_date=2017-10-03
+    min_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(name="inclusion_date", lookup_expr='gte') # ?min_inclusion_datetime=2017-10-02T23:05:20
+    max_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(name="inclusion_date", lookup_expr='lte')
+    featuresubtype = django_filters.filters.CharFilter(name="occurrence_cat__code")
+    class Meta:
+        model = OccurrenceTaxon
+        fields = ['released', 'verified', 'species']
+    
+class NaturalAreaFilter(FilterSet):
+    min_inclusion_date = django_filters.filters.DateFilter(name="inclusion_date", lookup_expr='gte') #?min_inclusion_date=2017-10-01
+    max_inclusion_date = django_filters.filters.DateFilter(name="inclusion_date", lookup_expr='lte') #?max_inclusion_date=2017-10-03
+    min_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(name="inclusion_date", lookup_expr='gte') # ?min_inclusion_datetime=2017-10-02T23:05:20
+    max_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(name="inclusion_date", lookup_expr='lte')
+    featuresubtype = django_filters.filters.CharFilter(name="occurrence_cat__code")
+    
+    class Meta:
+        model = OccurrenceNaturalArea
+        fields = ['released', 'verified'] 
+
+class PlantLayer(NfdLayer):
+    permission_classes = [ IsAuthenticated, CanCreatePlants ]
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TaxonFilter
+    
+    def get_post_serializer_class(self):
+        return TaxonOccurrenceSerializer
+    
+    def get_base_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
+    
+    def get_main_cat(self):
+        return "plant"
+
+class AnimalLayer(NfdLayer):
+    permission_classes = [ IsAuthenticated, CanCreateAnimals ]
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TaxonFilter
+    
+    def get_post_serializer_class(self):
+        return TaxonOccurrenceSerializer
+    
+    def get_base_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
+    
+    def get_main_cat(self):
+        return "animal"
 
 
-class NaturalAreaLayerList(NfdLayerList):
-    def get_serializer(self, data, is_writer, is_publisher):
-        return NaturalAreaOccurrenceSerializer(data=data, is_writer=is_writer, is_publisher=is_publisher)
-    def get_base_queryset(self, main_cat):
+class FungusLayer(NfdLayer):
+    permission_classes = [ IsAuthenticated, CanCreateFungus ]
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TaxonFilter
+    
+    def get_post_serializer_class(self):
+        return TaxonOccurrenceSerializer
+    
+    def get_base_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
+    
+    def get_main_cat(self):
+        return "fungus"
+
+class SlimeMoldLayer(NfdLayer):
+    permission_classes = [ IsAuthenticated, CanCreateSlimeMold ]
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TaxonFilter
+    
+    def get_post_serializer_class(self):
+        return TaxonOccurrenceSerializer
+    
+    def get_base_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
+    
+    def get_main_cat(self):
+        return "slimemold"
+
+class NaturalAreaLayer(NfdLayer):
+    permission_classes = [ IsAuthenticated, CanCreateNaturalAreas ]
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = NaturalAreaFilter
+    
+    def get_post_serializer_class(self):
+        return NaturalAreaOccurrenceSerializer
+    
+    def get_base_queryset(self):
         return OccurrenceNaturalArea.objects.all()
+    
+    def get_main_cat(self):
+        return "naturalarea"
 
+
+class NfdListPagination(PageNumberPagination):
+    page_size = 30
+
+class NfdList(ListAPIView):
+    pagination_class = NfdListPagination
+    filter_backends = (DjangoFilterBackend,)
+    
+    def get_queryset(self):
+        (is_writer, is_publisher) = get_permissions(self.request.user, self.get_main_cat())
+        queryset = self.get_base_queryset()
+        is_writer_or_publisher = (is_writer or is_publisher)
+        if not is_writer_or_publisher:
+            queryset = queryset.filter(released=True)
+        return queryset
+    
+    def get_serializer(self, instance=None, data=empty, many=False, partial=False):
+        (is_writer, is_publisher) = get_permissions(self.request.user, self.get_main_cat())
+        is_writer_or_publisher = (is_writer or is_publisher)
+        serializer_class = self.get_serializer_class()
+        return serializer_class(instance, many=many, is_writer_or_publisher=is_writer_or_publisher)
+    
+class TaxonList(NfdList):
+    filter_class = TaxonFilter
+    def get_serializer_class(self):
+        return TaxonListSerializer
+    def get_base_queryset(self):
+        return OccurrenceTaxon.objects.filter(occurrence_cat__main_cat=self.get_main_cat())
+
+class PlantList(TaxonList):
+    permission_classes = [ IsAuthenticated, CanCreatePlants ]
+    def get_main_cat(self):
+        return "plant"
+
+class AnimalList(TaxonList):
+    permission_classes = [ IsAuthenticated, CanCreateAnimals ]
+    def get_main_cat(self):
+        return "animal"
+
+
+class FungusList(TaxonList):
+    permission_classes = [ IsAuthenticated, CanCreateFungus ]
+    def get_main_cat(self):
+        return "fungus"
+
+class SlimeMoldList(TaxonList):
+    permission_classes = [ IsAuthenticated, CanCreateSlimeMold ]
+    
+    def get_main_cat(self):
+        return "slimemold"
+
+class NaturalAreaList(NfdList):
+    permission_classes = [ IsAuthenticated, CanCreateNaturalAreas ]
+    filter_class = NaturalAreaFilter
+    
+    def get_base_queryset(self):
+        return OccurrenceNaturalArea.objects.all()
+        
+    def get_serializer_class(self):
+        return NaturalAreaListSerializer
+    
+    def get_main_cat(self):
+        return "naturalarea"
 
 class LayerDetail(APIView):
     permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
@@ -93,7 +248,6 @@ class LayerDetail(APIView):
         feature = self.get_object(occurrence_maincat, pk)
         if isinstance(feature, OccurrenceNaturalArea):
             serializer = NaturalAreaOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
-            return Response({"error": "not supported yet"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             serializer = TaxonOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)         
         if serializer.is_valid():

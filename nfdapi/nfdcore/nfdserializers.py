@@ -4,7 +4,7 @@ from django.db.models.fields import IntegerField, DecimalField, FloatField
 from django.contrib.gis.db.models.fields import GeometryField, PolygonField
 
 from nfdcore.models import get_details_class, EarthwormEvidence, DisturbanceType,\
-    SlimeMoldLifestages, TaxonLocation, NaturalAreaLocation
+    SlimeMoldLifestages, TaxonLocation, NaturalAreaLocation, ElementNaturalAreas
 
 from nfdcore.models import DictionaryTable
 from nfdcore.models import Voucher, OccurrenceTaxon, PlantDetails,\
@@ -269,6 +269,19 @@ MOSS_PLANT_TYPE = [
     ]
 MOSS_PLANT_TYPE_DICT = get_form_dict(MOSS_PLANT_TYPE)
 
+NATURAL_AREA_TYPE = [
+    (_('element'), ElementNaturalAreas, ['element.earthworm_evidence', 'element.disturbance_type']),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('element.earthworm_evidence'), EarthwormEvidence, []),
+    (_('element.disturbance_type'), DisturbanceType, []),
+    (_('location'), NaturalAreaLocation, []),
+    ]
+NATURAL_AREA_TYPE_DICT = get_form_dict(NATURAL_AREA_TYPE)
+
 
 del _
 from django.utils.translation import ugettext_lazy as _
@@ -297,6 +310,8 @@ def get_details_serializer(category_code):
         return StreamAnimalDetailsSerializer
     elif category_code=='we':
         return WetlandAnimalDetailsSerializer
+    elif category_code=='na':
+        return NaturalAreaElementSerializer
 
 def is_deletable_field(f):
     if not getattr(f, 'related_model', False):
@@ -545,6 +560,9 @@ def init_forms(instance, category_code):
         elif category_code=='we':
             instance.forms = WETLAND_ANIMAL_TYPE
             instance._form_dict = WETLAND_ANIMAL_TYPE_DICT
+        elif category_code=='na':
+            instance.forms = NATURAL_AREA_TYPE
+            instance._form_dict = NATURAL_AREA_TYPE_DICT
 
 class UpdateOccurrenceMixin(object):
     def __init__(self, instance=None, data=empty, is_writer=False, is_publisher=False, **kwargs):
@@ -762,8 +780,12 @@ class UpdateOccurrenceMixin(object):
         return instance
     
     def create(self, validated_data):
-        instance = OccurrenceTaxon()
-        instance.occurrence_cat = OccurrenceCategory.objects.get(code=validated_data.get('featuresubtype'))
+        code = validated_data.get('featuresubtype')
+        if code == 'na':
+            instance = OccurrenceNaturalArea()
+        else:
+            instance = OccurrenceTaxon()
+        instance.occurrence_cat = OccurrenceCategory.objects.get(code=code)
         instance.geom = validated_data.get('geom')
         init_forms(self, instance.occurrence_cat.code)
         return self.update(instance, validated_data)
@@ -1002,8 +1024,6 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     version_date = rest_fields.DateTimeField(required=False, read_only=True)
     #geom = gisserializer.GeometryField()
     polygon = gisserializer.GeometryField(required=False)
-    voucher = VoucherSerializer(required=False)
-    species = SpeciesSerializer(required=False)
     observation = OccurrenceObservationSerializer(required=True)
     
     def get_fields(self):
@@ -1016,8 +1036,9 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         return fields
     
     def to_representation(self, instance):
-        details_name = instance.get_details_class().__name__.lower()
-        setattr(instance, details_name, instance.get_details())
+        if isinstance(instance, OccurrenceTaxon):
+            details_name = instance.get_details_class().__name__.lower()
+            setattr(instance, details_name, instance.get_details())
         r = Serializer.to_representation(self, instance)
 
         result = to_flat_representation(r)
@@ -1040,6 +1061,24 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             result['polygon'] = instance.location.polygon.geojson
         return result
     
+    def to_nested_representation(self, data):
+        formvalues = OrderedDict()
+        for global_field_name in data: # transform the flat object to a set of dictionaries of forms
+            field_parts = global_field_name.split(".")
+            if len(field_parts)>1:
+                base = formvalues
+                for local_field_name in field_parts[:-1]:
+                    base[local_field_name] = base.get(local_field_name, {})
+                    if base[local_field_name] is None:
+                        base[local_field_name] = {}
+                    base = base[local_field_name]
+                if not (isinstance(base.get(field_parts[-1]), dict) and data[global_field_name] is None):  # avoid overwritting new values with old empty forms
+                    base[field_parts[-1]] = data[global_field_name]
+            else:
+                if not (isinstance(formvalues.get(global_field_name), dict) and data[global_field_name] is None): # avoid overwritting new values with old empty forms 
+                    formvalues[global_field_name] = data[global_field_name]
+        return formvalues
+    
     def to_internal_value(self, data):
         
         """
@@ -1056,23 +1095,12 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         validated_formvalues = OrderedDict()
         errors = OrderedDict()
         self.featuresubtype = data.get("featuresubtype")
+        self.to_internal_value_extra(data, validated_formvalues, errors)
+        
         fields = self._writable_fields
         
-        formvalues = OrderedDict()
-        for global_field_name in data: # transform the flat object to a set of dictionaries of forms
-            field_parts = global_field_name.split(".")
-            if len(field_parts)>1:
-                base = formvalues
-                for local_field_name in field_parts[:-1]:
-                    base[local_field_name] = base.get(local_field_name, {})
-                    if base[local_field_name] is None:
-                        base[local_field_name] = {}
-                    base = base[local_field_name]
-                if not (isinstance(base.get(field_parts[-1]), dict) and data[global_field_name] is None):  # avoid overwritting new values with old empty forms
-                    base[field_parts[-1]] = data[global_field_name]
-            else:
-                if not (isinstance(formvalues.get(global_field_name), dict) and data[global_field_name] is None): # avoid overwritting new values with old empty forms 
-                    formvalues[global_field_name] = data[global_field_name]
+        # transform the flat object to a set of dictionaries of forms
+        formvalues = self.to_nested_representation(data)
 
         for field in fields: # validate values
             validate_method = getattr(self, 'validate_' + field.field_name, None)
@@ -1095,24 +1123,20 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             else:
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
-        result = validated_formvalues
-        result["released"] = data.get("released", False)
-        result["verified"] = data.get("verified", False)
-        #result['id'] = data.get("id", None)
-        result['featuretype'] = data.get("featuretype")
-        result['featuresubtype'] = data.get("featuresubtype")
-        species_id = data.get('species.id')
-        if not species_id:
-            errors["species"] = [_("No species was selected")]
+        validated_formvalues = validated_formvalues
+        validated_formvalues["released"] = data.get("released", False)
+        validated_formvalues["verified"] = data.get("verified", False)
+        validated_formvalues['featuretype'] = data.get("featuretype")
+        validated_formvalues['featuresubtype'] = data.get("featuresubtype")
             
-        if isinstance(result.get('polygon'), Polygon):
-            location = result.get('location', {})
-            location['polygon'] = result.pop('polygon')
-            result['location'] = location
+        if isinstance(validated_formvalues.get('polygon'), Polygon):
+            location = validated_formvalues.get('location', {})
+            location['polygon'] = validated_formvalues.pop('polygon')
+            validated_formvalues['location'] = location
         
         try:
             geom_serializer = gisserializer.GeometryField()
-            result['geom'] = geom_serializer.to_internal_value(data.get("geom"))
+            validated_formvalues['geom'] = geom_serializer.to_internal_value(data.get("geom"))
         except:
             if not data.get('id'):
                 errors["geom"] = [_("Geometry is missing")]
@@ -1120,12 +1144,20 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         if errors:
             raise rest_fields.ValidationError(to_flat_representation(errors))
 
-        return result
+        return validated_formvalues
 
 class TaxonLocationSerializer(CustomModelSerializerMixin, ModelSerializer):
     class Meta:
         model = TaxonLocation
         exclude = ('id', 'polygon')
+
+class NaturalAreaElementSerializer(CustomModelSerializerMixin, ModelSerializer):
+    disturbance_type = DisturbanceTypeSerializer(required=False)
+    earthworm_evidence = EarthwormEvidenceSerializer(required=False)
+    #lifestages = MossLifestages(required=False) # FIXME
+    class Meta:
+        model = ElementNaturalAreas
+        exclude = ('id',)
 
 class NaturalAreaLocationSerializer(CustomModelSerializerMixin, ModelSerializer):
     class Meta:
@@ -1133,41 +1165,21 @@ class NaturalAreaLocationSerializer(CustomModelSerializerMixin, ModelSerializer)
         exclude = ('id', 'polygon')
 
 class TaxonOccurrenceSerializer(OccurrenceSerializer, Serializer):
+    species = SpeciesSerializer(required=False)
+    voucher = VoucherSerializer(required=False)
     location = TaxonLocationSerializer(required=False)
+    
+    def to_internal_value_extra(self, data, result, errors):
+        species_id = data.get('species.id')
+        if not species_id:
+            errors["species"] = [_("No species was selected")]
 
 class NaturalAreaOccurrenceSerializer(OccurrenceSerializer, Serializer):
+    element = NaturalAreaElementSerializer(required=False)
     location = NaturalAreaLocationSerializer(required=False)
-
-""" -------------------------------------------
-CREATE OCCURRENCES -- OLD APPROACH - TO BE REMOVED
----------------------------------------------- """
-class CreateOccurrenceSerializer(Serializer):
-    """
-    Creates occurences
-    """
-    id = rest_fields.IntegerField(required=False, read_only=True)
-    featuretype = rest_fields.CharField(required=False, read_only=True)
-    featuresubtype = rest_fields.CharField()
-    version = rest_fields.IntegerField(required=False, read_only=True)
-    total_versions = rest_fields.IntegerField(required=False, read_only=True)
-    geom = gisserializer.GeometryField()
     
-    def create(self, validated_data):
-        subtype = validated_data['featuresubtype']
-        category = OccurrenceCategory.objects.get(code=subtype)
-        if subtype == 'na': # natural area
-            instance = OccurrenceNaturalArea()
-        else:
-            instance = OccurrenceTaxon()
-        instance.occurrence_cat = category
-        instance.geom = validated_data.get("geom")
-        instance.save()
-        result = {}
-        result['id'] = instance.pk
-        result['featuretype'] = instance.occurrence_cat.main_cat
-        result['featuresubtype'] = subtype
-        return result
-
+    def to_internal_value_extra(self, data, result, errors):
+        pass
 
 """ -------------------------------------------
 LAYERS
@@ -1178,6 +1190,8 @@ class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
     featuretype = rest_fields.CharField(required=False, read_only=True)
     featuresubtype = rest_fields.CharField()
     released = rest_fields.BooleanField(required=False, read_only=True)
+    inclusion_date = rest_fields.DateTimeField(required=False, read_only=True)
+    verified = rest_fields.BooleanField(required=False, read_only=True)
     version = rest_fields.IntegerField(required=False, read_only=True)
     total_versions = rest_fields.IntegerField(required=False, read_only=True)
     
@@ -1196,15 +1210,77 @@ class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
         result['featuresubtype'] = instance.occurrence_cat.code
         result['released'] = instance.released
         result['verified'] = instance.verified
+        result['inclusion_date'] = instance.inclusion_date
         result['id'] = instance.id
         return result
     
     class Meta:
         model = OccurrenceTaxon
         geo_field = "geom"
-        fields = ('id', 'featuretype', 'featuresubtype', 'released', 'verified', 'version', 'total_versions')
-        # you can also explicitly declare which fields you want to include
-        # as with a ModelSerializer.
+        fields = ('id', 'featuretype', 'featuresubtype', 'inclusion_date', 'released', 'verified', 'version', 'total_versions')
+
+class ListSerializer(gisserializer.GeoFeatureModelSerializer):
+    id = rest_fields.IntegerField(required=False, read_only=True)
+    featuretype = rest_fields.CharField(required=False, read_only=True)
+    featuresubtype = rest_fields.CharField()
+    released = rest_fields.BooleanField(required=False, read_only=True)
+    inclusion_date = rest_fields.DateTimeField(required=False, read_only=True)
+    verified = rest_fields.BooleanField(required=False, read_only=True)
+    version = rest_fields.IntegerField(required=False, read_only=True)
+    total_versions = rest_fields.IntegerField(required=False, read_only=True)
+    
+    def __init__(self, *args, **kwargs):
+        self.is_writer_or_publisher = kwargs.pop('is_writer_or_publisher', False)
+        super(ListSerializer, self).__init__(*args, **kwargs)
+    
+    
+    class Meta:
+        model = OccurrenceTaxon
+        geo_field = "geom"
+        fields = ('id', 'featuretype', 'featuresubtype', 'inclusion_date', 'released', 'verified', 'version', 'total_versions')
+
+
+class TaxonListSerializer(ListSerializer):    
+    def get_properties(self, instance, fields):
+        result = {}
+        if self.is_writer_or_publisher:
+            result['total_versions'] = instance.version
+        else:
+            result['total_versions'] = instance.released_versions
+        result['version'] = instance.version
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = instance.occurrence_cat.code
+        result['released'] = instance.released
+        result['verified'] = instance.verified
+        result['inclusion_date'] = instance.inclusion_date
+        result['id'] = instance.id
+        result['species.id'] = instance.species.id
+        result['species.first_common'] = instance.species.first_common
+        result['species.name_sci'] = instance.species.name_sci
+        result['observation.observation_date'] = instance.observation.observation_date
+        return result
+
+
+class NaturalAreaListSerializer(ListSerializer):    
+    def get_properties(self, instance, fields):
+        result = {}
+        if self.is_writer_or_publisher:
+            result['total_versions'] = instance.version
+        else:
+            result['total_versions'] = instance.released_versions
+        result['version'] = instance.version
+        result['featuretype'] = instance.occurrence_cat.main_cat
+        result['featuresubtype'] = instance.occurrence_cat.code
+        result['released'] = instance.released
+        result['verified'] = instance.verified
+        result['inclusion_date'] = instance.inclusion_date
+        result['id'] = instance.id
+        result['natural_area_element.id'] = instance.natural_area_element.id
+        result['natural_area_element.general_description'] = instance.natural_area_element.general_description
+        result['natural_area_element.type'] = instance.natural_area_element.type
+        result['natural_area_element.natural_area_code_nac'] = instance.natural_area_element.natural_area_code_nac
+        result['observation.observation_date'] = instance.observation.observation_date
+        return result
 
 """ -------------------------------------------
 FEATURE TYPES

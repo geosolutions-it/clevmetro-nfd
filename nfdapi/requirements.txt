@@ -1,6 +1,7 @@
 appdirs==1.4.3
 Django==1.11.4
 django-auth-ldap==1.2.14
+django-filter==1.0.4
 django-rest-auth==0.9.1
 django-reversion==2.0.10
 djangorestframework==3.6.3

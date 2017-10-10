@@ -13,7 +13,12 @@ const {
     CREATE_NATURAL_FEATURE_ERROR,
     UPDATE_SPECIES_FORMS,
     NATURAL_FEATURE_POLYGON_REPLACED,
-    NATURAL_FEATURE_MARKER_REPLACED
+    NATURAL_FEATURE_MARKER_REPLACED,
+    ADD_FEATURE,
+    END_EDITING,
+    EDIT_FEATURE,
+    VIEW_FEATURE,
+    NF_CLICKED
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -22,8 +27,7 @@ function naturalfeatures(state = {}, action) {
             return assign({}, state, {
                 forms: action.forms,
                 featuretype: action.featuretype,
-                featuresubtype: action.featuresubtype,
-                mode: action.mode
+                featuresubtype: action.featuresubtype
             });
         }
         case UPDATE_NATURAL_FEATURE_FORM: {
@@ -61,6 +65,16 @@ function naturalfeatures(state = {}, action) {
                 selectedFeature: selectedFeature
             });
         }
+        case ADD_FEATURE:
+            return assign({}, state, {mode: 'ADD'});
+        case EDIT_FEATURE:
+            return assign({}, state, {mode: 'EDIT'});
+        case VIEW_FEATURE:
+            return assign({}, state, {mode: 'VIEW'});
+        case END_EDITING:
+            return assign({}, state, {mode: undefined, froms: [], featuretype: "", featuresubtype: "", selectedFeature: {}, errors: {}, newFeature: {}});
+        case NF_CLICKED:
+            return assign({}, state, {nfclicked: action.nfId});
         default:
             return state;
     }

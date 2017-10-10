@@ -146,6 +146,11 @@ module.exports = {
             '/static/js/': {
                 target: "http://localhost:8081/",
                 pathRewrite: { "^/static/js": ""}
+            },
+            "/nfdapi/": {
+                target: "http://localpg:8000",
+                changeOrigin: true,
+                logLevel: 'debug'
             }
         }
     },
