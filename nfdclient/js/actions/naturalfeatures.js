@@ -464,7 +464,7 @@ function getData() {
     return (dispatch) => {
         dispatch(getAnimals('/nfdapi/layers/animal/'));
         dispatch(getPlants('nfdapi/layers/plant/'));
-        // dispatch(getNaturalAreas('/nfdapi/layers/naturalarea/'));
+        dispatch(getNaturalAreas('/nfdapi/layers/naturalarea/'));
         dispatch(getFungus('/nfdapi/layers/fungus/'));
         dispatch(getSlimeMolds('/nfdapi/layers/slimemold/'));
     };

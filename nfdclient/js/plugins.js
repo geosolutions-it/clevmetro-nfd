@@ -22,9 +22,11 @@ module.exports = {
         ZoomAllPlugin: require('../MapStore2/web/client/plugins/ZoomAll'),
         ZoomInPlugin: require('../MapStore2/web/client/plugins/ZoomIn'),
         ZoomOutPlugin: require('../MapStore2/web/client/plugins/ZoomOut'),
+        NotificationsPlugin: require('../MapStore2/web/client/plugins/Notifications'),
         ViewEditNaturalFeaturesPlugin: require('./plugins/ViewEditNaturalFeatures'),
         AddNaturalFeaturesPlugin: require('./plugins/AddNaturalFeatures'),
-        ToggleAddEditPanelPlugin: require('./plugins/ToggleAddEditPanel')
+        ToggleAddEditPanelPlugin: require('./plugins/ToggleAddEditPanel'),
+        FeaturesPlugin: require('./plugins/FeaturesPlugin')
     },
     requires: {}
 };

@@ -28,11 +28,21 @@ module.exports = {
                 newFeature: {},
                 errors: {},
                 dockSize: 0.35
+            },
+            featuresearch: {
+                featureTypes: ['animal', 'plant', 'fungus', 'slimemold', 'naturalarea'],
+                pageSize: 10,
+                defaultOperator: '>'
             }
         },
         mobile: {
             naturalfeatures: {
                 dockSize: 1.0
+            },
+            featuresearch: {
+                featureTypes: ['animal', 'plant', 'fungus', 'slimemold', 'naturalarea'],
+                pageSize: 10,
+                defaultOperator: '>'
             }
         }
     }
