@@ -37,6 +37,8 @@ urlpatterns = [
 
 
     #url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
+
+
     url(r'^'+APP_NAME+r'layers/naturalarea/$', coreviews.NaturalAreaLayer.as_view(), name='naturalareaLayer'),
     url(r'^'+APP_NAME+r'layers/plant/$', coreviews.PlantLayer.as_view(), name="plantLayer"),
     url(r'^'+APP_NAME+r'layers/animal/$', coreviews.AnimalLayer.as_view(), name="animalLayer"),
