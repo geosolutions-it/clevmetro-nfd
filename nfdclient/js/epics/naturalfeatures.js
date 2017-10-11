@@ -126,8 +126,8 @@ const getSlimeMoldsEpic = (action$, store) =>
 
 // Load features for all reatureTypes
 const getDataEpic = action$ =>
-    action$.ofType(NFD_LOGIN_SUCCESS)
-    .map(val => getData(val));
+    action$.ofType(NFD_LOGIN_SUCCESS).
+    switchMap(() => Rx.Observable.of(getData()));
 
 const unauthorizedUserErrorEpic = action$ =>
     action$.ofType(USER_NOT_AUTHENTICATED_ERROR)
@@ -157,7 +157,7 @@ const cleanDraw = (action$, store) =>
             return Rx.Observable.from([changeDrawingStatus("clean", null, "dockednaturalfeatures", [], {}), toggleControl(control)]);
         });
 const activeFeatureEdit = (action$, store) =>
-     action$.ofType(NF_CLICKED)
+     action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
         .filter(() => {
             const {naturalfeatures} = store.getState();
             return naturalfeatures.mode !== 'ADD' && naturalfeatures.mode !== 'EDIT';

@@ -17,6 +17,7 @@ const _ = require('lodash');
 // const isMobile = require('ismobilejs');
 require('react-selectize/themes/index.css');
 require('./DockedNaturalFeatures.css');
+const Utils = require("../../utils/nfdUtils");
 const Api = require('../../api/naturalfeaturesdata');
 
 const DockedNaturalFeatures = React.createClass({
@@ -88,31 +89,13 @@ const DockedNaturalFeatures = React.createClass({
         // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onAddPointClick: function() {
-        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: this.getMarkerIcon()});
+        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIconUrl(this.props.featuretype)});
     },
     onAddPolygonClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
     },
     onGetMyLocationClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
-    },
-    getMarkerIcon() {
-        if (this.props.featuretype === 'plant') {
-            return '../../assets/img/marker-icon-green-highlight.png';
-        }
-        if (this.props.featuretype === 'animal') {
-            return '../../assets/img/marker-icon-purple-highlight.png';
-        }
-        if (this.props.featuretype === 'fungus') {
-            return '../../assets/img/marker-icon-yellow-highlight.png';
-        }
-        if (this.props.featuretype === 'slimemold') {
-            return '../../assets/img/marker-icon-marine-highlight.png';
-        }
-        if (this.props.featuretype === 'naturalarea') {
-            return '../../assets/img/marker-icon-blue-highlight.png';
-        }
-
     },
     getIcon(formname) {
         let icon = 'question-sign';
@@ -155,46 +138,6 @@ const DockedNaturalFeatures = React.createClass({
                 <option style={{fontSize: "12px"}} value={item.key} key={index}>{item.value}</option>
             );
         });
-    },
-    getPrettyFeatureType(ft) {
-        let featuretype = '';
-        if (ft === 'plant') {
-            featuretype = 'Plant';
-        } else if (ft === 'animal') {
-            featuretype = 'Animal';
-        } else if (ft === 'fungus') {
-            featuretype = 'Fungus';
-        } else if (ft === 'slimemold') {
-            featuretype = 'Slime/Mold';
-        } else if (ft === 'naturalarea') {
-            featuretype = 'Natural area';
-        }
-        return featuretype;
-    },
-    getPrettyFeatureSubType(fst) {
-        let featuresubtype = '';
-        if (fst === 'co') {
-            featuresubtype = ' (Conifer)';
-        } else if (fst === 'fe') {
-            featuresubtype = ' (Fern)';
-        } else if (fst === 'fl') {
-            featuresubtype = ' (Flowering plant)';
-        } else if (fst === 'pl') {
-            featuresubtype = ' (Plant generic)';
-        } else if (fst === 'mo') {
-            featuresubtype = ' (Moss)';
-        } else if (fst === 'ln') {
-            featuresubtype = ' (Land animal)';
-        } else if (fst === 'lk') {
-            featuresubtype = ' (Pond Lake animal)';
-        } else if (fst === 'st') {
-            featuresubtype = ' (Stream animal)';
-        } else if (fst === 'we') {
-            featuresubtype = ' (Wetland animal)';
-        } else {
-            featuresubtype = ' (Natural area)';
-        }
-        return featuresubtype;
     },
     renderTabContent(tab, tabindex) {
         let searchDiv;
@@ -389,7 +332,7 @@ const DockedNaturalFeatures = React.createClass({
         });
 
         searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher) && this.props.featuresubtype !== 'na';
-
+        console.log(this.state);
         return (
             <div className="nf-tab-content">
                 {searchDiv ?
@@ -551,7 +494,7 @@ const DockedNaturalFeatures = React.createClass({
     },
     // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
-        let title = this.getPrettyFeatureType(this.props.featuretype) + this.getPrettyFeatureSubType(this.props.featuresubtype);
+        let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
         return (
             <Dock
                 zIndex={1030 /*below dialogs, above left menu*/}
