@@ -1022,7 +1022,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     total_versions = TotalVersionsField(required=False, read_only=True)
     inclusion_date = rest_fields.DateTimeField(required=False, read_only=True)
     version_date = rest_fields.DateTimeField(required=False, read_only=True)
-    #geom = gisserializer.GeometryField()
+    geom = gisserializer.GeometryField(required=False)
     polygon = gisserializer.GeometryField(required=False)
     observation = OccurrenceObservationSerializer(required=True)
     
@@ -1057,6 +1057,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result['images'] = photo_serializer.data
         result['is_writer'] = self.is_writer
         result['is_publisher'] = self.is_publisher
+        result['geom'] = instance.geom.geojson
         if instance.location and isinstance(instance.location.polygon, Polygon):
             result['polygon'] = instance.location.polygon.geojson
         return result
@@ -1164,7 +1165,7 @@ class NaturalAreaLocationSerializer(CustomModelSerializerMixin, ModelSerializer)
         model = NaturalAreaLocation
         exclude = ('id', 'polygon')
 
-class TaxonOccurrenceSerializer(OccurrenceSerializer, Serializer):
+class TaxonOccurrenceSerializer(OccurrenceSerializer):
     species = SpeciesSerializer(required=False)
     voucher = VoucherSerializer(required=False)
     location = TaxonLocationSerializer(required=False)
@@ -1174,7 +1175,7 @@ class TaxonOccurrenceSerializer(OccurrenceSerializer, Serializer):
         if not species_id:
             errors["species"] = [_("No species was selected")]
 
-class NaturalAreaOccurrenceSerializer(OccurrenceSerializer, Serializer):
+class NaturalAreaOccurrenceSerializer(OccurrenceSerializer):
     element = NaturalAreaElementSerializer(required=False)
     location = NaturalAreaLocationSerializer(required=False)
     
