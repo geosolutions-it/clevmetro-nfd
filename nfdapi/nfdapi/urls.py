@@ -35,18 +35,16 @@ urlpatterns = [
     
     url(r'^'+APP_NAME+r'admin/', admin.site.urls),
     
-            
-    #url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
     url(r'^'+APP_NAME+r'layers/naturalarea/$', coreviews.NaturalAreaLayer.as_view(), name='naturalareaLayer'),
     url(r'^'+APP_NAME+r'layers/plant/$', coreviews.PlantLayer.as_view(), name="plantLayer"),
     url(r'^'+APP_NAME+r'layers/animal/$', coreviews.AnimalLayer.as_view(), name="animalLayer"),
-    url(r'^'+APP_NAME+r'layers/slimemold$', coreviews.SlimeMoldLayer.as_view(), name='slimemoldLayer'),
+    url(r'^'+APP_NAME+r'layers/slimemold/$', coreviews.SlimeMoldLayer.as_view(), name='slimemoldLayer'),
     url(r'^'+APP_NAME+r'layers/fungus/$', coreviews.FungusLayer.as_view(), name="fungusLayer"),
 
     url(r'^'+APP_NAME+r'list/naturalarea/$', coreviews.NaturalAreaList.as_view(), name='naturalareaList'),
     url(r'^'+APP_NAME+r'list/plant/$', coreviews.PlantList.as_view(), name="plantList"),
     url(r'^'+APP_NAME+r'list/animal/$', coreviews.AnimalList.as_view(), name="animalList"),
-    url(r'^'+APP_NAME+r'list/slimemold$', coreviews.SlimeMoldList.as_view(), name='slimemoldList'),
+    url(r'^'+APP_NAME+r'list/slimemold/$', coreviews.SlimeMoldList.as_view(), name='slimemoldList'),
     url(r'^'+APP_NAME+r'list/fungus/$', coreviews.FungusList.as_view(), name="fungusList"),
     
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
