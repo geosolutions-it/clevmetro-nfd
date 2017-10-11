@@ -25,7 +25,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from nfdcore.nfdserializers import delete_object_and_children
 from nfdcore.permissions import CanUpdateFeatureType, get_permissions,\
-    CanCreateFeatureType, CanCreatePlants, CanCreateAnimals,\
+    CanCreatePlants, CanCreateAnimals,\
     CanCreateNaturalAreas, CanCreateSlimeMold, CanCreateFungus
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -33,7 +33,6 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import FilterSet
 import django_filters
-from django_filters.filters import DateFromToRangeFilter
 from rest_framework.fields import empty
 
 class NfdLayer(ListCreateAPIView):
