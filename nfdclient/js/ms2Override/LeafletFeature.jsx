@@ -221,7 +221,7 @@ let Feature = React.createClass({
     onClick() {
         const {properties, onClick, msId} = this.props;
         if (onClick) {
-            onClick(properties, msId, this._layer);
+            onClick(properties, msId);
         }
     },
     render() {

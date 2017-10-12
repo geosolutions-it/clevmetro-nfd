@@ -57,7 +57,7 @@ const LeafletDrawSupport = React.createClass({
                 this.clean();
                 break;
             case ("featureSelected"):
-                this.selectFeature(newProps.options.lflFeat);
+                // this.selectFeature(newProps.options.lflFeat);
                 break;
             case ("featureDeselected"):
                 this.deselectFeature();

@@ -7,7 +7,7 @@
  */
 const React = require('react');
 const {connect} = require('react-redux');
-
+const PropTypes = require('prop-types');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion, cancel} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
@@ -38,15 +38,21 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     cancel
 })(DockedNaturalFeatures);
 
-const ViewEditNaturalFeaturesPlugin = React.createClass({
+class ViewEditNaturalFeatures extends React.Component {
+    static propTypes = {
+      isVisible: PropTypes.bool.isRequired
+    }
     render() {
-        return (
+        return this.props.isVisible ? (
             <div id="docked-tutorial">
                 <SmartDockedNaturalFeatures mode="viewedit"/>
             </div>
-        );
+        ) : null;
     }
-});
+}
+const ViewEditNaturalFeaturesPlugin = connect((state) => ({
+    isVisible: state.controls.vieweditnaturalfeatures && state.controls.vieweditnaturalfeatures.enabled
+}))(ViewEditNaturalFeatures);
 
 module.exports = {
     ViewEditNaturalFeaturesPlugin,

@@ -77,8 +77,7 @@ const AddNaturalFeatures = React.createClass({
     },
     render() {
         return (
-            this.props.visible ?
-            (<div>
+            <div>
                 <DropdownButton disabled={this.props.disabled} id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
                     {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
@@ -117,17 +116,15 @@ const AddNaturalFeatures = React.createClass({
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
                     }
                 </DropdownButton>
-                <SmartDockedNaturalFeatures mode="add"/>
-            </div>) : null
-        );
+                { this.props.active ? (<SmartDockedNaturalFeatures/>) : null}
+            </div>);
     }
 });
 
 module.exports = {
     AddNaturalFeaturesPlugin: assign(connect((state) => ({
-        active: state.controls && state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.active,
+        active: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
         disabled: state.naturalfeatures && state.naturalfeatures.mode !== 'VIEW' && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id),
-        visible: true,
         plant_writer: state.security.user && state.security.user.plant_writer,
         animal_writer: state.security.user && state.security.user.animal_writer,
         slimemold_writer: state.security.user && state.security.user.slimemold_writer,

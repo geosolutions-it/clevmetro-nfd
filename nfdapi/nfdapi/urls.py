@@ -32,9 +32,13 @@ urlpatterns = [
     # for testing purposes:
     url(r'^'+APP_NAME, include('django.contrib.auth.urls')),
     url(r'^'+APP_NAME+r'rest-auth/', include('rest_auth.urls')),
-    
+
     url(r'^'+APP_NAME+r'admin/', admin.site.urls),
-    
+
+
+    #url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus)/$', coreviews.TaxonLayerList.as_view(), name='taxonList'),
+
+
     url(r'^'+APP_NAME+r'layers/naturalarea/$', coreviews.NaturalAreaLayer.as_view(), name='naturalareaLayer'),
     url(r'^'+APP_NAME+r'layers/plant/$', coreviews.PlantLayer.as_view(), name="plantLayer"),
     url(r'^'+APP_NAME+r'layers/animal/$', coreviews.AnimalLayer.as_view(), name="animalLayer"),
@@ -46,15 +50,15 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'list/animal/$', coreviews.AnimalList.as_view(), name="animalList"),
     url(r'^'+APP_NAME+r'list/slimemold/$', coreviews.SlimeMoldList.as_view(), name='slimemoldList'),
     url(r'^'+APP_NAME+r'list/fungus/$', coreviews.FungusList.as_view(), name="fungusList"),
-    
+
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', coreviews.LayerDetail.as_view()),
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/version/([0-9]+)/$', coreviews.LayerVersionDetail.as_view()),
-    
+
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/([0-9]+)/$', coreviews.get_feature_type),
     url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/$', coreviews.get_feature_type),
     url(r'^'+APP_NAME+r'species/$', coreviews.SpeciesSearch.as_view()),
     url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', coreviews.SpeciesDetail.as_view()),
     url(r'^'+APP_NAME, include(router.urls)),
     url(r'^'+APP_NAME+r'image/(plant|animal|slimemold|fungus)/$', coreviews.PhotoViewSet.as_view({'post': 'create'})),
-    
-] 
+
+]
