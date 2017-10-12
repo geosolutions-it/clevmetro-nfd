@@ -40,12 +40,13 @@ const FilterElement = require('../../components/naturalfeatures/FilterElement');
 
 const resetFilters = resetFtFilters.bind(null, 'plant');
 const upDateFeatureType = loadList.bind(null, 'plant', 1);
+
 const FilterPanel = connect((state) => {
-    const data = dataFilterSelector(state);
-    const operator = state.featuresearch && state.featuresearch.defaultOperator;
+    const filters = dataFilterSelector(state);
+    const featuresInfo = dataSelector(state);
     return {
         height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 600,
-        disableBtns: !FilterUtils.isFilterValid({operator, ...data})
+        disableSync: FilterUtils.equalFilters(filters, featuresInfo.filter)
     };
 }, {
     onReset: resetFilters,

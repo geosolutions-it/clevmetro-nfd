@@ -37,7 +37,7 @@ const load = (ftType, store, page = 1) => {
         filter = FilterUtils.getFilter({operator: featuresearch.defaultOperator, ...filters});
     }
     return Rx.Observable.fromPromise(Api.getData(`/nfdapi/list/${ftType}/?page=${page}${filter}`))
-            .map(val => listLoaded(ftType, val, page))
+            .map(val => listLoaded(ftType, val, page, filters))
             .catch((e) => Rx.Observable.from([error({title: Utils.getPrettyFeatureType(ftType), message: `Loading error ${e.statusText}`, autoDismiss: 0 }), onLoadListError(ftType, e)]));
 };
 
@@ -70,7 +70,13 @@ module.exports = {
                     .map(options => onSearchSepciesResult(a.featureType, options))
                     .catch(e => Rx.Observable.of(onSearchSepciesError(a.featureType, e)))
             ),
-    onClearFilter: (action$) =>
+    onClearFilter: (action$, store) =>
         action$.ofType(RESET_FEATURETYPE_FILTERS)
+            .filter((a) => {
+                const {featuresearch: fs} = store.getState();
+                const filters = fs[`${a.fttype}_filters`];
+                const fetureInfo = fs[a.fttype];
+                return FilterUtils.getFilter({operator: fs.defaultOperator, ...filters}) !== FilterUtils.getFilter({operator: fs.defaultOperator, ...fetureInfo.filter});
+            })
             .switchMap(a => Rx.Observable.of(loadList(a.fttype)))
 };

@@ -11,7 +11,7 @@
  * validation function in validator object, add a funciton that build filter
  * string in getFilter
  */
-const {isFinite, isBoolean} = require('lodash');
+const {isFinite, isBoolean, isEqual, isEmpty} = require('lodash');
 const moment = require('moment');
 const fields = ["selectedSpecies", "released", "includevalue"];
 
@@ -59,6 +59,12 @@ const getSpeciesFilter = (selectedSpecies) => {
 module.exports = {
     isFilterValid(filters) {
         return fields.reduce((valid, f) => valid ? valid : validator[f](filters), false);
+    },
+    equalFilters(a = {}, b = {}) {
+        return isEqual(a, b);
+    },
+    isFilterEmpty(f = {}) {
+        return isEmpty(f);
     },
     getFilter({released, selectedSpecies, operator, includevalue}) {
         return getIncludeFilter(includevalue, operator) + getReleasFilter(released) + getSpeciesFilter(selectedSpecies);

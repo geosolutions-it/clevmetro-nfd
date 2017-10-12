@@ -23,8 +23,8 @@ function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
         case TOGGLE_FEATURETYPE:
             return assign({}, state, {activeFt: action.activekey});
         case LIST_LOADED: {
-            const {fttype, features, total, page} = action;
-            return assign({}, state, {[fttype]: {features, total, page}});
+            const {fttype, features, total, page, filter} = action;
+            return assign({}, state, {[fttype]: {features, total, page, filter}});
         }
         case LIST_LOADING:
             return assign({}, state, {loading: assign({}, state.loading, {[action.fttype]: action.loading})});
