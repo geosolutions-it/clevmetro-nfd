@@ -77,6 +77,17 @@ const ReleasedFilter = connect((state) => {
     onChange: onReleasedChange
 })(require('../../components/naturalfeatures/CheckFilter'));
 
+const onNotReleasedChange = setFilterProp.bind(null, 'plant', 'notreleased');
+
+const NotReleasedFilter = connect((state) => {
+    const data = dataFilterSelector(state);
+    return {
+        value: !!data.notreleased
+    };
+}, {
+    onChange: onNotReleasedChange
+})(require('../../components/naturalfeatures/CheckFilter'));
+
 const updateFieldValue = setFilterProp.bind(null, 'fungus');
 
 const DateFiled = connect((state) => {
@@ -105,6 +116,7 @@ class Fungus extends React.Component {
                     </FilterElement>
                     <FilterElement label="by Properties">
                         <ReleasedFilter label="released"/>
+                        <NotReleasedFilter label="Not released"/>
                     </FilterElement>
                 </FilterPanel>
             </FeatureTypePanel>
