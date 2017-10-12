@@ -85,13 +85,14 @@ function onLoadListError(fttype, error) {
     };
 }
 
-function listLoaded(fttype, data, page = 0 ) {
+function listLoaded(fttype, data, page = 0, filter = {}) {
     return {
         type: LIST_LOADED,
         fttype,
         features: data.results.features || [],
         total: data.count,
-        page
+        page,
+        filter
     };
 }
 function loadList(fttype, page = 1) {
