@@ -77,7 +77,7 @@ const ReleasedFilter = connect((state) => {
     onChange: onReleasedChange
 })(require('../../components/naturalfeatures/CheckFilter'));
 
-const onNotReleasedChange = setFilterProp.bind(null, 'plant', 'notreleased');
+const onNotReleasedChange = setFilterProp.bind(null, 'fungus', 'notreleased');
 
 const NotReleasedFilter = connect((state) => {
     const data = dataFilterSelector(state);
