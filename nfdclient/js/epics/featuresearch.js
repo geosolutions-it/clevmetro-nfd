@@ -10,7 +10,11 @@ const Api = require('../api/naturalfeaturesdata');
 const Utils = require('../utils/nfdUtils');
 const FilterUtils = require('../utils/FilterUtils');
 const {
-    NFD_LOGIN_SUCCESS
+    NFD_LOGIN_SUCCESS,
+    UPDATE_NATURAL_FEATURE,
+    DELETE_NATURAL_FEATURE,
+    CREATE_NATURAL_FEATURE,
+    cancel
     } = require('../actions/naturalfeatures');
 const {
     LOAD_LIST,
@@ -25,6 +29,7 @@ const {
     onSearchSepciesError,
     RESET_FEATURETYPE_FILTERS
 } = require('../actions/featuresearch');
+
 const {zoomToPoint} = require('../../MapStore2/web/client/actions/map');
 const {error} = require('../../MapStore2/web/client/actions/notifications');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
@@ -37,7 +42,7 @@ const load = (ftType, store, page = 1) => {
         filter = FilterUtils.getFilter({operator: featuresearch.defaultOperator, ...filters});
     }
     return Rx.Observable.fromPromise(Api.getData(`/nfdapi/list/${ftType}/?page=${page}${filter}`))
-            .map(val => listLoaded(ftType, val, page))
+            .map(val => listLoaded(ftType, val, page, filters))
             .catch((e) => Rx.Observable.from([error({title: Utils.getPrettyFeatureType(ftType), message: `Loading error ${e.statusText}`, autoDismiss: 0 }), onLoadListError(ftType, e)]));
 };
 
@@ -70,7 +75,24 @@ module.exports = {
                     .map(options => onSearchSepciesResult(a.featureType, options))
                     .catch(e => Rx.Observable.of(onSearchSepciesError(a.featureType, e)))
             ),
-    onClearFilter: (action$) =>
+    onClearFilter: (action$, store) =>
         action$.ofType(RESET_FEATURETYPE_FILTERS)
-            .switchMap(a => Rx.Observable.of(loadList(a.fttype)))
+            .filter((a) => {
+                const {featuresearch: fs} = store.getState();
+                const filters = fs[`${a.fttype}_filters`];
+                const fetureInfo = fs[a.fttype];
+                return FilterUtils.getFilter({operator: fs.defaultOperator, ...filters}) !== FilterUtils.getFilter({operator: fs.defaultOperator, ...fetureInfo.filter});
+            })
+            .switchMap(a => Rx.Observable.of(loadList(a.fttype))),
+            // Reloads appropriate list and stops editing
+    onUpdateFeatureSuccess: (action$, store) =>
+        action$.ofType(UPDATE_NATURAL_FEATURE, DELETE_NATURAL_FEATURE, CREATE_NATURAL_FEATURE)
+            .filter(a => a.status === 'success')
+            .switchMap(() => {
+                const {naturalfeatures} = store.getState();
+                const {featuretype: ft} = naturalfeatures;
+                return Rx.Observable.from([loadList(ft), cancel()]);
+            })
+
+
 };

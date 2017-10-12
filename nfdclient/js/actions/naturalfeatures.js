@@ -391,7 +391,6 @@ function naturalFeatureCreated(featuretype, featuresubtype, feature) {
             if (resp) {
                 dispatch(createNaturalFeatureSuccess(resp.id));
                 dispatch(reloadFeatureType(resp.featuretype));
-                dispatch(cancel());
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -409,7 +408,6 @@ function updateNaturalFeature(featuretype, featuresubtype, properties) {
         return Api.updateNaturalFeature(featuretype, properties).then(() => {
             dispatch(updateNaturalFeatureSuccess(properties.id));
             dispatch(reloadFeatureType(featuretype));
-            dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
         }).catch((error) => {
             if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
@@ -449,7 +447,6 @@ function deleteNaturalFeature(featuretype, id) {
         return Api.deleteNaturalFeature(featuretype, id).then(() => {
             dispatch(changeLayerProperties(featuretype, {features: []}));
             dispatch(reloadFeatureType(featuretype));
-            dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', false));
             dispatch(deleteNaturalFeatureSuccess(id));
         }).catch((error) => {
             if (error.status === 401) {
@@ -551,6 +548,7 @@ module.exports = {
     UPDATE_NATURAL_FEATURE, updateNaturalFeature,
     UPDATE_NATURAL_FEATURE_ERROR,
     CREATE_NATURAL_FEATURE_ERROR,
+    CREATE_NATURAL_FEATURE,
     DELETE_NATURAL_FEATURE, deleteNaturalFeature,
     deleteNaturalFeatureLoading, deleteNaturalFeatureSuccess,
     deleteNaturalFeatureError,
