@@ -1315,10 +1315,11 @@ class NaturalAreaListSerializer(ListSerializer):
         result['verified'] = instance.verified
         result['inclusion_date'] = instance.inclusion_date
         result['id'] = instance.id
-        result['natural_area_element.id'] = instance.natural_area_element.id
-        result['natural_area_element.general_description'] = instance.natural_area_element.general_description
-        result['natural_area_element.type'] = instance.natural_area_element.type
-        result['natural_area_element.natural_area_code_nac'] = instance.natural_area_element.natural_area_code_nac
+        if instance.element:
+            result['element.id'] = instance.element.id
+            result['element.general_description'] = instance.element.general_description
+            result['element.type'] = instance.element.type
+            result['element.natural_area_code_nac'] = instance.element.natural_area_code_nac
         result['observation.observation_date'] = instance.observation.observation_date
         return result
 
