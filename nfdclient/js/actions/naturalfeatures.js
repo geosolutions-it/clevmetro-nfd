@@ -45,7 +45,13 @@ const EDIT_FEATURE = 'EDIT_FEATURE';
 const VIEW_FEATURE = 'VIEW_FEATURE';
 const END_EDITING = 'END_EDITING';
 const NF_CLICKED = 'NF_CLICKED';
+const CANCEL_EDITING = 'CANCEL_EDITING';
 
+function endEditing() {
+    return {
+        type: END_EDITING
+    };
+}
 function viewFeature() {
     return {
         type: VIEW_FEATURE
@@ -61,12 +67,13 @@ function onNfClick(properties, nfId, layer) {
 }
 function cancel() {
     return {
-        type: END_EDITING
+        type: CANCEL_EDITING
     };
 }
-function editFeature() {
+function editFeature(properties) {
     return {
-        type: EDIT_FEATURE
+        type: EDIT_FEATURE,
+        properties
     };
 }
 
@@ -210,13 +217,13 @@ function reloadFeatureType(featuretype) {
     };
 }
 
-function getFeatureInfo(properties, nfid) {
+function getFeatureInfo(properties, nfid, action) {
     return (dispatch) => {
         return Api.getFeatureInfo(properties.featuretype, nfid).then((resp) => {
             if (resp) {
                 let feature = normalizeInfo(resp);
                 dispatch(updateNaturalFeatureForm(feature));
-                dispatch(setControlProperty('vieweditnaturalfeatures', 'enabled', true));
+                dispatch(action);
                 dispatch(changeDrawingStatus("selectionGeomLoaded", "Marker", "dockednaturalfeatures", [], {properties: resp}));
             }
         }).catch((error) => {
@@ -243,16 +250,12 @@ function getSpecies(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid, fature) {
-    const theLflFeat = fature;
+function naturalFeatureSelected(properties, nfid, action) {
     return (dispatch) => {
-        // not necessary
-        dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"));
-                dispatch(getFeatureInfo(properties, nfid));
-                dispatch(changeDrawingStatus("featureSelected", "Marker", "dockednaturalfeatures", [], {properties: properties, lflFeat: theLflFeat}));
+                dispatch(getFeatureInfo(properties, nfid, action));
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -293,7 +296,6 @@ function naturalFeatureMarkerAdded(feature) {
                 dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
                 newFeat = assign(createEmptyFormValues(response.forms), newFeat);
                 dispatch(updateNaturalFeatureForm(newFeat));
-                dispatch(setControlProperty('addnaturalfeatures', 'enabled', true));
             }
         }).catch((error) => {
             if (error.status === 401) {
@@ -446,9 +448,8 @@ function deleteNaturalFeatureError(id, error) {
 function deleteNaturalFeature(featuretype, id) {
     return (dispatch) => {
         return Api.deleteNaturalFeature(featuretype, id).then(() => {
-            dispatch(changeLayerProperties(featuretype, {features: []}));
-            dispatch(reloadFeatureType(featuretype));
             dispatch(deleteNaturalFeatureSuccess(id));
+            dispatch(reloadFeatureType(featuretype));
         }).catch((error) => {
             if (error.status === 401) {
                 return dispatch(userNotAuthenticatedError(error));
@@ -563,7 +564,8 @@ module.exports = {
     nextVersion, previousVersion, naturalFeatureGeomAdded,
     addFeature, ADD_FEATURE,
     editFeature, EDIT_FEATURE,
-    cancel, END_EDITING,
+    cancel, CANCEL_EDITING,
+    endEditing, END_EDITING,
     onNfClick, NF_CLICKED,
     viewFeature, VIEW_FEATURE
 };
