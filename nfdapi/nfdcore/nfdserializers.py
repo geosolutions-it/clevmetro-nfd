@@ -4,7 +4,8 @@ from django.db.models.fields import IntegerField, DecimalField, FloatField
 from django.contrib.gis.db.models.fields import GeometryField, PolygonField
 
 from nfdcore.models import get_details_class, EarthwormEvidence, DisturbanceType,\
-    SlimeMoldLifestages, TaxonLocation, NaturalAreaLocation, ElementNaturalAreas
+    SlimeMoldLifestages, TaxonLocation, NaturalAreaLocation, ElementNaturalAreas,\
+    ObservedAssociations, FruitingBodiesAge, FungusDetails
 
 from nfdcore.models import DictionaryTable
 from nfdcore.models import Voucher, OccurrenceTaxon, PlantDetails,\
@@ -269,6 +270,24 @@ MOSS_PLANT_TYPE = [
     ]
 MOSS_PLANT_TYPE_DICT = get_form_dict(MOSS_PLANT_TYPE)
 
+FUNGUS_TYPE = [
+    (_('species'), Species, ['species.element_species']),
+    (_('species.element_species'), ElementSpecies, []),
+    (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
+    (_('observation'), OccurrenceObservation, ['observation.reporter', 'observation.verifier', 'observation.recorder']),
+    (_('observation.reporter'), PointOfContact, []),
+    (_('observation.verifier'), PointOfContact, []),
+    (_('observation.recorder'), PointOfContact, []),
+    (_('voucher'), Voucher, []),
+    (_('details'), FungusDetails, ['details.earthworm_evidence', 'details.disturbance_type', 'details.other_observed_associations', 'details.fruiting_bodies_age']),
+    (_('details.earthworm_evidence'), EarthwormEvidence, []),
+    (_('details.disturbance_type'), DisturbanceType, []),
+    (_('details.other_observed_associations'), ObservedAssociations, []),
+    (_('details.fruiting_bodies_age'), FruitingBodiesAge, []),
+    (_('location'), TaxonLocation, []),
+    ]
+FUNGUS_TYPE_DICT = get_form_dict(FUNGUS_TYPE)
+
 NATURAL_AREA_TYPE = [
     (_('element'), ElementNaturalAreas, ['element.earthworm_evidence', 'element.disturbance_type']),
     (MANAGEMENT_FORM_NAME, OccurrenceTaxon, []),
@@ -299,7 +318,7 @@ def get_details_serializer(category_code):
     elif category_code=='mo':
         return MossDetailsSerializer
     elif category_code=='fu':
-        return Serializer # FIXME
+        return FungusDetailsSerializer
     elif category_code=='sl':
         return SlimeMoldDetailsSerializer
     elif category_code=='ln':
@@ -544,7 +563,8 @@ def init_forms(instance, category_code):
             instance.forms = MOSS_PLANT_TYPE
             instance._form_dict = MOSS_PLANT_TYPE_DICT
         elif category_code=='fu':
-            return None #FIXME
+            instance.forms = FUNGUS_TYPE
+            instance._form_dict = FUNGUS_TYPE_DICT
         elif category_code=='sl':
             instance.forms = SLIMEMOLD_TYPE
             instance._form_dict = SLIMEMOLD_TYPE_DICT
@@ -942,6 +962,25 @@ class SlimeMoldDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializ
     lifestages = SlimeMoldLifestagesSerializer(required=False)
     class Meta:
         model = SlimeMoldDetails
+        exclude = ('id',)
+
+class FruitingBodiesAgeSerializer(CustomModelSerializerMixin, ModelSerializer):
+    class Meta:
+        model = FruitingBodiesAge
+        exclude = ('id',)
+
+class ObservedAssociationsSerializer(CustomModelSerializerMixin, ModelSerializer):
+    class Meta:
+        model = ObservedAssociations
+        exclude = ('id',)
+    
+class FungusDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+    disturbance_type = DisturbanceTypeSerializer(required=False)
+    earthworm_evidence = EarthwormEvidenceSerializer(required=False)
+    fruiting_bodies_age = FruitingBodiesAgeSerializer(required=False)
+    other_observed_associations = ObservedAssociationsSerializer(required=False)
+    class Meta:
+        model = FungusDetails
         exclude = ('id',)
 
 

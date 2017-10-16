@@ -15,7 +15,9 @@ from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
     GroundSurface, CanopyCover, GeneralHabitatCategory, LandscapePosition,\
     Aspect, Slope, Watershed, Reservation, CMSensitivity, LeapLandCover,\
     GlacialDepositPleistoceneAge, GlacialDeposit, NaturalAreaCondition,\
-    NaturalAreaType, BedrockAndOutcrops, RegionalFrequency
+    NaturalAreaType, BedrockAndOutcrops, RegionalFrequency,\
+    FungusApparentSubstrate, MushroomVerticalLocation, MushroomGrowthForm,\
+    MushroomOdor, FungalAssociationType
 from django.utils import timezone
 import reversion
 from reversion.models import Version
@@ -888,6 +890,51 @@ regional_frequency = [
     ("VR", _("Very rare"))
     ]
 
+fungus_aparent_substrate = [
+    ("1", _("live wood")),
+    ("2", _("woody debris")),
+    ("3", _("soil")),
+    ("4", _("duff/leaf litter")),
+    ("5", _("other species of mushroom")),
+    ("6", _("invertebrate animal")),
+    ("7", _("vertebrate animal")),
+    ("8", _("other")),
+    ("9", _("NA")),
+    ("10", _("unknown"))
+    ]
+
+mushroom_vertical_location = [
+    ("1", _("above ground, 5 ft and over")),
+    ("2", _("above ground, under 5 ft")),
+    ("3", _("ground level")),
+    ("4", _("underground"))
+    ]
+mushroom_growth_form = [
+    ("1", _("clustered")),
+    ("2", _("fairy ring")),
+    ("3", _("scattered")),
+    ("4", _("single"))
+    ]
+
+mushroom_odor = [
+    ("1", _("flower aroma")),
+    ("2", _("fruity")),
+    ("3", _("fish-like")),
+    ("4", _("mushroom")),
+    ("5", _("rotting flesh/excrement")),
+    ("6", _("No smell"))
+    ]
+
+fungal_association_type = [
+    ("0", _("N/A")),
+    ("1", _("circling or hovering")),
+    ("2", _("feeding")),
+    ("3", _("laying eggs")),
+    ("4", _("mating on")),
+    ("5", _("moving over")),
+]
+
+
 def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
@@ -974,6 +1021,13 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(LandscapePosition, landscape_position, ifempty, clean)
     _init_dict_table(Aspect, aspect, ifempty, clean)
     _init_dict_table(Slope, slope, ifempty, clean)
+    
+    _init_dict_table(FungusApparentSubstrate, fungus_aparent_substrate, ifempty, clean)
+    _init_dict_table(MushroomVerticalLocation, mushroom_vertical_location, ifempty, clean)
+    _init_dict_table(MushroomGrowthForm, mushroom_growth_form, ifempty, clean)
+    _init_dict_table(MushroomOdor, mushroom_odor, ifempty, clean)
+    _init_dict_table(FungalAssociationType, fungal_association_type, ifempty, clean)
+    
     
     _init_dict_table(Watershed, watershed, ifempty, clean)
     _init_dict_table(Reservation, reservation, ifempty, clean)
