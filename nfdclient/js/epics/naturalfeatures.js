@@ -144,7 +144,7 @@ const unauthorizedUserErrorEpic = action$ =>
 const addNaturalFeatureGeometryEpic = (action$) =>
     action$.ofType(END_DRAWING)
         .switchMap((action) => {
-            return Rx.Observable.from([toggleControl('addnaturalfeatures', 'enabled', true), naturalFeatureGeomAdded(action.geometry)]);
+            return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)].concat(action.geometry.drawMethod === 'Marker' ? [toggleControl('addnaturalfeatures', 'enabled', true)] : []));
         });
 const activateFeatureInsert = (action$) =>
     action$.ofType(ADD_FEATURE)

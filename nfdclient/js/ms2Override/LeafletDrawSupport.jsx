@@ -9,6 +9,7 @@
 const React = require('react');
 var L = require('leaflet');
 require('leaflet-draw');
+const {isObject} = require('lodash');
 // const isMobile = require('ismobilejs');
 
 // const CoordinatesUtils = require('../../MapStore2/web/client/utils/CoordinatesUtils');
@@ -22,7 +23,8 @@ const LeafletDrawSupport = React.createClass({
         features: React.PropTypes.array,
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
-        messages: React.PropTypes.object
+        messages: React.PropTypes.object,
+        options: React.PropTypes.object
     },
     getDefaultProps() {
         return {
@@ -41,6 +43,10 @@ const LeafletDrawSupport = React.createClass({
         if (drawingStrings) {
             L.drawLocal = drawingStrings;
         }
+        const {options} = this.props;
+        const featuretype = (options && options.properties || {}).featuretype;
+        const {options: newOptions} = newProps;
+        const newFeaturetype = (newOptions && newOptions.properties || {}).featuretype;
         switch (newProps.drawStatus) {
             case ("start"):
                     this.addDrawInteraction(newProps);
@@ -58,6 +64,9 @@ const LeafletDrawSupport = React.createClass({
                 this.deselectFeature();
                 break;
             case ("selectionGeomLoaded"):
+                if (featuretype && featuretype !== newFeaturetype) {
+                    this.clean();
+                }
                 this.drawMarker(newProps.options.properties);
                 this.drawPolygon(newProps.options.properties);
                 break;
@@ -237,7 +246,7 @@ const LeafletDrawSupport = React.createClass({
     },
     drawMarker: function(props) {
         if (props.geom) {
-            let feature = {geometry: JSON.parse(props.geom), properties: props, type: "Feature", projection: "EPSG:4326"};
+            let feature = {geometry: isObject(props.geom) ? props.geom : JSON.parse(props.geom), properties: props, type: "Feature", projection: "EPSG:4326"};
             this.addMarkerLayer(Utils.getIcon(props.featuretype));
             this.drawMarkerLayer.clearLayers();
             this.drawMarkerLayer.addData(feature);
@@ -247,7 +256,7 @@ const LeafletDrawSupport = React.createClass({
         this.addPolygonLayer();
         this.drawPolygonLayer.clearLayers();
         if (props.polygon) {
-            let feature = {geometry: JSON.parse(props.polygon), properties: props, type: "Feature", projection: "EPSG:4326"};
+            let feature = {geometry: isObject(props.polygon) ? props.polygon : JSON.parse(props.polygon), properties: props, type: "Feature", projection: "EPSG:4326"};
             this.drawPolygonLayer.addData(feature);
         } else if (props.geometry) {
             this.drawPolygonLayer.addData(props);
