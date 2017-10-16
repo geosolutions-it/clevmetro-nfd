@@ -13,7 +13,7 @@
             "group": "background",
             "visibility": true
         }, {
-            "type": "vector",
+            "type": "clustermarker",
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
@@ -22,13 +22,15 @@
             "id": "naturalarea",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-blue.png",
-                "highlightIconUrl": "./assets/img/marker-icon-blue-highlight.png",
-                "iconAnchor": [12, 40]
+                "html":{
+                    "className": "marker-naturalarea",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
             },
             "features" : []
         }, {
-            "type": "vector",
+            "type": "clustermarker",
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
@@ -37,13 +39,15 @@
             "id": "plant",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-green.png",
-                "highlightIconUrl": "./assets/img/marker-icon-green-highlight.png",
-                "iconAnchor": [12, 40]
+                "html":{
+                    "className": "marker-plant",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
             },
             "features" : []
         }, {
-            "type": "vector",
+            "type": "clustermarker",
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
@@ -52,13 +56,15 @@
             "id": "slimemold",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-marine.png",
-                "highlightIconUrl": "./assets/img/marker-icon-marine-highlight.png",
-                "iconAnchor": [12, 40]
+                "html":{
+                    "className": "marker-slimemold",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
             },
             "features" : []
         }, {
-            "type": "vector",
+            "type": "clustermarker",
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
@@ -67,13 +73,15 @@
             "id": "fungus",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-yellow.png",
-                "highlightIconUrl": "./assets/img/marker-icon-yellow-highlight.png",
-                "iconAnchor": [12, 40]
+                "html":{
+                    "className": "marker-fungus",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
             },
             "features" : []
         }, {
-            "type": "vector",
+            "type": "clustermarker",
             "queryable": true,
             "visibility": true,
             "group": "Natural features",
@@ -82,9 +90,11 @@
             "id": "animal",
             "styleName": "marker",
             "style": {
-                "iconUrl": "./assets/img/marker-icon-purple.png",
-                "highlightIconUrl": "./assets/img/marker-icon-purple-highlight.png",
-                "iconAnchor": [12, 40]
+                "html":{
+                    "className": "marker-animal",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
             },
             "features" : []
         }]
