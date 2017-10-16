@@ -14,7 +14,7 @@ const {
     UPDATE_NATURAL_FEATURE,
     DELETE_NATURAL_FEATURE,
     CREATE_NATURAL_FEATURE,
-    cancel
+    endEditing
     } = require('../actions/naturalfeatures');
 const {
     LOAD_LIST,
@@ -91,7 +91,7 @@ module.exports = {
             .switchMap(() => {
                 const {naturalfeatures} = store.getState();
                 const {featuretype: ft} = naturalfeatures;
-                return Rx.Observable.from([loadList(ft), cancel()]);
+                return Rx.Observable.from([loadList(ft), endEditing()]);
             })
 
 
