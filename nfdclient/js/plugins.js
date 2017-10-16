@@ -8,7 +8,7 @@
 
 module.exports = {
     plugins: {
-        MapPlugin: require('./plugins/NFDMap'),
+        MapPlugin: require('./plugins/NfdMap'),
         DrawerMenuPlugin: require('../MapStore2/web/client/plugins/DrawerMenu'),
         TutorialPlugin: require('../MapStore2/web/client/plugins/Tutorial'),
         TOCPlugin: require('../MapStore2/web/client/plugins/TOC'),
