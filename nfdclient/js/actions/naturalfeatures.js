@@ -246,6 +246,7 @@ function getSpecies(id) {
 function naturalFeatureSelected(properties, nfid, fature) {
     const theLflFeat = fature;
     return (dispatch) => {
+        // not necessary
         dispatch(changeDrawingStatus("clean", "Marker", "dockednaturalfeatures", [], {}));
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {

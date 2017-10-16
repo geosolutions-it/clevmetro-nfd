@@ -172,6 +172,8 @@ const activeFeatureEdit = (action$, store) =>
             const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature() : viewFeature();
             return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, a.layer), modeAction]);
         });
+    // const removeAddEditedFeature = (action$, store) =>
+    //     action$.ofType()
 module.exports = {
     getDataEpic,
     unauthorizedUserErrorEpic,

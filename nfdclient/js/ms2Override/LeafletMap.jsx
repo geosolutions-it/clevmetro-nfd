@@ -216,7 +216,36 @@ let LeafletMap = React.createClass({
             <div id={this.props.id} style={this.props.style}>
                 {children}
                 <div id="nfd-legend" className="nfd-legend">
-                    <img src="./assets/img/legend.png" className="nfd-legend-img" />
+                    <div className="row flex-center">
+                        <div className="marker-animal col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Animals</label>
+                        </div>
+                    </div>
+                    <div className="row flex-center">
+                        <div className="marker-plant col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Plants</label>
+                        </div>
+                    </div>
+                    <div className="row flex-center">
+                        <div className="marker-fungus col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Fungi</label>
+                        </div>
+                    </div>
+                    <div className="row flex-center">
+                        <div className="marker-slimemold col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Slime/Mold</label>
+                        </div>
+                    </div>
+                    <div className="row flex-center">
+                        <div className="marker-naturalarea col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Natural areas</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

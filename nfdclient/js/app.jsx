@@ -14,10 +14,7 @@ const appReducers = {
 };
 
 const dEpics = require('./epics/naturalfeatures');
-const ConfigUtils = require('../MapStore2/web/client/utils/ConfigUtils');
-
-// Set one hour cache
-ConfigUtils.setConfigProp("cacheDataExpire", 3600);
+require('./components/map/LeafletClusterMarker.js');
 
 const StandardApp = require('../MapStore2/web/client/components/app/StandardApp');
 

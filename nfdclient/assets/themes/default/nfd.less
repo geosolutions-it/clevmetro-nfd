@@ -137,3 +137,94 @@ box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.24);
     right: 10px;
     top: 12px;
 }
+// feature type map icon
+
+@plant-color:#37ca28;
+@animal-color:#9e25ca;
+@fungus-color:#c9b926;
+@naturalarea-color:#2880c9;
+@slimemold-color:#28c1ca;
+
+[class^="leaflet-marker-icon marker-"]{
+    background-size: 30px 30px;
+}
+.nfd-legend div[class^="marker-"]{
+    height: 30px;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+}
+.marker-plant{
+    background-image: url(../../img/tree-b.svg);
+}
+.marker-plant-h {
+    background-image: url(../../img/tree-h.svg);
+}
+.marker-cluster-plant {
+    background-color: lighten(@plant-color, 40%);
+}
+.marker-cluster-plant div {
+    background-color: @plant-color;
+}
+
+.marker-fungus{
+    background-image: url(../../img/mushroom-b.svg);
+}
+.marker-fungus-h {
+    background-image: url(../../img/mushroom-h.svg);
+}
+.marker-cluster-fungus {
+    background-color: lighten(@fungus-color, 40%);
+}
+.marker-cluster-fungus div {
+    background-color: @fungus-color;
+}
+.marker-animal {
+    background-image: url(../../img/animal-b.svg);
+}
+.marker-animal-h {
+    background-image: url(../../img/animal-h.svg);
+}
+.marker-cluster-animal {
+    background-color: lighten(@animal-color, 40%);
+}
+.marker-cluster-animal div {
+    background-color: @animal-color;
+}
+
+.marker-slimemold{
+    background-image: url(../../img/slimemold-b.svg);
+}
+.marker-slimemold-h {
+    background-image: url(../../img/slimemold-h.svg);
+}
+.marker-cluster-slimemold {
+    background-color: lighten(@slimemold-color, 40%);
+}
+.marker-cluster-slimemold div {
+    background-color: @slimemold-color;
+}
+.marker-naturalarea{
+    background-image: url(../../img/natural-b.svg);
+}
+.marker-naturalarea-h {
+    background-image: url(../../img/natural-h.svg);
+}
+.marker-cluster-naturalarea {
+    background-color: lighten(@naturalarea-color, 40%);
+}
+.marker-cluster-naturalarea div {
+    background-color: @naturalarea-color;
+}
+.nfd-legend .row {
+    padding-left: 17px;
+}
+.nfd-legend .row label{
+    line-height: 30px;
+    color: gray;
+}
+.nfd-legend div[class^="col-"] {
+    padding: 0px 5px;
+}
+.nfd-legend {
+width: 150px;
+}
