@@ -31,6 +31,16 @@ var coordsToLatLngs = function(coords, levelsDeep, coordsToLatLng) {
 };
 // Create a new Leaflet layer with custom icon marker or circleMarker
 var getPointLayer = function(pointToLayer, geojson, latlng, options) {
+    const {style} = options;
+    if (style && style.html) {
+        const icon = L.divIcon(style.html);
+        return L.marker(
+            latlng,
+            {
+                icon,
+                opacity: style && style.opacity || 1
+            });
+    }
     if (pointToLayer) {
         return pointToLayer(geojson, latlng);
     }
