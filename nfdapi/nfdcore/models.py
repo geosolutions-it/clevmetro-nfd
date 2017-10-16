@@ -302,7 +302,7 @@ def get_details_class(category_code):
     elif category_code=='mo':
         return MossDetails
     elif category_code=='fu':
-        return TaxonDetails #FIXME
+        return FungusDetails
     elif category_code=='sl':
         return SlimeMoldDetails
     elif category_code=='ln':
@@ -617,16 +617,16 @@ class Slope(DictionaryTable):
 class PlantDetails(TaxonDetails):
     plant_count = models.ForeignKey(PlantCount, on_delete=models.SET_NULL, blank=True, null=True)
     area_ranges = models.TextField(blank=True, null=True)
-    #soil_type = models.ForeignKey(SoilType, on_delete=models.SET_NULL, blank=True, null=True)
+    #soil_type = models.ForeignKey(SoilType, on_delete=models.SET_NULL, blank=True, null=True) # FIXME
     moisture_regime = models.ForeignKey(MoistureRegime, on_delete=models.SET_NULL, blank=True, null=True)
     ground_surface = models.ForeignKey(GroundSurface, on_delete=models.SET_NULL, blank=True, null=True)
     tree_canopy_cover = models.ForeignKey(CanopyCover, on_delete=models.SET_NULL, blank=True, null=True)
-    #common_trees_and_bushes = models.ForeignKey(CommonTreesAndBushes, on_delete=models.SET_NULL, blank=True, null=True)
-    #common_ground_vegetation = models.ForeignKey(CommonGroundVegetation, on_delete=models.SET_NULL, blank=True, null=True)
+    #common_trees_and_bushes = models.ForeignKey(CommonTreesAndBushes, on_delete=models.SET_NULL, blank=True, null=True) # FIXME
+    #common_ground_vegetation = models.ForeignKey(CommonGroundVegetation, on_delete=models.SET_NULL, blank=True, null=True) # FIXME
     general_habitat_category = models.ForeignKey(GeneralHabitatCategory, on_delete=models.SET_NULL, blank=True, null=True)
     leap_land_cover_category = models.TextField(blank=True, null=True)
     disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
-    #invasive_plants = models.ForeignKey(InvasivePlants, on_delete=models.SET_NULL, blank=True, null=True)
+    #invasive_plants = models.ForeignKey(InvasivePlants, on_delete=models.SET_NULL, blank=True, null=True) # FIXME
     earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
     landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
     aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
@@ -650,6 +650,75 @@ class FloweringPlantDetails(PlantDetails):
 @reversion.register(follow=['taxondetails_ptr'])
 class MossDetails(PlantDetails):
     lifestages = models.ForeignKey(MossLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+
+class FungusApparentSubstrate(DictionaryTable):
+    pass
+
+class MushroomVerticalLocation(DictionaryTable):
+    pass
+
+class MushroomGrowthForm(DictionaryTable):
+    pass
+
+class MushroomOdor(DictionaryTable):
+    pass
+
+@reversion.register()
+class FruitingBodiesAge(models.Model):
+    aged_diam_cm = models.FloatField(null=True)
+    aged_count = models.PositiveIntegerField(null=True)
+    buttons_diam_cm = models.FloatField(null=True)
+    buttons_count = models.PositiveIntegerField(null=True)
+    decomposing_diam_cm = models.FloatField(null=True)
+    decomposing_count = models.PositiveIntegerField(null=True)
+    emergents_diam_cm = models.FloatField(null=True)
+    emergents_count = models.PositiveIntegerField(null=True)
+    mature_diam_cm = models.FloatField(null=True)
+    mature_count = models.PositiveIntegerField(null=True)
+    young_diam_cm = models.FloatField(null=True)
+    young_count = models.PositiveIntegerField(null=True)
+    
+class FungalAssociationType(DictionaryTable):
+    pass
+    
+@reversion.register()
+class ObservedAssociations(models.Model):
+    #gnat_association_present = models.NullBooleanField(default=False) # FIXME, needed??
+    gnat_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="gnat")
+    ants_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="ants")
+    termite_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="termite")
+    beetles_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="beetles")
+    snow_flea_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="snow_flea")
+    slug_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="slug")
+    snail_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="snail")
+    skunk_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="skunk")
+    badger_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="badger")
+    easter_gray_squirrel_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="easter_gray_squirrel")
+    chipmunk_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="chipmunk")
+    other_small_rodent_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="other_small_rodent")
+    turtle_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="turtle")
+    deer_association = models.ForeignKey(FungalAssociationType, on_delete=models.SET_NULL, blank=True, null=True, related_name="deer")
+
+@reversion.register(follow=['taxondetails_ptr'])
+class FungusDetails(TaxonDetails):
+    visible_mycelium = models.NullBooleanField(default=False)
+    areal_extent = models.TextField(blank=True, null=True, default='') #FIXME
+    mycelium_description = models.TextField(blank=True, null=True, default='') #FIXME
+    canopy_cover = models.ForeignKey(CanopyCover, on_delete=models.SET_NULL, blank=True, null=True)
+    aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
+    slope = models.ForeignKey(Slope, on_delete=models.SET_NULL, blank=True, null=True)
+    landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
+    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
+    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
+    landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
+    #spore_print boolean, # flag for associated photos 
+    apparent_substrate = models.ForeignKey(FungusApparentSubstrate, on_delete=models.SET_NULL, blank=True, null=True)
+    #potential_plant_hosts character varying, # invasive plants # FIXME
+    other_observed_associations = models.ForeignKey(ObservedAssociations, on_delete=models.CASCADE, blank=True, null=True)
+    mushroom_vertical_location = models.ForeignKey(MushroomVerticalLocation, on_delete=models.SET_NULL, blank=True, null=True)
+    fruiting_bodies_age = models.ForeignKey(FruitingBodiesAge, on_delete=models.CASCADE, blank=True, null=True) 
+    mushroom_growth_form = models.ForeignKey(MushroomGrowthForm, on_delete=models.SET_NULL, blank=True, null=True)
+    mushroom_odor = models.ForeignKey(MushroomOdor, on_delete=models.SET_NULL, blank=True, null=True)
 
 class CMSensitivity(DictionaryTable):
     pass

@@ -129,7 +129,12 @@ const DockedNaturalFeatures = React.createClass({
             icon = 'uniE232';
         } else if (formname.includes('disturbance')) {
             icon = 'uniE162';
+        } else if (formname.includes('association')) {
+            icon = 'uni4C';
+        } else if (formname.includes('fruit')) {
+            icon = 'uniF8FF';
         }
+        
         return icon;
     },
     getOptions(values) {
