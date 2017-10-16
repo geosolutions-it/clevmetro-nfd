@@ -9,10 +9,11 @@
 const React = require('react');
 var L = require('leaflet');
 require('leaflet-draw');
-const isMobile = require('ismobilejs');
+const {isObject} = require('lodash');
+// const isMobile = require('ismobilejs');
 
-const CoordinatesUtils = require('../../MapStore2/web/client/utils/CoordinatesUtils');
-
+// const CoordinatesUtils = require('../../MapStore2/web/client/utils/CoordinatesUtils');
+const Utils = require('../utils/nfdUtils');
 const LeafletDrawSupport = React.createClass({
     propTypes: {
         map: React.PropTypes.object,
@@ -22,7 +23,8 @@ const LeafletDrawSupport = React.createClass({
         features: React.PropTypes.array,
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
-        messages: React.PropTypes.object
+        messages: React.PropTypes.object,
+        options: React.PropTypes.object
     },
     getDefaultProps() {
         return {
@@ -41,14 +43,13 @@ const LeafletDrawSupport = React.createClass({
         if (drawingStrings) {
             L.drawLocal = drawingStrings;
         }
+        const {options} = this.props;
+        const featuretype = (options && options.properties || {}).featuretype;
+        const {options: newOptions} = newProps;
+        const newFeaturetype = (newOptions && newOptions.properties || {}).featuretype;
         switch (newProps.drawStatus) {
             case ("start"):
-                if (isMobile.any) {
-                    // this.addMobileDrawInteraction(newProps);
                     this.addDrawInteraction(newProps);
-                } else {
-                    this.addDrawInteraction(newProps);
-                }
                 break;
             case ("stop"):
                 this.removeDrawInteraction();
@@ -57,12 +58,15 @@ const LeafletDrawSupport = React.createClass({
                 this.clean();
                 break;
             case ("featureSelected"):
-                // this.selectFeature(newProps.options.lflFeat);
+                this.selectFeature(newProps.options.lflFeat);
                 break;
             case ("featureDeselected"):
                 this.deselectFeature();
                 break;
             case ("selectionGeomLoaded"):
+                if (featuretype && featuretype !== newFeaturetype) {
+                    this.clean();
+                }
                 this.drawMarker(newProps.options.properties);
                 this.drawPolygon(newProps.options.properties);
                 break;
@@ -75,38 +79,32 @@ const LeafletDrawSupport = React.createClass({
             this.drawing = true;
         }
     },
-    getSelectionIconUrl() {
-        try {
-            return this.selectionHighlightIcon.options.iconUrl;
-        } catch (e) {
-            console.log(e);
-        }
-        return null;
-    },
     render() {
         return null;
     },
-    addMarkerLayer: function(iconUrl) {
-        var smallIcon;
+    addMarkerLayer: function(style) {
+        let icon;
         if (this.drawMarkerLayer) {
             return;
         }
-        if (iconUrl) {
-            smallIcon = new L.Icon({
-                iconUrl: iconUrl,
+        if (style.iconUrl) {
+            icon = new L.Icon({
+                iconUrl: style.iconUrl,
                 iconAnchor: [12, 40]
             });
+        }else if (style.html) {
+            icon = L.divIcon(style.html);
         }
         let vector = L.geoJson(null, {
             pointToLayer: function(feature, latLng) {
                 var marker;
-                let center = CoordinatesUtils.reproject({x: latLng.lng, y: latLng.lat}, feature.projection, "EPSG:4326");
-                if (smallIcon) {
-                    marker = L.marker(L.latLng(center.y, center.x), {
-                        icon: smallIcon
+                // let center = CoordinatesUtils.reproject({x: latLng.lng, y: latLng.lat}, feature.projection, "EPSG:4326");
+                if (icon) {
+                    marker = L.marker(latLng, {
+                        icon: icon
                     });
                 } else {
-                    marker = L.circleMarker(L.latLng(center.y, center.x), {
+                    marker = L.circleMarker(latLng, {
                         color: '#ff0000',
                         opacity: 0.6,
                         weight: 2,
@@ -147,7 +145,6 @@ const LeafletDrawSupport = React.createClass({
             let geoJsonFt = layer.toGeoJSON();
             if (evt.layerType === "marker") {
                 if (drawMethod === "MarkerReplace") {
-                    this.deselectFeature();
                     this.drawMarkerLayer.clearLayers();
                 }
                 geoJsonFt.projection = "EPSG:4326";
@@ -178,14 +175,17 @@ const LeafletDrawSupport = React.createClass({
         this.props.map.on('draw:drawstart', this.onDraw.drawStart, this);
 
         if (newProps.drawMethod === 'Marker' || newProps.drawMethod === 'MarkerReplace') {
-            let NaturalFeatureMarker = L.Icon.extend({
-                options: {
-                    iconUrl: newProps.options.icon,
+            let icon;
+            if (newProps.options.icon.html) {
+                icon = L.divIcon(newProps.options.icon.html);
+            }else if (newProps.options.icon.iconUrl) {
+                icon = new L.Icon({
+                    iconUrl: newProps.options.icon.html.iconUrl,
                     iconAnchor: [12, 40]
-                }
-            });
+                });
+            }
             this.drawControl = new L.Draw.Marker(this.props.map, {
-                icon: new NaturalFeatureMarker(),
+                icon,
                 repeatMode: false
             });
         } else if (newProps.drawMethod === 'Polygon') {
@@ -201,50 +201,8 @@ const LeafletDrawSupport = React.createClass({
                 repeatMode: true
             });
         }
-
         // start the draw control
         this.drawControl.enable(newProps);
-    },
-    addMobileDrawInteraction: function(newProps) {
-        if (!this.drawMarkerLayer) {
-            this.addMarkerLayer(newProps.options.icon);
-        }
-        this.removeMobileDrawInteraction();
-        navigator.geolocation.getCurrentPosition((currentPosition) => {
-            this.drawing = false;
-            let smallIcon = new L.Icon({
-                iconUrl: newProps.options.icon,
-                iconAnchor: [12, 40]
-            });
-            let marker = L.marker(L.latLng(currentPosition.coords.latitude, currentPosition.coords.longitude), {
-                icon: smallIcon
-            });// .addTo(this.props.map);
-            // let drawn geom stay on the map
-            let geoJesonFt = marker.toGeoJSON();
-
-            geoJesonFt.projection = "EPSG:4326";
-            geoJesonFt.radius = marker.getRadius ? marker.getRadius() : 0;
-            geoJesonFt.properties.featuretype = newProps.options.properties.featuretype;
-            geoJesonFt.properties.featuresubtype = newProps.options.properties.featuresubtype;
-            this.drawMarkerLayer.addData(geoJesonFt);
-
-            let newFeature = {
-                featuretype: newProps.options.properties.featuretype,
-                featuresubtype: newProps.options.properties.featuresubtype,
-                geom: {
-                    type: "Point",
-                    coordinates: geoJesonFt.geometry.coordinates
-                }
-            };
-
-            this.props.onChangeDrawingStatus('stop', this.props.drawMethod, this.props.drawOwner);
-            this.props.onEndDrawing(newFeature, this.props.drawOwner);
-
-        }, (error) => {
-            if (error.code === 1) {
-                console.log('Error');
-            }
-        });
     },
     removeDrawInteraction: function() {
         if (this.drawControl !== null && this.drawControl !== undefined) {
@@ -256,7 +214,6 @@ const LeafletDrawSupport = React.createClass({
             this.props.map.off('draw:drawstart', this.onDraw.drawStart, this);
         }
     },
-    removeMobileDrawInteraction: function() {},
     cleanMarkerLayer: function() {
         this.removeDrawInteraction();
 
@@ -289,27 +246,18 @@ const LeafletDrawSupport = React.createClass({
     },
     drawMarker: function(props) {
         if (props.geom) {
-            try {
-                let feature = {geometry: props.geom, properties: props, type: "Feature", projection: "EPSG:4326"};
-                this.addMarkerLayer(this.getSelectionIconUrl());
-                this.drawMarkerLayer.clearLayers();
-                this.deselectFeature();
-                this.drawMarkerLayer.addData(feature);
-            } catch(e) {
-                console.log(e);
-            }
+            let feature = {geometry: isObject(props.geom) ? props.geom : JSON.parse(props.geom), properties: props, type: "Feature", projection: "EPSG:4326"};
+            this.addMarkerLayer(Utils.getIcon(props.featuretype));
+            this.drawMarkerLayer.clearLayers();
+            this.drawMarkerLayer.addData(feature);
         }
     },
     drawPolygon: function(props) {
         this.addPolygonLayer();
         this.drawPolygonLayer.clearLayers();
         if (props.polygon) {
-            try {
-                let feature = {geometry: JSON.parse(props.polygon), properties: props, type: "Feature", projection: "EPSG:4326"};
-                this.drawPolygonLayer.addData(feature);
-            } catch(e) {
-                console.log(e);
-            }
+            let feature = {geometry: isObject(props.polygon) ? props.polygon : JSON.parse(props.polygon), properties: props, type: "Feature", projection: "EPSG:4326"};
+            this.drawPolygonLayer.addData(feature);
         } else if (props.geometry) {
             this.drawPolygonLayer.addData(props);
         }

@@ -89,7 +89,7 @@ const DockedNaturalFeatures = React.createClass({
         // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onAddPointClick: function() {
-        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIconUrl(this.props.featuretype)});
+        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIcon(this.props.featuretype)});
     },
     onAddPolygonClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
@@ -129,6 +129,10 @@ const DockedNaturalFeatures = React.createClass({
             icon = 'uniE232';
         } else if (formname.includes('disturbance')) {
             icon = 'uniE162';
+        } else if (formname.includes('association')) {
+            icon = 'uni4C';
+        } else if (formname.includes('fruit')) {
+            icon = 'uniF8FF';
         }
         return icon;
     },
