@@ -63,7 +63,8 @@
         "ViewEditNaturalFeatures",
         "AddNaturalFeatures",
         "ToggleAddEditPanel",
-        "Features"
+        "Features",
+        "Notifications"
       ],
       "mobile": [{
           "name": "Map",
@@ -89,7 +90,8 @@
       "ViewEditNaturalFeatures",
       "AddNaturalFeatures",
       "ToggleAddEditPanel",
-      "Features"
+      "Features",
+      "Notifications"
     ]
 	}
 }
