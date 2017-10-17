@@ -9,7 +9,7 @@
 const React = require('react');
 const {connect} = require('react-redux');
 
-const {loadList, selectFeature, zooToFeature, searchSpecies, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
+const {loadList, selectFeature, zooToFeature, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
 
 const FilterUtils = require('../../utils/FilterUtils');
 
@@ -52,19 +52,6 @@ const FilterPanel = connect((state) => {
     onReset: resetFilters,
     onUpdate: upDateFeatureType
 })(require('../../components/naturalfeatures/FilterPanel'));
-
-const onSearch = searchSpecies.bind(null, 'naturalarea');
-const onSpeciesChange = setFilterProp.bind(null, 'naturalarea', 'selectedSpecies');
-
-const SpeciesSelector = connect((state) => {
-    const data = dataFilterSelector(state);
-    return {
-        options: data.species,
-        selectedSpecies: data.selectedSpecies
-}; }, {
-    onSearch,
-    onChange: onSpeciesChange
-})(require('../../components/naturalfeatures/SpeciesSelector'));
 
 const onReleasedChange = setFilterProp.bind(null, 'naturalarea', 'released');
 

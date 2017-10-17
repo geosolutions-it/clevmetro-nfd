@@ -30,11 +30,14 @@ const {
     naturalFeatureSelected,
     viewFeature,
     editFeature,
-    CANCEL_EDITING
+    CANCEL_EDITING,
+    EDIT_FEATURE_CLICKED
 } = require('../actions/naturalfeatures');
 const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
 const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const Utils = require('../utils/nfdUtils');
+
+const {warning} = require('../../MapStore2/web/client/actions/notifications');
 
 const getAnimalsEpic = (action$, store) =>
     action$.ofType(GET_ANIMALS)
@@ -160,14 +163,25 @@ const cleanDraw = (action$, store) =>
         });
 const activeFeatureEdit = (action$, store) =>
      action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
-        .filter(() => {
-            const {naturalfeatures} = store.getState();
-            return naturalfeatures.mode !== 'ADD' && naturalfeatures.mode !== 'EDIT';
-        })
         .switchMap((a) => {
+            const {naturalfeatures} = store.getState();
+            const isEditing = naturalfeatures.mode === 'ADD' || naturalfeatures.mode === 'EDIT';
+            if (isEditing) {
+                return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a new natura feature", autoDismiss: 2}));
+            }
             const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature(a.properties) : viewFeature();
             return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
         });
+const showEditPanel = (action$, store) =>
+        action$.ofType(EDIT_FEATURE_CLICKED)
+            .filter((a) => {
+                const {vieweditnaturalfeatures: v, addnaturalfeatures: ad} = (store.getState()).controls;
+                return (a.ftId && !(v && v.enabled)) || (!a.ftId && !(ad && ad.enabled));
+            })
+            .switchMap((a) => {
+                const control = a.ftId ? 'vieweditnaturalfeatures' : 'addnaturalfeatures';
+                return Rx.Observable.of(setControlProperty(control, 'enabled', true));
+            });
 const removeAddEditedFeature = (action$, store) =>
         action$.ofType(EDIT_FEATURE)
                 .switchMap((a) => {
@@ -198,5 +212,6 @@ module.exports = {
     cleanDraw,
     activeFeatureEdit,
    removeAddEditedFeature,
-   onCancel
+   onCancel,
+   showEditPanel
 };
