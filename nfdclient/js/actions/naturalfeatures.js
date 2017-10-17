@@ -46,6 +46,14 @@ const VIEW_FEATURE = 'VIEW_FEATURE';
 const END_EDITING = 'END_EDITING';
 const NF_CLICKED = 'NF_CLICKED';
 const CANCEL_EDITING = 'CANCEL_EDITING';
+const EDIT_FEATURE_CLICKED = 'EDIT_FEATURE_CLICKED';
+
+function editClicked(ftId) {
+    return {
+        type: EDIT_FEATURE_CLICKED,
+        ftId
+    };
+}
 
 function endEditing() {
     return {
@@ -567,5 +575,6 @@ module.exports = {
     cancel, CANCEL_EDITING,
     endEditing, END_EDITING,
     onNfClick, NF_CLICKED,
-    viewFeature, VIEW_FEATURE
+    viewFeature, VIEW_FEATURE,
+    editClicked, EDIT_FEATURE_CLICKED
 };

@@ -10,5 +10,6 @@ module.exports = {
     animal: require('./Animal'),
     plant: require('./Plant'),
     slimemold: require('./Slimemold'),
-    fungus: require('./Fungus')
+    fungus: require('./Fungus'),
+    naturalarea: require('./NaturalArea')
 };

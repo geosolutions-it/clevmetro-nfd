@@ -7,9 +7,11 @@
  */
 
 const React = require('react');
-var L = require('leaflet');
+const L = require('leaflet');
 require('leaflet-draw');
 const {isObject} = require('lodash');
+const {connect} = require('react-redux');
+const {editClicked} = require('../actions/naturalfeatures');
 // const isMobile = require('ismobilejs');
 
 // const CoordinatesUtils = require('../../MapStore2/web/client/utils/CoordinatesUtils');
@@ -24,7 +26,8 @@ const LeafletDrawSupport = React.createClass({
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
         messages: React.PropTypes.object,
-        options: React.PropTypes.object
+        options: React.PropTypes.object,
+        onClick: React.PropTypes.func
     },
     getDefaultProps() {
         return {
@@ -79,6 +82,13 @@ const LeafletDrawSupport = React.createClass({
             this.drawing = true;
         }
     },
+    onClick: function() {
+        const {options, onClick} = this.props;
+        const id = options && options.properties && options.properties.id;
+        if (onClick) {
+            onClick(id);
+        }
+    },
     render() {
         return null;
     },
@@ -117,6 +127,7 @@ const LeafletDrawSupport = React.createClass({
         });
         this.props.map.addLayer(vector);
         this.drawMarkerLayer = vector;
+        this.drawMarkerLayer.on('click', this.onClick);
     },
     addPolygonLayer: function() {
         if (this.drawPolygonLayer) {
@@ -218,6 +229,7 @@ const LeafletDrawSupport = React.createClass({
         this.removeDrawInteraction();
 
         if (this.drawMarkerLayer) {
+            this.drawMarkerLayer.off('click', this.onClick);
             this.drawMarkerLayer.clearLayers();
             this.props.map.removeLayer(this.drawMarkerLayer);
             this.drawMarkerLayer = null;
@@ -264,4 +276,4 @@ const LeafletDrawSupport = React.createClass({
     }
 });
 
-module.exports = LeafletDrawSupport;
+module.exports = connect(()=> ({}), {onClick: editClicked})(LeafletDrawSupport);

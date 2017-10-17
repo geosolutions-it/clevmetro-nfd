@@ -43,7 +43,7 @@ const load = (ftType, store, page = 1) => {
     }
     return Rx.Observable.fromPromise(Api.getData(`/nfdapi/list/${ftType}/?page=${page}${filter}`))
             .map(val => listLoaded(ftType, val, page, filters))
-            .catch((e) => Rx.Observable.from([error({title: Utils.getPrettyFeatureType(ftType), message: `Loading error ${e.statusText}`, autoDismiss: 0 }), onLoadListError(ftType, e)]));
+            .catch((e) => Rx.Observable.from([error({title: Utils.getPrettyFeatureType(ftType), message: `Loading error ${e.statusText}`}), onLoadListError(ftType, e)]));
 };
 
 module.exports = {
