@@ -20,6 +20,18 @@ const {
 function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
     let prop;
     switch (action.type) {
+        case "LOGOUT": {
+            let newState = assign({}, state, {loading: {}});
+            (newState.featureTypes || []).forEach((ft) => {
+                if (newState.hasOwnProperty(ft)) {
+                    delete newState[ft];
+                }
+                if (newState.hasOwnProperty(`${ft}_filters`)) {
+                    delete newState[`${ft}_filters`];
+                }
+            });
+            return newState;
+        }
         case TOGGLE_FEATURETYPE:
             return assign({}, state, {activeFt: action.activekey});
         case LIST_LOADED: {
