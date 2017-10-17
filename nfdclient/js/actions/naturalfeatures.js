@@ -506,6 +506,7 @@ function showLogin() {
 function nfdLogout() {
     sessionStorage.setItem('nfd-jwt-auth-token', null);
     return (dispatch) => {
+        dispatch(changeDrawingStatus('clean', null, 'dockednaturalfeatures', []));
         dispatch(logout(null));
         dispatch(changeLayerProperties("animal", {features: []}));
         dispatch(changeLayerProperties("fungus", {features: []}));

@@ -55,7 +55,7 @@ function searchSpecies(featureType, query) {
     };
 }
 
-function zooToFeature(feature, zoom = 14) {
+function zooToFeature(feature, zoom = 16) {
     return {
         type: ZOOM_TO_NFD_FEATURE,
         feature,

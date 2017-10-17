@@ -23,6 +23,9 @@ const {
 
 function naturalfeatures(state = {}, action) {
     switch (action.type) {
+        case "LOGOUT": {
+            return assign({}, state, {featuretype: undefined, featuresubtype: undefined, selectedFeature: {}, newFeature: {}, error: {}, mode: undefined});
+        }
         case NATURAL_FEATURE_TYPE_LOADED: {
             return assign({}, state, {
                 forms: action.forms,
