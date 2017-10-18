@@ -17,6 +17,9 @@ import os, time
 from datetime import datetime
 from nfdapi.settings import MEDIA_ROOT
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import crypto
+import logging
+import tempfile
 
 @python_2_unicode_compatible
 class DictionaryTable(models.Model):
@@ -85,7 +88,13 @@ class OccurrenceObservation(models.Model):
 
 PHOTO_UPLOAD_TO = 'images/%Y/%m/'
 PHOTO_THUMB_SIZE=300
+FILENAME_MAX_LENGTH=2048
 
+def get_img_format(extension):
+    if extension[1:].upper() in ('JPG', 'JPEG', 'JPE'):
+        return 'JPEG'
+    return 'PNG'
+    
 def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_SIZE, PHOTO_THUMB_SIZE)):
     """
     Create a thumbnail of an existing image
@@ -99,6 +108,7 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
     image = Image.open(input_image)
     date = None
     try:
+        # get date from exif data
         if image._getexif:
             for (exif_key, exif_value) in image._getexif().iteritems():
                 if exif_key == 0x9003: # "DateTimeOriginal", decimal: 36867
@@ -108,16 +118,30 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
                     if not date:
                         date = datetime.strptime(exif_value, "%Y:%m:%d %H:%M:%S")
     except:
-        pass
-    if not date:
-        date = timezone.now()
-    image.thumbnail(thumbnail_size)
-    basename = os.path.basename(input_path)
-    name, ext = os.path.splitext(basename)
-    thumb_filename = name + "_thumb" + ext
-    thumb_fullpath = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO), thumb_filename)
-    image.save(thumb_fullpath)
-    return (thumb_fullpath  , date)
+        logging.exception("Error getting exif date")
+    try:
+        if not date:
+            date = timezone.now()
+        
+        # create target directory
+        thumb_dirname = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO))
+        if not os.path.exists(thumb_dirname):
+                os.makedirs(thumb_dirname, mode=775)
+                
+        # create thumbnail
+        image.thumbnail(thumbnail_size)
+        basename = os.path.basename(input_path)
+        name, ext = os.path.splitext(basename)
+        (fd,thumb_fullpath) = tempfile.mkstemp(suffix=ext, prefix='thumb_', dir=thumb_dirname)
+        thumb_file = os.fdopen(fd, "w")
+        image.save(thumb_file, get_img_format(ext))
+        thumb_file.close()
+        image.close()
+        os.chmod(thumb_fullpath, 774)
+        thum_relpath = os.path.relpath(thumb_fullpath, MEDIA_ROOT)
+        return (thum_relpath, date)
+    except:
+        logging.exception("Error creating thumbnail")
 
 class Photograph(models.Model):
     image = ImageField(upload_to=PHOTO_UPLOAD_TO, height_field='image_height', width_field='image_width', max_length=1000)
