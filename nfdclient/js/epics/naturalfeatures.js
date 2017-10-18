@@ -8,7 +8,7 @@
 const Rx = require('rxjs');
 const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
-const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
+const {toggleControl, setControlProperty} = require('../../MapStore2/web/client/actions/controls');
 const {
     GET_ANIMALS,
     GET_PLANTS,
@@ -26,13 +26,18 @@ const {
     showLogin,
     END_EDITING,
     NF_CLICKED,
+    EDIT_FEATURE, endEditing,
     naturalFeatureSelected,
     viewFeature,
-    editFeature
+    editFeature,
+    CANCEL_EDITING,
+    EDIT_FEATURE_CLICKED
 } = require('../actions/naturalfeatures');
 const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
 const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const Utils = require('../utils/nfdUtils');
+
+const {warning} = require('../../MapStore2/web/client/actions/notifications');
 
 const getAnimalsEpic = (action$, store) =>
     action$.ofType(GET_ANIMALS)
@@ -142,12 +147,12 @@ const unauthorizedUserErrorEpic = action$ =>
 const addNaturalFeatureGeometryEpic = (action$) =>
     action$.ofType(END_DRAWING)
         .switchMap((action) => {
-            return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)]);
+            return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)].concat(action.geometry.drawMethod === 'Marker' ? [toggleControl('addnaturalfeatures', 'enabled', true)] : []));
         });
 const activateFeatureInsert = (action$) =>
     action$.ofType(ADD_FEATURE)
     .switchMap(({properties}) => {
-        return Rx.Observable.of(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties, icon: Utils.getIconUrl(properties.featuretype)}));
+        return action$.ofType('NATURAL_FEATURE_TYPE_ERROR').mapTo(endEditing()).takeUntil(action$.ofType('NATURAL_FEATURE_TYPE_LOADED')).startWith(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties, icon: Utils.getIcon(properties.featuretype)}));
     });
 const cleanDraw = (action$, store) =>
         action$.ofType(END_EDITING)
@@ -158,22 +163,42 @@ const cleanDraw = (action$, store) =>
         });
 const activeFeatureEdit = (action$, store) =>
      action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
-        .filter(() => {
-            const {naturalfeatures} = store.getState();
-            return naturalfeatures.mode !== 'ADD' && naturalfeatures.mode !== 'EDIT';
-        })
         .switchMap((a) => {
-            // TODO: Recover the json geom form the layer and add to props
-            // const {flat: layers} = (store.getState()).layers;
-            // const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
-            // const feature = (layer && layer.features || []).filter(f => f.id === a.properties.id).pop();
-            // const geom = feature && feature.geometry;
-            // const props = {...a.properties, geom};
-            const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature() : viewFeature();
-            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, a.layer), modeAction]);
+            const {naturalfeatures} = store.getState();
+            const isEditing = naturalfeatures.mode === 'ADD' || naturalfeatures.mode === 'EDIT';
+            if (isEditing) {
+                return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a new natura feature", autoDismiss: 2}));
+            }
+            const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature(a.properties) : viewFeature();
+            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
         });
-    // const removeAddEditedFeature = (action$, store) =>
-    //     action$.ofType()
+const showEditPanel = (action$, store) =>
+        action$.ofType(EDIT_FEATURE_CLICKED)
+            .filter((a) => {
+                const {vieweditnaturalfeatures: v, addnaturalfeatures: ad} = (store.getState()).controls;
+                return (a.ftId && !(v && v.enabled)) || (!a.ftId && !(ad && ad.enabled));
+            })
+            .switchMap((a) => {
+                const control = a.ftId ? 'vieweditnaturalfeatures' : 'addnaturalfeatures';
+                return Rx.Observable.of(setControlProperty(control, 'enabled', true));
+            });
+const removeAddEditedFeature = (action$, store) =>
+        action$.ofType(EDIT_FEATURE)
+                .switchMap((a) => {
+                    const {flat: layers} = (store.getState()).layers;
+                    const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
+                    const features = layer.features || [];
+                    const newFeatures = features.filter(f => f.id !== a.properties.id);
+                    return action$.ofType(CANCEL_EDITING).
+                            switchMap(() => Rx.Observable.of(changeLayerProperties(layer.id, {features}))
+                                .takeUntil(action$.ofType(END_EDITING)))
+                            .startWith(changeLayerProperties(layer.id, {features: newFeatures}));
+                });
+const onCancel = action$ =>
+        action$.ofType(CANCEL_EDITING)
+        .mapTo(endEditing());
+
+
 module.exports = {
     getDataEpic,
     unauthorizedUserErrorEpic,
@@ -185,5 +210,8 @@ module.exports = {
     addNaturalFeatureGeometryEpic,
     activateFeatureInsert,
     cleanDraw,
-    activeFeatureEdit
+    activeFeatureEdit,
+   removeAddEditedFeature,
+   onCancel,
+   showEditPanel
 };

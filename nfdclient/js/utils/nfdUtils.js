@@ -6,19 +6,23 @@
  * LICENSE file in the root directory of this source tree.
  */
 const baseUrl = '../../assets/img/';
+const baseStyle = {
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+};
 module.exports = {
-    getIconUrl: (ftType) => {
+    getIcon: (ftType) => {
         switch (ftType) {
             case 'plant':
-                return `${baseUrl}marker-icon-green-highlight.png`;
+                return {html: {...baseStyle, className: "marker-plant-h"}};
             case 'animal':
-                return `${baseUrl}marker-icon-purple-highlight.png`;
+                return {html: {...baseStyle, className: "marker-animal-h"}};
             case 'fungus':
-                return `${baseUrl}marker-icon-yellow-highlight.png`;
+                return {html: {...baseStyle, className: "marker-fungus-h"}};
             case 'slimemold':
-                return `${baseUrl}marker-icon-marine-highlight.png`;
+                return {html: {...baseStyle, className: "marker-slimemold-h"}};
             case 'naturalarea':
-                return `${baseUrl}marker-icon-blue-highlight.png`;
+                return {html: {...baseStyle, className: "marker-naturalarea-h"}};
             default:
                 return `${baseUrl}marker-icon-green-highlight.png`;
         }
