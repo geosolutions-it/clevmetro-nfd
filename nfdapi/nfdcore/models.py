@@ -137,7 +137,7 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
         image.save(thumb_file, get_img_format(ext))
         thumb_file.close()
         image.close()
-        os.chmod(thumb_fullpath, 774)
+        os.chmod(thumb_fullpath, 0774)
         thum_relpath = os.path.relpath(thumb_fullpath, MEDIA_ROOT)
         return (thum_relpath, date)
     except:
