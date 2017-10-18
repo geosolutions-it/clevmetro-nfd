@@ -126,7 +126,7 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
         # create target directory
         thumb_dirname = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO))
         if not os.path.exists(thumb_dirname):
-                os.makedirs(thumb_dirname, mode=775)
+            os.makedirs(thumb_dirname, mode=0775)
                 
         # create thumbnail
         image.thumbnail(thumbnail_size)
