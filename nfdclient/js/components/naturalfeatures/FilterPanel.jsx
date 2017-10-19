@@ -13,7 +13,7 @@ const {Button, ButtonGroup} = require('react-bootstrap');
 const FilterPanel = ({height, children, onReset, onUpdate, disableSync}) => {
     return (
         <div className="filter-panel">
-            <div style={{overflow: 'auto', height: height - 40 - 51 - 10 - 59 - 59 - 2 - 30 - 40}} className="ft-filter">
+            <div style={{overflow: 'auto', height: height - 10 - 59 - 59 - 2 - 30 - 40}} className="ft-filter">
                 {children ? children : null}
             </div>
             <div className="row" style={{height: 40}}>

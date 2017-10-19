@@ -20,7 +20,7 @@ const FeaturesPanel = ({featureType, features, height, pageSize, page, total, lo
     };
     return (
         <div>
-            <div style={{overflow: 'auto', height: height - 40 - 51 - 10 - 59 - 59 - 2 - 20 - 84}} className="ft-list-container">
+            <div style={{overflow: 'auto', height: height - 10 - 59 - 59 - 2 - 20 - 84}} className="ft-list-container">
                 <ListGroup>
                     {features.map((ft, idx) => React.cloneElement(children, {key: idx, feature: ft}))}
                 </ListGroup>

@@ -52,12 +52,7 @@
     color: #ff0000;
 }
 
-.nfd-form-title {
-    float: right;
-    font-size: 26px;
-    font-weight: 500;
-    color: #888888;
-}
+
 
 /* tablets and desktop */
 @media only screen and (min-width: 768px) {
