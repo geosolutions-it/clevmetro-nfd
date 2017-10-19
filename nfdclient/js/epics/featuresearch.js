@@ -9,11 +9,12 @@ const Rx = require('rxjs');
 const Api = require('../api/naturalfeaturesdata');
 const Utils = require('../utils/nfdUtils');
 const FilterUtils = require('../utils/FilterUtils');
+
 const {
     NFD_LOGIN_SUCCESS,
     UPDATE_NATURAL_FEATURE,
     DELETE_NATURAL_FEATURE,
-    CREATE_NATURAL_FEATURE,
+    NATURAL_FEATURE_CREATED,
     endEditing
     } = require('../actions/naturalfeatures');
 const {
@@ -86,13 +87,11 @@ module.exports = {
             .switchMap(a => Rx.Observable.of(loadList(a.fttype))),
             // Reloads appropriate list and stops editing
     onUpdateFeatureSuccess: (action$, store) =>
-        action$.ofType(UPDATE_NATURAL_FEATURE, DELETE_NATURAL_FEATURE, CREATE_NATURAL_FEATURE)
+        action$.ofType(UPDATE_NATURAL_FEATURE, DELETE_NATURAL_FEATURE, NATURAL_FEATURE_CREATED)
             .filter(a => a.status === 'success')
             .switchMap(() => {
                 const {naturalfeatures} = store.getState();
                 const {featuretype: ft} = naturalfeatures;
                 return Rx.Observable.from([loadList(ft), endEditing()]);
             })
-
-
 };

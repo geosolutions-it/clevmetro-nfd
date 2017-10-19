@@ -148,10 +148,16 @@ module.exports = {
                 pathRewrite: { "^/static/js": ""}
             },
             "/nfdapi/": {
-                target: "http://localpg:8000",
+                target: "http://localpg:8000/",
+                changeOrigin: true,
+                logLevel: 'debug'
+            },
+            "/media/images": {
+                target: "http://localpg/",
                 changeOrigin: true,
                 logLevel: 'debug'
             }
+
         }
     },
 

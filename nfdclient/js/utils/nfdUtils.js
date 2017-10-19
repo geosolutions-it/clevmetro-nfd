@@ -75,5 +75,44 @@ module.exports = {
     },
     isLoading(loding = {}) {
         return Object.keys(loding).reduce((l, k) => l ? l : loding[k], false);
+    },
+    getFormIcon(formname) {
+        let icon = 'question-sign';
+        if (formname === 'species') {
+            icon = 'question-sign';
+        } else if (formname === 'species.element_species') {
+            icon = 'star';
+        } else if (formname === 'details') {
+            icon = 'th-list';
+        } else if (formname === 'details.lifestages') {
+            icon = 'refresh';
+        } else if (formname === 'occurrencemanagement') {
+            icon = 'cog';
+        } else if (formname === 'observation') {
+            icon = 'eye-open';
+        } else if (formname === 'observation.reporter') {
+            icon = 'reporter';
+        } else if (formname === 'observation.recorder') {
+            icon = 'recorder';
+        } else if (formname === 'observation.verifier') {
+            icon = 'verifier';
+        } else if (formname === 'voucher') {
+            icon = 'tag';
+        } else if (formname === 'location') {
+            icon = 'uniE062';
+        } else if (formname === 'details.vegetation') {
+            icon = 'uniE103';
+        } else if (formname === 'details.substrate') {
+            icon = 'uniE135';
+        } else if (formname.includes('earthworm')) {
+            icon = 'uniE232';
+        } else if (formname.includes('disturbance')) {
+            icon = 'uniE162';
+        } else if (formname.includes('association')) {
+            icon = 'uni4C';
+        } else if (formname.includes('fruit')) {
+            icon = 'uniF8FF';
+        }
+        return icon;
     }
 };
