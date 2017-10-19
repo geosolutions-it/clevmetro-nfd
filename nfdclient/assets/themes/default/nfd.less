@@ -80,7 +80,6 @@
     margin-bottom: 4px;
 }
 .nfd-list-item:hover{
-
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.24);
 }
 .list-item-btn {
@@ -227,4 +226,73 @@ box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.24);
 }
 .nfd-legend {
 width: 150px;
+}
+.nfd-images {
+    overflow: hidden;
+}
+.nfd-thumbnails-container {
+    overflow: auto;
+    background-color: white;
+    position: relative;
+}
+.nfd-images .alert {
+    overflow: hidden;
+    position: relative;
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    border-color: #eeeeee
+}
+.nfd-images.nfd-images-mobile .alert {
+    height: 50px;
+}
+.nfd-images.nfd-images-mobile .dropzone-content-image{
+    padding-top: 0px;
+}
+.nfd-images .nfd-image {
+    margin: 0px 20px;
+    height: 150px;
+    padding: 2px;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color:  #edf2f6;
+    border: 1px solid;
+    -webkit-box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d0dbe4;
+}
+.img-card {
+    margin: 2px;
+    height: 158px;
+    padding: 3px 10px;
+    position: relative;
+}
+.image-remove {
+    top:0px;
+    right: 31px;
+    z-index: 5;
+    position: absolute;
+    font-size: x-large;
+}
+
+.img-card:hover .image-remove span {
+    color: lighten(black, 50%);
+}
+
+.image-remove span {
+    color: #edf2f6;
+}
+.nfd-images-mobile .image-remove span {
+    color: lighten(black, 50%);
+}
+
+.image-remove span:hover {
+    color: @ms2-color-danger !important;
+    cursor: pointer;
+}
+.nfd-thumbnails-container .img-loading-spinner{
+    position: absolute;
+    top: 66px;
+    left: calc(~'50% - 10px');
 }

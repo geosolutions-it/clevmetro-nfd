@@ -11,7 +11,8 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {naturalFeatureCreated, getSpecies, addFeature, cancel} = require('../actions/naturalfeatures');
+const {addNaturalFeature, getSpecies, addFeature, cancel, addImage, removeImage,
+imageError} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
@@ -20,6 +21,7 @@ const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
 
 const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
+// const NfdImage  = require('../components/naturalfeatures/NfdImage');
 const SmartDockedNaturalFeatures = connect((state) => ({
     isVisible: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
     forms: state.naturalfeatures.forms,
@@ -31,16 +33,20 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     mode: state.naturalfeatures.mode,
     isAdmin: state.naturalfeatures.is_admin || false,
     isWriter: isWriter(state),
-    isPublisher: isPublisher(state)
+    isPublisher: isPublisher(state),
+    images: state && state.naturalfeatures && state.naturalfeatures.selectedFeature && state.naturalfeatures.selectedFeature.images || []
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
-    onUpdate: naturalFeatureCreated.bind(null),
+    onUpdate: addNaturalFeature,
     getSpecies: getSpecies.bind(null),
     onChangeDrawingStatus: changeDrawingStatus,
     onEndDrawing: endDrawing,
-    cancel
+    cancel,
+    onError: imageError,
+    addImage: addImage,
+    removeImage: removeImage
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
-require('../components/naturalfeatures/DockedNaturalFeatures.css');
+
 
 const AddNaturalFeatures = React.createClass({
     propTypes: {

@@ -13,8 +13,8 @@ const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
-const _ = require('lodash');
-// const isMobile = require('ismobilejs');
+const {isEmpty} = require('lodash');
+const NfdImage = require('./NfdImage');
 require('react-selectize/themes/index.css');
 require('./DockedNaturalFeatures.css');
 const Utils = require("../../utils/nfdUtils");
@@ -22,6 +22,8 @@ const Api = require('../../api/naturalfeaturesdata');
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
+        isMobile: React.PropTypes.bool,
+        height: React.PropTypes.number,
         forms: React.PropTypes.array,
         featuretype: React.PropTypes.string,
         featuresubtype: React.PropTypes.string,
@@ -34,9 +36,6 @@ const DockedNaturalFeatures = React.createClass({
         onDelete: React.PropTypes.func,
         initWidth: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.string ]),
         dockSize: React.PropTypes.number,
-        minDockSize: React.PropTypes.number,
-        maxDockSize: React.PropTypes.number,
-        setDockSize: React.PropTypes.func,
         previousVersion: React.PropTypes.func,
         nextVersion: React.PropTypes.func,
         mode: React.PropTypes.string,
@@ -50,22 +49,28 @@ const DockedNaturalFeatures = React.createClass({
         getMyLocationEnabled: React.PropTypes.bool,
         onChangeDrawingStatus: React.PropTypes.func,
         onEndDrawing: React.PropTypes.func,
-        photos: React.PropTypes.array,
         getSpecies: React.PropTypes.func,
         cancel: React.PropTypes.func,
-        selectedSpecie: React.PropTypes.number
+        selectedSpecie: React.PropTypes.number,
+        images: React.PropTypes.array,
+        onError: React.PropTypes.func,
+        addImage: React.PropTypes.func,
+        removeImage: React.PropTypes.func,
+        dockProps: React.PropTypes.object
     },
     getDefaultProps() {
         return {
             forms: [],
-            photos: [],
             currentFeature: {},
             errors: {},
+            dockProps: {
+                dimMode: "none",
+                fluid: true,
+                position: "right",
+                zIndex: 1030
+            },
             isVisible: false,
-            initWidth: 600,
             dockSize: 0.35,
-            minDockSize: 0.1,
-            maxDockSize: 1.0,
             addPointGlyph: "1-point-add",
             addPolygonGlyph: "1-polygon-add",
             setDockSize: () => {},
@@ -97,45 +102,6 @@ const DockedNaturalFeatures = React.createClass({
     onGetMyLocationClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
     },
-    getIcon(formname) {
-        let icon = 'question-sign';
-        if (formname === 'species') {
-            icon = 'question-sign';
-        } else if (formname === 'species.element_species') {
-            icon = 'star';
-        } else if (formname === 'details') {
-            icon = 'th-list';
-        } else if (formname === 'details.lifestages') {
-            icon = 'refresh';
-        } else if (formname === 'occurrencemanagement') {
-            icon = 'cog';
-        } else if (formname === 'observation') {
-            icon = 'eye-open';
-        } else if (formname === 'observation.reporter') {
-            icon = 'reporter';
-        } else if (formname === 'observation.recorder') {
-            icon = 'recorder';
-        } else if (formname === 'observation.verifier') {
-            icon = 'verifier';
-        } else if (formname === 'voucher') {
-            icon = 'tag';
-        } else if (formname === 'location') {
-            icon = 'uniE062';
-        } else if (formname === 'details.vegetation') {
-            icon = 'uniE103';
-        } else if (formname === 'details.substrate') {
-            icon = 'uniE135';
-        } else if (formname.includes('earthworm')) {
-            icon = 'uniE232';
-        } else if (formname.includes('disturbance')) {
-            icon = 'uniE162';
-        } else if (formname.includes('association')) {
-            icon = 'uni4C';
-        } else if (formname.includes('fruit')) {
-            icon = 'uniF8FF';
-        }
-        return icon;
-    },
     getOptions(values) {
         return values.items.map((item, index) => {
             return (
@@ -157,7 +123,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
@@ -184,7 +150,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
@@ -217,7 +183,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
@@ -250,7 +216,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.readonly) {
                     readOnly = true;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 return (
@@ -279,7 +245,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 {
@@ -308,7 +274,7 @@ const DockedNaturalFeatures = React.createClass({
                 if (item.mandatory) {
                     label = '* ' + item.label;
                 }
-                if (!_.isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
+                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
                     value = this.props.currentFeature[item.key];
                 }
                 {
@@ -336,7 +302,6 @@ const DockedNaturalFeatures = React.createClass({
         });
 
         searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher) && this.props.featuresubtype !== 'na';
-        console.log(this.state);
         return (
             <div className="nf-tab-content">
                 {searchDiv ?
@@ -363,11 +328,10 @@ const DockedNaturalFeatures = React.createClass({
     },
     renderTabs() {
         let tabs = [];
-
         this.props.forms.map((tab, index) => {
             let i = index + 1;
             let key = "tab-" + i;
-            let tabIcon = this.getIcon(tab.formname);
+            let tabIcon = Utils.getFormIcon(tab.formname);
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     {this.renderTabContent(tab, i)}
@@ -375,35 +339,18 @@ const DockedNaturalFeatures = React.createClass({
                 </Tab>
             );
         });
-        /*if (isMobile.any) {
-            let lastIndex = tabs.length + 1;
-            tabs.push(
-                <Tab eventKey={lastIndex} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    <div>
-                        <input type="file" accept="image/*" id="captured-images" multiple="multiple" onChange={this.handleImageChange}/>
-                        <output id="result" />
-                    </div>
-                </Tab>
-            );
-        }*/
-        if (this.props.mode === 'ADD') {
+        if (tabs.length > 0) {
             tabs.push(
                 <Tab eventKey={(tabs.length + 1)} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
                     <div className="nf-tab-content">
-                        <span className="btn btn-default btn-file">
-                            Select or capture images <input type="file" accept="image/*" id="captured-images" multiple="multiple" onChange={this.handleImageChange}/>
-                        </span>
-                        <output id="result" />
+                        <NfdImage onError={this.props.onError}
+                                  addImage={this.props.addImage}
+                                  removeImage={this.props.removeImage}
+                                  images={this.props.images}/>
                     </div>
                 </Tab>
             );
         }
-        /*
-        tabs.push(
-            <Tab eventKey={tabs.length + 1} key="location" title={<Glyphicon glyph="uniE062" style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                {this.renderDrawTools()}
-            </Tab>
-        );*/
         return tabs;
     },
     renderButtons() {
@@ -496,22 +443,11 @@ const DockedNaturalFeatures = React.createClass({
         }
         return (<ul>{errorItems}</ul>);
     },
-    // <Tabs defaultActiveKey={1} id="naturalfeature-tabs" onSelect={this.handleVisibility}>
     render() {
         let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
         return (
-            <Dock
-                zIndex={1030 /*below dialogs, above left menu*/}
-                position={"right" /* 'left', 'top', 'right', 'bottom' */}
-                size={this.props.dockSize}
-                dimMode={"none" /*'transparent', 'none', 'opaque'*/}
-                isVisible={this.props.isVisible}
-                onVisibleChange={this.handleVisibleChange}
-                onSizeChange={(this.limitDockHeight)}
-                fluid={true}
-                dimStyle={{ background: 'rgba(0, 0, 100, 0.2)' }}
-                dockStyle={{ left: '0px', right: '0px'}}
-                dockHiddenStyle={null}>
+            <Dock {...this.props.dockProps} size={this.props.dockSize}
+                isVisible={this.props.isVisible}>
                 <div style={{width: "100%", minHeight: "35px", fontSize: "26px", padding: "15px"}}>
                     <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
                     <span className="nfd-form-title">{title}</span>
@@ -561,15 +497,6 @@ const DockedNaturalFeatures = React.createClass({
             }
         }
     },
-    limitDockHeight(size) {
-        if (size >= this.props.maxDockSize) {
-            this.props.setDockSize(this.props.maxDockSize);
-        } else if (size <= this.props.minDockSize) {
-            this.props.setDockSize(this.props.minDockSize);
-        } else {
-            this.props.setDockSize(size);
-        }
-    },
     handleChange(e) {
         if (e.target.value === '') {
             this.props.currentFeature[e.target.name] = null;
@@ -580,31 +507,6 @@ const DockedNaturalFeatures = React.createClass({
             this.setState({selectedFeature: this.props.currentFeature});
         } else if (this.props.mode === 'ADD') {
             this.setState({selectedFeature: this.props.currentFeature});
-        }
-    },
-    loadImage(e) {
-        const picFile = e.target;
-        const output = document.getElementById("result");
-        const div = document.createElement("div");
-        div.innerHTML = "<img class='thumbnail' src='" + picFile.result + "'" + "title='" + picFile.name + "'/>";
-        output.insertBefore(div, null);
-        this.props.photos.push(picFile.result);
-    },
-    handleImageChange(event) {
-        // Check File API support
-        if (window.File && window.FileList && window.FileReader) {
-            const files = event.target.files;
-            for (let i = 0; i < files.length; i++) {
-                let file = files[i];
-                // Only pics
-                if (!file.type.match('image')) continue;
-                let picReader = new FileReader();
-                picReader.addEventListener("load", this.loadImage);
-                // Read the image
-                picReader.readAsDataURL(file);
-            }
-        } else {
-            console.log("Your browser does not support File API");
         }
     }
 });

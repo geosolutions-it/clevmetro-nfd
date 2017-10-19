@@ -18,7 +18,10 @@ const {
     END_EDITING,
     EDIT_FEATURE,
     VIEW_FEATURE,
-    NF_CLICKED
+    NF_CLICKED,
+    ADD_IMAGE,
+    REMOVE_IMAGE,
+    IMAGE_UPLOADED
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -36,6 +39,7 @@ function naturalfeatures(state = {}, action) {
         case UPDATE_NATURAL_FEATURE_FORM: {
             return assign({}, state, {
                 selectedFeature: action.feature,
+                images: action.feature.images || [],
                 errors: {}
             });
         }
@@ -78,6 +82,22 @@ function naturalfeatures(state = {}, action) {
             return assign({}, state, {mode: undefined, froms: [], featuretype: "", featuresubtype: "", selectedFeature: {}, errors: {}, newFeature: {}});
         case NF_CLICKED:
             return assign({}, state, {nfclicked: action.nfId});
+        case ADD_IMAGE: {
+            const image = assign({}, action.image, {loading: true});
+            const images = [image].concat((state.selectedFeature.images || []));
+            const selectedFeature = assign({}, state.selectedFeature, {images});
+            return assign({}, state, {selectedFeature});
+        }
+        case IMAGE_UPLOADED: {
+            const images = [action.image].concat(state.selectedFeature.images.slice(1));
+            const selectedFeature = assign({}, state.selectedFeature, {images});
+            return assign({}, state, {selectedFeature});
+        }
+        case REMOVE_IMAGE: {
+            const images = state.selectedFeature.images.filter((a, idx) => idx !== action.idx);
+            const selectedFeature = assign({}, state.selectedFeature, {images});
+            return assign({}, state, {selectedFeature});
+        }
         default:
             return state;
     }
