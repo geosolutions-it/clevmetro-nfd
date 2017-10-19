@@ -9,29 +9,12 @@ const Rx = require('rxjs');
 const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 const {toggleControl, setControlProperty} = require('../../MapStore2/web/client/actions/controls');
+const {error} = require('../../MapStore2/web/client/actions/notifications');
 const {
-    GET_ANIMALS,
-    GET_PLANTS,
-    GET_NATURAL_AREAS,
-    GET_FUNGUS,
-    GET_SLIME_MOLDS,
-    NFD_LOGIN_SUCCESS,
-    ADD_FEATURE,
-    getData,
-    naturalFeaturesLoaded,
-    naturalFeaturesLoading,
-    naturalFeaturesError,
-    naturalFeatureGeomAdded,
-    USER_NOT_AUTHENTICATED_ERROR,
-    showLogin,
-    END_EDITING,
-    NF_CLICKED,
-    EDIT_FEATURE, endEditing,
-    naturalFeatureSelected,
-    viewFeature,
-    editFeature,
-    CANCEL_EDITING,
-    EDIT_FEATURE_CLICKED
+    CREATE_NATURAL_FEATURE, NFD_LOGIN_SUCCESS, ADD_FEATURE,
+    NATURAL_FEATURES_LOADED, LOAD_NATURAL_FEATURES, naturalFeaturesLoaded, naturalFeaturesLoading, naturalFeaturesError, naturalFeatureGeomAdded,
+    USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, editFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
+    IMAGE_ERROR
 } = require('../actions/naturalfeatures');
 const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
 const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
@@ -39,179 +22,130 @@ const Utils = require('../utils/nfdUtils');
 
 const {warning} = require('../../MapStore2/web/client/actions/notifications');
 
-const getAnimalsEpic = (action$, store) =>
-    action$.ofType(GET_ANIMALS)
-    .audit(() => {
-        const isMapConfigured = (store.getState()).mapInitialConfig && true;
-        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
-    })
-    .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url))
-        .retry(1)
-        .map(val => [
-            changeLayerProperties('animal', {features: val.features}),
-            naturalFeaturesLoaded(val.features, action.url)
-        ])
-        .mergeAll()
-        .startWith(naturalFeaturesLoading())
-        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
-    );
+const fetchFeatures = (featureType) => {
+    return Rx.Observable.defer(() => Api.getData(`/nfdapi/layers/${featureType}/`))
+                .retry(1)
+                .map(val => naturalFeaturesLoaded(featureType, val.features))
+                .catch(e => Rx.Observable.of(naturalFeaturesError(featureType, e)));
+};
+// const uploadImage = (featureType, ftId, image) =>
+//         Rx.Observable.fromPromise(Api.uploadImage("plant", 40, a.image))
+//         .do(val => console.log(val))
+//         .catch(e => console.log(e));
+module.exports = {
 
-const getPlantsEpic = (action$, store) =>
-    action$.ofType(GET_PLANTS)
-    .audit(() => {
-        const isMapConfigured = (store.getState()).mapInitialConfig && true;
-        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
-    })
-    .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url))
-        .retry(1)
-        .map(val => [
-            changeLayerProperties('plant', {features: val.features}),
-            naturalFeaturesLoaded(val.features, action.url)
-        ])
-        .mergeAll()
-        .startWith(naturalFeaturesLoading())
-        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
-    );
+updateFeatureTypeLayer: (action$) =>
+    action$.ofType(NATURAL_FEATURES_LOADED)
+    .switchMap((a) => Rx.Observable.of(changeLayerProperties(a.featureType, {features: a.features}))),
 
-const getFungusEpic = (action$, store) =>
-    action$.ofType(GET_FUNGUS)
-    .audit(() => {
-        const isMapConfigured = (store.getState()).mapInitialConfig && true;
-        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
-    })
-    .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url))
-        .retry(1)
-        .map(val => [
-            changeLayerProperties('fungus', {features: val.features}),
-            naturalFeaturesLoaded(val.features, action.url)
-        ])
-        .mergeAll()
-        .startWith(naturalFeaturesLoading())
-        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
-    );
+// Get fature for a featuretype
+fetchNaturalFeatures: (action$) =>
+    action$.ofType(LOAD_NATURAL_FEATURES, NATURAL_FEATURE_CREATED)
+    .switchMap( a => fetchFeatures(a.featureType)
+                    .startWith(naturalFeaturesLoading(true))
+                    .concat([naturalFeaturesLoading(false)])),
 
-const getNaturalAreasEpic = (action$, store) =>
-    action$.ofType(GET_NATURAL_AREAS)
-    .audit(() => {
-        const isMapConfigured = (store.getState()).mapInitialConfig && true;
-        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
-    })
-    .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url))
-        .retry(1)
-        .map(val => [
-            changeLayerProperties('naturalarea', {features: val.features}),
-            naturalFeaturesLoaded(val.features, action.url)
-        ])
-        .mergeAll()
-        .startWith(naturalFeaturesLoading())
-        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
-    );
-
-const getSlimeMoldsEpic = (action$, store) =>
-    action$.ofType(GET_SLIME_MOLDS)
-    .audit(() => {
-        const isMapConfigured = (store.getState()).mapInitialConfig && true;
-        return isMapConfigured && Rx.Observable.of(isMapConfigured) || action$.ofType('MAP_CONFIG_LOADED');
-    })
-    .switchMap(action =>
-        Rx.Observable.defer(() => Api.getData(action.url))
-        .retry(1)
-        .map(val => [
-            changeLayerProperties('slimemold', {features: val.features}),
-            naturalFeaturesLoaded(val.features, action.url)
-        ])
-        .mergeAll()
-        .startWith(naturalFeaturesLoading())
-        .catch(e => Rx.Observable.of(naturalFeaturesError(e)))
-    );
-
-// Load features for all reatureTypes
-const getDataEpic = action$ =>
+// Load features for all featureTypes
+getDataEpic: (action$, store) =>
     action$.ofType(NFD_LOGIN_SUCCESS).
-    switchMap(() => Rx.Observable.of(getData()));
+    switchMap(() => {
+        const {featureTypes = []} = (store.getState()).featuresearch;
+        return Rx.Observable.from(featureTypes.map((ft) => fetchFeatures(ft))).mergeAll().
+        startWith(naturalFeaturesLoading(true)).concat([naturalFeaturesLoading(false)]);
+    }),
 
-const unauthorizedUserErrorEpic = action$ =>
+unauthorizedUserErrorEpic: action$ =>
     action$.ofType(USER_NOT_AUTHENTICATED_ERROR)
     .map(() =>
-        showLogin());
+        showLogin()),
 
 /**
  * @memberof epics.naturalfeatures
  * @param {external:Observable} action$ manages `NATURAL_FEATURE_CREATED`
  * @return {external:Observable}
  */
-const addNaturalFeatureGeometryEpic = (action$) =>
+addNaturalFeatureGeometryEpic: (action$) =>
     action$.ofType(END_DRAWING)
         .switchMap((action) => {
             return Rx.Observable.from([naturalFeatureGeomAdded(action.geometry)].concat(action.geometry.drawMethod === 'Marker' ? [toggleControl('addnaturalfeatures', 'enabled', true)] : []));
-        });
-const activateFeatureInsert = (action$) =>
+        }),
+// Activate drawing when user enter in add feature on error end editing
+activateFeatureInsert: (action$) =>
     action$.ofType(ADD_FEATURE)
     .switchMap(({properties}) => {
         return action$.ofType('NATURAL_FEATURE_TYPE_ERROR').mapTo(endEditing()).takeUntil(action$.ofType('NATURAL_FEATURE_TYPE_LOADED')).startWith(changeDrawingStatus("start", "Marker", "dockednaturalfeatures", [], {properties, icon: Utils.getIcon(properties.featuretype)}));
-    });
-const cleanDraw = (action$, store) =>
+    }),
+// Reset the state on end editing
+cleanDraw: (action$, store) =>
         action$.ofType(END_EDITING)
         .switchMap(() => {
             const {controls} = store.getState();
             const control = controls.addnaturalfeatures && controls.addnaturalfeatures.enabled ? 'addnaturalfeatures' : 'vieweditnaturalfeatures';
             return Rx.Observable.from([changeDrawingStatus("clean", null, "dockednaturalfeatures", [], {}), toggleControl(control)]);
-        });
-const activeFeatureEdit = (action$, store) =>
-     action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
+        }),
+// Start edit when e feature is clicked or selected from the list.
+activeFeatureEdit: (action$, store) =>
+    action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
         .switchMap((a) => {
             const {naturalfeatures} = store.getState();
             const isEditing = naturalfeatures.mode === 'ADD' || naturalfeatures.mode === 'EDIT';
             if (isEditing) {
-                return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a new natura feature", autoDismiss: 2}));
+                return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a different natural feature", autoDismiss: 2}));
             }
             const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature(a.properties) : viewFeature();
             return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
-        });
-const showEditPanel = (action$, store) =>
-        action$.ofType(EDIT_FEATURE_CLICKED)
-            .filter((a) => {
-                const {vieweditnaturalfeatures: v, addnaturalfeatures: ad} = (store.getState()).controls;
-                return (a.ftId && !(v && v.enabled)) || (!a.ftId && !(ad && ad.enabled));
-            })
-            .switchMap((a) => {
-                const control = a.ftId ? 'vieweditnaturalfeatures' : 'addnaturalfeatures';
-                return Rx.Observable.of(setControlProperty(control, 'enabled', true));
-            });
-const removeAddEditedFeature = (action$, store) =>
-        action$.ofType(EDIT_FEATURE)
-                .switchMap((a) => {
-                    const {flat: layers} = (store.getState()).layers;
-                    const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
-                    const features = layer.features || [];
-                    const newFeatures = features.filter(f => f.id !== a.properties.id);
-                    return action$.ofType(CANCEL_EDITING).
-                            switchMap(() => Rx.Observable.of(changeLayerProperties(layer.id, {features}))
-                                .takeUntil(action$.ofType(END_EDITING)))
-                            .startWith(changeLayerProperties(layer.id, {features: newFeatures}));
-                });
-const onCancel = action$ =>
+        }),
+// Open the form edit panel if It's close and a user clikcs on the feature that is currently editing
+showEditPanel: (action$, store) =>
+    action$.ofType(EDIT_FEATURE_CLICKED)
+        .filter((a) => {
+            const {vieweditnaturalfeatures: v, addnaturalfeatures: ad} = (store.getState()).controls;
+            return (a.ftId && !(v && v.enabled)) || (!a.ftId && !(ad && ad.enabled));
+        })
+        .switchMap((a) => {
+            const control = a.ftId ? 'vieweditnaturalfeatures' : 'addnaturalfeatures';
+            return Rx.Observable.of(setControlProperty(control, 'enabled', true));
+        }),
+// Remove the edited feature from Its layer and when editing end if needed reads it
+removeAddEditedFeature: (action$, store) =>
+    action$.ofType(EDIT_FEATURE)
+        .switchMap((a) => {
+            const {flat: layers} = (store.getState()).layers;
+            const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
+            const features = layer.features || [];
+            const newFeatures = features.filter(f => f.id !== a.properties.id);
+            return action$.ofType(CANCEL_EDITING).
+                    switchMap(() => Rx.Observable.of(changeLayerProperties(layer.id, {features}))
+                        .takeUntil(action$.ofType(END_EDITING)))
+                    .startWith(changeLayerProperties(layer.id, {features: newFeatures}));
+        }),
+onCancel: action$ =>
         action$.ofType(CANCEL_EDITING)
-        .mapTo(endEditing());
+        .mapTo(endEditing()),
 
-
-module.exports = {
-    getDataEpic,
-    unauthorizedUserErrorEpic,
-    getAnimalsEpic,
-    getPlantsEpic,
-    getFungusEpic,
-    getNaturalAreasEpic,
-    getSlimeMoldsEpic,
-    addNaturalFeatureGeometryEpic,
-    activateFeatureInsert,
-    cleanDraw,
-    activeFeatureEdit,
-   removeAddEditedFeature,
-   onCancel,
-   showEditPanel
+addNaturalFeature: (action$) =>
+    action$.ofType(CREATE_NATURAL_FEATURE)
+    .switchMap( a => {
+        return Rx.Observable.fromPromise(Api.createNewFeature(a.feature))
+                .map((v) => createNaturalFeatureSuccess(a.featuretype, v.id))
+                .startWith(naturalFeaturesLoading(true))
+                .catch((e) => {
+                    const action = e.status === 401 ? userNotAuthenticatedError(e) : createNaturalFeatureError(-1, e);
+                    return Rx.Observable.of(action);
+                })
+                .concat([naturalFeaturesLoading(false)]);
+    }),
+uploadImage: (action$, store) =>
+    action$.ofType('ADD_IMAGE').filter(a => a.image).
+    switchMap( a => {
+        const {selectedFeature} = (store.getState()).naturalfeatures;
+        return Rx.Observable.fromPromise(Api.uploadImage(selectedFeature.featuretype, selectedFeature.id, a.image)).map((image) => (imageUploaded(image)))
+        .startWith(naturalFeaturesLoading(true))
+        .catch(e => Rx.Observable.from([error({title: 'Uploading', message: `Error: ${e.statusText}`}), removeImage(0)]))
+        .concat([naturalFeaturesLoading(false)]);
+    }),
+// Sowhs error message if user tries to add wrong image
+onImageEr: (action$) =>
+    action$.ofType(IMAGE_ERROR)
+    .map((a) => error({title: 'Wrong Image', message: `Wrong ${a.errors.join(" and ")}`}))
 };

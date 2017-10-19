@@ -8,6 +8,8 @@
 const axios = require('../../MapStore2/web/client/libs/ajax');
 const ConfigUtils = require('../../MapStore2/web/client/utils/ConfigUtils');
 const assign = require('object-assign');
+const toBlob = require('canvas-to-blob');
+
 const dataCache = {};
 
 let getOptions = () => {
@@ -78,6 +80,15 @@ const Api = {
         return axios.get(url, getOptions()).then((response) => {
             return response.data;
         });
+    },
+    uploadImage: function(featureType, featureId, image) {
+        const url = '/nfdapi/images/';
+        let data = new FormData();
+        data.append("occurrence_fk", featureId);
+        data.append("featuretype", featureType);
+        const blob = toBlob(image.dataUrl);
+        data.append("image", blob, image.name);
+        return axios.post(url, data, getOptions()).then(function(response) {return response.data; });
     }
 };
 

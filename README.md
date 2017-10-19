@@ -38,6 +38,13 @@ Alias /static /opt/clevmetro-nfd/nfdclient
       Require all granted
 </Directory>
 
+Alias /media /var/www/media
+<Directory "/var/www/media">
+      Order allow,deny
+      Allow from all
+      Require all granted
+</Directory>
+
 Alias /nfdapi-static /var/www/clevmetronfd-static
 <Directory "/var/www/clevmetronfd-static">
       Order allow,deny
@@ -227,6 +234,7 @@ ServerName dev.nfd.geo-solutions.it
 </IfModule>
 
 ```
+Images are stored on /var/www/media/images. Ensure the folder exists and is writable by the www-data user.
 
 Have a look to the specific [nfdapi readme file](nfdapi/README.md) for
 additional configuration steps (required for develoment and deployment
