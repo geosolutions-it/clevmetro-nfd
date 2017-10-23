@@ -67,7 +67,7 @@ class FeaturesSearchPanel extends React.Component {
     }
     renderTabs() {
         const {featureTypes, width, height, dockSize} = this.props;
-        const tabRows = Math.ceil((featureTypes.length * 58) / (width * dockSize));
+        const tabRows = Math.ceil((featureTypes.length) / Math.floor((width * dockSize) / 58));
         return featureTypes.filter(ft => FeatureTypeComponents[ft]).map((ft, idx) => {
             const FeatureType = FeatureTypeComponents[ft];
             return (
