@@ -1,32 +1,10 @@
-.dock-panel-footer-buttons{
-    width: 100%;
-}
-
-.nf-historic {
-    float: left;
-}
-
-.nf-historic-date {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.nfdraw-tools {
-    padding: 20px;
-}
-
 .nfdraw-tools-title {
     font-weight: 600;
 }
-
 .nfdraw-tools-buttons {
-    margin-top: 15px;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
-
-.thumbnail {
-    max-width: 200px;
-}
-
 .btn-file {
     position: relative;
     overflow: hidden;
@@ -48,68 +26,56 @@
 }
 
 .nf-errors {
-    padding: 20px;
+    padding: 0px;
     color: #ff0000;
+}
+
+.dock-panel-footer {
+    position: absolute;
+    bottom: 0px;
+    left:0px;
+    right: 0px;
+    border-top: 1px solid #ccc;
+    text-align: center;
+    padding-bottom: 5px;
+    background-color: white;
+}
+
+.dock-panel-footer-buttons{
+    width: 100%;
+}
+.dock-panel-footer-buttons button{
+    margin-top: 5px;
+}
+.nf-historic {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.nf-historic-date {
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 
 
 /* tablets and desktop */
 @media only screen and (min-width: 768px) {
-    .dock-panel-footer {
-        /* position: fixed; */
-        bottom: 0px;
-        padding: 20px;
-        border-top: 1px solid #ccc;
-        /* width: 35%; */
-        text-align: right;
-    }
-    .dock-panel-footer-buttons {
-        float: right;
-    }
     .nf-tab-content {
-        padding: 20px;
-        max-height: 500px;
-        overflow: auto
+        padding: 0px 10px;
     }
 }
 
 /* phones */
 @media only screen and (max-width: 767px) {
-    .dock-panel-footer {
-        /* position: fixed; */
-        bottom: 0px;
-        padding: 20px;
-        border-top: 1px solid #ccc;
-        /* width: 100%; */
-        text-align: right;
-    }
-    .dock-panel-footer-buttons {
-        float: right;
-    }
     .nf-tab-content {
         padding: 2px;
-        max-height: 250px;
-        overflow: auto
     }
 }
 
 /* portrait phones */
 @media only screen and (max-width: 767px) and (orientation: portrait) {
-    .dock-panel-footer {
-        /* position: fixed; */
-        bottom: 0px;
-        padding: 20px;
-        border-top: 1px solid #ccc;
-        /* width: 100%; */
-        text-align: right;
-    }
-    .dock-panel-footer-buttons {
-        float: right;
-    }
     .nf-tab-content {
         padding: 2px;
-        max-height: 250px;
-        overflow: auto;
     }
 }
