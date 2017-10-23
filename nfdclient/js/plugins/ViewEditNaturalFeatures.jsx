@@ -15,6 +15,8 @@ const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
 const DockedNaturalFeatures = require('../components/naturalfeatures/DockedNaturalFeatures');
 const SmartDockedNaturalFeatures = connect((state) => ({
+    height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 798,
+    width: state.map && state.map.present && state.map.present.size && state.map.present.size.width || 0,
     isVisible: state.controls.vieweditnaturalfeatures && state.controls.vieweditnaturalfeatures.enabled,
     forms: state.naturalfeatures.forms,
     featuretype: state.naturalfeatures.featuretype,

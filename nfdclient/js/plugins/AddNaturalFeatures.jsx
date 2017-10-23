@@ -23,6 +23,8 @@ const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
 // const NfdImage  = require('../components/naturalfeatures/NfdImage');
 const SmartDockedNaturalFeatures = connect((state) => ({
+    height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 798,
+    width: state.map && state.map.present && state.map.present.size && state.map.present.size.width || 0,
     isVisible: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
     forms: state.naturalfeatures.forms,
     featuretype: state.naturalfeatures.featuretype,

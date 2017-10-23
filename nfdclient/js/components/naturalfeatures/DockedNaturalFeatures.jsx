@@ -7,6 +7,7 @@
  */
 const React = require('react');
 const Dock = require('react-dock');
+const Spinner = require('react-spinkit');
 const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox} = require('react-bootstrap');
 const DatePicker = require("react-bootstrap-date-picker");
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
@@ -22,8 +23,10 @@ const Api = require('../../api/naturalfeaturesdata');
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
+        isLoading: React.PropTypes.bool,
         isMobile: React.PropTypes.bool,
         height: React.PropTypes.number,
+        width: React.PropTypes.number,
         forms: React.PropTypes.array,
         featuretype: React.PropTypes.string,
         featuresubtype: React.PropTypes.string,
@@ -443,28 +446,38 @@ const DockedNaturalFeatures = React.createClass({
         }
         return (<ul>{errorItems}</ul>);
     },
-    render() {
+    renderLoading() {
+        return (<div className="ft-plugin-loading"><Spinner spinnerName="circle" noFadeIn overrideSpinnerClassName="spinner"/></div>);
+    },
+    renderHeader() {
         let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
+        return (
+            <div className="nfd-header">
+            <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
+            <div className="nfd-form-title">{title}</div>
+            {this.props.isLoading ? this.renderLoading() : null}
+            </div>);
+    },
+    render() {
         return (
             <Dock {...this.props.dockProps} size={this.props.dockSize}
                 isVisible={this.props.isVisible}>
-                <div style={{width: "100%", minHeight: "35px", fontSize: "26px", padding: "15px"}}>
-                    <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
-                    <span className="nfd-form-title">{title}</span>
-                </div>
-                <div>
+                {this.renderHeader()}
+
+                <div style={{height: this.props.height - 40, overflow: 'auto'}}>
                     <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
                         {this.renderTabs()}
                     </Tabs>
                     <div className="nf-errors">
                         {this.renderErrors()}
                     </div>
-                </div>
+
                 <div className="dock-panel-footer">
                     <div className="dock-panel-footer-buttons">
                         {(this.props.mode === 'EDIT') ? this.renderHistoric() : null}
                         {this.renderButtons()}
                     </div>
+                </div>
                 </div>
             </Dock>
         );

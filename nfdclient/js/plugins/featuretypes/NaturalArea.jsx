@@ -23,8 +23,8 @@ const FeaturesPanel = connect((state) => {
         features: data.features || [],
         page: data.page || 0,
         total: data.total || 0,
-        pageSize: state.featuresearch && state.featuresearch.pageSize || 30,
-        height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 600};
+        pageSize: state.featuresearch && state.featuresearch.pageSize || 30
+    };
 }, {
     loadFtType: loadList
 })(require('../../components/naturalfeatures/FeaturesPanel'));
@@ -45,7 +45,6 @@ const FilterPanel = connect((state) => {
     const filters = dataFilterSelector(state);
     const featuresInfo = dataSelector(state);
     return {
-        height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 600,
         disableSync: FilterUtils.equalFilters(filters, featuresInfo.filter)
     };
 }, {
@@ -88,13 +87,16 @@ const DateFiled = connect((state) => {
 })(require('../../components/naturalfeatures/DateFilter'));
 
 class NaturalArea extends React.Component {
+    static propTypes = {
+      height: React.PropTypes.number
+    }
     render() {
         return (
             <FeatureTypePanel featureType="naturalarea">
-                <FeaturesPanel>
+                <FeaturesPanel height={this.props.height}>
                     <FeatureCard/>
                 </FeaturesPanel>
-                <FilterPanel>
+                <FilterPanel height={this.props.height}>
                     <FilterElement label="by Inclusion date">
                         <DateFiled/>
                     </FilterElement>

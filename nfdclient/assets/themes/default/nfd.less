@@ -4,6 +4,8 @@
     font-size: 26px;
     padding: 0px 5px;
     margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .lists-container .tab-content{
     padding-top: 10px;
@@ -295,4 +297,19 @@ width: 150px;
     position: absolute;
     top: 66px;
     left: calc(~'50% - 10px');
+}
+// Edit Panel styles
+.nfd-form-title {
+   text-align: center;
+   overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   position: absolute;
+   top: 6px;
+   left: 35px;
+   right: 10px;
+   height: 35px;
+   font-size: 20px;
+   font-weight: 500;
+   color: #888888;
 }
