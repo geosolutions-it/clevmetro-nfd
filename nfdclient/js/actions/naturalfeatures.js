@@ -55,10 +55,10 @@ const IMAGE_ERROR = 'IMAGE_ERROR';
 const REMOVE_IMAGE = 'REMOVE_IMAGE';
 const IMAGE_UPLOADED = 'IMAGE_UPLOADED';
 
-function imageUploaded(image) {
+function imageUploaded(images) {
     return {
         type: IMAGE_UPLOADED,
-        image
+        images
     };
 }
 
