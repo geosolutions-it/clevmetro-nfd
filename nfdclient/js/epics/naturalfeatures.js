@@ -135,11 +135,10 @@ addNaturalFeature: (action$) =>
                 })
                 .concat([naturalFeaturesLoading(false)]);
     }),
-uploadImage: (action$, store) =>
+uploadImage: (action$) =>
     action$.ofType('ADD_IMAGE').filter(a => a.image).
     switchMap( a => {
-        const {selectedFeature} = (store.getState()).naturalfeatures;
-        return Rx.Observable.fromPromise(Api.uploadImage(selectedFeature.featuretype, selectedFeature.id, a.image)).map((image) => (imageUploaded(image)))
+        return Rx.Observable.fromPromise(Api.uploadImage(a.image)).map(({images = []}) => (imageUploaded(images)))
         .startWith(naturalFeaturesLoading(true))
         .catch(e => Rx.Observable.from([error({title: 'Uploading', message: `Error: ${e.statusText}`}), removeImage(0)]))
         .concat([naturalFeaturesLoading(false)]);
