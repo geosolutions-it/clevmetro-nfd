@@ -821,8 +821,7 @@ class UpdateOccurrenceMixin(object):
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
                     self._update_form(form_name, model_class, validated_data, instance, children)
-
-            self.process_photos(instance, validated_data)
+           
             instance.geom = validated_data.get("geom") or instance.geom
             instance.version = instance.version + 1
             instance.verified = validated_data.get("verified", False) or False
@@ -833,6 +832,8 @@ class UpdateOccurrenceMixin(object):
             else:
                 instance.released = False
             instance.save()
+            # ensure the instance has been saved before associating photos
+            self.process_photos(instance, validated_data)
         return instance
     
     def create(self, validated_data):
