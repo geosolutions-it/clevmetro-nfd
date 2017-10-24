@@ -1032,7 +1032,7 @@ class PhotographPublishSerializer(Serializer):
         child=ImageField(max_length=1000,
             allow_empty_file=False,
             use_url=True))
-    image_id = rest_fields.IntegerField(required=False, read_only=True)
+    id = rest_fields.IntegerField(required=False, read_only=True)
     thumbnail = rest_fields.CharField(required=False, read_only=True)
     description = rest_fields.CharField(required=False, allow_blank=True)
     notes = rest_fields.CharField(required=False, allow_blank=True)
@@ -1052,7 +1052,7 @@ class PhotographPublishSerializer(Serializer):
             photo = Photograph.objects.create(image=img, **validated_data)
             img_desc = {
                 'image': photo.image.url,
-                'image_id': photo.id
+                'id': photo.id
                 }
             if photo.thumbnail:
                 img_desc['thumbnail'] = photo.thumbnail.url
