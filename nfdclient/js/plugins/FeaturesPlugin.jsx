@@ -26,6 +26,7 @@ const Utils = require('../utils/nfdUtils');
 class FeaturesSearchPanel extends React.Component {
     static propTypes = {
         height: PropTypes.number,
+        width: PropTypes.number,
         dockProps: PropTypes.object,
         active: PropTypes.bool,
         dockSize: PropTypes.number,
@@ -40,6 +41,7 @@ class FeaturesSearchPanel extends React.Component {
     };
     static defaultProps = {
         height: 798,
+        width: 800,
         eventsLoading: false,
         dockProps: {
             dimMode: "none",
@@ -64,12 +66,13 @@ class FeaturesSearchPanel extends React.Component {
             </div>);
     }
     renderTabs() {
-        const {featureTypes} = this.props;
+        const {featureTypes, width, height, dockSize} = this.props;
+        const tabRows = Math.ceil((featureTypes.length) / Math.floor((width * dockSize) / 58));
         return featureTypes.filter(ft => FeatureTypeComponents[ft]).map((ft, idx) => {
             const FeatureType = FeatureTypeComponents[ft];
             return (
             <Tab key={idx} eventKey={ft} title={<Glyphicon className="icon24" glyph={ft}/>}>
-                <FeatureType/>
+                <FeatureType height={height - 40 - (51 * tabRows)}/>
             </Tab>);
         });
     }
@@ -116,6 +119,7 @@ const FeaturesPlugin = connect((state) => ({
     dockSize: state.naturalfeatures.dockSize,
     active: state.controls && state.controls.features && state.controls.features.enabled,
     height: state.map && state.map.present && state.map.present.size && state.map.present.size.height || 798,
+    width: state.map && state.map.present && state.map.present.size && state.map.present.size.width || 0,
     activeFt: state.featuresearch && state.featuresearch.activeFt,
     featureTypes: state.featuresearch && state.featuresearch.featureTypes || [],
     isLoading: state.featuresearch && state.featuresearch.loading ? Utils.isLoading(state.featuresearch.loading) : false

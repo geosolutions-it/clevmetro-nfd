@@ -81,11 +81,9 @@ const Api = {
             return response.data;
         });
     },
-    uploadImage: function(featureType, featureId, image) {
+    uploadImage: function(image) {
         const url = '/nfdapi/images/';
         let data = new FormData();
-        data.append("occurrence_fk", featureId);
-        data.append("featuretype", featureType);
         const blob = toBlob(image.dataUrl);
         data.append("image", blob, image.name);
         return axios.post(url, data, getOptions()).then(function(response) {return response.data; });

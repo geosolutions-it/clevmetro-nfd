@@ -7,6 +7,7 @@
  */
 const React = require('react');
 const Dock = require('react-dock');
+const Spinner = require('react-spinkit');
 const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox} = require('react-bootstrap');
 const DatePicker = require("react-bootstrap-date-picker");
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
@@ -22,8 +23,10 @@ const Api = require('../../api/naturalfeaturesdata');
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
+        isLoading: React.PropTypes.bool,
         isMobile: React.PropTypes.bool,
         height: React.PropTypes.number,
+        width: React.PropTypes.number,
         forms: React.PropTypes.array,
         featuretype: React.PropTypes.string,
         featuresubtype: React.PropTypes.string,
@@ -109,7 +112,7 @@ const DockedNaturalFeatures = React.createClass({
             );
         });
     },
-    renderTabContent(tab, tabindex) {
+    renderTabContent(tab, tabindex, tabContentHeigth) {
         let searchDiv;
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
@@ -303,7 +306,7 @@ const DockedNaturalFeatures = React.createClass({
 
         searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher) && this.props.featuresubtype !== 'na';
         return (
-            <div className="nf-tab-content">
+            <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>
                 {searchDiv ?
                     (<AsyncTypeahead
                         {...this.state}
@@ -323,10 +326,11 @@ const DockedNaturalFeatures = React.createClass({
                     <caption style={{display: "table-caption", textAlign: "center", backgroundColor: "#ccc", color: "#ffffff"}}>{tabName}</caption>
                     <tbody style={{width: "100%"}}>{items}</tbody>
                 </Table>
+                {(tab.formname === 'location') ? this.renderDrawTools() : null}
             </div>
         );
     },
-    renderTabs() {
+    renderTabs(tabContentHeigth) {
         let tabs = [];
         this.props.forms.map((tab, index) => {
             let i = index + 1;
@@ -334,19 +338,20 @@ const DockedNaturalFeatures = React.createClass({
             let tabIcon = Utils.getFormIcon(tab.formname);
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    {this.renderTabContent(tab, i)}
-                    {(tab.formname === 'location') ? this.renderDrawTools() : null}
+                    {this.renderTabContent(tab, i, tabContentHeigth)}
                 </Tab>
             );
         });
         if (tabs.length > 0) {
             tabs.push(
                 <Tab eventKey={(tabs.length + 1)} key="resources" title={<Glyphicon glyph="camera" style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    <div className="nf-tab-content">
-                        <NfdImage onError={this.props.onError}
-                                  addImage={this.props.addImage}
-                                  removeImage={this.props.removeImage}
-                                  images={this.props.images}/>
+                    <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "hidden"}}>
+                        <NfdImage height={tabContentHeigth}
+                            isMobile={this.props.isMobile}
+                            onError={this.props.onError}
+                            addImage={this.props.addImage}
+                            removeImage={this.props.removeImage}
+                            images={this.props.images}/>
                     </div>
                 </Tab>
             );
@@ -443,27 +448,37 @@ const DockedNaturalFeatures = React.createClass({
         }
         return (<ul>{errorItems}</ul>);
     },
-    render() {
+    renderLoading() {
+        return (<div className="ft-plugin-loading"><Spinner spinnerName="circle" noFadeIn overrideSpinnerClassName="spinner"/></div>);
+    },
+    renderHeader() {
         let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
         return (
-            <Dock {...this.props.dockProps} size={this.props.dockSize}
-                isVisible={this.props.isVisible}>
-                <div style={{width: "100%", minHeight: "35px", fontSize: "26px", padding: "15px"}}>
-                    <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
-                    <span className="nfd-form-title">{title}</span>
-                </div>
-                <div>
-                    <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
-                        {this.renderTabs()}
-                    </Tabs>
-                    <div className="nf-errors">
+            <div className="nfd-header">
+            <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
+            <div className="nfd-form-title">{title}</div>
+            {this.props.isLoading ? this.renderLoading() : null}
+            </div>);
+    },
+    render() {
+        const {forms = [], width, height, dockSize, mode, dockProps, isVisible} = this.props;
+        const tabRows = Math.ceil((forms.length + 1) / Math.floor((width * dockSize) / 58));
+        const footerHeight = (mode === 'EDIT') ? 70 : 41;
+        const tabContentHeigth = height - 40 - footerHeight - (45 * tabRows) + 1;
+        return (
+            <Dock {...dockProps} size={dockSize}
+                isVisible={isVisible}>
+                {this.renderHeader()}
+                <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
+                        {this.renderTabs(tabContentHeigth)}
+                </Tabs>
+                <div className="nf-errors">
                         {this.renderErrors()}
-                    </div>
                 </div>
-                <div className="dock-panel-footer">
+                <div className="dock-panel-footer" style={{height: footerHeight}}>
+                    {(mode === 'EDIT') ? this.renderHistoric() : null}
                     <div className="dock-panel-footer-buttons">
-                        {(this.props.mode === 'EDIT') ? this.renderHistoric() : null}
-                        {this.renderButtons()}
+                    {this.renderButtons()}
                     </div>
                 </div>
             </Dock>

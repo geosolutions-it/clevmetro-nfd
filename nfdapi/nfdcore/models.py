@@ -143,6 +143,7 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
     except:
         logging.exception("Error creating thumbnail")
 
+@reversion.register()
 class Photograph(models.Model):
     image = ImageField(upload_to=PHOTO_UPLOAD_TO, height_field='image_height', width_field='image_width', max_length=1000)
     thumbnail = ImageField(upload_to=PHOTO_UPLOAD_TO, height_field='thumb_height', width_field='thumb_width', max_length=1000, blank=True)
@@ -153,8 +154,8 @@ class Photograph(models.Model):
     description = models.TextField(blank=True, null=True, default='')
     date = models.DateTimeField(default=timezone.now)
     notes = models.TextField(blank=True, null=True, default='')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    occurrence_fk = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
+    occurrence_fk = models.PositiveIntegerField(blank=True, null=True)
     occurrence = GenericForeignKey('content_type', 'occurrence_fk')
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
@@ -164,7 +165,7 @@ class Photograph(models.Model):
             self.date = date
         except:
             pass
-        super(Photograph, self).save(force_insert=False, force_update=False, using=None, update_fields=None)
+        super(Photograph, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 def get_occurrence_model(occurrence_maincat):
     try:
@@ -340,7 +341,7 @@ def get_details_class(category_code):
     elif category_code=='na':
         return ElementNaturalAreas
 
-@reversion.register()
+@reversion.register(follow=['photographs'])
 class OccurrenceTaxon(Occurrence):
     voucher = models.OneToOneField(Voucher, blank=True, null=True, on_delete=models.CASCADE)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
@@ -790,7 +791,7 @@ class ElementNaturalAreas(Element):
     regional_frequency = models.ForeignKey(RegionalFrequency, on_delete=models.SET_NULL, blank=True, null=True)
     # soils_ssurgo_wrap # FIXME
 
-@reversion.register()
+@reversion.register(follow=['photographs'])
 class OccurrenceNaturalArea(Occurrence):
     #details = models.OneToOneField(NaturalAreaDetails, on_delete=models.CASCADE, null=True)
     element = models.ForeignKey(ElementNaturalAreas, on_delete=models.CASCADE, blank=True, null=True)

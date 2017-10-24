@@ -59,6 +59,4 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'species/$', coreviews.SpeciesSearch.as_view()),
     url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', coreviews.SpeciesDetail.as_view()),
     url(r'^'+APP_NAME, include(router.urls)),
-    url(r'^'+APP_NAME+r'image/(plant|animal|slimemold|fungus)/$', coreviews.PhotoViewSet.as_view({'post': 'create'})),
-
 ]

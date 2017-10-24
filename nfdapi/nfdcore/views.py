@@ -26,7 +26,8 @@ from rest_framework.pagination import PageNumberPagination
 from nfdcore.nfdserializers import delete_object_and_children
 from nfdcore.permissions import CanUpdateFeatureType, get_permissions,\
     CanCreatePlants, CanCreateAnimals,\
-    CanCreateNaturalAreas, CanCreateSlimeMold, CanCreateFungus
+    CanCreateNaturalAreas, CanCreateSlimeMold, CanCreateFungus,\
+    CanWriteOrUpdateAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ModelViewSet
@@ -273,8 +274,6 @@ class LayerVersionDetail(APIView):
             serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
             if serialized_feature.get('released', False) == False and excude_unreleased:
                 return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
-            if isinstance(serialized_feature, OccurrenceNaturalArea):
-                return Response({"error": "not supported yet"})
             serialized_feature['featuretype'] = occurrence_maincat
             serialized_feature['featuresubtype'] = instance.occurrence_cat.code
             return Response(serialized_feature)
@@ -283,14 +282,10 @@ class LayerVersionDetail(APIView):
             #raise Http404
 
 class PhotoViewSet(ModelViewSet):
+    permission_classes = [ IsAuthenticated, CanWriteOrUpdateAny ]
     serializer_class = PhotographPublishSerializer
     parser_classes = (MultiPartParser, FormParser,)
     queryset=Photograph.objects.all()
-
-    def pre_save(self, obj):
-        #print "hola"
-        pass
-        #self.request
 
 @api_view(['GET'])
 def get_feature_type(request, occurrence_subcat, feature_id=None):

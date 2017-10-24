@@ -58,6 +58,21 @@ def can_update_feature_type(user, featuretype_name):
         return user.is_naturalarea_publisher or user.is_naturalarea_writer
     return False
 
+class CanWriteOrUpdateAny(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (request.user.is_animal_publisher or \
+                request.user.is_animal_writer or \
+                request.user.is_slimemold_publisher or \
+                request.user.is_slimemold_writer or \
+                request.user.is_plant_publisher or \
+                request.user.is_plant_writer or \
+                request.user.is_fungus_publisher or \
+                request.user.is_fungus_writer or \
+                request.user.is_naturalarea_publisher or \
+                request.user.is_naturalarea_writer)
+    def has_object_permission(self, request, view, obj):
+        return True
+    
 class CanUpdateFeatureType(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method not in SAFE_METHODS:

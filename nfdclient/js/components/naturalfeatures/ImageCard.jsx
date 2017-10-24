@@ -26,7 +26,7 @@ class ImageCard extends React.Component {
     }
     getThumbOrImageUrl = (image) => {
         // Changes thumb and image when thumb's path will be fixe on server
-        return image && (image.image || image.thumbnail);
+        return image && (image.thumbnail || image.image);
     }
     getThumbnailUrl = (image) => {
         const img = image.dataUrl ? image.dataUrl : this.getThumbOrImageUrl(image);

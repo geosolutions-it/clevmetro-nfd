@@ -89,7 +89,7 @@ function naturalfeatures(state = {}, action) {
             return assign({}, state, {selectedFeature});
         }
         case IMAGE_UPLOADED: {
-            const images = [action.image].concat(state.selectedFeature.images.slice(1));
+            const images = action.images.concat(state.selectedFeature.images.slice(1));
             const selectedFeature = assign({}, state.selectedFeature, {images});
             return assign({}, state, {selectedFeature});
         }
