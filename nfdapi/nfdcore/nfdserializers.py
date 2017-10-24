@@ -765,6 +765,48 @@ class UpdateOccurrenceMixin(object):
         """
         return self.forms
     
+    def process_photos(self, instance, validated_data):
+        images = validated_data.get('images')
+        if images:
+            try:
+                updated_ids = [i.get('id') for i in images]
+                instance.photographs.exclude(pk__in=updated_ids).delete()
+                
+                for photo_data in validated_data.get('images'):
+                    try:
+                        photo = Photograph.objects.get(pk=photo_data.get('id'))
+                    except:
+                        if Version.objects.get_for_object_reference(Photograph, photo_data.get('id')).count() > 0:
+                            # we are restoring a removed photo
+                            last_version = Version.objects.get_for_object_reference(Photograph, photo_data.get('id'))[0]
+                            # ensure the photo matches current instance
+                            if last_version.field_dict.get('occurrence_fk') != instance.id:
+                                raise ValidationError({"images": [_("Tried to restore an invalid image")]})
+                            if last_version.field_dict.get('content_type_id') != ContentType.objects.get_for_model(instance._meta.model).pk:
+                                raise ValidationError({"images": [_("Tried to restore an invalid image")]})
+                            last_version.revert()
+                            photo = Photograph.objects.get(pk=photo_data.get('id'))
+                    updated = False
+                    if not photo.occurrence:
+                        photo.occurrence = instance
+                        updated = True
+                    elif photo.occurrence != instance:
+                        raise ValidationError({"images": [_("Invalid images were specified")]})
+                    notes = photo_data.get('notes')
+                    if photo.notes != notes:
+                        photo.notes = notes
+                        updated = True
+                    desc = photo_data.get('description')
+                    if photo.description != desc:
+                        photo.description = desc
+                        updated = True
+                    if updated:
+                        photo.save()
+            except ValidationError:
+                raise
+            except:
+                raise ValidationError({"images": [_("Invalid images were specified")]})
+
     def update(self, instance, validated_data):
         with reversion.create_revision():
             for (form_name, model_class, children) in self.get_toplevel_forms():
@@ -779,14 +821,8 @@ class UpdateOccurrenceMixin(object):
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
                     self._update_form(form_name, model_class, validated_data, instance, children)
-            
-            if isinstance(instance, OccurrenceTaxon):
-                # taxon
-                pass
-            else:
-                # natural area
-                pass
 
+            self.process_photos(instance, validated_data)
             instance.geom = validated_data.get("geom") or instance.geom
             instance.version = instance.version + 1
             instance.verified = validated_data.get("verified", False) or False
@@ -996,45 +1032,32 @@ class PhotographPublishSerializer(Serializer):
         child=ImageField(max_length=1000,
             allow_empty_file=False,
             use_url=True))
-    featuretype = rest_fields.CharField()
-    occurrence_fk = rest_fields.IntegerField()
     image_id = rest_fields.IntegerField(required=False, read_only=True)
     thumbnail = rest_fields.CharField(required=False, read_only=True)
     description = rest_fields.CharField(required=False, allow_blank=True)
     notes = rest_fields.CharField(required=False, allow_blank=True)
-    
-    def validate(self, data):
-        try:
-            ft = data.get("featuretype")
-            fk = data.get("occurrence_fk")
-            ft_model = get_occurrence_model(ft)
-            ft_model.objects.get(pk=fk)
-        except:
-            raise serializers.ValidationError(_("occurrence_fk: Not a valid occurrence"))
-        return data
-                      
+               
     class Meta:
         model = Photograph
         fields = ('image', 'featuretype', 'occurrence_fk')
 
+    def to_representation(self, instance):
+        return instance
+
+
     def create(self, validated_data):
         image=validated_data.pop('image')
-        ft = validated_data.pop("featuretype")
-        ft_model = get_occurrence_model(ft)
-        content_type = ContentType.objects.get_for_model(ft_model)
-        response = {
-            "image": [],
-            "featuretype": ft,
-            "occurrence_fk": validated_data.get("occurrence_fk")
-            }
+        image_list = []
         for img in image:
-            photo = Photograph.objects.create(image=img, content_type_id=content_type.id, **validated_data)
-            #photo.thumbnail = create_thumbnail(img, photo.image.path)
-            response['image'].append(photo.image)
-        if len(response['image'])==1:
-            response['image_id'] = photo.id
-            response['thumbnail'] = photo.thumbnail.url
-        return response
+            photo = Photograph.objects.create(image=img, **validated_data)
+            img_desc = {
+                'image': photo.image.url,
+                'image_id': photo.id
+                }
+            if photo.thumbnail:
+                img_desc['thumbnail'] = photo.thumbnail.url
+            image_list.append(img_desc)
+        return {'images': image_list}
 
 class PhotographSerializer(ModelSerializer):
     """
@@ -1043,6 +1066,7 @@ class PhotographSerializer(ModelSerializer):
     class Meta:
         model = Photograph
         fields = '__all__'
+        read_only_fields = ('image', 'thumbnail', 'image_width', 'image_height','thumb_width', 'thumb_height', 'date')
         #exclude = ('occurrence_fk', 'occurrence', 'content_type') 
 
 """ -------------------------------------------
@@ -1064,6 +1088,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
     geom = gisserializer.GeometryField(required=False)
     polygon = gisserializer.GeometryField(required=False)
     observation = OccurrenceObservationSerializer(required=True)
+    images = PhotographSerializer(required=False, many=True)
     
     def get_fields(self):
         fields = Serializer.get_fields(self)
@@ -1163,11 +1188,11 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
             else:
                 rest_fields.set_value(validated_formvalues, field.source_attrs, validated_value)
 
-        validated_formvalues = validated_formvalues
         validated_formvalues["released"] = data.get("released", False)
         validated_formvalues["verified"] = data.get("verified", False)
         validated_formvalues['featuretype'] = data.get("featuretype")
         validated_formvalues['featuresubtype'] = data.get("featuresubtype")
+        validated_formvalues['images'] = formvalues.get('images')
             
         if isinstance(validated_formvalues.get('polygon'), Polygon):
             location = validated_formvalues.get('location', {})
@@ -1457,6 +1482,16 @@ class OccurrenceVersionSerializer():
             return get_details_class(category.code)
         return model 
     
+    def get_images(self, requested_version):
+        versioned_photos = []
+        for version in requested_version.revision.version_set.all():
+            if isinstance(version._object_version.object, Photograph):
+                versioned_photos.append(version._object_version.object)
+                
+        photo_serializer = PhotographSerializer(versioned_photos, many=True)
+        return photo_serializer.data
+        
+    
     def get_version(self, instance, version, exclude_unreleased=False):
         """
         Gets a dict representing a particular version of the occurrence
@@ -1486,6 +1521,9 @@ class OccurrenceVersionSerializer():
         if result.get('location') and isinstance(result.get('location').get('polygon'), Polygon):
             result['polygon'] = result.get('location').pop('polygon').geojson
         result['geom'] = {'type': 'Point', 'coordinates': result['geom'].coords}
+        
+        images = self.get_images(requested_version)
+        result['images'] = images
         result['total_versions'] = total_versions
         result['version'] = version
         result['version_date'] = revision_date
