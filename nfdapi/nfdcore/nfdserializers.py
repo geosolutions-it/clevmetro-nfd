@@ -806,6 +806,8 @@ class UpdateOccurrenceMixin(object):
                 raise
             except:
                 raise ValidationError({"images": [_("Invalid images were specified")]})
+        else:
+            instance.photographs.all().delete()
 
     def update(self, instance, validated_data):
         with reversion.create_revision():
