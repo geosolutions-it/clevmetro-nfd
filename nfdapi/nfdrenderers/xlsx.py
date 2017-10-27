@@ -12,7 +12,7 @@ from pyexcel import PyExcelBaseRenderer
 
 class XlsxRenderer(PyExcelBaseRenderer):
     media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    format = "xslx"
+    format = "xlsx"
     charset = None
     render_style = 'binary'
         

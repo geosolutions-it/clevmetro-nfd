@@ -26,7 +26,8 @@ module.exports = {
         ViewEditNaturalFeaturesPlugin: require('./plugins/ViewEditNaturalFeatures'),
         AddNaturalFeaturesPlugin: require('./plugins/AddNaturalFeatures'),
         ToggleAddEditPanelPlugin: require('./plugins/ToggleAddEditPanel'),
-        FeaturesPlugin: require('./plugins/FeaturesPlugin')
+        FeaturesPlugin: require('./plugins/FeaturesPlugin'),
+        ExportFeaturesPlugin: require('./plugins/ExportFeatures')
     },
     requires: {}
 };
