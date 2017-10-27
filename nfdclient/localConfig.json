@@ -64,7 +64,8 @@
         "AddNaturalFeatures",
         "ToggleAddEditPanel",
         "Features",
-        "Notifications"
+        "Notifications",
+        "ExportFeatures"
       ],
       "mobile": [{
           "name": "Map",
@@ -91,7 +92,8 @@
       "AddNaturalFeatures",
       "ToggleAddEditPanel",
       "Features",
-      "Notifications"
+      "Notifications",
+      "ExportFeatures"
     ]
 	}
 }

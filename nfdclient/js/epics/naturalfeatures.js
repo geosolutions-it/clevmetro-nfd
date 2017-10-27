@@ -28,10 +28,7 @@ const fetchFeatures = (featureType) => {
                 .map(val => naturalFeaturesLoaded(featureType, val.features))
                 .catch(e => Rx.Observable.of(naturalFeaturesError(featureType, e)));
 };
-// const uploadImage = (featureType, ftId, image) =>
-//         Rx.Observable.fromPromise(Api.uploadImage("plant", 40, a.image))
-//         .do(val => console.log(val))
-//         .catch(e => console.log(e));
+
 module.exports = {
 
 updateFeatureTypeLayer: (action$) =>

@@ -10,13 +10,17 @@ const React = require('react');
 const {connect} = require('react-redux');
 
 const {loadList, selectFeature, zooToFeature, searchSpecies, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
-
+const {onToggleExport} = require('../../actions/exportfeatures');
 const FilterUtils = require('../../utils/FilterUtils');
 
 const dataSelector = (state) => state.featuresearch && state.featuresearch.fungus || {};
 const dataFilterSelector = (state) => state.featuresearch && state.featuresearch.fungus_filters || {};
 
-const FeatureTypePanel = require('../../components/naturalfeatures/FeatureTypePanel');
+const toggleExport = onToggleExport.bind(null, 'LIST', 'fungus', null);
+const FeatureTypePanel = connect(() => ({}), {
+    toggleExport
+})(require('../../components/naturalfeatures/FeatureTypePanel'));
+
 const FeaturesPanel = connect((state) => {
     const data = dataSelector(state);
     return {

@@ -36,7 +36,7 @@ class ShpRenderer(BaseRenderer):
             return feature.get('properties')
         else:
             return feature
-    
+
     def _get_field_def(self, features):
         field_dict = OrderedDict()
         field_def = []
@@ -60,7 +60,7 @@ class ShpRenderer(BaseRenderer):
                     field_def.append((key, "C", 254))
                     field_dict[key] = "C"
         return (field_def, field_dict)
-    
+
     def _get_row(self, feature, fdef):
         row = []
         props = self._get_properties(feature)
@@ -85,7 +85,7 @@ class ShpRenderer(BaseRenderer):
                 row.append(value.replace(tzinfo=None))
                 """
         return row
-    
+
     def _get_coords(self, feature):
         if feature.get("geometry"):
             return feature['geometry']['coordinates']
@@ -96,11 +96,11 @@ class ShpRenderer(BaseRenderer):
             return feature['geom']['coordinates']
         else:
             return [None, None]
-    
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         w = shapefile.Writer(shapeType=shapefile.POINT)
         features = self._get_features(data)
-        (dbf_def, field_dict) = self._get_field_def(features) 
+        (dbf_def, field_dict) = self._get_field_def(features)
         for fdef in dbf_def:
             w.field(*fdef)
         for feature in features:
@@ -116,7 +116,7 @@ class ShpRenderer(BaseRenderer):
         w.saveShp(shp)
         w.saveShx(shx)
         w.saveDbf(dbf)
-        
+
         # packaging the shp in a zipfile
         with BytesIO() as zipbuffer:
             zip_writer = ZipFile(zipbuffer, 'w')
@@ -126,6 +126,6 @@ class ShpRenderer(BaseRenderer):
             shx.close()
             zip_writer.writestr("nfdexport.dbf", dbf.getvalue())
             dbf.close()
-            zip_writer.writestr("nfdexport.proj", prj) 
+            zip_writer.writestr("nfdexport.prj", prj)
             zip_writer.close()
             return zipbuffer.getvalue()
