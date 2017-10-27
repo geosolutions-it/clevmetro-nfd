@@ -12,11 +12,15 @@ const {connect} = require('react-redux');
 const {loadList, selectFeature, zooToFeature, searchSpecies, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
 
 const FilterUtils = require('../../utils/FilterUtils');
-
+const {onToggleExport} = require('../../actions/exportfeatures');
 const dataSelector = (state) => state.featuresearch && state.featuresearch.slimemold || {};
 const dataFilterSelector = (state) => state.featuresearch && state.featuresearch.slimemold_filters || {};
 
-const FeatureTypePanel = require('../../components/naturalfeatures/FeatureTypePanel');
+const toggleExport = onToggleExport.bind(null, 'LIST', 'slimemold', null);
+const FeatureTypePanel = connect(() => ({}), {
+    toggleExport
+})(require('../../components/naturalfeatures/FeatureTypePanel'));
+
 const FeaturesPanel = connect((state) => {
     const data = dataSelector(state);
     return {

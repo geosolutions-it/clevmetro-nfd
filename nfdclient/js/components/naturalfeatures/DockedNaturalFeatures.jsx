@@ -59,7 +59,8 @@ const DockedNaturalFeatures = React.createClass({
         onError: React.PropTypes.func,
         addImage: React.PropTypes.func,
         removeImage: React.PropTypes.func,
-        dockProps: React.PropTypes.object
+        dockProps: React.PropTypes.object,
+        exportFt: React.PropTypes.func
     },
     getDefaultProps() {
         return {
@@ -86,7 +87,8 @@ const DockedNaturalFeatures = React.createClass({
             nextVersion: () => {},
             onChangeDrawingStatus: () => {},
             onEndDrawing: () => {},
-            cancel: () => {}
+            cancel: () => {},
+            exportFt: () => {}
         };
     },
     componentWillMount: function() {
@@ -366,9 +368,16 @@ const DockedNaturalFeatures = React.createClass({
                     style={{marginRight: "2px"}}>
                     <Message msgId="cancel" />
                 </Button>);
+        const exportBtn = (
+            <Button key="exportFt" bsSize="small"
+                    bsStyle="primary"
+                    onClick={this.exportFt}
+                    >
+                    <Glyphicon glyph="download" style={{fontSize: 18}}/>
+                </Button>);
         if (this.props.isWriter || this.props.isPublisher) {
             return (this.props.mode === 'EDIT') ? [cancel,
-                <Button key="delete" bsSize="small"
+               <Button key="delete" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.id)}
                     style={{marginRight: "2px"}}
@@ -378,21 +387,19 @@ const DockedNaturalFeatures = React.createClass({
                 <Button key="update" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
-                    disabled={false}>
+                    disabled={false}
+                    style={{marginRight: "2px"}}>
                     <Message msgId="naturalfeatures.update" />
-                </Button>
-
-            ] : [cancel,
+                </Button>, exportBtn] : [cancel,
                 <Button key="save" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                     disabled={false}>
                     <Message msgId="naturalfeatures.save" />
                 </Button>
-
             ];
         }
-        return [];
+        return [exportBtn];
     },
     renderHistoric() {
         return (
@@ -523,6 +530,9 @@ const DockedNaturalFeatures = React.createClass({
         } else if (this.props.mode === 'ADD') {
             this.setState({selectedFeature: this.props.currentFeature});
         }
+    },
+    exportFt() {
+        this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id);
     }
 });
 

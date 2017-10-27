@@ -11,7 +11,18 @@ const assign = require('object-assign');
 const toBlob = require('canvas-to-blob');
 
 const dataCache = {};
-
+const getAccept = (format) => {
+    switch (format) {
+        case 'csv':
+            return {'Accept': 'text/csv'};
+        case 'xlsx':
+            return {'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+        case 'shp':
+            return {'Accept': 'application/zip'};
+        default :
+            return {'Accept': 'application/zip'};
+    }
+};
 let getOptions = () => {
     const token = sessionStorage.getItem('nfd-jwt-auth-token');
     if (token !== null) {
@@ -87,6 +98,16 @@ const Api = {
         const blob = toBlob(image.dataUrl);
         data.append("image", blob, image.name);
         return axios.post(url, data, getOptions()).then(function(response) {return response.data; });
+    },
+    exportFeature: function(featureType, id, format) {
+        let url = `/nfdapi/layers/${featureType}/${id}/?format=${format}`;
+        const headers = assign({}, (getOptions()).headers, getAccept(format));
+        return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
+    },
+    exportFeatureList: function(featureType, format, filter, page) {
+        let url = `/nfdapi/list/${featureType}/?format=${format}${page}${filter}`;
+        const headers = assign({}, (getOptions()).headers, getAccept(format));
+        return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
     }
 };
 
