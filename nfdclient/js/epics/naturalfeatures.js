@@ -16,6 +16,7 @@ const {
     USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, editFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
     IMAGE_ERROR
 } = require('../actions/naturalfeatures');
+const {SELECT_FEATURE} = require('../actions/featuresearch');
 const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
 const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const Utils = require('../utils/nfdUtils');
@@ -82,7 +83,7 @@ cleanDraw: (action$, store) =>
         }),
 // Start edit when e feature is clicked or selected from the list.
 activeFeatureEdit: (action$, store) =>
-    action$.ofType(NF_CLICKED, 'SELECT_FEATURE')
+    action$.ofType(NF_CLICKED, SELECT_FEATURE)
         .switchMap((a) => {
             const {naturalfeatures} = store.getState();
             const isEditing = naturalfeatures.mode === 'ADD' || naturalfeatures.mode === 'EDIT';
@@ -90,7 +91,7 @@ activeFeatureEdit: (action$, store) =>
                 return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a different natural feature", autoDismiss: 2}));
             }
             const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature(a.properties) : viewFeature();
-            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
+            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('features', 'enabled', false), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
         }),
 // Open the form edit panel if It's close and a user clikcs on the feature that is currently editing
 showEditPanel: (action$, store) =>
