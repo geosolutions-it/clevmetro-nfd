@@ -894,7 +894,9 @@
             "land_animal": "Land animal",
             "pond_lake_animal": "Pond lake animal",
             "stream_animal": "Stream animal",
-            "wetland_animal": "Wetland animal"
+            "wetland_animal": "Wetland animal",
+            "deleteTitle": "Delete Natural Feature",
+            "deleteMsg": "Are you sure you want to delete?"
         },
         "export" : {
             "title": "Export Data",
