@@ -12,6 +12,8 @@ const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox}
 const DatePicker = require("react-bootstrap-date-picker");
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
+
+const ConfirmDialog = require('../../../MapStore2/web/client/components/misc/ConfirmDialog');
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
 const {isEmpty} = require('lodash');
@@ -37,7 +39,6 @@ const DockedNaturalFeatures = React.createClass({
         onSave: React.PropTypes.func,
         onUpdate: React.PropTypes.func,
         onDelete: React.PropTypes.func,
-        initWidth: React.PropTypes.oneOfType([ React.PropTypes.number, React.PropTypes.string ]),
         dockSize: React.PropTypes.number,
         previousVersion: React.PropTypes.func,
         nextVersion: React.PropTypes.func,
@@ -91,21 +92,17 @@ const DockedNaturalFeatures = React.createClass({
             exportFt: () => {}
         };
     },
-    componentWillMount: function() {
-        // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
+    getInitialState() {
+        return {showConfirm: false};
     },
     onClose: function() {
         this.props.onToggle();
-        // this.props.onChangeDrawingStatus("clean", null, "dockednaturalfeatures", [], {});
     },
     onAddPointClick: function() {
         this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIcon(this.props.featuretype)});
     },
     onAddPolygonClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
-    },
-    onGetMyLocationClick: function() {
-        this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {});
     },
     getOptions(values) {
         return values.items.map((item, index) => {
@@ -379,7 +376,7 @@ const DockedNaturalFeatures = React.createClass({
             return (this.props.mode === 'EDIT') ? [cancel,
                <Button key="delete" bsSize="small"
                     bsStyle="primary"
-                    onClick={() => this.props.onDelete(this.props.featuretype, this.props.currentFeature.id)}
+                    onClick={() => {this.setState({showConfirm: true}); }}
                     style={{marginRight: "2px"}}
                     disabled={false}>
                     <Message msgId="naturalfeatures.delete" />
@@ -436,11 +433,6 @@ const DockedNaturalFeatures = React.createClass({
                       style={{marginRight: "10px", padding: "9px"}}
                       pressed={this.props.addPolygonEnabled}
                       onClick={this.onAddPolygonClick} />
-                  {/*<ToggleButton
-                      text={<Message msgId="naturalfeatures.get_my_loc" />}
-                      style={{}}
-                      pressed={this.props.getMyLocationEnabled}
-                      onClick={this.onGetMyLocationClick} />*/}
               </div>
           </div>
         );
@@ -488,6 +480,7 @@ const DockedNaturalFeatures = React.createClass({
                     {this.renderButtons()}
                     </div>
                 </div>
+                {this.state.showConfirm ? this._renderConfirm() : null}
             </Dock>
         );
     },
@@ -533,6 +526,14 @@ const DockedNaturalFeatures = React.createClass({
     },
     exportFt() {
         this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id);
+    },
+    handleDelete() {
+        this.props.onDelete(this.props.featuretype, this.props.currentFeature.id);
+    },
+    _renderConfirm() {
+        return (<ConfirmDialog onConfirm={this.handleDelete} onClose={()=> {this.setState({showConfirm: false}); }} show={true} title={<Message msgId="naturalfeatures.deleteTitle" />} >
+                    <Message msgId="naturalfeatures.deleteMsg"/>
+                </ConfirmDialog>);
     }
 });
 

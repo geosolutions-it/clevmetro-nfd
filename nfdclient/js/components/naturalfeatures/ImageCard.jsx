@@ -21,15 +21,18 @@ class ImageCard extends React.Component {
       onRemove: () => {},
       glyphiconRemove: "remove-circle"
     }
+    state = {
+        showImage: false
+    }
     onRemove = () => {
         this.props.onRemove(this.props.id);
     }
-    getThumbOrImageUrl = (image) => {
+    getThumbOrImageUrl = (image, thumb = true) => {
         // Changes thumb and image when thumb's path will be fixe on server
-        return image && (image.thumbnail || image.image);
+        return image && (thumb && image.thumbnail || image.image);
     }
-    getThumbnailUrl = (image) => {
-        const img = image.dataUrl ? image.dataUrl : this.getThumbOrImageUrl(image);
+    getThumbnailUrl = (image, thumb = true) => {
+        const img = image.dataUrl ? image.dataUrl : this.getThumbOrImageUrl(image, thumb);
         return img ? decodeURIComponent(img) : null;
     }
     renderLoading() {
@@ -38,9 +41,11 @@ class ImageCard extends React.Component {
     render() {
         const {loading} = this.props.image;
         const imgStyle = loading ? {} : {backgroundImage: `url(${this.getThumbnailUrl(this.props.image)})`};
-        return (
+        return this.state.showImage ? (<div onClick={() => {this.setState({showImage: false}); }} className="fade in modal" style={{ background: "rgba(255,255,255,1)", display: 'block', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <img src={this.getThumbnailUrl(this.props.image, false)} style={{maxWidth: '95%', maxHeight: '95%'}}/>
+            </div>) : (
             <div className="img-card">
-                <div className="nfd-image" style={imgStyle}/>
+                <div className="nfd-image" style={imgStyle} onClick={() => this.setState({showImage: true})}/>
                 {loading ? this.renderLoading() : (
                 <div className="image-remove" onClick={this.onRemove}>
                     <Glyphicon glyph={this.props.glyphiconRemove} />

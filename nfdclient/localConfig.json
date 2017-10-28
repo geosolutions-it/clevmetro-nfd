@@ -51,6 +51,12 @@
               ]
             }
         },
+        {
+            "name": "BackgroundSelector",
+            "cfg": {
+                "bottom": 200
+            }
+        },
         "TOC",
         "OmniBar",
         "BurgerMenu",
@@ -78,7 +84,21 @@
           "cfg": {
               "glyph": "cleveland"
           }
-      },
+      },{
+                "name": "BackgroundSelector",
+                "cfg": {
+                    "bottom": 200,
+                    "dimensions": {
+                    "side": 55,
+                    "sidePreview": 55,
+                    "frame": 2,
+                    "margin": 5,
+                    "label": false,
+                    "vertical": true
+                   }
+                }
+            }
+      ,
       "TOC",
       "OmniBar",
       "BurgerMenu",

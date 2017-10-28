@@ -13,6 +13,32 @@
             "group": "background",
             "visibility": true
         }, {
+        "type": "google",
+        "title": "Google HYBRID",
+        "name": "HYBRID",
+        "source": "google",
+        "group": "background",
+        "visibility": false
+      },
+      {
+        "type": "tileprovider",
+        "title": "NASAGIBS Night 2012",
+        "provider": "NASAGIBS.ViirsEarthAtNight2012",
+        "name": "Night2012",
+        "source": "nasagibs",
+        "group": "background",
+        "visibility": false
+      },
+      {
+                "type": "wms",
+        "url":"http://www.realvista.it/reflector/open/service",
+        "visibility": false,
+                "title": "e-Geos Ortofoto RealVista 1.0",
+                "name": "rv1",
+                "group": "background",
+                "format": "image/jpeg"
+            },
+         {
             "type": "clustermarker",
             "queryable": true,
             "visibility": true,
