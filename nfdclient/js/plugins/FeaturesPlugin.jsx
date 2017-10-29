@@ -110,7 +110,7 @@ class ToggleFeaturesPanel extends React.Component {
     }
 }
 const ToggleFeaturesPanelTool = connect((state) => ({
-        active: state.controls && state.controls.features && state.controls.features.enabled || false
+        active: state.controls && state.controls.features && !!state.controls.features.enabled
     }), {
         onToggle: toggleControl.bind(null, 'features', 'enabled')
     })(ToggleFeaturesPanel);

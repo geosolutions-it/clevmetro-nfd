@@ -15,17 +15,21 @@ class ImageCard extends React.Component {
       onRemove: PropTypes.func,
       image: PropTypes.object,
       glyphiconRemove: PropTypes.string,
+      disabled: PropTypes.bool,
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
     };
     static defaultProps = {
       onRemove: () => {},
+      disabled: false,
       glyphiconRemove: "remove-circle"
     }
     state = {
         showImage: false
     }
     onRemove = () => {
-        this.props.onRemove(this.props.id);
+        if (!this.props.disabled) {
+            this.props.onRemove(this.props.id);
+        }
     }
     getThumbOrImageUrl = (image, thumb = true) => {
         // Changes thumb and image when thumb's path will be fixe on server
@@ -41,13 +45,13 @@ class ImageCard extends React.Component {
     render() {
         const {loading} = this.props.image;
         const imgStyle = loading ? {} : {backgroundImage: `url(${this.getThumbnailUrl(this.props.image)})`};
-        return this.state.showImage ? (<div onClick={() => {this.setState({showImage: false}); }} className="fade in modal" style={{ background: "rgba(255,255,255,1)", display: 'block', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        return this.state.showImage ? (<div onClick={() => {this.setState({showImage: false}); }} className="fade in modal" style={{ background: "rgba(255,255,255,1)", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <img src={this.getThumbnailUrl(this.props.image, false)} style={{maxWidth: '95%', maxHeight: '95%'}}/>
             </div>) : (
             <div className="img-card">
                 <div className="nfd-image" style={imgStyle} onClick={() => this.setState({showImage: true})}/>
                 {loading ? this.renderLoading() : (
-                <div className="image-remove" onClick={this.onRemove}>
+                <div className={`image-remove ${this.props.disabled ? 'disabled' : ''}`} onClick={this.onRemove}>
                     <Glyphicon glyph={this.props.glyphiconRemove} />
                 </div>)}
         </div>);
