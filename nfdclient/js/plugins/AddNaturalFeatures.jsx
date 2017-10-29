@@ -12,14 +12,12 @@ const assign = require('object-assign');
 
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 const {addNaturalFeature, getSpecies, addFeature, cancel, addImage, removeImage,
-imageError} = require('../actions/naturalfeatures');
+imageError, onFeaturePropertyChange} = require('../actions/naturalfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
 
 const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
-
-const {isWriter, isPublisher} = require('./naturalfeatures/securityutils.js');
 
 // const NfdImage  = require('../components/naturalfeatures/NfdImage');
 const SmartDockedNaturalFeatures = connect((state) => ({
@@ -33,9 +31,6 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     errors: state.naturalfeatures.errors,
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
-    isAdmin: state.naturalfeatures.is_admin || false,
-    isWriter: isWriter(state),
-    isPublisher: isPublisher(state),
     images: state.naturalfeatures && state.naturalfeatures.selectedFeature && state.naturalfeatures.selectedFeature.images || [],
     isMobile: state.browser && state.browser.mobile
 }), {
@@ -47,13 +42,14 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     cancel,
     onError: imageError,
     addImage: addImage,
-    removeImage: removeImage
+    removeImage: removeImage,
+    onFeaturePropertyChange
 })(require('../components/naturalfeatures/DockedNaturalFeatures'));
 
 
 const AddNaturalFeatures = React.createClass({
     propTypes: {
-        active: React.PropTypes.string,
+        active: React.PropTypes.bool,
         onToggleNewNaturalFeature: React.PropTypes.func,
         glyph: React.PropTypes.string,
         buttonStyle: React.PropTypes.string,
@@ -61,7 +57,6 @@ const AddNaturalFeatures = React.createClass({
         buttonClassName: React.PropTypes.string,
         menuButtonStyle: React.PropTypes.object,
         disabled: React.PropTypes.bool,
-        visible: React.PropTypes.bool,
         plant_writer: React.PropTypes.bool,
         animal_writer: React.PropTypes.bool,
         slimemold_writer: React.PropTypes.bool,
@@ -76,7 +71,6 @@ const AddNaturalFeatures = React.createClass({
             menuOptions: {},
             buttonClassName: "square-button",
             disabled: false,
-            visible: false,
             plant_writer: false,
             animal_writer: false,
             slimemold_writer: false,
@@ -97,7 +91,7 @@ const AddNaturalFeatures = React.createClass({
                     {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "fl"})}><Message msgId="naturalfeatures.flowering_plant"/></MenuItem>
                     }
-                    {this.props.plant_writer && false &&
+                    {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "pl"})}><Message msgId="naturalfeatures.plant_generic"/></MenuItem>
                     }
                     {this.props.plant_writer &&
@@ -132,8 +126,8 @@ const AddNaturalFeatures = React.createClass({
 
 module.exports = {
     AddNaturalFeaturesPlugin: assign(connect((state) => ({
-        active: state.controls.addnaturalfeatures && state.controls.addnaturalfeatures.enabled,
-        disabled: state.naturalfeatures && state.naturalfeatures.mode !== 'VIEW' && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id),
+        active: state.controls.addnaturalfeatures && !!state.controls.addnaturalfeatures.enabled,
+        disabled: !!(state.naturalfeatures && state.naturalfeatures.mode !== 'VIEW' && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id)),
         plant_writer: state.security.user && state.security.user.plant_writer,
         animal_writer: state.security.user && state.security.user.animal_writer,
         slimemold_writer: state.security.user && state.security.user.slimemold_writer,

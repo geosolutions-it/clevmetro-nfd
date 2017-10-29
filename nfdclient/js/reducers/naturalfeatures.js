@@ -21,7 +21,8 @@ const {
     NF_CLICKED,
     ADD_IMAGE,
     REMOVE_IMAGE,
-    IMAGE_UPLOADED
+    IMAGE_UPLOADED,
+    FEATURE_PROPERTY_CHANGE
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
@@ -71,6 +72,10 @@ function naturalfeatures(state = {}, action) {
             return assign({}, state, {
                 selectedFeature: selectedFeature
             });
+        }
+        case FEATURE_PROPERTY_CHANGE: {
+            const selectedFeature = assign({}, state.selectedFeature, {[action.property]: action.value});
+            return assign({}, state, {selectedFeature});
         }
         case ADD_FEATURE:
             return assign({}, state, {mode: 'ADD'});

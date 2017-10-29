@@ -15,7 +15,7 @@ const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 class ToggleAddEditPanel extends React.Component {
     static propTypes = {
        onToggle: PropTypes.func,
-       mode: PropTypes.bool,
+       mode: PropTypes.string,
        disabled: PropTypes.bool
     };
     static defaultProps = {
@@ -45,7 +45,8 @@ class ToggleAddEditPanel extends React.Component {
 
 const ToggleAddEditPanelPlugin = connect((state) => ({
     mode: state.naturalfeatures && state.naturalfeatures.mode,
-    disabled: !(state.naturalfeatures && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id))}), {
+    disabled: !(state.naturalfeatures && state.naturalfeatures.selectedFeature && (state.naturalfeatures.selectedFeature.geom || state.naturalfeatures.selectedFeature.id))
+}), {
     onToggle: toggleControl
 })(ToggleAddEditPanel);
 

@@ -52,7 +52,8 @@ const LeafletDrawSupport = React.createClass({
         const newFeaturetype = (newOptions && newOptions.properties || {}).featuretype;
         switch (newProps.drawStatus) {
             case ("start"):
-                    this.addDrawInteraction(newProps);
+                this.clean();
+                this.addDrawInteraction(newProps);
                 break;
             case ("stop"):
                 this.removeDrawInteraction();
