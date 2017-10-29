@@ -21,6 +21,7 @@ class NfdImage extends React.Component {
     static propTypes= {
         height: PropTypes.number,
         images: PropTypes.array,
+        disabled: PropTypes.bool,
         glyphiconRemove: PropTypes.string,
         // CALLBACKS
         onError: PropTypes.func,
@@ -40,6 +41,7 @@ class NfdImage extends React.Component {
         images: [],
         fileSize: 5242880, // in Byte
         glyphiconRemove: "remove-circle",
+        disabled: false,
         onError: () => {},
         addImage: () => {},
         removeImage: () => {},
@@ -79,12 +81,12 @@ class NfdImage extends React.Component {
         const isUploading = this.props.images.filter((i) => i.loading).length > 0;
         const suggestion = `Max file size ${this.props.fileSize / MB} MB`;
         return (
-            <div className={`nfd-images ${this.props.isMobile ? 'nfd-images-mobile' : ''}`} style={{height: this.props.height}}>
-                <Dropzone disabled={isUploading} multiple={false} className="dropzone alert alert-info" rejectClassName="alert-danger" onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected}accept="image/jpeg, image/png, image/jpg" disablePreview={true}>
+            <div className={`nfd-images ${this.props.isMobile ? 'nfd-images-mobile' : ''} ${this.props.disabled ? 'disabled' : ''}`} style={{height: this.props.height}}>
+                <Dropzone disabled={this.props.disabled || isUploading} multiple={false} className="dropzone alert alert-info" rejectClassName="alert-danger" onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected}accept="image/jpeg, image/png, image/jpg" disablePreview={true}>
                     <div className="dropzone-content-image">{this.props.message}<br/>{suggestion}</div>
                 </Dropzone>
                 <div className="nfd-thumbnails-container" style={{height: this.props.height - 100 }}>
-                    {this.props.images.map( (img, idx) => (<ImageCard key={idx} image={img} onRemove={this.onRemoveImage} id={idx}/>))}
+                    {this.props.images.map( (img, idx) => (<ImageCard disabled={this.props.disabled || isUploading} key={idx} image={img} onRemove={this.onRemoveImage} id={idx}/>))}
                 </div>
             </div>);
     }

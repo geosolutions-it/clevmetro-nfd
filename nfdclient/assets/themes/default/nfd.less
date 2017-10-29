@@ -238,6 +238,7 @@ width: 150px;
 }
 .nfd-images {
     overflow: hidden;
+    cursor: pointer;
 }
 .nfd-thumbnails-container {
     overflow: auto;
@@ -254,6 +255,9 @@ width: 150px;
 }
 .nfd-images.nfd-images-mobile .alert {
     height: 50px;
+}
+.disabled .dropzone.alert.alert-info{
+    cursor: not-allowed;
 }
 .nfd-images.nfd-images-mobile .dropzone-content-image{
     padding-top: 0px;
@@ -299,6 +303,11 @@ width: 150px;
 .image-remove span:hover {
     color: @ms2-color-danger !important;
     cursor: pointer;
+}
+
+.disabled .image-remove span:hover {
+    color: #edf2f6;
+    cursor: not-allowed;
 }
 .nfd-thumbnails-container .img-loading-spinner{
     position: absolute;

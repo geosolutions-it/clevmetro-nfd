@@ -43,16 +43,12 @@ const DockedNaturalFeatures = React.createClass({
         previousVersion: React.PropTypes.func,
         nextVersion: React.PropTypes.func,
         mode: React.PropTypes.string,
-        isAdmin: React.PropTypes.bool,
-        isWriter: React.PropTypes.bool,
-        isPublisher: React.PropTypes.bool,
         addPointGlyph: React.PropTypes.string,
         addPointEnabled: React.PropTypes.bool,
         addPolygonGlyph: React.PropTypes.string,
         addPolygonEnabled: React.PropTypes.bool,
         getMyLocationEnabled: React.PropTypes.bool,
         onChangeDrawingStatus: React.PropTypes.func,
-        onEndDrawing: React.PropTypes.func,
         getSpecies: React.PropTypes.func,
         cancel: React.PropTypes.func,
         selectedSpecie: React.PropTypes.number,
@@ -61,7 +57,8 @@ const DockedNaturalFeatures = React.createClass({
         addImage: React.PropTypes.func,
         removeImage: React.PropTypes.func,
         dockProps: React.PropTypes.object,
-        exportFt: React.PropTypes.func
+        exportFt: React.PropTypes.func,
+        onFeaturePropertyChange: React.PropTypes.func
     },
     getDefaultProps() {
         return {
@@ -87,9 +84,9 @@ const DockedNaturalFeatures = React.createClass({
             previousVersion: () => {},
             nextVersion: () => {},
             onChangeDrawingStatus: () => {},
-            onEndDrawing: () => {},
             cancel: () => {},
-            exportFt: () => {}
+            exportFt: () => {},
+            onFeaturePropertyChange: () => {}
         };
     },
     getInitialState() {
@@ -303,7 +300,7 @@ const DockedNaturalFeatures = React.createClass({
             }
         });
 
-        searchDiv = tabindex <= 2 && (this.props.isWriter || this.props.isPublisher) && this.props.featuresubtype !== 'na';
+        searchDiv = tabindex <= 2 && this.props.mode !== 'VIEW' && this.props.featuresubtype !== 'na';
         return (
             <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>
                 {searchDiv ?
@@ -347,6 +344,7 @@ const DockedNaturalFeatures = React.createClass({
                     <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "hidden"}}>
                         <NfdImage height={tabContentHeigth}
                             isMobile={this.props.isMobile}
+                            disabled={this.props.mode === 'VIEW'}
                             onError={this.props.onError}
                             addImage={this.props.addImage}
                             removeImage={this.props.removeImage}
@@ -358,45 +356,41 @@ const DockedNaturalFeatures = React.createClass({
         return tabs;
     },
     renderButtons() {
-        const cancel = (<Button key="cancel" bsSize="small"
+        let buttons = [<Button key="cancel" bsSize="small"
                     bsStyle="primary"
                     onClick={this.props.cancel}
                     disabled={false}
                     style={{marginRight: "2px"}}>
                     <Message msgId="cancel" />
-                </Button>);
-        const exportBtn = (
-            <Button key="exportFt" bsSize="small"
-                    bsStyle="primary"
-                    onClick={this.exportFt}
-                    >
-                    <Glyphicon glyph="download" style={{fontSize: 18}}/>
-                </Button>);
-        if (this.props.isWriter || this.props.isPublisher) {
-            return (this.props.mode === 'EDIT') ? [cancel,
-               <Button key="delete" bsSize="small"
+                </Button>];
+        if (this.props.mode === 'EDIT') {
+            buttons = buttons.concat([<Button key="delete" bsSize="small"
                     bsStyle="primary"
                     onClick={() => {this.setState({showConfirm: true}); }}
                     style={{marginRight: "2px"}}
                     disabled={false}>
                     <Message msgId="naturalfeatures.delete" />
-                </Button>,
-                <Button key="update" bsSize="small"
+                </Button>, <Button key="update" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                     disabled={false}
                     style={{marginRight: "2px"}}>
                     <Message msgId="naturalfeatures.update" />
-                </Button>, exportBtn] : [cancel,
-                <Button key="save" bsSize="small"
+                </Button>]);
+        }else if (this.props.mode === 'ADD') {
+            return buttons.concat([<Button key="save" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                     disabled={false}>
                     <Message msgId="naturalfeatures.save" />
-                </Button>
-            ];
+                </Button>]);
         }
-        return [exportBtn];
+        return buttons.concat([<Button key="exportFt" bsSize="small"
+                    bsStyle="primary"
+                    onClick={this.exportFt}
+                    >
+                    <Glyphicon glyph="download" style={{fontSize: 18}}/>
+                </Button>]);
     },
     renderHistoric() {
         return (
@@ -514,14 +508,11 @@ const DockedNaturalFeatures = React.createClass({
     },
     handleChange(e) {
         if (e.target.value === '') {
-            this.props.currentFeature[e.target.name] = null;
+            this.props.onFeaturePropertyChange(e.target.name, null);
+            // this.props.currentFeature[e.target.name] = null;
         } else {
-            this.props.currentFeature[e.target.name] = e.target.value;
-        }
-        if (this.props.mode === 'EDIT') {
-            this.setState({selectedFeature: this.props.currentFeature});
-        } else if (this.props.mode === 'ADD') {
-            this.setState({selectedFeature: this.props.currentFeature});
+            this.props.onFeaturePropertyChange(e.target.name, e.target.value);
+            // this.props.currentFeature[e.target.name] = e.target.value;
         }
     },
     exportFt() {
