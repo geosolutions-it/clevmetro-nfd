@@ -121,10 +121,10 @@ function cancel() {
         type: CANCEL_EDITING
     };
 }
-function editFeature(properties) {
+function editFeature(feature) {
     return {
         type: EDIT_FEATURE,
-        properties
+        feature
     };
 }
 function addFeature(properties) {
@@ -217,20 +217,22 @@ function userNotAuthenticatedError(error) {
     };
 }
 
-function getFeatureInfo(properties, nfid, action) {
+function getFeatureInfo(properties, nfid) {
     return (dispatch) => {
         return Api.getFeatureInfo(properties.featuretype, nfid).then((resp) => {
             if (resp) {
                 let feature = normalizeInfo(resp);
                 dispatch(updateNaturalFeatureForm(feature));
-                dispatch(action);
                 dispatch(changeDrawingStatus("selectionGeomLoaded", "Marker", "dockednaturalfeatures", [], {properties: resp}));
+                dispatch(naturalFeaturesLoading(false));
             }
         }).catch((error) => {
             if (error.status === 401) {
-                return dispatch(userNotAuthenticatedError(error));
+                dispatch(userNotAuthenticatedError(error));
+            }else {
+                dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
             }
-            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            dispatch(naturalFeaturesLoading(false));
         });
     };
 }
@@ -250,18 +252,21 @@ function getSpecies(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid, action) {
+function naturalFeatureSelected(properties, nfid) {
     return (dispatch) => {
+        dispatch(naturalFeaturesLoading());
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"));
-                dispatch(getFeatureInfo(properties, nfid, action));
+                dispatch(getFeatureInfo(properties, nfid));
             }
         }).catch((error) => {
             if (error.status === 401) {
-                return dispatch(userNotAuthenticatedError(error));
+                dispatch(userNotAuthenticatedError(error));
+            }else {
+                dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
             }
-            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            dispatch(naturalFeaturesLoading(false));
         });
     };
 }
@@ -291,7 +296,10 @@ function naturalFeatureMarkerAdded(feature) {
     let newFeat = feature;
     let featuresubtype = newFeat.featuresubtype;
     return (dispatch) => {
+        dispatch({type: "CLEAN_FORM"});
+        dispatch(naturalFeaturesLoading(true));
         return Api.getFeatureSubtype(featuresubtype).then((response) => {
+            dispatch(naturalFeaturesLoading(false));
             if (response.forms && response.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(response.forms, response.featuretype, response.featuresubtype, "add"));
                 newFeat = assign(createEmptyFormValues(response.forms), newFeat);
@@ -299,9 +307,11 @@ function naturalFeatureMarkerAdded(feature) {
             }
         }).catch((error) => {
             if (error.status === 401) {
-                return dispatch(userNotAuthenticatedError(error));
+                dispatch(userNotAuthenticatedError(error));
+            }else {
+                dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
             }
-            return dispatch(naturalFeatureTypeError('Error from REST SERVICE: ' + error.message));
+            dispatch(naturalFeaturesLoading(false));
         });
     };
 }
@@ -334,14 +344,6 @@ function naturalFeatureGeomAdded(feature) {
     }
     return (dispatch) => {
         dispatch(naturalFeatureMarkerReplaced(newFeat.geom));
-    };
-}
-
-function updateNaturalFeatureLoading(id) {
-    return {
-        type: UPDATE_NATURAL_FEATURE,
-        status: "loading",
-        id
     };
 }
 
@@ -389,15 +391,18 @@ function addNaturalFeature(featuretype, featuresubtype, feature) {
 
 function updateNaturalFeature(featuretype, featuresubtype, properties) {
     return (dispatch) => {
-        dispatch(updateNaturalFeatureLoading(properties));
+        dispatch(naturalFeaturesLoading());
         return Api.updateNaturalFeature(featuretype, properties).then(() => {
             dispatch(updateNaturalFeatureSuccess(properties.id));
             dispatch(getNaturalFeatures(featuretype));
+            dispatch(naturalFeaturesLoading(false));
         }).catch((error) => {
             if (error.status === 401) {
-                return dispatch(userNotAuthenticatedError(error));
+                dispatch(userNotAuthenticatedError(error));
+            } else {
+                dispatch(updateNaturalFeatureError(properties.id, error));
             }
-            return dispatch(updateNaturalFeatureError(properties.id, error));
+            dispatch(naturalFeaturesLoading(false));
         });
     };
 }
@@ -483,17 +488,18 @@ function nfdLogout() {
 
 function getVersion(featureType, featId, version) {
     return (dispatch) => {
+        dispatch(naturalFeaturesLoading());
         return Api.getVersion(featureType, featId, version).then((feature) => {
+            dispatch(naturalFeaturesLoading(false));
             if (feature) {
-                // disptach(getVersionSuccess());
                 dispatch(updateNaturalFeatureForm(feature));
                 dispatch(changeDrawingStatus("selectionGeomLoaded", "MarkerReplace", "dockednaturalfeatures", [], {properties: feature}));
             }
         }).catch((error) => {
             if (error.status === 401) {
-                return dispatch(userNotAuthenticatedError(error));
+                dispatch(userNotAuthenticatedError(error));
             }
-            // return dispatch(getVersionError(featureType, featId, error));
+            dispatch(naturalFeaturesLoading(false));
         });
     };
 }

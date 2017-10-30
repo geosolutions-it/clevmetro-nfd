@@ -876,6 +876,7 @@
             "update": "Update",
             "save": "Save",
             "delete": "Delete",
+            "edit": "Edit",
             "draw_loc": "Draw the location on the map",
             "get_my_loc": "Get my location",
             "draw": "Draw",

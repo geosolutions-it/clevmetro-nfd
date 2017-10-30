@@ -60,7 +60,19 @@ const Api = {
     },
     getFeatureSubtype: function(featuresubtype) {
         let url = '/nfdapi/featuretypes/' + featuresubtype + '/';
-        return axios.get(url, getOptions()).then(function(response) {return response.data; });
+        const cached = dataCache[url];
+        if (cached && new Date().getTime() < cached.timestamp + (ConfigUtils.getConfigProp('cacheDataExpire') || 600) * 1000) {
+            return new Promise((resolve) => {
+                resolve(cached.data);
+            });
+        }
+        return axios.get(url, getOptions()).then(function(response) {
+            dataCache[url] = {
+                timestamp: new Date().getTime(),
+                data: response.data
+            };
+            return response.data;
+        });
     },
     getFeatureType: function(ftype, nfid) {
         let url = '/nfdapi/featuretypes/' + ftype + '/' + nfid + '/';

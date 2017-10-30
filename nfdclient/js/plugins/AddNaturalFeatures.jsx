@@ -32,7 +32,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     images: state.naturalfeatures && state.naturalfeatures.selectedFeature && state.naturalfeatures.selectedFeature.images || [],
-    isMobile: state.browser && state.browser.mobile
+    isMobile: state.browser && state.browser.mobile,
+    isLoading: !!(state.naturalfeatures && state.naturalfeatures.loading)
 }), {
     onToggle: toggleControl.bind(null, 'addnaturalfeatures', null),
     onUpdate: addNaturalFeature,

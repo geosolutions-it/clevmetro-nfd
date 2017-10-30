@@ -13,11 +13,12 @@ const {error} = require('../../MapStore2/web/client/actions/notifications');
 const {
     CREATE_NATURAL_FEATURE, NFD_LOGIN_SUCCESS, ADD_FEATURE,
     NATURAL_FEATURES_LOADED, LOAD_NATURAL_FEATURES, naturalFeaturesLoaded, naturalFeaturesLoading, naturalFeaturesError, naturalFeatureGeomAdded,
-    USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, editFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
-    IMAGE_ERROR
+    USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
+    IMAGE_ERROR,
+    CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR
 } = require('../actions/naturalfeatures');
 const {SELECT_FEATURE} = require('../actions/featuresearch');
-const {isWriter, isPublisher} = require('../plugins/naturalfeatures/securityutils.js');
+
 const {END_DRAWING, changeDrawingStatus} = require('../../MapStore2/web/client/actions/draw');
 const Utils = require('../utils/nfdUtils');
 
@@ -90,8 +91,7 @@ activeFeatureEdit: (action$, store) =>
             if (isEditing) {
                 return Rx.Observable.of(warning({title: "Warning", message: "End edit to select a different natural feature", autoDismiss: 2}));
             }
-            const modeAction = isPublisher(store.getState(), a.properties.featuretype) || isWriter(store.getState(), a.properties.featuretype) ? editFeature(a.properties) : viewFeature();
-            return Rx.Observable.from([naturalFeatureSelected(a.properties, a.nfId, modeAction), setControlProperty('features', 'enabled', false), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
+            return Rx.Observable.from([{type: "CLEAN_FORM"}, naturalFeatureSelected(a.properties, a.nfId), viewFeature(), setControlProperty('features', 'enabled', false), setControlProperty('vieweditnaturalfeatures', 'enabled', true)]);
         }),
 // Open the form edit panel if It's close and a user clikcs on the feature that is currently editing
 showEditPanel: (action$, store) =>
@@ -109,9 +109,9 @@ removeAddEditedFeature: (action$, store) =>
     action$.ofType(EDIT_FEATURE)
         .switchMap((a) => {
             const {flat: layers} = (store.getState()).layers;
-            const layer = layers.filter(l => l.id === a.properties.featuretype).pop();
+            const layer = layers.filter(l => l.id === a.feature.featuretype).pop();
             const features = layer.features || [];
-            const newFeatures = features.filter(f => f.id !== a.properties.id);
+            const newFeatures = features.filter(f => f.id !== a.feature.id);
             return action$.ofType(CANCEL_EDITING).
                     switchMap(() => Rx.Observable.of(changeLayerProperties(layer.id, {features}))
                         .takeUntil(action$.ofType(END_EDITING)))
@@ -132,6 +132,16 @@ addNaturalFeature: (action$) =>
                     return Rx.Observable.of(action);
                 })
                 .concat([naturalFeaturesLoading(false)]);
+    }),
+showSaveUpdateDeleteErrors: action$ =>
+    action$.ofType(CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR)
+    .switchMap( a => {
+        if (a.error.status >= 500) {
+            return Rx.Observable.of(error({title: 'Bad request', message: `Error: ${a.error.statusText}`}));
+        }
+        return Rx.Observable.from(Object.keys(a.error.data).map((k) => {
+            return error({uid: k, title: 'Bad request', message: `${k}: ${a.error.data[k]}`});
+        }));
     }),
 uploadImage: (action$) =>
     action$.ofType('ADD_IMAGE').filter(a => a.image).

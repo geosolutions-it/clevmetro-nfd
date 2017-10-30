@@ -40,7 +40,7 @@ module.exports = {
             case 'naturalarea':
                 return 'Natural area';
             default:
-                return 'Plant';
+                return '';
         }
     },
     getPrettyFeatureSubType(fst) {
@@ -64,7 +64,7 @@ module.exports = {
             case 'we':
                 return 'Wetland animal';
             default:
-                return 'Natural area';
+                return '';
         }
     },
     isWriter(user = {}, ft) {

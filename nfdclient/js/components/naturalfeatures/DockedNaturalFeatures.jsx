@@ -58,7 +58,9 @@ const DockedNaturalFeatures = React.createClass({
         removeImage: React.PropTypes.func,
         dockProps: React.PropTypes.object,
         exportFt: React.PropTypes.func,
-        onFeaturePropertyChange: React.PropTypes.func
+        onFeaturePropertyChange: React.PropTypes.func,
+        editFeature: React.PropTypes.func,
+        isEditable: React.PropTypes.bool
     },
     getDefaultProps() {
         return {
@@ -75,6 +77,7 @@ const DockedNaturalFeatures = React.createClass({
             dockSize: 0.35,
             addPointGlyph: "1-point-add",
             addPolygonGlyph: "1-polygon-add",
+            isEditable: false,
             setDockSize: () => {},
             onToggle: () => {},
             onSave: () => {},
@@ -86,7 +89,8 @@ const DockedNaturalFeatures = React.createClass({
             onChangeDrawingStatus: () => {},
             cancel: () => {},
             exportFt: () => {},
-            onFeaturePropertyChange: () => {}
+            onFeaturePropertyChange: () => {},
+            editFeature: () => {}
         };
     },
     getInitialState() {
@@ -108,33 +112,28 @@ const DockedNaturalFeatures = React.createClass({
             );
         });
     },
+    getLabel(item) {
+        return `${item.mandatory ? '* ' : ''}${item.label}`;
+    },
+    getValue(key, defaultValue = '') {
+        return !isEmpty(this.props.currentFeature) && this.props.currentFeature[key] || defaultValue;
+    },
     renderTabContent(tab, tabindex, tabContentHeigth) {
+        const isEditable = this.props.mode !== 'VIEW';
         let searchDiv;
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
             if (item.type === 'string') {
-                let value = "";
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                let readOnly = false;
-                if (item.readonly) {
-                    readOnly = true;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={value}
-                                readOnly={readOnly}
+                                value={this.getValue(item.key)}
+                                readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
                                 name={item.key}
@@ -144,57 +143,30 @@ const DockedNaturalFeatures = React.createClass({
                     </tr>
                 );
             } else if (item.type === 'stringcombo') {
-                let value = "";
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            {item.readonly ?
-                                (<select disabled style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" bsSize="small" value={value || ""}>
+                            <select disabled={!isEditable || !!item.readonly} style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={this.getValue(item.key)} onChange={this.handleChange}>
                                     <option value="">---</option>
                                     {this.getOptions(item.values)}
-                                </select>)
-                                :
-                                (<select style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={value || ""} onChange={this.handleChange}>
-                                    <option value="">---</option>
-                                    {this.getOptions(item.values)}
-                                </select>)
-                            }
+                            </select>
                         </td>
                     </tr>
                 );
             } else if (item.type === 'integer') {
-                let value = "";
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                let readOnly = false;
-                if (item.readonly) {
-                    readOnly = true;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={value}
-                                readOnly={readOnly}
+                                value={this.getValue(item.key)}
+                                readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
                                 name={item.key}
@@ -206,28 +178,16 @@ const DockedNaturalFeatures = React.createClass({
                     </tr>
                 );
             } else if (item.type === 'double') {
-                let value = "";
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                let readOnly = false;
-                if (item.readonly) {
-                    readOnly = true;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
                 return (
                     <tr style={{width: "100%"}} key={item.key + "-row"}>
                         <td style={{width: "40%"}}>
-                            <ControlLabel>{label}</ControlLabel>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={value}
-                                readOnly={readOnly}
+                                value={this.getValue(item.key)}
+                                readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
                                 name={item.key}
@@ -239,64 +199,27 @@ const DockedNaturalFeatures = React.createClass({
                     </tr>
                 );
             } else if (item.type === 'boolean') {
-                let value = false;
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
-                {
-                    let self = this;
-                    let handleBooleanChange = function(evt) {
-                        self.handleChange({target: {name: evt.target.name, value: evt.target.checked}});
-                    };
-                    return (
-                        <tr style={{width: "100%"}} key={item.key + "-row"}>
-                            <td style={{width: "40%"}}>
-                                <ControlLabel>{label}</ControlLabel>
-                            </td>
-                            <td style={{width: "60%"}}>
-                                {item.readonly ?
-                                    (<Checkbox name={item.key} checked={value} disabled/>)
-                                    :
-                                    (<Checkbox name={item.key} checked={value} onChange={handleBooleanChange}/>)
-                                }
-                            </td>
-                        </tr>
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            <Checkbox name={item.key} checked={this.getValue(item.key, false)} disabled={!isEditable || !!item.readonly} onChange={this.handleBooleanChange}/>
+                        </td>
+                    </tr>
                     );
-                }
             } else if (item.type === 'date') {
-                let value = null;
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
-                {
-                    let self = this;
-                    let handleDateChange = function(isoDate, formattedDate) {
-                        self.handleChange({target: {name: item.key, value: formattedDate}});
-                    };
-                    return (
-                        <tr style={{width: "100%"}} key={item.key + "-row"}>
-                            <td style={{width: "40%"}}>
-                                <ControlLabel>{label}</ControlLabel>
-                            </td>
-                            <td style={{width: "60%"}}>
-                                {item.readonly ?
-                                    (<DatePicker dateFormat="YYYY-MM-DD" disabled style={{height: "24px"}} value={value} />)
-                                    :
-                                    (<DatePicker dateFormat="YYYY-MM-DD" style={{height: "24px"}} value={value} onChange={handleDateChange} />)
-
-                                }
-                            </td>
-                        </tr>
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            <DatePicker dateFormat="YYYY-MM-DD" disabled={!isEditable || !!item.readonly} style={{height: "24px"}} value={this.getValue(item.key, null)} onChange={(iso, fdate) => this.handleDateChange(item.key, fdate)}/>
+                        </td>
+                    </tr>
                     );
-                }
             }
         });
 
@@ -364,13 +287,14 @@ const DockedNaturalFeatures = React.createClass({
                     <Message msgId="cancel" />
                 </Button>];
         if (this.props.mode === 'EDIT') {
-            buttons = buttons.concat([<Button key="delete" bsSize="small"
-                    bsStyle="primary"
-                    onClick={() => {this.setState({showConfirm: true}); }}
-                    style={{marginRight: "2px"}}
-                    disabled={false}>
+            return buttons.concat([<Button key="delete" bsSize="small"
+                bsStyle="primary"
+                onClick={() => {this.setState({showConfirm: true}); }}
+                style={{marginRight: "2px"}}
+                disabled={false}>
                     <Message msgId="naturalfeatures.delete" />
-                </Button>, <Button key="update" bsSize="small"
+                </Button>,
+                <Button key="update" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
                     disabled={false}
@@ -385,7 +309,13 @@ const DockedNaturalFeatures = React.createClass({
                     <Message msgId="naturalfeatures.save" />
                 </Button>]);
         }
-        return buttons.concat([<Button key="exportFt" bsSize="small"
+        return buttons.concat([<Button key="edit" bsSize="small"
+                    bsStyle="primary"
+                    disabled={!this.props.isEditable}
+                    onClick={this.handleEdit}
+                    style={{marginRight: "2px"}}>
+                        <Message msgId="naturalfeatures.edit" />
+                    </Button>, <Button key="exportFt" bsSize="small"
                     bsStyle="primary"
                     onClick={this.exportFt}
                     >
@@ -445,7 +375,8 @@ const DockedNaturalFeatures = React.createClass({
         return (<div className="ft-plugin-loading"><Spinner spinnerName="circle" noFadeIn overrideSpinnerClassName="spinner"/></div>);
     },
     renderHeader() {
-        let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
+        const subTitle = Utils.getPrettyFeatureSubType(this.props.featuresubtype);
+        const title = this.props.featuretype && `${Utils.getPrettyFeatureType(this.props.featuretype)}${subTitle.length > 0 ? `(${subTitle})` : ''}`;
         return (
             <div className="nfd-header">
             <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
@@ -465,9 +396,6 @@ const DockedNaturalFeatures = React.createClass({
                 <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
                         {this.renderTabs(tabContentHeigth)}
                 </Tabs>
-                <div className="nf-errors">
-                        {this.renderErrors()}
-                </div>
                 <div className="dock-panel-footer" style={{height: footerHeight}}>
                     {(mode === 'EDIT') ? this.renderHistoric() : null}
                     <div className="dock-panel-footer-buttons">
@@ -525,7 +453,17 @@ const DockedNaturalFeatures = React.createClass({
         return (<ConfirmDialog onConfirm={this.handleDelete} onClose={()=> {this.setState({showConfirm: false}); }} show={true} title={<Message msgId="naturalfeatures.deleteTitle" />} >
                     <Message msgId="naturalfeatures.deleteMsg"/>
                 </ConfirmDialog>);
+    },
+    handleEdit() {
+        return this.props.editFeature(this.props.currentFeature);
+    },
+    handleBooleanChange(e) {
+        this.props.onFeaturePropertyChange(e.target.name, e.target.checked);
+    },
+    handleDateChange(key, formattedDate) {
+        this.props.onFeaturePropertyChange(key, formattedDate);
     }
+
 });
 
 module.exports = DockedNaturalFeatures;

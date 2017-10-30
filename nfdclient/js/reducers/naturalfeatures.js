@@ -22,13 +22,17 @@ const {
     ADD_IMAGE,
     REMOVE_IMAGE,
     IMAGE_UPLOADED,
-    FEATURE_PROPERTY_CHANGE
+    FEATURE_PROPERTY_CHANGE,
+    NATURAL_FEATURES_LOADING
 } = require('../actions/naturalfeatures');
 
 function naturalfeatures(state = {}, action) {
     switch (action.type) {
+        case "CLEAN_FORM": {
+            return assign({}, state, {featuretype: undefined, featuresubtype: undefined, selectedFeature: {}, newFeature: {}, errors: {}, forms: [], images: []});
+        }
         case "LOGOUT": {
-            return assign({}, state, {featuretype: undefined, featuresubtype: undefined, selectedFeature: {}, newFeature: {}, error: {}, mode: undefined});
+            return assign({}, state, {featuretype: undefined, featuresubtype: undefined, selectedFeature: {}, newFeature: {}, errors: {}, mode: undefined, loading: false, forms: [], images: []});
         }
         case NATURAL_FEATURE_TYPE_LOADED: {
             return assign({}, state, {
@@ -102,6 +106,9 @@ function naturalfeatures(state = {}, action) {
             const images = state.selectedFeature.images.filter((a, idx) => idx !== action.idx);
             const selectedFeature = assign({}, state.selectedFeature, {images});
             return assign({}, state, {selectedFeature});
+        }
+        case NATURAL_FEATURES_LOADING: {
+            return assign({}, state, {loading: action.loading});
         }
         default:
             return state;

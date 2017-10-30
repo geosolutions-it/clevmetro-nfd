@@ -9,10 +9,10 @@ const React = require('react');
 const {connect} = require('react-redux');
 const PropTypes = require('prop-types');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
-const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion, cancel, imageError, addImage, removeImage, onFeaturePropertyChange} = require('../actions/naturalfeatures');
+const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion, cancel, imageError, addImage, removeImage, onFeaturePropertyChange, editFeature} = require('../actions/naturalfeatures');
 const {onToggleExport} = require('../actions/exportfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
-
+const {isPublisher, isWriter} = require('./naturalfeatures/securityutils');
 
 const DockedNaturalFeatures = require('../components/naturalfeatures/DockedNaturalFeatures');
 const SmartDockedNaturalFeatures = connect((state) => ({
@@ -27,7 +27,9 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     dockSize: state.naturalfeatures.dockSize,
     mode: state.naturalfeatures.mode,
     images: state.naturalfeatures && state.naturalfeatures.selectedFeature && state.naturalfeatures.selectedFeature.images || [],
-    isMobile: state.browser && state.browser.mobile
+    isMobile: state.browser && state.browser.mobile,
+    isEditable: isPublisher(state) || isWriter(state),
+    isLoading: !!(state.naturalfeatures && state.naturalfeatures.loading)
 }), {
     onToggle: toggleControl.bind(null, 'vieweditnaturalfeatures', null),
     onUpdate: updateNaturalFeature.bind(null),
@@ -42,7 +44,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     addImage: addImage,
     removeImage: removeImage,
     exportFt: onToggleExport,
-    onFeaturePropertyChange
+    onFeaturePropertyChange,
+    editFeature
 })(DockedNaturalFeatures);
 
 class ViewEditNaturalFeatures extends React.Component {
