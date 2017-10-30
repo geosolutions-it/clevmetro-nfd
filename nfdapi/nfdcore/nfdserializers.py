@@ -37,6 +37,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
 from django.template.context_processors import request
 from django.contrib.gis.geos import Point, Polygon
+import six
 
 def _(message): return message
 
@@ -817,8 +818,6 @@ class UpdateOccurrenceMixin(object):
                         species_id = validated_data['species']['id']
                         selected_species = Species.objects.get(pk=species_id)
                         instance.species = selected_species
-                        self._update_form('species', Species, validated_data, instance)
-                        self._update_form('species.element_species', ElementSpecies, validated_data, selected_species)
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
@@ -862,9 +861,13 @@ class ElementSpeciesSerializer(CustomModelSerializerMixin,ModelSerializer):
     class Meta:
         model = ElementSpecies
         exclude = ('id',)
-        
+        read_only_fields = ("native", "oh_status", "usfws_status", "iucn_red_list_category", \
+                            "other_code", "ibp_english", "ibp_scientific", "bblab_number", "nrcs_usda_symbol", \
+                            "synonym_nrcs_usda_symbol", "epa_numeric_code", "mushroom_group", \
+                            "cm_status", "s_rank", "n_rank", "g_rank")
+
 class SpeciesSerializer(CustomModelSerializerMixin,ModelSerializer):
-    element_species = ElementSpeciesSerializer(required=False)
+    element_species = ElementSpeciesSerializer(required=False, read_only=True)
     
     def to_internal_value(self, data):
         result = super(SpeciesSerializer, self).to_internal_value(data)
@@ -876,6 +879,7 @@ class SpeciesSerializer(CustomModelSerializerMixin,ModelSerializer):
     class Meta:
         model = Species
         fields = "__all__"
+        read_only_fields = ("first_common", "name_sci", "tsn", "synonym", "second_common", "third_common", "family", "family_common", "phylum", "phylum_common")
 
 class PointOfContactSerializer(CustomModelSerializerMixin, ModelSerializer):
         
@@ -1372,7 +1376,11 @@ class FeatureTypeSerializer():
             form_name = formdef[0]
             form['formlabel'] = _(form_name)
             form['formname'] = form_name
-            if form_name != MANAGEMENT_FORM_NAME:
+            if 'species' == form_name:
+                form['formitems'] = self.get_form_featuretype(form_name, formdef[1], SpeciesSerializer())
+            elif 'species.element_species' == form_name:
+                form['formitems'] = self.get_form_featuretype(form_name, formdef[1], ElementSpeciesSerializer())
+            elif form_name != MANAGEMENT_FORM_NAME:
                 form['formitems'] = self.get_form_featuretype(form_name, formdef[1])
             else:
                 if self.is_publisher:
@@ -1383,8 +1391,9 @@ class FeatureTypeSerializer():
         result['forms'] = forms
         return result
 
-    def get_form_featuretype(self, form_name, model):
+    def get_form_featuretype(self, form_name, model, model_serializer=None):
         fields = model._meta.get_fields()
+        model_fields = model_serializer.get_fields() if model_serializer else {}
         result = []
         for f in fields:
             fdef = {}
@@ -1424,14 +1433,18 @@ class FeatureTypeSerializer():
                     pass
                 
             if 'type' in fdef:
-                fdef['mandatory'] = (not getattr(f, "null", True) and not getattr(f, "blank", True))
+                mfield = model_fields.get(f.name)
+                if mfield:
+                    fdef['readonly'] = getattr(mfield, "read_only", False)
+                    fdef['mandatory'] = (not getattr(mfield, "allo_null", True) and not getattr(mfield, "allow_blank", True))
+                else:
+                    fdef['mandatory'] = (not getattr(f, "null", True) and not getattr(f, "blank", True))
                 if not (self.is_writer or self.is_publisher):
                     fdef['readonly'] = True
                 fdef['key'] = form_name + "." + f.name
                 fdef['label'] = _(f.name)
                 result.append(fdef)
         return result
-
 
 class OccurrenceVersionSerializer():
     def is_related_field(self, f):
