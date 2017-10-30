@@ -115,6 +115,9 @@ const DockedNaturalFeatures = React.createClass({
     getLabel(item) {
         return `${item.mandatory ? '* ' : ''}${item.label}`;
     },
+    getValue(key, defaultValue = '') {
+        return !isEmpty(this.props.currentFeature) && this.props.currentFeature[key] || defaultValue;
+    },
     renderTabContent(tab, tabindex, tabContentHeigth) {
         const isEditable = this.props.mode !== 'VIEW';
         let searchDiv;
@@ -129,7 +132,7 @@ const DockedNaturalFeatures = React.createClass({
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key] || ''}
+                                value={this.getValue(item.key)}
                                 readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
@@ -146,7 +149,7 @@ const DockedNaturalFeatures = React.createClass({
                             <ControlLabel>{this.getLabel(item)}</ControlLabel>
                         </td>
                         <td style={{width: "60%"}}>
-                            <select disabled={!isEditable || !!item.readonly} style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key] || ""} onChange={this.handleChange}>
+                            <select disabled={!isEditable || !!item.readonly} style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={this.getValue(item.key)} onChange={this.handleChange}>
                                     <option value="">---</option>
                                     {this.getOptions(item.values)}
                             </select>
@@ -162,7 +165,7 @@ const DockedNaturalFeatures = React.createClass({
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]}
+                                value={this.getValue(item.key)}
                                 readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
@@ -183,7 +186,7 @@ const DockedNaturalFeatures = React.createClass({
                         <td style={{width: "60%"}}>
                             <FormControl
                                 style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]}
+                                value={this.getValue(item.key)}
                                 readOnly={!isEditable || !!item.readonly}
                                 onChange={this.handleChange}
                                 key={item.key}
@@ -196,55 +199,27 @@ const DockedNaturalFeatures = React.createClass({
                     </tr>
                 );
             } else if (item.type === 'boolean') {
-                let value = false;
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
-                {
-                    let self = this;
-                    let handleBooleanChange = function(evt) {
-                        self.handleChange({target: {name: evt.target.name, value: evt.target.checked}});
-                    };
-                    return (
-                        <tr style={{width: "100%"}} key={item.key + "-row"}>
-                            <td style={{width: "40%"}}>
-                                <ControlLabel>{label}</ControlLabel>
-                            </td>
-                            <td style={{width: "60%"}}>
-                                <Checkbox name={item.key} checked={value} disabled={!isEditable || !!item.readonly} onChange={handleBooleanChange}/>
-                            </td>
-                        </tr>
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            <Checkbox name={item.key} checked={this.getValue(item.key, false)} disabled={!isEditable || !!item.readonly} onChange={this.handleBooleanChange}/>
+                        </td>
+                    </tr>
                     );
-                }
             } else if (item.type === 'date') {
-                let value = null;
-                let label = item.label;
-                if (item.mandatory) {
-                    label = '* ' + item.label;
-                }
-                if (!isEmpty(this.props.currentFeature) && this.props.currentFeature[item.key]) {
-                    value = this.props.currentFeature[item.key];
-                }
-                {
-                    let self = this;
-                    let handleDateChange = function(isoDate, formattedDate) {
-                        self.handleChange({target: {name: item.key, value: formattedDate}});
-                    };
-                    return (
-                        <tr style={{width: "100%"}} key={item.key + "-row"}>
-                            <td style={{width: "40%"}}>
-                                <ControlLabel>{label}</ControlLabel>
-                            </td>
-                            <td style={{width: "60%"}}>
-                                <DatePicker dateFormat="YYYY-MM-DD" disabled={!isEditable || !!item.readonly} style={{height: "24px"}} value={value} onChange={handleDateChange}/>
-                            </td>
-                        </tr>
+                return (
+                    <tr style={{width: "100%"}} key={item.key + "-row"}>
+                        <td style={{width: "40%"}}>
+                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
+                        </td>
+                        <td style={{width: "60%"}}>
+                            <DatePicker dateFormat="YYYY-MM-DD" disabled={!isEditable || !!item.readonly} style={{height: "24px"}} value={this.getValue(item.key, null)} onChange={(iso, fdate) => this.handleDateChange(item.key, fdate)}/>
+                        </td>
+                    </tr>
                     );
-                }
             }
         });
 
@@ -400,7 +375,8 @@ const DockedNaturalFeatures = React.createClass({
         return (<div className="ft-plugin-loading"><Spinner spinnerName="circle" noFadeIn overrideSpinnerClassName="spinner"/></div>);
     },
     renderHeader() {
-        let title = Utils.getPrettyFeatureType(this.props.featuretype) + ` (${Utils.getPrettyFeatureSubType(this.props.featuresubtype)})`;
+        const subTitle = Utils.getPrettyFeatureSubType(this.props.featuresubtype);
+        const title = this.props.featuretype && `${Utils.getPrettyFeatureType(this.props.featuretype)}${subTitle.length > 0 ? `(${subTitle})` : ''}`;
         return (
             <div className="nfd-header">
             <Glyphicon glyph="1-close" className="no-border btn-default" onClick={this.onClose} style={{cursor: "pointer"}}/>
@@ -420,9 +396,6 @@ const DockedNaturalFeatures = React.createClass({
                 <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
                         {this.renderTabs(tabContentHeigth)}
                 </Tabs>
-                <div className="nf-errors">
-                        {this.renderErrors()}
-                </div>
                 <div className="dock-panel-footer" style={{height: footerHeight}}>
                     {(mode === 'EDIT') ? this.renderHistoric() : null}
                     <div className="dock-panel-footer-buttons">
@@ -483,6 +456,12 @@ const DockedNaturalFeatures = React.createClass({
     },
     handleEdit() {
         return this.props.editFeature(this.props.currentFeature);
+    },
+    handleBooleanChange(e) {
+        this.props.onFeaturePropertyChange(e.target.name, e.target.checked);
+    },
+    handleDateChange(key, formattedDate) {
+        this.props.onFeaturePropertyChange(key, formattedDate);
     }
 
 });
