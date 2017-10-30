@@ -28,7 +28,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     mode: state.naturalfeatures.mode,
     images: state.naturalfeatures && state.naturalfeatures.selectedFeature && state.naturalfeatures.selectedFeature.images || [],
     isMobile: state.browser && state.browser.mobile,
-    isEditable: isPublisher(state) || isWriter(state)
+    isEditable: isPublisher(state) || isWriter(state),
+    isLoading: !!(state.naturalfeatures && state.naturalfeatures.loading)
 }), {
     onToggle: toggleControl.bind(null, 'vieweditnaturalfeatures', null),
     onUpdate: updateNaturalFeature.bind(null),
