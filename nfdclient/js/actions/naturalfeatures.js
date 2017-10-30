@@ -121,10 +121,10 @@ function cancel() {
         type: CANCEL_EDITING
     };
 }
-function editFeature(properties) {
+function editFeature(feature) {
     return {
         type: EDIT_FEATURE,
-        properties
+        feature
     };
 }
 function addFeature(properties) {
@@ -217,13 +217,12 @@ function userNotAuthenticatedError(error) {
     };
 }
 
-function getFeatureInfo(properties, nfid, action) {
+function getFeatureInfo(properties, nfid) {
     return (dispatch) => {
         return Api.getFeatureInfo(properties.featuretype, nfid).then((resp) => {
             if (resp) {
                 let feature = normalizeInfo(resp);
                 dispatch(updateNaturalFeatureForm(feature));
-                dispatch(action);
                 dispatch(changeDrawingStatus("selectionGeomLoaded", "Marker", "dockednaturalfeatures", [], {properties: resp}));
             }
         }).catch((error) => {
@@ -250,12 +249,12 @@ function getSpecies(id) {
     };
 }
 
-function naturalFeatureSelected(properties, nfid, action) {
+function naturalFeatureSelected(properties, nfid) {
     return (dispatch) => {
         return Api.getFeatureSubtype(properties.featuresubtype).then((resp) => {
             if (resp.forms && resp.forms[0]) {
                 dispatch(naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"));
-                dispatch(getFeatureInfo(properties, nfid, action));
+                dispatch(getFeatureInfo(properties, nfid));
             }
         }).catch((error) => {
             if (error.status === 401) {
