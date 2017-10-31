@@ -8,11 +8,10 @@
 const React = require('react');
 const Dock = require('react-dock');
 const Spinner = require('react-spinkit');
-const {Glyphicon, Tabs, Tab, FormControl, ControlLabel, Table, Button, Checkbox} = require('react-bootstrap');
-const DatePicker = require("react-bootstrap-date-picker");
+const {Glyphicon, Tabs, Tab, Form, Button} = require('react-bootstrap');
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
-
+const Fields = require('./Fields');
 const ConfirmDialog = require('../../../MapStore2/web/client/components/misc/ConfirmDialog');
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
@@ -105,127 +104,33 @@ const DockedNaturalFeatures = React.createClass({
     onAddPolygonClick: function() {
         this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
     },
-    getOptions(values) {
-        return values.items.map((item, index) => {
-            return (
-                <option style={{fontSize: "12px"}} value={item.key} key={index}>{item.value}</option>
-            );
-        });
-    },
     getLabel(item) {
         return `${item.mandatory ? '* ' : ''}${item.label}`;
     },
     getValue(key, defaultValue = '') {
         return !isEmpty(this.props.currentFeature) && this.props.currentFeature[key] || defaultValue;
     },
-    renderTabContent(tab, tabindex, tabContentHeigth) {
-        const isEditable = this.props.mode !== 'VIEW';
+    renderTabContent(tab, tabindex, tabContentHeigth, horizontalForm) {
+        const {mode, currentFeature} = this.props;
+        const isEditable = mode !== 'VIEW';
         let searchDiv;
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
-            if (item.type === 'string') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <FormControl
-                                style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={this.getValue(item.key)}
-                                readOnly={!isEditable || !!item.readonly}
-                                onChange={this.handleChange}
-                                key={item.key}
-                                name={item.key}
-                                componentClass="input"
-                                type="text"/>
-                        </td>
-                    </tr>
-                );
-            } else if (item.type === 'stringcombo') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <select disabled={!isEditable || !!item.readonly} style={{height: "24px", fontSize: "12px"}} name={item.key} className="form-control" value={this.getValue(item.key)} onChange={this.handleChange}>
-                                    <option value="">---</option>
-                                    {this.getOptions(item.values)}
-                            </select>
-                        </td>
-                    </tr>
-                );
-            } else if (item.type === 'integer') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <FormControl
-                                style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={this.getValue(item.key)}
-                                readOnly={!isEditable || !!item.readonly}
-                                onChange={this.handleChange}
-                                key={item.key}
-                                name={item.key}
-                                componentClass="input"
-                                min="0"
-                                step="1"
-                                type="number"/>
-                        </td>
-                    </tr>
-                );
-            } else if (item.type === 'double') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <FormControl
-                                style={{width: "100%", height: "24px", fontSize: "12px"}}
-                                value={this.getValue(item.key)}
-                                readOnly={!isEditable || !!item.readonly}
-                                onChange={this.handleChange}
-                                key={item.key}
-                                name={item.key}
-                                componentClass="input"
-                                min="0"
-                                step="any"
-                                type="number"/>
-                        </td>
-                    </tr>
-                );
-            } else if (item.type === 'boolean') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <Checkbox name={item.key} checked={this.getValue(item.key, false)} disabled={!isEditable || !!item.readonly} onChange={this.handleBooleanChange}/>
-                        </td>
-                    </tr>
-                    );
-            } else if (item.type === 'date') {
-                return (
-                    <tr style={{width: "100%"}} key={item.key + "-row"}>
-                        <td style={{width: "40%"}}>
-                            <ControlLabel>{this.getLabel(item)}</ControlLabel>
-                        </td>
-                        <td style={{width: "60%"}}>
-                            <DatePicker dateFormat="YYYY-MM-DD" disabled={!isEditable || !!item.readonly} style={{height: "24px"}} value={this.getValue(item.key, null)} onChange={(iso, fdate) => this.handleDateChange(item.key, fdate)}/>
-                        </td>
-                    </tr>
-                    );
-            }
+            const Field = Fields[`_${item.type}`];
+            return Field ?
+                (<Field
+                    item={item}
+                    editable={isEditable}
+                    horizontal={horizontalForm}
+                    feature={currentFeature}
+                    onChange={this.props.onFeaturePropertyChange}
+                    />) : null;
         });
 
         searchDiv = tabindex <= 2 && this.props.mode !== 'VIEW' && this.props.featuresubtype !== 'na';
         return (
             <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>
+            <div className="form-title">{tabName}</div>
                 {searchDiv ?
                     (<AsyncTypeahead
                         {...this.state}
@@ -237,19 +142,15 @@ const DockedNaturalFeatures = React.createClass({
                         renderMenuItemChildren={this._renderMenuItemChildren}
                         selected={this.props.selectedSpecie}
                         onChange={this._handleSpeciesChange}
-                    />)
-                    :
-                    (<div></div>)
-                }
-                <Table style={{width: "100%", marginTop: "10px"}} responsive striped condensed bordered>
-                    <caption style={{display: "table-caption", textAlign: "center", backgroundColor: "#ccc", color: "#ffffff"}}>{tabName}</caption>
-                    <tbody style={{width: "100%"}}>{items}</tbody>
-                </Table>
+                    />) : null}
+                <Form horizontal={horizontalForm}>
+                {items}
                 {(tab.formname === 'location') ? this.renderDrawTools() : null}
+                </Form>
             </div>
         );
     },
-    renderTabs(tabContentHeigth) {
+    renderTabs(tabContentHeigth, horizontalForm) {
         let tabs = [];
         this.props.forms.map((tab, index) => {
             let i = index + 1;
@@ -257,7 +158,7 @@ const DockedNaturalFeatures = React.createClass({
             let tabIcon = Utils.getFormIcon(tab.formname);
             tabs.push(
                 <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    {this.renderTabContent(tab, i, tabContentHeigth)}
+                    {this.renderTabContent(tab, i, tabContentHeigth, horizontalForm)}
                 </Tab>
             );
         });
@@ -387,6 +288,7 @@ const DockedNaturalFeatures = React.createClass({
     render() {
         const {forms = [], width, height, dockSize, mode, dockProps, isVisible} = this.props;
         const tabRows = Math.ceil((forms.length + 1) / Math.floor((width * dockSize) / 58));
+        const horizontalForm = (width * dockSize) > 400;
         const footerHeight = (mode === 'EDIT') ? 70 : 41;
         const tabContentHeigth = height - 40 - footerHeight - (45 * tabRows) + 1;
         return (
@@ -394,7 +296,7 @@ const DockedNaturalFeatures = React.createClass({
                 isVisible={isVisible}>
                 {this.renderHeader()}
                 <Tabs defaultActiveKey={1} id="naturalfeature-tabs" ref={(tabs) => { this.tabs = tabs; }}>
-                        {this.renderTabs(tabContentHeigth)}
+                        {this.renderTabs(tabContentHeigth, horizontalForm)}
                 </Tabs>
                 <div className="dock-panel-footer" style={{height: footerHeight}}>
                     {(mode === 'EDIT') ? this.renderHistoric() : null}
@@ -425,24 +327,6 @@ const DockedNaturalFeatures = React.createClass({
         Api.searchSpecies(query)
             .then(json => this.setState({options: json}));
     },
-    handleVisibility(index, label) {
-        if (this.props.mode === 'ADD') {
-            if (label.target.className === "glyphicon glyphicon-camera") {
-                document.getElementById("nfdraw-tools").style.display = "none";
-            } else {
-                document.getElementById("nfdraw-tools").style.display = "block";
-            }
-        }
-    },
-    handleChange(e) {
-        if (e.target.value === '') {
-            this.props.onFeaturePropertyChange(e.target.name, null);
-            // this.props.currentFeature[e.target.name] = null;
-        } else {
-            this.props.onFeaturePropertyChange(e.target.name, e.target.value);
-            // this.props.currentFeature[e.target.name] = e.target.value;
-        }
-    },
     exportFt() {
         this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id);
     },
@@ -456,14 +340,7 @@ const DockedNaturalFeatures = React.createClass({
     },
     handleEdit() {
         return this.props.editFeature(this.props.currentFeature);
-    },
-    handleBooleanChange(e) {
-        this.props.onFeaturePropertyChange(e.target.name, e.target.checked);
-    },
-    handleDateChange(key, formattedDate) {
-        this.props.onFeaturePropertyChange(key, formattedDate);
     }
-
 });
 
 module.exports = DockedNaturalFeatures;
