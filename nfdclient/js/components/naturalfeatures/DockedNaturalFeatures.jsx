@@ -119,11 +119,13 @@ const DockedNaturalFeatures = React.createClass({
             const Field = Fields[`_${item.type}`];
             return Field ?
                 (<Field
+                    key={item.key}
                     item={item}
                     editable={isEditable}
                     horizontal={horizontalForm}
                     feature={currentFeature}
                     onChange={this.props.onFeaturePropertyChange}
+                    isMobile={this.props.isMobile}
                     />) : null;
         });
 

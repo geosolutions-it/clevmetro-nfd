@@ -16,11 +16,13 @@ class BooleanField extends React.Component {
         feature: PropTypes.object,
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
+        isMobile: PropTypes.bool,
         onChange: PropTypes.func
     }
     static defaultProps = {
       editable: false,
       horizontal: false,
+      isMobile: false,
       feature: {},
       onChange: () => {}
     }
