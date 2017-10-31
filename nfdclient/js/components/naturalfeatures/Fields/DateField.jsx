@@ -30,13 +30,13 @@ class DateField extends React.Component {
     componentDidMount() {
         const el = document.getElementById(`datepicker.${this.props.item.key}`);
         if (this.props.isMobile && el) {
-            el.setAttribute('readonly');
+            el.setAttribute('readonly', true);
         }
     }
     componentDidUpdate() {
         const el = document.getElementById(`datepicker.${this.props.item.key}`);
         if (this.props.isMobile && el) {
-            el.setAttribute('readonly');
+            el.setAttribute('readonly', true);
         }
     }
     renderVertical = () => {
