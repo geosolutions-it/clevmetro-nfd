@@ -1,3 +1,11 @@
+.form-title {
+    width: 100%;
+    text-align: center;
+    background-color: rgb(204, 204, 204);
+    color: rgb(255, 255, 255);
+    margin: 2px 0px;
+    font-size: 20px;
+}
 .nfdraw-tools-title {
     font-weight: 600;
 }
@@ -56,13 +64,33 @@
     margin-left: 10px;
     margin-right: 10px;
 }
-
-
-
+.nf-tab-content form{
+margin-top: 10px;
+background-color: rgba(204, 204, 204, 0.18);
+padding: 2px;
+}
+.nf-tab-content .form-control{
+    height: 28px;
+    font-size: 14px;
+}
+.nf-tab-content .form-control[disabled], .nf-tab-content .form-control[readonly], .nf-tab-content fieldset[disabled] .form-control{
+    opacity: 0.5;
+}
+.nf-tab-content label.readonly{
+    opacity: 0.7;
+}
+.nf-tab-content .radio label, .nf-tab-content .checkbox label {
+    font-weight: bold;
+    padding-left: 10px;
+}
+.label-col {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /* tablets and desktop */
 @media only screen and (min-width: 768px) {
     .nf-tab-content {
-        padding: 0px 10px;
+        padding: 2px 10px;
     }
 }
 
