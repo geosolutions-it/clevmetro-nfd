@@ -9,22 +9,18 @@ const React = require('react');
 const Dock = require('react-dock');
 const Spinner = require('react-spinkit');
 const {Glyphicon, Tabs, Tab, Form, Button} = require('react-bootstrap');
-
+const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
+const AsyncTypeahead = asyncContainer(Typeahead);
+const Fields = require('./Fields');
 const ConfirmDialog = require('../../../MapStore2/web/client/components/misc/ConfirmDialog');
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
-
-const Fields = require('./Fields');
-const SpeciesSelector = require('./SpeciesSelector');
+const {isEmpty} = require('lodash');
 const NfdImage = require('./NfdImage');
-
+require('react-selectize/themes/index.css');
+require('./DockedNaturalFeatures.css');
 const Utils = require("../../utils/nfdUtils");
 const Api = require('../../api/naturalfeaturesdata');
-
-const {isEmpty} = require('lodash');
-
-require('./DockedNaturalFeatures.css');
-
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
@@ -138,10 +134,15 @@ const DockedNaturalFeatures = React.createClass({
             <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>
             <div className="form-title">{tabName}</div>
                 {searchDiv ?
-                    (<SpeciesSelector
-                        options={this.state.options}
+                    (<AsyncTypeahead
+                        {...this.state}
+                        labelKey="name"
+                        bsSize="small"
+                        maxResults={20}
                         onSearch={this._handleSearch}
-                        selectedSpecies={this.props.selectedSpecie}
+                        placeholder="Search for a specie..."
+                        renderMenuItemChildren={this._renderMenuItemChildren}
+                        selected={this.props.selectedSpecie}
                         onChange={this._handleSpeciesChange}
                     />) : null}
                 <Form horizontal={horizontalForm}>

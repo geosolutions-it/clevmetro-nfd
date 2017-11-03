@@ -77,10 +77,10 @@ class FeaturesSearchPanel extends React.Component {
         });
     }
     render() {
-        const {activeFt, dockProps, active, dockSize, toggleFeatureType: tfTt} = this.props;
+        const {activeFt, dockProps, active, height, dockSize, toggleFeatureType: tfTt} = this.props;
         return active ? (<Dock {...dockProps} isVisible={active} size={dockSize}>
             {this.renderHeader()}
-            <div className="lists-container">
+            <div style={{height: height - 40}} className="lists-container">
                 <Tabs id="featuretypes-tab" activeKey={activeFt} onSelect={tfTt}>
                 {this.renderTabs()}
                 </Tabs>
