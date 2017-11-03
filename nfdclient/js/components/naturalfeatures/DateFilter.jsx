@@ -34,11 +34,12 @@ class DateFilter extends React.Component {
                         <div className="col-xs-5" style={{paddingLeft: 0}} >
                         <label>Operator</label>
                         <ComboField
-                                fieldOptions= {operatorOptions}
-                                fieldName="operator"
-                                fieldRowId={rowId}
-                                fieldValue={operator}
-                                onUpdateField={this.update}/>
+                            placeholder=""
+                            fieldOptions= {operatorOptions}
+                            fieldName="operator"
+                            fieldRowId={rowId}
+                            fieldValue={operator}
+                            onUpdateField={this.update}/>
                         </div>
                     </div>
                     <div className="row">

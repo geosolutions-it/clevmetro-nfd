@@ -6,10 +6,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 const React = require('react');
-
+const isMobile = require('ismobilejs');
 const Moment = require('moment');
 const momentLocalizer = require('react-widgets/lib/localizers/moment');
-
+var ReactDOM = require('react-dom');
 momentLocalizer(Moment);
 
 const {DateTimePicker} = require('react-widgets');
@@ -44,6 +44,40 @@ const DateField = React.createClass({
             onUpdateExceptionField: () => {}
         };
     },
+    componentDidMount() {
+        if (isMobile.any) {
+            this.setInputOnMobile(this.start);
+            this.setInputOnMobile(this.end);
+            this.setInputOnMobile(this.date);
+        }
+    },
+    componentDidUpdate() {
+        if (isMobile.any) {
+            this.setInputOnMobile(this.start);
+            this.setInputOnMobile(this.end);
+            this.setInputOnMobile(this.date);
+        }
+    },
+    componentWillUnmount() {
+        this.end = null;
+        this.start = null;
+        this.date = null;
+    },
+    startRef(el) {
+        if (el) {
+            this.start = el;
+        }
+    },
+    endRef(el) {
+        if (el) {
+            this.end = el;
+        }
+    },
+    dateRef(el) {
+        if (el) {
+            this.date = el;
+        }
+    },
     render() {
         let dateRow = this.props.operator === "><" ? (
                 <div>
@@ -51,6 +85,8 @@ const DateField = React.createClass({
                         <Col xs={12}>
                         <label>Start Date</label>
                             <DateTimePicker
+                                ref={this.startRef}
+                                inputProps={{readonly: isMobile.any}}
                                 value={this.props.fieldValue ? this.props.fieldValue.startDate : null}
                                 time={this.props.timeEnabled}
                                 format={this.props.dateFormat}
@@ -61,6 +97,7 @@ const DateField = React.createClass({
                         <Col xs={12}>
                         <label>End Date</label>
                             <DateTimePicker
+                                ref={this.endRef}
                                 value={this.props.fieldValue ? this.props.fieldValue.endDate : null}
                                 time={this.props.timeEnabled}
                                 format={this.props.dateFormat}
@@ -73,6 +110,7 @@ const DateField = React.createClass({
                     <Col xs={12}>
                     <label>Date</label>
                         <DateTimePicker
+                            ref={this.dateRef}
                             value={this.props.fieldValue ? this.props.fieldValue.startDate : null}
                             time={this.props.timeEnabled}
                             format={this.props.dateFormat}
@@ -93,6 +131,15 @@ const DateField = React.createClass({
         }
 
         this.props.onUpdateField(this.props.fieldRowId, this.props.fieldName, value, this.props.attType);
+    },
+    setInputOnMobile(r) {
+        if (isMobile.any && r && r.refs && r.refs.inner && r.refs.inner.refs && r.refs.inner.refs.valueInput) {
+            let el = ReactDOM.findDOMNode(r.refs.inner.refs.valueInput);
+            if (el) {
+                el.setAttribute('readonly', true);
+                el = null;
+            }
+        }
     }
 });
 
