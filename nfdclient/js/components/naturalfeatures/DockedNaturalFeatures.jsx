@@ -9,18 +9,22 @@ const React = require('react');
 const Dock = require('react-dock');
 const Spinner = require('react-spinkit');
 const {Glyphicon, Tabs, Tab, Form, Button} = require('react-bootstrap');
-const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
-const AsyncTypeahead = asyncContainer(Typeahead);
-const Fields = require('./Fields');
+
 const ConfirmDialog = require('../../../MapStore2/web/client/components/misc/ConfirmDialog');
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const ToggleButton = require('../../../MapStore2/web/client/components/buttons/ToggleButton');
-const {isEmpty} = require('lodash');
+
+const Fields = require('./Fields');
+const SpeciesSelector = require('./SpeciesSelector');
 const NfdImage = require('./NfdImage');
-require('react-selectize/themes/index.css');
-require('./DockedNaturalFeatures.css');
+
 const Utils = require("../../utils/nfdUtils");
 const Api = require('../../api/naturalfeaturesdata');
+
+const {isEmpty} = require('lodash');
+
+require('./DockedNaturalFeatures.css');
+
 
 const DockedNaturalFeatures = React.createClass({
     propTypes: {
@@ -119,11 +123,13 @@ const DockedNaturalFeatures = React.createClass({
             const Field = Fields[`_${item.type}`];
             return Field ?
                 (<Field
+                    key={item.key}
                     item={item}
                     editable={isEditable}
                     horizontal={horizontalForm}
                     feature={currentFeature}
                     onChange={this.props.onFeaturePropertyChange}
+                    isMobile={this.props.isMobile}
                     />) : null;
         });
 
@@ -132,15 +138,10 @@ const DockedNaturalFeatures = React.createClass({
             <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>
             <div className="form-title">{tabName}</div>
                 {searchDiv ?
-                    (<AsyncTypeahead
-                        {...this.state}
-                        labelKey="name"
-                        bsSize="small"
-                        maxResults={20}
+                    (<SpeciesSelector
+                        options={this.state.options}
                         onSearch={this._handleSearch}
-                        placeholder="Search for a specie..."
-                        renderMenuItemChildren={this._renderMenuItemChildren}
-                        selected={this.props.selectedSpecie}
+                        selectedSpecies={this.props.selectedSpecie}
                         onChange={this._handleSpeciesChange}
                     />) : null}
                 <Form horizontal={horizontalForm}>
