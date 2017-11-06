@@ -52,7 +52,9 @@ const LeafletDrawSupport = React.createClass({
         const newFeaturetype = (newOptions && newOptions.properties || {}).featuretype;
         switch (newProps.drawStatus) {
             case ("start"):
-                this.clean();
+                if (newProps.drawMethod !== "MarkerReplace" && newProps.drawMethod !== "Polygon" ) {
+                    this.clean();
+                }
                 this.addDrawInteraction(newProps);
                 break;
             case ("stop"):
