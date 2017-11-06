@@ -103,10 +103,14 @@ const DockedNaturalFeatures = React.createClass({
         this.props.onToggle();
     },
     onAddPointClick: function() {
-        this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIcon(this.props.featuretype)});
+        if (this.props.mode === 'EDIT') {
+            this.props.onChangeDrawingStatus("start", "MarkerReplace", "dockednaturalfeatures", [], {properties: this.props.currentFeature, icon: Utils.getIcon(this.props.featuretype)});
+        }
     },
     onAddPolygonClick: function() {
-        this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
+        if (this.props.mode === 'EDIT') {
+            this.props.onChangeDrawingStatus("start", "Polygon", "dockednaturalfeatures", [], {properties: this.props.currentFeature});
+        }
     },
     getLabel(item) {
         return `${item.mandatory ? '* ' : ''}${item.label}`;
@@ -245,20 +249,22 @@ const DockedNaturalFeatures = React.createClass({
         );
     },
     renderDrawTools() {
+        const disabled = this.props.mode !== 'EDIT';
         return (
           <div id="nfdraw-tools" className="nfdraw-tools">
               <span className="nfdraw-tools-title"><Message msgId="naturalfeatures.draw_loc" /></span>
-              <div className="nfdraw-tools-buttons">
+              <div className={disabled ? 'nfdraw-tools-buttons disabled' : 'nfdraw-tools-buttons'}>
                   <ToggleButton
-                      glyphicon={this.props.addPointGlyph}
-                      style={{marginRight: "10px", padding: "9px"}}
-                      pressed={this.props.addPointEnabled}
-                      onClick={this.onAddPointClick} />
+                        className={disabled ? 'disabled' : ''}
+                        glyphicon={this.props.addPointGlyph}
+                        style={{marginRight: "10px", padding: "9px"}}
+                        pressed={this.props.addPointEnabled}
+                        onClick={this.onAddPointClick} />
                   <ToggleButton
-                      glyphicon={this.props.addPolygonGlyph}
-                      style={{marginRight: "10px", padding: "9px"}}
-                      pressed={this.props.addPolygonEnabled}
-                      onClick={this.onAddPolygonClick} />
+                        glyphicon={this.props.addPolygonGlyph}
+                        style={{marginRight: "10px", padding: "9px"}}
+                        pressed={this.props.addPolygonEnabled}
+                        onClick={this.onAddPolygonClick} />
               </div>
           </div>
         );
