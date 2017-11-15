@@ -23,7 +23,7 @@ import reversion
 from reversion.models import Version
 from nfdcore.nfdserializers import delete_object_and_children
 
-# mark messages for translations but don't translate then right now 
+# mark messages for translations but don't translate then right now
 def _(message): return message
 
 """
@@ -112,7 +112,7 @@ season = [
     ("mw", _("Mid winter")),
     ("lw", _("Late winter"))
     ]
- 
+
 record_origin = [
     ("bi", _("bioblitz")),
     ("ct", _("camera trap")),
@@ -244,7 +244,7 @@ n_rank = [
     ("NU", _("Unrankable, more information needed")),
     ("NZ", _("Not a conservation concern in the US"))
     ]
-    
+
 s_rank = [
     ("S1", _("Critically imperiled")),
     ("S1B, S2N", _("Breeding population criticaly imperiled, non-breeding population imperiled")),
@@ -694,89 +694,89 @@ reservation = [
 
 watershed = [
     ("1", _("Allardale Creek, East Branch, Rocky River")),
-	("2", _("Aurora Branch, Chagrin River")),
-	("3", _("Bain Creek, Main Stem, Rocky River")),
-	("4", _("Baldwin Creek, East Branch, Rocky River")),
-	("5", _("Beaver Meadows Creek, Tinkers Creek, Cuyahoga River")),
-	("6", _("Beechers Brook, Main Branch, Chagrin River")),
-	("7", _("Big Creek, Cuyahoga River")),
-	("8", _("Blodgett Creek, West Branch, Rocky River")),
-	("9", _("Burk Branch, Cuyahoga River")),
-	("10", _("Buttermilk Creek, Main Branch, Chagrin River")),
-	("11", _("Cahoon Creek")),
-	("12", _("Center Creek, Big Creek, Cuyahoga River")),
-	("13", _("Chagrin River")),
-	("14", _("Chardon Run, Main Branch, Chagrin River")),
-	("15", _("Chevy Run, Big Creek, Cuyahoga River")),
-	("16", _("Chippewa Creek, Cuyahoga River")),
-	("17", _("Claribel Creek, East Branch, Euclid Creek")),
-	("18", _("Colleda Branch, Big Creek, Cuyahoga River")),
-	("19", _("Creek Chub Run, Main Branch, Chagrin River")),
-	("20", _("Cuyahoga River")),
-	("21", _("Deerlick Run, Tinkers Creek, Cuyahoga River")),
-	("22", _("Doan Brook")),
-	("23", _("Dugway Brook")),
-	("24", _("East Branch, Big Creek, Cuyahoga River")),
-	("25", _("East Branch, Euclid Creek")),
-	("26", _("East Branch, Rocky River")),
-	("27", _("Euclid Creek")),
-	("28", _("Fosters Run, Main Branch, Chagrin River")),
-	("29", _("French Creek, Black River")),
-	("30", _("Furnace Run, Cuyahoga River")),
-	("31", _("Griswold Creek, Main Branch, Chagrin River")),
-	("32", _("Gully Brook, Main Branch, Chagrin River")),
-	("33", _("Hawthorne Creek, Tinkers Creek-Walton Hills, Cuyahoga River")),
-	("34", _("Healy Creek, East Branch, Rocky River")),
-	("35", _("Hemlock Creek-Independence, Cuyahoga River")),
-	("36", _("Hemlock Creek, Tinkers Creek, Cuyahoga River")),
-	("37", _("Hollows Run, Chippewa Creek, Cuyahoga River")),
-	("38", _("Johnsons Creek, East Branch, Rocky River")),
-	("39", _("Kinsbury Run, Cuyahoga River")),
-	("40", _("Main Stem, Rocky River")),
-	("41", _("Meadows Run, Chippewa Creek, Cuyahoga River")),
-	("42", _("Middle Fork, Sulphur Spring, Chagrin River")),
-	("43", _("Mill Creek, Cuyahoga River")),
-	("44", _("Mills Creek, French Creek, Black River")),
-	("45", _("Minnie Creek, West Branch, Rocky River")),
-	("46", _("Morgana Run, Cuyahoga River")),
-	("47", _("Nine Mile Brook")),
-	("48", _("none")),
-	("49", _("None")),
-	("50", _("North Fork, Sulphur Springs, Chagrin River")),
-	("51", _("Pepper/Luce Creek, Main Branch, Chagrin River")),
-	("52", _("Porter Creek")),
-	("53", _("Redstone Run, East Branch, Euclid Creek")),
-	("54", _("Rice Ridge Run, Cuyahoga River")),
-	("55", _("Rocky River")),
-	("56", _("South Fork, Sulphur springs, Chagrin River")),
-	("57", _("Sperry Creek")),
-	("58", _("Spring Fork, Sulphur Springs, Chagrin River")),
-	("59", _("Stevenson Creek, East Branch, Euclid Creek")),
-	("60", _("Stickney Creek, East Branch, Big Creek, Cuyahoga River")),
-	("61", _("Strawberry Creek, Buttermilk Creek, Main Branch, Chagrin River")),
-	("62", _("Sulphur Springs, Chagrin River")),
-	("63", _("Tinkers Creek, Cuyahoga River")),
-	("64", _("Treadway Creek, Big Creek, Cuyahoga River")),
-	("65", _("Trout Creek, East Branch, Rocky River")),
-	("66", _("Tuttle Creek")),
-	("67", _("Unnamed tributary, Chagrin River")),
-	("68", _("Unnamed tributary, Cuyahoga River")),
-	("69", _("Unnamed tributary, Doan Brook")),
-	("70", _("Unnamed tributary, East Branch, Rocky River")),
-	("71", _("Unnamed tributary, Euclid Creek")),
-	("72", _("Unnamed tributary, Main Stem, Rocky River")),
-	("73", _("Unnamed tributary, West Branch, Rocky River")),
-	("74", _("Upper East Branch, Rocky River")),
-	("75", _("Upper Euclid Creek, at Acacia")),
-	("76", _("Upper Main Brach, Chagrin River")),
-	("77", _("Versbky Creek, East Branch, Euclid Creek")),
-	("78", _("Wadworth Run, Cuyahoga River")),
-	("79", _("Wallin Creek, Chippewa Creek, Cuyahoga River")),
-	("80", _("West Branch, Rocky River")),
-	("81", _("West Creek, Cuyahoga River")),
-	("82", _("Wiley Creek, Main Branch, Chagrin River")),
-	("83", _("Wischmeyer Creek")),
-	("84", _("Wolf Creek, Mill Creek, Cuyahoga River"))
+    ("2", _("Aurora Branch, Chagrin River")),
+    ("3", _("Bain Creek, Main Stem, Rocky River")),
+    ("4", _("Baldwin Creek, East Branch, Rocky River")),
+    ("5", _("Beaver Meadows Creek, Tinkers Creek, Cuyahoga River")),
+    ("6", _("Beechers Brook, Main Branch, Chagrin River")),
+    ("7", _("Big Creek, Cuyahoga River")),
+    ("8", _("Blodgett Creek, West Branch, Rocky River")),
+    ("9", _("Burk Branch, Cuyahoga River")),
+    ("10", _("Buttermilk Creek, Main Branch, Chagrin River")),
+    ("11", _("Cahoon Creek")),
+    ("12", _("Center Creek, Big Creek, Cuyahoga River")),
+    ("13", _("Chagrin River")),
+    ("14", _("Chardon Run, Main Branch, Chagrin River")),
+    ("15", _("Chevy Run, Big Creek, Cuyahoga River")),
+    ("16", _("Chippewa Creek, Cuyahoga River")),
+    ("17", _("Claribel Creek, East Branch, Euclid Creek")),
+    ("18", _("Colleda Branch, Big Creek, Cuyahoga River")),
+    ("19", _("Creek Chub Run, Main Branch, Chagrin River")),
+    ("20", _("Cuyahoga River")),
+    ("21", _("Deerlick Run, Tinkers Creek, Cuyahoga River")),
+    ("22", _("Doan Brook")),
+    ("23", _("Dugway Brook")),
+    ("24", _("East Branch, Big Creek, Cuyahoga River")),
+    ("25", _("East Branch, Euclid Creek")),
+    ("26", _("East Branch, Rocky River")),
+    ("27", _("Euclid Creek")),
+    ("28", _("Fosters Run, Main Branch, Chagrin River")),
+    ("29", _("French Creek, Black River")),
+    ("30", _("Furnace Run, Cuyahoga River")),
+    ("31", _("Griswold Creek, Main Branch, Chagrin River")),
+    ("32", _("Gully Brook, Main Branch, Chagrin River")),
+    ("33", _("Hawthorne Creek, Tinkers Creek-Walton Hills, Cuyahoga River")),
+    ("34", _("Healy Creek, East Branch, Rocky River")),
+    ("35", _("Hemlock Creek-Independence, Cuyahoga River")),
+    ("36", _("Hemlock Creek, Tinkers Creek, Cuyahoga River")),
+    ("37", _("Hollows Run, Chippewa Creek, Cuyahoga River")),
+    ("38", _("Johnsons Creek, East Branch, Rocky River")),
+    ("39", _("Kinsbury Run, Cuyahoga River")),
+    ("40", _("Main Stem, Rocky River")),
+    ("41", _("Meadows Run, Chippewa Creek, Cuyahoga River")),
+    ("42", _("Middle Fork, Sulphur Spring, Chagrin River")),
+    ("43", _("Mill Creek, Cuyahoga River")),
+    ("44", _("Mills Creek, French Creek, Black River")),
+    ("45", _("Minnie Creek, West Branch, Rocky River")),
+    ("46", _("Morgana Run, Cuyahoga River")),
+    ("47", _("Nine Mile Brook")),
+    ("48", _("none")),
+    ("49", _("None")),
+    ("50", _("North Fork, Sulphur Springs, Chagrin River")),
+    ("51", _("Pepper/Luce Creek, Main Branch, Chagrin River")),
+    ("52", _("Porter Creek")),
+    ("53", _("Redstone Run, East Branch, Euclid Creek")),
+    ("54", _("Rice Ridge Run, Cuyahoga River")),
+    ("55", _("Rocky River")),
+    ("56", _("South Fork, Sulphur springs, Chagrin River")),
+    ("57", _("Sperry Creek")),
+    ("58", _("Spring Fork, Sulphur Springs, Chagrin River")),
+    ("59", _("Stevenson Creek, East Branch, Euclid Creek")),
+    ("60", _("Stickney Creek, East Branch, Big Creek, Cuyahoga River")),
+    ("61", _("Strawberry Creek, Buttermilk Creek, Main Branch, Chagrin River")),
+    ("62", _("Sulphur Springs, Chagrin River")),
+    ("63", _("Tinkers Creek, Cuyahoga River")),
+    ("64", _("Treadway Creek, Big Creek, Cuyahoga River")),
+    ("65", _("Trout Creek, East Branch, Rocky River")),
+    ("66", _("Tuttle Creek")),
+    ("67", _("Unnamed tributary, Chagrin River")),
+    ("68", _("Unnamed tributary, Cuyahoga River")),
+    ("69", _("Unnamed tributary, Doan Brook")),
+    ("70", _("Unnamed tributary, East Branch, Rocky River")),
+    ("71", _("Unnamed tributary, Euclid Creek")),
+    ("72", _("Unnamed tributary, Main Stem, Rocky River")),
+    ("73", _("Unnamed tributary, West Branch, Rocky River")),
+    ("74", _("Upper East Branch, Rocky River")),
+    ("75", _("Upper Euclid Creek, at Acacia")),
+    ("76", _("Upper Main Brach, Chagrin River")),
+    ("77", _("Versbky Creek, East Branch, Euclid Creek")),
+    ("78", _("Wadworth Run, Cuyahoga River")),
+    ("79", _("Wallin Creek, Chippewa Creek, Cuyahoga River")),
+    ("80", _("West Branch, Rocky River")),
+    ("81", _("West Creek, Cuyahoga River")),
+    ("82", _("Wiley Creek, Main Branch, Chagrin River")),
+    ("83", _("Wischmeyer Creek")),
+    ("84", _("Wolf Creek, Mill Creek, Cuyahoga River"))
     ]
 
 cm_sensitivity = [
@@ -788,48 +788,48 @@ cm_sensitivity = [
     ]
 
 leap_land_cover = [
-	("1", _("IA1 - Dry Oak forest and Woodland")),
-	("2", _("IA2 - Dry-Mesic Oak Forest and Woodland")),
-	("3", _("IB1 -  Appalachian (Hemlock)-Hardwood Forest")),
-	("4", _("IB2 - Hemlock Ravine")),
-	("5", _("IC1 - Beech-Maple Forest")),
-	("6", _("IC2 - Mixed Hardwood - red oak, tulip, sugar maple, little to no beech")),
-	("7", _("IC3 - Rich Mesophytic Forest - New York")),
-	("8", _("ID - Oak Savanna/Barrens")),
-	("9", _("IE1 - Non-Calcareous Cliff and Talus")),
-	("10", _("IE2 - Calcareous Cliff and Talus")),
-	("11", _("IF - Great Lakes Rocky Shore and Cliff_Alkaline")),
-	("12", _("IIA1 - Floodplain Low gradient- equal or above 3rd order streams and rivers")),
-	("13", _("IIA2 - Floodplain High gradient - 1st and 2nd order streams")),
-	("14", _("IIB1 - Floodplain Emergent Herbaceous - Marsh")),
-	("15", _("IIB2 - Floodplain Emergent Herbaceous - Wet Meadow")),
-	("16", _("IIC1 - Bog")),
-	("17", _("IIC - Floodplain Scrub-Shrub")),
-	("18", _("IIIA1 - Forested Flat not on floodplain, including vernal pools")),
-	("19", _("IIIA2 - Forest Seeps, not on floodplain, ground-water driven communities")),
-	("20", _("IIIA3 - Bog Forests, on peat soils")),
-	("21", _("IIIB1a - Coastal Marsh -lakeshore marsh systems-, emergent herbaceous")),
-	("22", _("IIIB1b - Inland Freshwater Marsh - emergent herbaceous")),
-	("23", _("IIIC2a - Rich fen")),
-	("24", _("IIIC2b - Poor fen")),
-	("25", _("IVA1 - Lakeshore - Beach")),
-	("26", _("IVa2 - Lakeshore - Wooded Dune")),
-	("27", _("IVB1 - Submersed bed")),
-	("28", _("IVB2 - Riverine sand bar")),
-	("29", _("N/A - Not applicable ")),
-	("30", _("Old Field - Ruderal Upland")),
-	("31", _("Open water - Lakes, Ponds and Reservoirs")),
-	("32", _("Other Shrub Swamp")),
-	("33", _("VA1 - Active Farming - Cultivated Crops and Irrigated Agriculture")),
-	("34", _("VA2 - Pasture/Hay")),
-	("35", _("VA4 - Post Clearcut Communities - Successional Shrub/Scrub")),
-	("36", _("VA5 - Tree Plantations")),
-	("37", _("VB - Atypical Successional Woody Communities - Ruderal Forest")),
-	("38", _("VC - Disturbed Soil Communities - Quarries/Strip Mines/Gravel Pits")),
-	("39", _("VF1 - Development - Open Space")),
-	("40", _("VF2 - Development - Low Intensity")),
-	("41", _("VF3 - Development - Medium Intensity")),
-	("42", _("VF4 - Development - High Intensity")),
+    ("1", _("IA1 - Dry Oak forest and Woodland")),
+    ("2", _("IA2 - Dry-Mesic Oak Forest and Woodland")),
+    ("3", _("IB1 -  Appalachian (Hemlock)-Hardwood Forest")),
+    ("4", _("IB2 - Hemlock Ravine")),
+    ("5", _("IC1 - Beech-Maple Forest")),
+    ("6", _("IC2 - Mixed Hardwood - red oak, tulip, sugar maple, little to no beech")),
+    ("7", _("IC3 - Rich Mesophytic Forest - New York")),
+    ("8", _("ID - Oak Savanna/Barrens")),
+    ("9", _("IE1 - Non-Calcareous Cliff and Talus")),
+    ("10", _("IE2 - Calcareous Cliff and Talus")),
+    ("11", _("IF - Great Lakes Rocky Shore and Cliff_Alkaline")),
+    ("12", _("IIA1 - Floodplain Low gradient- equal or above 3rd order streams and rivers")),
+    ("13", _("IIA2 - Floodplain High gradient - 1st and 2nd order streams")),
+    ("14", _("IIB1 - Floodplain Emergent Herbaceous - Marsh")),
+    ("15", _("IIB2 - Floodplain Emergent Herbaceous - Wet Meadow")),
+    ("16", _("IIC1 - Bog")),
+    ("17", _("IIC - Floodplain Scrub-Shrub")),
+    ("18", _("IIIA1 - Forested Flat not on floodplain, including vernal pools")),
+    ("19", _("IIIA2 - Forest Seeps, not on floodplain, ground-water driven communities")),
+    ("20", _("IIIA3 - Bog Forests, on peat soils")),
+    ("21", _("IIIB1a - Coastal Marsh -lakeshore marsh systems-, emergent herbaceous")),
+    ("22", _("IIIB1b - Inland Freshwater Marsh - emergent herbaceous")),
+    ("23", _("IIIC2a - Rich fen")),
+    ("24", _("IIIC2b - Poor fen")),
+    ("25", _("IVA1 - Lakeshore - Beach")),
+    ("26", _("IVa2 - Lakeshore - Wooded Dune")),
+    ("27", _("IVB1 - Submersed bed")),
+    ("28", _("IVB2 - Riverine sand bar")),
+    ("29", _("N/A - Not applicable ")),
+    ("30", _("Old Field - Ruderal Upland")),
+    ("31", _("Open water - Lakes, Ponds and Reservoirs")),
+    ("32", _("Other Shrub Swamp")),
+    ("33", _("VA1 - Active Farming - Cultivated Crops and Irrigated Agriculture")),
+    ("34", _("VA2 - Pasture/Hay")),
+    ("35", _("VA4 - Post Clearcut Communities - Successional Shrub/Scrub")),
+    ("36", _("VA5 - Tree Plantations")),
+    ("37", _("VB - Atypical Successional Woody Communities - Ruderal Forest")),
+    ("38", _("VC - Disturbed Soil Communities - Quarries/Strip Mines/Gravel Pits")),
+    ("39", _("VF1 - Development - Open Space")),
+    ("40", _("VF2 - Development - Low Intensity")),
+    ("41", _("VF3 - Development - Medium Intensity")),
+    ("42", _("VF4 - Development - High Intensity")),
     ]
 
 pleistocene_glaciar_diposits = [
@@ -938,12 +938,12 @@ fungal_association_type = [
 def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
-    
+
     if ifempty:
         if model_class.objects.all().count()>0:
             return
-        
-    for entry in values:        
+
+    for entry in values:
         c = model_class()
         c.code = entry[0]
         c.name = entry[1]
@@ -957,8 +957,8 @@ def _init_dict_table(model_class, values, ifempty=True, clean=False):
     if ifempty:
         if model_class.objects.all().count()>0:
             return
-        
-    for entry in values:        
+
+    for entry in values:
         c = model_class()
         c.code = entry[0]
         c.name = entry[1]
@@ -969,24 +969,24 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(SRank, s_rank)
     _init_dict_table(NRank, n_rank)
     _init_dict_table(GRank, g_rank)
-    
+
     _init_dict_table(IucnRedListCategory, iucn_redlist, ifempty, clean)
     _init_dict_table(UsfwsStatus, usfws_status, ifempty, clean)
     _init_dict_table(RegionalStatus, oh_status)
     _init_dict_table(MushroomGroup, mushroom_group)
-    
+
     _init_dict_table(DayTime, day_time, ifempty, clean)
     _init_dict_table(Season, season, ifempty, clean)
     _init_dict_table(RecordOrigin, record_origin, ifempty, clean)
     _init_dict_table(Preservative, preservative, ifempty, clean)
     _init_dict_table(Gender, gender, ifempty, clean)
     _init_dict_table(TerrestrialSampler, terrestrial_sampler, ifempty, clean)
-    
-    
+
+
     _init_dict_table(Storage, storage, ifempty, clean)
     _init_dict_table(Marks, marks, ifempty, clean)
     _init_dict_table(DiseasesAndAbnormalities, diseases, ifempty, clean)
-    
+
     _init_dict_table(AquaticSampler, aquatic_sampler, ifempty, clean)
     _init_dict_table(StreamDesignatedUse, stream_designated_use, ifempty, clean)
     _init_dict_table(ChannelType, channel_type, ifempty, clean)
@@ -994,21 +994,21 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(LoticHabitatType, lotic_habitat_type, ifempty, clean)
     _init_dict_table(WaterFlowType, water_flow_type, ifempty, clean)
     _init_dict_table(TerrestrialStratum, terrestrial_location_or_stratum, ifempty, clean)
-    
+
     _init_dict_table(PondLakeType, pond_lake_type, ifempty, clean)
     _init_dict_table(PondLakeUse, pond_lake_use, ifempty, clean)
     _init_dict_table(ShorelineType, pond_lake_shoreline, ifempty, clean)
     _init_dict_table(LakeMicrohabitat, pond_lake_microhabitat, ifempty, clean)
-    
+
     _init_dict_table(WetlandType, wetland_type, ifempty, clean)
     _init_dict_table(WetlandLocation, wetland_location, ifempty, clean)
     _init_dict_table(WetlandConnectivity, wetland_connectivity, ifempty, clean)
     _init_dict_table(WaterSource, water_source, ifempty, clean)
     _init_dict_table(WetlandHabitatFeature, wetland_habitat_feature, ifempty, clean)
-    
+
     _init_dict_table(SlimeMoldMedia, slime_mold_media, ifempty, clean)
     _init_dict_extended_table(SlimeMoldClass, slime_mold_class, ifempty, clean)
-    
+
     #_init_dict_table(ConiferLifestages, conifer_lifestages, ifempty, clean)
     _init_dict_table(FernLifestages, fern_lifestages, ifempty, clean)
     _init_dict_table(FloweringPlantLifestages, flowring_plant_lifestages, ifempty, clean)
@@ -1021,17 +1021,17 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(LandscapePosition, landscape_position, ifempty, clean)
     _init_dict_table(Aspect, aspect, ifempty, clean)
     _init_dict_table(Slope, slope, ifempty, clean)
-    
+
     _init_dict_table(FungusApparentSubstrate, fungus_aparent_substrate, ifempty, clean)
     _init_dict_table(MushroomVerticalLocation, mushroom_vertical_location, ifempty, clean)
     _init_dict_table(MushroomGrowthForm, mushroom_growth_form, ifempty, clean)
     _init_dict_table(MushroomOdor, mushroom_odor, ifempty, clean)
     _init_dict_table(FungalAssociationType, fungal_association_type, ifempty, clean)
-    
-    
+
+
     _init_dict_table(Watershed, watershed, ifempty, clean)
     _init_dict_table(Reservation, reservation, ifempty, clean)
-    
+
     _init_dict_table(CMSensitivity, cm_sensitivity, ifempty, clean)
     _init_dict_table(LeapLandCover, leap_land_cover, ifempty, clean)
     _init_dict_table(GlacialDepositPleistoceneAge, pleistocene_glaciar_diposits, ifempty, clean)
@@ -1040,10 +1040,10 @@ def init_model(ifempty=True, clean=False):
     _init_dict_table(NaturalAreaType, natural_area_type, ifempty, clean)
     _init_dict_table(BedrockAndOutcrops, bedrock_and_outcrops, ifempty, clean)
     _init_dict_table(RegionalFrequency, regional_frequency, ifempty, clean)
-    
+
     if clean:
         OccurrenceCategory.objects.all().delete()
-    
+
     if ifempty:
         if OccurrenceCategory.objects.count() > 0:
             return
@@ -1065,14 +1065,14 @@ def clean_species():
 def insert_test_species(clean=False):
     if clean:
         clean_species()
-    
+
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
     with reversion.create_revision():
         element_species = ElementSpecies()
         element_species.other_code = "lontra_cnd"
         element_species.iucn_red_list_category = iucn_cat
         element_species.save()
-        
+
         species = Species()
         species.tsn = 180549
         species.first_common = 'North American river otter'
@@ -1088,7 +1088,7 @@ def insert_test_species(clean=False):
         element_species.other_code = "bl_bear"
         element_species.iucn_red_list_category = iucn_cat
         element_species.save()
-        
+
         species = Species()
         species.tsn = 180544
         species.first_common = 'American black bear'
@@ -1098,30 +1098,30 @@ def insert_test_species(clean=False):
         species.family_common = 'Bears'
         species.phylum = 'Chordata'
         species.phylum_common = 'Chordate'
-        species.save()    
+        species.save()
 
 def insert_test_data(clean=True):
     if clean:
         clean_occurrences()
-    
+
     iucn_cat = IucnRedListCategory.objects.get(code='LC')
-    """    
+    """
     plant_cat = OccurrenceCategory.objects.get(code='pl')
-    
+
     with reversion.create_revision():
         element_species = ElementSpecies()
         element_species.iucn_red_list_category = iucn_cat
         element_species.other_code = "qrc_alba"
-        #element_species.nrcs_usda_symbol = 
+        #element_species.nrcs_usda_symbol =
         element_species.save()
-        
+
         species = Species()
         species.tsn = '19290'
         species.first_common = 'White oak'
         species.name_sci = 'Quercus alba'
         species.element_species = element_species
         species.save()
-    
+
     with reversion.create_revision():
         t = OccurrenceTaxon()
         t.occurrence_cat = plant_cat
@@ -1143,26 +1143,26 @@ def insert_test_data(clean=True):
         t.species = species
         t.save()
     """
-    stream_animal_cat = OccurrenceCategory.objects.get(code='st')    
-    species = Species.objects.get(tsn=180549)    
+    stream_animal_cat = OccurrenceCategory.objects.get(code='st')
+    species = Species.objects.get(tsn=180549)
     gender = Gender.objects.get(code='fe')
-    
+
     with reversion.create_revision():
         stream_details = StreamAnimalDetails()
         stream_details.gender = gender
         stream_details.stream_name_1 = 'Ramdom stream name1'
         stream_details.save()
-        
+
         reporter = PointOfContact()
         reporter.name = "I'm the reporter"
         reporter.save()
-        
+
         observation = OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.reporter = reporter
         observation.save()
-        
+
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.554282 41.379035 )'
         t.species = species
@@ -1170,29 +1170,29 @@ def insert_test_data(clean=True):
         t.details = stream_details
         t.observation = observation
         t.save()
-    
+
     with reversion.create_revision():
         stream_details = StreamAnimalDetails()
         stream_details.gender = gender
         stream_details.stream_name_1 = 'Ramdom stream name2'
         stream_details.save()
-        
+
         recorder = PointOfContact()
         recorder.name = "I'm the recorder2"
         recorder.save()
-        
+
         reporter = PointOfContact()
         reporter.name = "I'm the reporter2"
         reporter.save()
-        
+
         observation = OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
         observation.reporter = reporter
         observation.save()
-        
-        
+
+
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.546814 41.386602 )'
         t.species = species
@@ -1200,32 +1200,32 @@ def insert_test_data(clean=True):
         t.details = stream_details
         t.observation = observation
         t.save()
-    
+
     with reversion.create_revision():
         recorder = PointOfContact()
         recorder.name = "I'm the recorder"
         recorder.save()
-        
+
         reporter = PointOfContact()
         reporter.name = "I'm the reporter"
         reporter.save()
-        
+
         observation = OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
         observation.reporter = reporter
         observation.save()
-        
+
         land_animal_cat = OccurrenceCategory.objects.get(code='ln')
         sound_recording = TerrestrialSampler.objects.get(code='sr')
         land_animal_details = LandAnimalDetails()
-        land_animal_details.sampler = sound_recording        
+        land_animal_details.sampler = sound_recording
         land_animal_details.gender = gender
         land_animal_details.save()
-        
-        species = Species.objects.get(tsn=180544)    
-        
+
+        species = Species.objects.get(tsn=180544)
+
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.526814 41.366602 )'
         t.species = species
@@ -1236,7 +1236,7 @@ def insert_test_data(clean=True):
 
         land_animal_details = LandAnimalDetails()
         camera = TerrestrialSampler.objects.get(code='wc')
-        land_animal_details.sampler = camera        
+        land_animal_details.sampler = camera
         land_animal_details.gender = gender
         land_animal_details.save()
 
@@ -1249,7 +1249,7 @@ def insert_test_data(clean=True):
         observation.recording_datetime = timezone.now()
         observation.reporter = reporter
         observation.save()
-        
+
         t = OccurrenceTaxon()
         t.geom = 'POINT( -81.226814 41.166602 )'
         t.species = species
@@ -1257,5 +1257,4 @@ def insert_test_data(clean=True):
         t.details = land_animal_details
         t.observation = observation
         t.save()
-        
-        
+
