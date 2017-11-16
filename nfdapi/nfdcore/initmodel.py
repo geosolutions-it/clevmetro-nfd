@@ -1062,6 +1062,18 @@ def clean_species():
     Species.objects.all().delete()
     ElementSpecies.objects.all().delete()
 
+def fix_species():
+    iucn_cat = IucnRedListCategory.objects.get(code='LC')
+    species = Species.objects.filter().all()
+    for specie in species:
+        if not specie.element_species:
+            print("Assigning IUCN Category {} to {}".format(iucn_cat, specie))
+            element_species = ElementSpecies()
+            element_species.iucn_red_list_category = iucn_cat
+            element_species.save()
+            specie.element_species = element_species
+            specie.save()
+
 def insert_test_species(clean=False):
     if clean:
         clean_species()

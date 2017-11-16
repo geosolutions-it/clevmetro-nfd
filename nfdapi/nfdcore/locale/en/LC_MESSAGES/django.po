@@ -3,19 +3,278 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-16 12:41+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2017-11-16 16:39+0100\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.0.4\n"
+
+msgid "first_common"
+msgstr "First Common"
+
+msgid "name_sci"
+msgstr "Scientific Name"
+
+msgid "tsn"
+msgstr "TSN"
+
+msgid "synonym"
+msgstr "Synonym"
+
+msgid "second_common"
+msgstr "Second Common"
+
+msgid "third_common"
+msgstr "Third Common"
+
+msgid "family"
+msgstr "Family"
+
+msgid "family_common"
+msgstr "Family Common Name"
+
+msgid "phylum"
+msgstr "Phylum"
+
+msgid "phylum_common"
+msgstr "Phylum Common Name"
+
+msgid "cm_status"
+msgstr "CM Status"
+
+msgid "s_rank"
+msgstr "S Rank"
+
+msgid "n_rank"
+msgstr "N Rank"
+
+msgid "g_rank"
+msgstr "G Rank"
+
+msgid "native"
+msgstr "Is Native"
+
+msgid "oh_status"
+msgstr "OH Status"
+
+msgid "usfws_status"
+msgstr "USFWS Status"
+
+msgid "iucn_red_list_category"
+msgstr "IUCN Red List Category"
+
+msgid "other_code"
+msgstr "Other Code"
+
+msgid "ibp_english"
+msgstr "IPB English"
+
+msgid "ibp_scientific"
+msgstr "IPB Scientific"
+
+msgid "bblab_number"
+msgstr "BBLAB Number"
+
+msgid "nrcs_usda_symbol"
+msgstr "NRCS USDA Symbol"
+
+msgid "synonym_nrcs_usda_symbol"
+msgstr "Synonym NRCS USDA Symbol"
+
+msgid "epa_numeric_code"
+msgstr "EPA Numeric Code"
+
+msgid "mushroom_group"
+msgstr "Mushroom Group"
+
+msgid "plant"
+msgstr "Plant"
+
+msgid "observation_date"
+msgstr "Observation Date"
+
+msgid "recording_datetime"
+msgstr "Recording Date/Time"
+
+msgid "daytime"
+msgstr "Day Time"
+
+msgid "season"
+msgstr "Season"
+
+msgid "record_origin"
+msgstr "Record Origin"
+
+msgid "recording_station"
+msgstr "Recording Station"
+
+msgid "name"
+msgstr "Name"
+
+msgid "affiliation"
+msgstr "Affiliation"
+
+msgid "phone1"
+msgstr "Phone-1"
+
+msgid "phone2"
+msgstr "Phone-2"
+
+msgid "email"
+msgstr "e-Mail"
+
+msgid "street_address"
+msgstr "Street Address"
+
+msgid "voucher_number"
+msgstr "Voucher Number"
+
+msgid "specimen_collected"
+msgstr "Specimen Collected"
+
+msgid "parts_collected"
+msgstr "Parts Collected"
+
+msgid "specimen_number"
+msgstr "Specimen Number"
+
+msgid "preservative"
+msgstr "Preservative"
+
+msgid "storage"
+msgstr "Storage"
+
+msgid "repository"
+msgstr "Repository"
+
+msgid "plant_count"
+msgstr "Plant Count"
+
+msgid "area_ranges"
+msgstr "Area Ranges"
+
+msgid "moisture_regime"
+msgstr "Moisture Regime"
+
+msgid "ground_surface"
+msgstr "Ground Surface"
+
+msgid "tree_canopy_cover"
+msgstr "Tree Canopy Cover"
+
+msgid "general_habitat_category"
+msgstr "General Habitat Category"
+
+msgid "leap_land_cover_category"
+msgstr "Leap Land Cover Category"
+
+msgid "landscape_position"
+msgstr "Landscape Position"
+
+msgid "aspect"
+msgstr "Aspect"
+
+msgid "slope"
+msgstr "Slope"
+
+msgid "lifestages"
+msgstr "Lifestages"
+
+msgid "casting_piles"
+msgstr "Casting Piles"
+
+msgid "compacted_soil"
+msgstr "Compacted Soil"
+
+msgid "individuals"
+msgstr "Individuals"
+
+msgid "layered_castings"
+msgstr "Layered Castings"
+
+msgid "middens"
+msgstr "Middens"
+
+msgid "no_evidence"
+msgstr "No Evidence"
+
+msgid "browse"
+msgstr "Browse"
+
+msgid "collecting"
+msgstr "Collecting"
+
+msgid "disease_pest"
+msgstr "Disease Pest"
+
+msgid "mowing"
+msgstr "Mowing"
+
+msgid "trampling"
+msgstr "Trampling"
+
+msgid "vehicle_traffic"
+msgstr "Vehicle Traffic"
+
+msgid "woody_plant_removal"
+msgstr "Woody Plant Removal"
+
+msgid "site_description"
+msgstr "Site Description"
+
+msgid "reservation"
+msgstr "Reservation"
+
+msgid "watershed"
+msgstr "Wartershed"
+
+msgid "directions"
+msgstr "Directions"
+
+msgid "parcel"
+msgstr "Parcel"
+
+msgid "city_township"
+msgstr "City Township"
+
+msgid "county"
+msgstr "County"
+
+msgid "quad_name"
+msgstr "Quad Name"
+
+msgid "quad_number"
+msgstr "Quad Number"
+
+msgid "id"
+msgstr "ID"
+
+msgid "featuretype"
+msgstr "Feature Type"
+
+msgid "featuresubtype"
+msgstr "Feature Sub-Type"
+
+msgid "released"
+msgstr "Is Released"
+
+msgid "verified"
+msgstr "Is Verified"
+
+msgid "inclusion_date"
+msgstr "Inclusion Date"
+
+msgid "version_date"
+msgstr "Version Date"
 
 #: nfdcore/initmodel.py:40
 msgid "Plant"
@@ -509,8 +768,7 @@ msgid "Restricted"
 msgstr ""
 
 #: nfdcore/initmodel.py:190
-msgid ""
-"Several occurrences, more than one watershed, but all east, west or south"
+msgid "Several occurrences, more than one watershed, but all east, west or south"
 msgstr ""
 
 #: nfdcore/initmodel.py:191
@@ -594,26 +852,19 @@ msgid "Critically imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:214
-msgid ""
-"Breeding population critically imperiled, non-breeding population imperiled "
-"in US"
+msgid "Breeding population critically imperiled, non-breeding population imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:215 nfdcore/initmodel.py:221
-msgid ""
-"Breeding population imperiled, non-breeding population rare or uncommon in US"
+msgid "Breeding population imperiled, non-breeding population rare or uncommon in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:216
-msgid ""
-"Breeding population critically imperiled, non-breeding population apparently "
-"secure in US"
+msgid "Breeding population critically imperiled, non-breeding population apparently secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:217
-msgid ""
-"Breeding population critically imperiled, non-breeding population "
-"demonstrably secure in US"
+msgid "Breeding population critically imperiled, non-breeding population demonstrably secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:218
@@ -625,21 +876,15 @@ msgid "Imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:220
-msgid ""
-"Breeding population imperiled, non-breeding population critically imperiled "
-"in US"
+msgid "Breeding population imperiled, non-breeding population critically imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:222
-msgid ""
-"Breeding population imperiled, non-breeding population apparently secure in "
-"US"
+msgid "Breeding population imperiled, non-breeding population apparently secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:223
-msgid ""
-"Breeding population imperiled, non-breeding population demonstrably secure "
-"in US"
+msgid "Breeding population imperiled, non-breeding population demonstrably secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:224
@@ -651,26 +896,19 @@ msgid "Rare or uncommon in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:226
-msgid ""
-"Breeding population rare or uncommon, non-breeding population critically "
-"imperiled in US"
+msgid "Breeding population rare or uncommon, non-breeding population critically imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:227
-msgid ""
-"Breeding population rare or uncommon, non-breeding population imperiled in US"
+msgid "Breeding population rare or uncommon, non-breeding population imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:228
-msgid ""
-"Breeding population rare or uncommon, non-breeding population apparently "
-"secure in US"
+msgid "Breeding population rare or uncommon, non-breeding population apparently secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:229
-msgid ""
-"Breeding population rare or uncommon, non-breeding population demonstrably "
-"secure in US"
+msgid "Breeding population rare or uncommon, non-breeding population demonstrably secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:230
@@ -682,27 +920,19 @@ msgid "Widespread, abundant, apparently secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:232
-msgid ""
-"Breeding population apparently secure, non-breeding population criticaly "
-"imperiled in US"
+msgid "Breeding population apparently secure, non-breeding population criticaly imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:233
-msgid ""
-"Breeding population apparently secure, non-breeding population imperiled in "
-"US"
+msgid "Breeding population apparently secure, non-breeding population imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:234
-msgid ""
-"Breeding population apparently secure, non-breeding population rae or "
-"uncommon in US"
+msgid "Breeding population apparently secure, non-breeding population rae or uncommon in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:235
-msgid ""
-"Breeding population apparently secure, non-breeding population demonstrably "
-"secure in US"
+msgid "Breeding population apparently secure, non-breeding population demonstrably secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:236
@@ -714,21 +944,15 @@ msgid "Demonstrably widespread,abundant and secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:238
-msgid ""
-"Breeding population demonstrably secure, non-breeding population imperiled "
-"in US"
+msgid "Breeding population demonstrably secure, non-breeding population imperiled in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:239
-msgid ""
-"Breeding population demonstrably secure, non-breeding population rare or "
-"uncommon in US"
+msgid "Breeding population demonstrably secure, non-breeding population rare or uncommon in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:240
-msgid ""
-"Breeding population demonstrably secure, non-breeding population apparently "
-"secure in US"
+msgid "Breeding population demonstrably secure, non-breeding population apparently secure in US"
 msgstr ""
 
 #: nfdcore/initmodel.py:241
@@ -756,8 +980,7 @@ msgid "Critically imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:250
-msgid ""
-"Breeding population criticaly imperiled, non-breeding population imperiled"
+msgid "Breeding population criticaly imperiled, non-breeding population imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:251 nfdcore/initmodel.py:257
@@ -765,15 +988,11 @@ msgid "Breeding population imperiled, non-breeding population rare or uncommon"
 msgstr ""
 
 #: nfdcore/initmodel.py:252
-msgid ""
-"Breeding population critically imperiled, non-breeding population apparently "
-"secure"
+msgid "Breeding population critically imperiled, non-breeding population apparently secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:253
-msgid ""
-"Breeding population criticaly imperiled, non-breeding population "
-"demonstrably secure"
+msgid "Breeding population criticaly imperiled, non-breeding population demonstrably secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:254
@@ -785,18 +1004,15 @@ msgid "Imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:256
-msgid ""
-"Breeding population imperiled, non-breeding population critically imperiled"
+msgid "Breeding population imperiled, non-breeding population critically imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:258
-msgid ""
-"Breeding population imperiled, non-breeding population apparently secure"
+msgid "Breeding population imperiled, non-breeding population apparently secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:259
-msgid ""
-"Breeding population imperiled, non-breeding population demonstrably secure"
+msgid "Breeding population imperiled, non-breeding population demonstrably secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:260
@@ -808,9 +1024,7 @@ msgid "Vulnerable because of rarity"
 msgstr ""
 
 #: nfdcore/initmodel.py:262
-msgid ""
-"Breeding population rare or uncommon, non-breeding population critically "
-"imperiled"
+msgid "Breeding population rare or uncommon, non-breeding population critically imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:263
@@ -818,15 +1032,11 @@ msgid "Breeding population rare or uncommon, non-breeding population imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:264
-msgid ""
-"Breeding population rare or uncommon, non-breeding population apparently "
-"secure"
+msgid "Breeding population rare or uncommon, non-breeding population apparently secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:265
-msgid ""
-"Breeding population rare or uncommon, non-breeding population demonstrably "
-"secure"
+msgid "Breeding population rare or uncommon, non-breeding population demonstrably secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:266
@@ -838,26 +1048,19 @@ msgid "Widespread, abundant, apparently secure in the state"
 msgstr ""
 
 #: nfdcore/initmodel.py:268
-msgid ""
-"Breeding population apparently secure, non-breeding population criticaly "
-"imperiled"
+msgid "Breeding population apparently secure, non-breeding population criticaly imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:269
-msgid ""
-"Breeding population apparently secure, non-breeding population imperiled"
+msgid "Breeding population apparently secure, non-breeding population imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:270
-msgid ""
-"Breeding population apparently secure, non-breeding population rae or "
-"uncommon"
+msgid "Breeding population apparently secure, non-breeding population rae or uncommon"
 msgstr ""
 
 #: nfdcore/initmodel.py:271
-msgid ""
-"Breeding population apparently secure, non-breeding population demonstrably "
-"secure"
+msgid "Breeding population apparently secure, non-breeding population demonstrably secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:272
@@ -869,20 +1072,15 @@ msgid "Demonstrably widespread,abundant and secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:274
-msgid ""
-"Breeding population demonstrably secure, non-breeding population imperiled"
+msgid "Breeding population demonstrably secure, non-breeding population imperiled"
 msgstr ""
 
 #: nfdcore/initmodel.py:275
-msgid ""
-"Breeding population demonstrably secure, non-breeding population rare or "
-"uncommon"
+msgid "Breeding population demonstrably secure, non-breeding population rare or uncommon"
 msgstr ""
 
 #: nfdcore/initmodel.py:276
-msgid ""
-"Breeding population demonstrably secure, non-breeding population apparently "
-"secure"
+msgid "Breeding population demonstrably secure, non-breeding population apparently secure"
 msgstr ""
 
 #: nfdcore/initmodel.py:277
@@ -894,8 +1092,7 @@ msgid "Exotic species established in the state"
 msgstr ""
 
 #: nfdcore/initmodel.py:279
-msgid ""
-"Historical occurrences only but it is suspected of still being in the state"
+msgid "Historical occurrences only but it is suspected of still being in the state"
 msgstr ""
 
 #: nfdcore/initmodel.py:280
@@ -2488,8 +2685,7 @@ msgid "IF - Great Lakes Rocky Shore and Cliff_Alkaline"
 msgstr ""
 
 #: nfdcore/initmodel.py:802
-msgid ""
-"IIA1 - Floodplain Low gradient- equal or above 3rd order streams and rivers"
+msgid "IIA1 - Floodplain Low gradient- equal or above 3rd order streams and rivers"
 msgstr ""
 
 #: nfdcore/initmodel.py:803
@@ -2517,8 +2713,7 @@ msgid "IIIA1 - Forested Flat not on floodplain, including vernal pools"
 msgstr ""
 
 #: nfdcore/initmodel.py:809
-msgid ""
-"IIIA2 - Forest Seeps, not on floodplain, ground-water driven communities"
+msgid "IIIA2 - Forest Seeps, not on floodplain, ground-water driven communities"
 msgstr ""
 
 #: nfdcore/initmodel.py:810
@@ -2868,55 +3063,27 @@ msgstr ""
 
 #: nfdcore/initmodel.py:930
 msgid "circling or hovering"
-msgstr ""
+msgstr "Circling or Hovering"
 
 #: nfdcore/initmodel.py:931
 msgid "feeding"
-msgstr ""
+msgstr "Feeding"
 
 #: nfdcore/initmodel.py:932
 msgid "laying eggs"
-msgstr ""
+msgstr "Laying Eggs"
 
 #: nfdcore/initmodel.py:933
 msgid "mating on"
-msgstr ""
+msgstr "Mating On"
 
 #: nfdcore/initmodel.py:934
 msgid "moving over"
-msgstr ""
+msgstr "Moving over"
 
 #: nfdcore/nfdserializers.py:53
 msgid "occurrencemanagement"
 msgstr "Management"
-
-#: nfdcore/nfdserializers.py:56 nfdcore/nfdserializers.py:93
-msgid "id"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:61 nfdcore/nfdserializers.py:98
-msgid "featuretype"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:66 nfdcore/nfdserializers.py:103
-msgid "featuresubtype"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:71 nfdcore/nfdserializers.py:108
-msgid "released"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:76 nfdcore/nfdserializers.py:113
-msgid "verified"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:81 nfdcore/nfdserializers.py:118
-msgid "inclusion_date"
-msgstr ""
-
-#: nfdcore/nfdserializers.py:86 nfdcore/nfdserializers.py:123
-msgid "version_date"
-msgstr ""
 
 #: nfdcore/nfdserializers.py:130 nfdcore/nfdserializers.py:145
 #: nfdcore/nfdserializers.py:162 nfdcore/nfdserializers.py:178

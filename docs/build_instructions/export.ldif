@@ -1,0 +1,178 @@
+# Entry 1: dc=nfd,dc=geo-solutions,dc=it
+dn: dc=nfd,dc=geo-solutions,dc=it
+dc: Metroparks
+o: Metroparks
+objectclass: top
+objectclass: dcObject
+objectclass: organization
+
+# Entry 2: cn=admin,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=admin,dc=nfd,dc=geo-solutions,dc=it
+cn: admin
+description: LDAP administrator
+objectclass: simpleSecurityObject
+objectclass: organizationalRole
+userpassword: {SSHA}25WTCgVYQn9o+47oiaN3IcKXavLIz9ip
+
+# Entry 3: ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: ou=groups,dc=nfd,dc=geo-solutions,dc=it
+objectclass: organizationalUnit
+objectclass: top
+ou: groups
+
+# Entry 4: cn=animal_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=animal_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: animal_publisher
+gidnumber: 503
+memberuid: user_003
+memberuid: user_004
+objectclass: posixGroup
+objectclass: top
+
+# Entry 5: cn=animal_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=animal_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: animal_writer
+gidnumber: 504
+memberuid: user_002
+memberuid: user_004
+objectclass: posixGroup
+objectclass: top
+
+# Entry 6: cn=fungus_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=fungus_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: fungus_publisher
+gidnumber: 508
+memberuid: user_002
+objectclass: posixGroup
+objectclass: top
+
+# Entry 7: cn=fungus_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=fungus_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: fungus_writer
+gidnumber: 507
+memberuid: user_001
+objectclass: posixGroup
+objectclass: top
+
+# Entry 8: cn=naturalarea_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=naturalarea_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: naturalarea_publisher
+gidnumber: 511
+objectclass: posixGroup
+objectclass: top
+
+# Entry 9: cn=naturalarea_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=naturalarea_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: naturalarea_writer
+gidnumber: 510
+objectclass: posixGroup
+objectclass: top
+
+# Entry 10: cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: nfdadmins
+gidnumber: 509
+memberuid: user_004
+objectclass: posixGroup
+objectclass: top
+
+# Entry 11: cn=plant_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=plant_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: plant_publisher
+gidnumber: 505
+memberuid: user_003
+memberuid: user_004
+objectclass: posixGroup
+objectclass: top
+
+# Entry 12: cn=plant_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=plant_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: plant_writer
+gidnumber: 501
+memberuid: user_004
+memberuid: user_002
+objectclass: posixGroup
+objectclass: top
+
+# Entry 13: cn=slimemold_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=slimemold_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: slimemold_publisher
+gidnumber: 506
+memberuid: user_002
+objectclass: posixGroup
+objectclass: top
+
+# Entry 14: cn=slimemold_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+dn: cn=slimemold_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it
+cn: slimemold_writer
+gidnumber: 502
+memberuid: user_001
+objectclass: posixGroup
+objectclass: top
+
+# Entry 15: ou=users,dc=nfd,dc=geo-solutions,dc=it
+dn: ou=users,dc=nfd,dc=geo-solutions,dc=it
+objectclass: organizationalUnit
+objectclass: top
+ou: users
+
+# Entry 16: uid=user_001,dc=nfd,dc=geo-solutions,dc=it
+dn: uid=user_001,dc=nfd,dc=geo-solutions,dc=it
+cn: User
+mail: cesar.izq@gmail.com
+mobile: 768687564
+objectclass: inetOrgPerson
+objectclass: top
+postaladdress: Carrer Sense nom
+sn: 001
+street: Carrer sense nom street
+telephonenumber: 23423423424
+uid: user_001
+userpassword: {MD5}1GHwE8KaE3IAZNraDyEw0Q==
+userpassword: {SSHA}RFBJ9Y+ClaIwvJCjcJZw8AXLuwo01zNV
+userpassword: {SHA}ah8w0pIX2/186d3d3O2mU85BshY=
+
+# Entry 17: uid=user_002,dc=nfd,dc=geo-solutions,dc=it
+dn: uid=user_002,dc=nfd,dc=geo-solutions,dc=it
+cn: User
+mail: cmartinez@scolab.es
+mobile: 23423242
+objectclass: inetOrgPerson
+objectclass: top
+postaladdress: Carrer sense nom postal address
+sn: 002
+street: Carrer sense nom street
+telephonenumber: 23423423432
+uid: user_002
+userpassword: {MD5}8dk60SPGJDgX98DhoUS7VA==
+userpassword: {SHA}H071QcdfoYt12GrJNVfBVoqUH8g=
+
+# Entry 18: uid=user_003,dc=nfd,dc=geo-solutions,dc=it
+dn: uid=user_003,dc=nfd,dc=geo-solutions,dc=it
+cn: User
+mail: cesarizq@gmail.com
+mobile: 4353452442342
+objectclass: inetOrgPerson
+objectclass: top
+postaladdress: Carrer sense nom postalAddress
+sn: 003
+street: Carrer sense nom street
+telephonenumber: 54646546
+uid: user_003
+userpassword: {SHA}JVxRTUTHYmM1Y8Ca+V6WY4a/Hi4=
+
+# Entry 19: uid=user_004,dc=nfd,dc=geo-solutions,dc=it
+dn: uid=user_004,dc=nfd,dc=geo-solutions,dc=it
+cn: User
+mail: ces.ar.izq@gmail.com
+mobile: 233422134
+objectclass: inetOrgPerson
+objectclass: top
+postaladdress: Carrer sense nom PostalAddress
+sn: 004
+street: Carrer sense nom street
+telephonenumber: 345342342
+uid: user_004
+userpassword: {MD5}4ghiJe1WFOE2Y1gy493/6A==
+userpassword: {SHA}PQ5i0IPJPOnNzobVTNm+lE0M0k8=
+userpassword: {SSHA}NGCd7s2HWbMqVUjoI5NhM75kLH7cZiad

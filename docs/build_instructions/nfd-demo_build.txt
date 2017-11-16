@@ -1,0 +1,13 @@
+geosolutions@188.165.62.185
+
+cd clevmetro-nfd/
+source venvs/metroparksnfd/bin/activate
+git pull origin master
+
+# APIs
+cd nfdapi/
+./restart.sh
+
+# Client
+cd nfdclient/
+./build.sh

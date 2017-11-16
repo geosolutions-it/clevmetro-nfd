@@ -1,7 +1,4 @@
-./manage.py makemigrations
-./manage.py migrate
-# ./manage.py compilemessages
-./manage.py collectstatic --noinput
+./manage.py createinitialrevisions
 
 sudo systemctl restart slapd
 sudo systemctl restart apache2

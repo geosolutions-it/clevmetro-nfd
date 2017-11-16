@@ -18,7 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import reversion
 from reversion.models import Version
 from nfdcore.nfdserializers import SpeciesSearchSerializer,\
-    SpeciesSearchResultSerializer
+    SpeciesSearchResultSerializer, SpeciesFilter
 from rest_framework.generics import ListAPIView,\
     RetrieveAPIView, ListCreateAPIView
 from rest_framework.filters import SearchFilter
@@ -34,7 +34,9 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import FilterSet
 import django_filters
+from django.db.models import Q
 from rest_framework.fields import empty
+import traceback
 
 class NfdLayer(ListCreateAPIView):
     def get_queryset(self):
@@ -304,7 +306,7 @@ def get_feature_type(request, occurrence_subcat, feature_id=None):
     return Response(ftdata)
 
 class SpeciesPaginationClass(PageNumberPagination):
-    page_size = 15
+    page_size = 100
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -313,11 +315,75 @@ class SpeciesSearch(ListAPIView):
     queryset = Species.objects.all()
     serializer_class = SpeciesSearchSerializer
     filter_backends = (SearchFilter,)
+    # filter_class = SpeciesFilter
     pagination_class = SpeciesPaginationClass
     search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
 
+    def get_queryset(self):
+        queryset = Species.objects.all()
+
+        request = self.request
+        if request and request.query_params:
+            try:
+                search_params = request.query_params.getlist('search')
+                for filter_param in search_params:
+                    queryset = queryset.filter(
+                        Q(first_common__icontains=filter_param) |
+                        Q(second_common__icontains=filter_param) |
+                        Q(third_common__icontains=filter_param) |
+                        Q(name_sci__icontains=filter_param) |
+                        Q(synonym__icontains=filter_param) |
+                        # startswith
+                        Q(first_common__startswith=filter_param) |
+                        Q(second_common__startswith=filter_param) |
+                        Q(third_common__startswith=filter_param) |
+                        Q(name_sci__startswith=filter_param) |
+                        Q(synonym__startswith=filter_param) |
+                        # endswith
+                        Q(first_common__endswith=filter_param) |
+                        Q(second_common__endswith=filter_param) |
+                        Q(third_common__endswith=filter_param) |
+                        Q(name_sci__endswith=filter_param) |
+                        Q(synonym__endswith=filter_param)
+                        )
+            except:
+                traceback.print_exc()
+
+        return queryset.order_by('first_common')
 
 class SpeciesDetail(RetrieveAPIView):
     queryset = Species.objects.all()
     serializer_class = SpeciesSearchResultSerializer
     search_fields = ('first_common', 'name_sci', 'second_common', 'third_common', 'synonym')
+
+    def get_queryset(self):
+        queryset = Species.objects.all()
+
+        request = self.request
+        if request and request.query_params:
+            try:
+                search_params = request.query_params.getlist('search')
+                for filter_param in search_params:
+                    queryset = queryset.filter(
+                        Q(first_common__icontains=filter_param) |
+                        Q(second_common__icontains=filter_param) |
+                        Q(third_common__icontains=filter_param) |
+                        Q(name_sci__icontains=filter_param) |
+                        Q(synonym__icontains=filter_param) |
+                        # startswith
+                        Q(first_common__startswith=filter_param) |
+                        Q(second_common__startswith=filter_param) |
+                        Q(third_common__startswith=filter_param) |
+                        Q(name_sci__startswith=filter_param) |
+                        Q(synonym__startswith=filter_param) |
+                        # endswith
+                        Q(first_common__endswith=filter_param) |
+                        Q(second_common__endswith=filter_param) |
+                        Q(third_common__endswith=filter_param) |
+                        Q(name_sci__endswith=filter_param) |
+                        Q(synonym__endswith=filter_param)
+                        )
+            except:
+                traceback.print_exc()
+
+        return queryset.order_by('first_common')

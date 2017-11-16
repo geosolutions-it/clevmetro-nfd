@@ -18,6 +18,7 @@ from datetime import datetime
 from nfdapi.settings import MEDIA_ROOT
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import crypto
+from django.utils.encoding import smart_text
 import logging
 import tempfile
 
@@ -25,33 +26,33 @@ import tempfile
 class DictionaryTable(models.Model):
     code = models.TextField(unique=True)
     name = models.TextField()
-    
+
     def __str__(self):
-        return "{0}-{1}".format(self.code, self.name) 
-    
+        return "{0}-{1}".format(self.code, self.name)
+
     class Meta:
         abstract = True
 
-@python_2_unicode_compatible    
+@python_2_unicode_compatible
 class DictionaryTableExtended(models.Model):
     code = models.TextField(unique=True)
     name = models.TextField()
     description = models.TextField()
-    
+
     def __str__(self):
         return "{0}-{1}".format(self.code, self.name)
-       
+
     class Meta:
         abstract = True
 
 class OccurrenceCategory(DictionaryTable):
     # natural_area, plant, animal, fungus, slimemold
     main_cat = models.TextField()
-    
+
     def natural_key(self):
         return (self.main_cat, self.code, self.name)
 
-@reversion.register()    
+@reversion.register()
 class PointOfContact(models.Model):
     name = models.TextField(blank=False)
     affiliation = models.TextField(blank=True, null=True, default='')
@@ -94,7 +95,7 @@ def get_img_format(extension):
     if extension[1:].upper() in ('JPG', 'JPEG', 'JPE'):
         return 'JPEG'
     return 'PNG'
-    
+
 def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_SIZE, PHOTO_THUMB_SIZE)):
     """
     Create a thumbnail of an existing image
@@ -122,12 +123,12 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
     try:
         if not date:
             date = timezone.now()
-        
+
         # create target directory
         thumb_dirname = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO))
         if not os.path.exists(thumb_dirname):
             os.makedirs(thumb_dirname, mode=0775)
-                
+
         # create thumbnail
         image.thumbnail(thumbnail_size)
         basename = os.path.basename(input_path)
@@ -214,11 +215,11 @@ class Occurrence(models.Model):
     class Meta:
         abstract = True
 
-     
+
 class CmStatus(DictionaryTableExtended):
     pass
 
-    
+
 class SRank(DictionaryTable):
     pass
 
@@ -235,7 +236,7 @@ class Element(models.Model):
     s_rank = models.ForeignKey(SRank, on_delete=models.SET_NULL, blank=True, null=True)
     n_rank = models.ForeignKey(NRank, on_delete=models.SET_NULL, blank=True, null=True)
     g_rank = models.ForeignKey(GRank, on_delete=models.SET_NULL, blank=True, null=True)
-    
+
     class Meta:
         abstract = True
 
@@ -285,6 +286,13 @@ class Species(models.Model):
     phylum = models.TextField(blank=True, default='')
     phylum_common = models.TextField(blank=True, default='')
     element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __unicode__(self):
+        if self.synonym:
+            return u'{} - {} ({})'.format(smart_text(self.first_common),
+                smart_text(self.name_sci), smart_text(self.synonym))
+        else:
+            return u'{} - {}'.format(smart_text(self.first_common), smart_text(self.name_sci))
 
 class Preservative(DictionaryTable):
     pass
@@ -348,11 +356,11 @@ class OccurrenceTaxon(Occurrence):
     details = models.OneToOneField(TaxonDetails, on_delete=models.CASCADE, null=True)
     location = models.OneToOneField(TaxonLocation, on_delete=models.CASCADE, null=True)
     photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
-            
+
     def get_details_class(self):
         if self.occurrence_cat:
             return get_details_class(self.occurrence_cat.code)
-        
+
     def get_details(self):
         """
         Gets the taxon details using the right model for the concrete instance. By default,
@@ -457,7 +465,7 @@ class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
     shoreline_type = models.ForeignKey(ShorelineType, on_delete=models.SET_NULL, blank=True, null=True)
     microhabitat = models.ForeignKey(LakeMicrohabitat, on_delete=models.SET_NULL, blank=True, null=True)
     microhabitat_comments = models.TextField(default='', blank=True, null=True)
-    
+
 
 class StreamDesignatedUse(DictionaryTable):
     pass
@@ -656,14 +664,14 @@ class PlantDetails(TaxonDetails):
     landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
     aspect = models.ForeignKey(Aspect, on_delete=models.SET_NULL, blank=True, null=True)
     slope = models.ForeignKey(Slope, on_delete=models.SET_NULL, blank=True, null=True)
-    
+
     class Meta:
         abstract = True
-        
+
 @reversion.register(follow=['taxondetails_ptr'])
 class ConiferDetails(PlantDetails):
     lifestages = models.ForeignKey(ConiferLifestages, on_delete=models.SET_NULL, blank=True, null=True)
-    
+
 @reversion.register(follow=['taxondetails_ptr'])
 class FernDetails(PlantDetails):
     lifestages = models.ForeignKey(FernLifestages, on_delete=models.SET_NULL, blank=True, null=True)
@@ -702,10 +710,10 @@ class FruitingBodiesAge(models.Model):
     mature_count = models.PositiveIntegerField(null=True)
     young_diam_cm = models.FloatField(null=True)
     young_count = models.PositiveIntegerField(null=True)
-    
+
 class FungalAssociationType(DictionaryTable):
     pass
-    
+
 @reversion.register()
 class ObservedAssociations(models.Model):
     #gnat_association_present = models.NullBooleanField(default=False) # FIXME, needed??
@@ -736,12 +744,12 @@ class FungusDetails(TaxonDetails):
     disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
     earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
     landscape_position = models.ForeignKey(LandscapePosition, on_delete=models.SET_NULL, blank=True, null=True)
-    #spore_print boolean, # flag for associated photos 
+    #spore_print boolean, # flag for associated photos
     apparent_substrate = models.ForeignKey(FungusApparentSubstrate, on_delete=models.SET_NULL, blank=True, null=True)
     #potential_plant_hosts character varying, # invasive plants # FIXME
     other_observed_associations = models.ForeignKey(ObservedAssociations, on_delete=models.CASCADE, blank=True, null=True)
     mushroom_vertical_location = models.ForeignKey(MushroomVerticalLocation, on_delete=models.SET_NULL, blank=True, null=True)
-    fruiting_bodies_age = models.ForeignKey(FruitingBodiesAge, on_delete=models.CASCADE, blank=True, null=True) 
+    fruiting_bodies_age = models.ForeignKey(FruitingBodiesAge, on_delete=models.CASCADE, blank=True, null=True)
     mushroom_growth_form = models.ForeignKey(MushroomGrowthForm, on_delete=models.SET_NULL, blank=True, null=True)
     mushroom_odor = models.ForeignKey(MushroomOdor, on_delete=models.SET_NULL, blank=True, null=True)
 

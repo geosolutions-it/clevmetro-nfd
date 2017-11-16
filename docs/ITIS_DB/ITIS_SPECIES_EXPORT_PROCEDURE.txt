@@ -1,0 +1,102 @@
+1. Dump 'nfdcore_species' schema
+pg_dump -t 'nfdcore_species' --schema-only metroparksnfd > nfdcore_species_schema.sql
+
+2a. Edit SQL and remote any 'element_species' dep
+2b. Edit SQL and remote any 'ALTER SET OWNER' both on table and sequence
+
+3. Restore 'nfdcore_species' schema on ITIS
+psql -f nfdcore_species_schema.sql ITIS
+
+4. psql ITIS
+
+CREATE VIEW nfdspecies2 AS (
+    SELECT
+        S.tsn, S.name_sci,
+        S.first_common, S.second_common, S.third_common,
+        S.family_tsn, F.name_sci as familiy_name_sci,
+        F.first_common as familiy_first_common,
+        F.second_common as familiy_second_common,
+        F.third_common as familiy_third_common,
+        S.phylum_tsn, P.name_sci as phylum_name_sci,
+        P.first_common as phylum_first_common,
+        P.second_common as phylum_second_common,
+        P.third_common as phylum_third_common,
+        S.synonym_tsn, SYN.name_sci as synonym_name_sci,
+        SYN.first_common as synonym_first_common,
+        SYN.second_common as synonym_second_common,
+        SYN.third_common as synonym_third_common
+    FROM cmispecies3 S
+    LEFT JOIN cmifamilies2 F ON S.family_tsn = F.tsn
+    LEFT JOIN cmiphylums2 P ON S.phylum_tsn = P.tsn
+    LEFT JOIN cmisynonymi2 SYN ON S.synonym_tsn = SYN.tsn AND S.name_sci = SYN.name_sci
+);
+
+
+5.
+  INSERT INTO nfdcore_species (tsn, name_sci, synonym, first_common, second_common, third_common, family, family_common, phylum, phylum_common)
+  (
+   SELECT 
+    tsn, name_sci, synonym_first_common, first_common, second_common, third_common,
+    familiy_name_sci, familiy_first_common,
+    phylum_name_sci, phylum_first_common
+   FROM nfdspecies
+   WHERE
+    familiy_name_sci is not NULL AND
+    phylum_name_sci is not NULL
+    
+  UNION
+   SELECT 
+    tsn, name_sci, synonym_first_common, first_common, second_common, third_common,
+     'Not Specified', 'Not Specified',
+    phylum_name_sci, phylum_first_common
+   FROM nfdspecies
+   WHERE
+    familiy_name_sci is NULL AND
+    phylum_name_sci is not NULL
+    
+  UNION
+   SELECT 
+    tsn, name_sci, synonym_first_common, first_common, second_common, third_common,
+    familiy_name_sci, familiy_first_common,
+    'Not Specified', 'Not Specified'
+   FROM nfdspecies
+   WHERE
+    familiy_name_sci is not NULL AND
+    phylum_name_sci is NULL
+
+  UNION
+   SELECT 
+    tsn, name_sci, synonym_first_common, first_common, second_common, third_common,
+    'Not Specified', 'Not Specified',
+    'Not Specified', 'Not Specified'
+   FROM nfdspecies
+   WHERE
+    familiy_name_sci is NULL AND
+    phylum_name_sci is NULL
+  );
+
+---------------------------------  
+> sudo su - postgres     
+---------------------------------
+
+6. pg_dump -t 'nfdcore_species' --data-only --inserts ITIS > nfdcore_species_data.sql
+
+7. psql -c "DELETE FROM nfdcore_species;" -d metroparksnfd
+
+8. psql -f nfdcore_species_data.sql -d metroparksnfd
+
+--------------------------------
+WARNING: Update Revisions
+--------------------------------
+
+10. ./manage.py createinitialrevisions
+
+11. ./restart.sh
+
+NOTE: To do that programmatically
+
+with reversion.create_revision():
+    species = Species()
+    species.first_common = 'bla bla bla'
+    ....
+    species.save()
