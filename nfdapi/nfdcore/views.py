@@ -229,6 +229,11 @@ class LayerDetail(APIView):
     """
     Retrieve, update or delete an occurrence instance.
     """
+
+    def __init__(self, *args, **kwargs):
+        super(LayerDetail, self).__init__(*args, **kwargs)
+        self.__instance = None
+
     def get_object(self, occurrence_maincat, pk):
 
         try:
@@ -245,6 +250,8 @@ class LayerDetail(APIView):
             serializer = NaturalAreaOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
         else:
             serializer = TaxonOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
+        if feature:
+            self.__instance = feature
         return Response(serializer.data)
 
     def put(self, request, occurrence_maincat, pk, format=None):
@@ -283,8 +290,7 @@ class LayerDetail(APIView):
 
             response.accepted_renderer = request.accepted_renderer
             if response.accepted_renderer.format == 'csv':
-                # print("0. ****************** {} **** ".format(self.get_object()))
-                print("1. ****************** {} **** ".format(self.get_view_name()))
+                print("0. ****************** {} **** ".format(self.__instance))
                 response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
@@ -338,7 +344,6 @@ class LayerVersionDetail(APIView):
             response.accepted_renderer = request.accepted_renderer
             if response.accepted_renderer.format == 'csv':
                 print("0. ****************** {} **** ".format(self.__instance))
-                print("2. ****************** {} **** ".format(self.get_view_name()))
                 response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
