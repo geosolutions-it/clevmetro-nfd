@@ -5,7 +5,7 @@ Created on 17 nov. 2017
 @author: Alessio Fabiani
 '''
 
-import easy_pdf
+from easy_pdf.rendering import render_to_pdf_response
 from collections import OrderedDict
 from io import BytesIO
 from pyexcel import PyExcelBaseRenderer
@@ -21,4 +21,4 @@ class PdfRenderer(PyExcelBaseRenderer):
         for record in features:
             matrix.append(self._get_row(record))
         sheet_data.update({"Sheet 1": matrix})
-        return easy_pdf.rendering.render_to_pdf('hello_pdf.html', context={})
+        return render_to_pdf('hello_pdf.html', context={})
