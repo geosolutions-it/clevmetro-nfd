@@ -7,6 +7,7 @@ from nfdcore.models import OccurrenceTaxon, OccurrenceNaturalArea, Species,\
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
+from django.http.response import HttpResponseBase
 from rest_framework.response import Response
 from rest_framework import status
 from nfdcore.nfdserializers import FeatureTypeSerializer, LayerSerializer, OccurrenceSerializer,\
@@ -265,18 +266,47 @@ class LayerDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def finalize_response(self, request, response, *args, **kwargs):
-        response = super(NfdLayer, self).finalize_response(request, response, *args, **kwargs)
-        if response.accepted_renderer.format == 'csv':
-            response['content-disposition'] = 'attachment; filename={}.csv'.format(self.get_main_cat())
+        """
+        Returns the final response object.
+        """
+        # Make the error obvious if a proper response is not returned
+        assert isinstance(response, HttpResponseBase), (
+            'Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` '
+            'to be returned from the view, but received a `%s`'
+            % type(response)
+        )
+
+        if isinstance(response, Response):
+            if not getattr(request, 'accepted_renderer', None):
+                neg = self.perform_content_negotiation(request, force=True)
+                request.accepted_renderer, request.accepted_media_type = neg
+
+            response.accepted_renderer = request.accepted_renderer
+            if response.accepted_renderer.format == 'csv':
+                # print("0. ****************** {} **** ".format(self.get_object()))
+                print("1. ****************** {} **** ".format(self.get_view_name()))
+                response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
+            response.accepted_media_type = request.accepted_media_type
+            response.renderer_context = self.get_renderer_context()
+
+        for key, value in self.headers.items():
+            response[key] = value
+
         return response
 
 class LayerVersionDetail(APIView):
     permission_classes = [ IsAuthenticated ]
 
+    def __init__(self, *args, **kwargs):
+        super(LayerVersionDetail, self).__init__(*args, **kwargs)
+        self.__instance = None
+
     def get(self, request, occurrence_maincat, pk, version, format=None):
         try:
             (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
             instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+            if instance:
+                self.__instance = instance
             serializer = OccurrenceVersionSerializer()
             excude_unreleased = not (is_writer or is_publisher)
             serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
@@ -288,6 +318,35 @@ class LayerVersionDetail(APIView):
         except ObjectDoesNotExist:
             raise
             #raise Http404
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        Returns the final response object.
+        """
+        # Make the error obvious if a proper response is not returned
+        assert isinstance(response, HttpResponseBase), (
+            'Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` '
+            'to be returned from the view, but received a `%s`'
+            % type(response)
+        )
+
+        if isinstance(response, Response):
+            if not getattr(request, 'accepted_renderer', None):
+                neg = self.perform_content_negotiation(request, force=True)
+                request.accepted_renderer, request.accepted_media_type = neg
+
+            response.accepted_renderer = request.accepted_renderer
+            if response.accepted_renderer.format == 'csv':
+                print("0. ****************** {} **** ".format(self.__instance))
+                print("2. ****************** {} **** ".format(self.get_view_name()))
+                response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
+            response.accepted_media_type = request.accepted_media_type
+            response.renderer_context = self.get_renderer_context()
+
+        for key, value in self.headers.items():
+            response[key] = value
+
+        return response
 
 class PhotoViewSet(ModelViewSet):
     permission_classes = [ IsAuthenticated, CanWriteOrUpdateAny ]
