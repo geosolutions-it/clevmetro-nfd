@@ -39,6 +39,7 @@ from rest_framework.fields import empty
 import traceback
 
 class NfdLayer(ListCreateAPIView):
+
     def get_queryset(self):
         (is_writer, is_publisher) = get_permissions(self.request.user, self.get_main_cat())
         queryset = self.get_base_queryset()
@@ -64,6 +65,12 @@ class NfdLayer(ListCreateAPIView):
             is_writer_or_publisher = (is_writer or is_publisher)
             serializer_class = self.get_serializer_class()
             return serializer_class(instance, many=many, is_writer_or_publisher=is_writer_or_publisher)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super(NfdLayer, self).finalize_response(request, response, *args, **kwargs)
+        if response.accepted_renderer.format == 'csv':
+            response['content-disposition'] = 'attachment; filename={}.csv'.format(self.get_main_cat())
+        return response
 
 class TaxonFilter(FilterSet):
     #inclusion_date = DateFromToRangeFilter() # ?inclusion_date_0=2017-10-01&inclusion_date_1=2017-10-03
