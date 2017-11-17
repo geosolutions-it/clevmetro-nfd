@@ -228,8 +228,24 @@ class BaseLayerDetailView(APIView):
 
     def __init__(self, *args, **kwargs):
         super(BaseLayerDetailView, self).__init__(*args, **kwargs)
-        self.__instance = None
-        self.__version = None
+        self._instance = None
+        self._version = None
+
+    @property
+    def instance(self):
+        return self._instance
+
+    @instance.setter
+    def instance(self, value):
+        self._instance = value
+
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, value):
+        self._version = value
 
     def finalize_response(self, request, response, *args, **kwargs):
         """
@@ -249,12 +265,12 @@ class BaseLayerDetailView(APIView):
 
             response.accepted_renderer = request.accepted_renderer
             file_name = 'download'
-            if self.__instance:
+            if self.instance:
                 file_name = '{}_tsn-{}'.format(
-                    self.__instance.occurrence_cat.main_cat,
-                    self.__instance.species.tsn)
-                if self.__version:
-                    file_name += '.v.{}'.format(self.__version)
+                    self.instance.occurrence_cat.main_cat,
+                    self.instance.species.tsn)
+                if self.version:
+                    file_name += '.v.{}'.format(self.version)
 
             if response.accepted_renderer.format == 'csv':
                 response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
@@ -274,12 +290,19 @@ class BaseLayerDetailView(APIView):
             response[key] = value
 
         return response
+    
+    class Meta:
+        abstract = True
 
 class LayerDetail(BaseLayerDetailView):
-    permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
     """
     Retrieve, update or delete an occurrence instance.
     """
+    permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
+
+    def __init__ (self) :
+        BaseLayerDetailView.__init__(self)
+
     def get_object(self, occurrence_maincat, pk):
         try:
             return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
@@ -296,8 +319,8 @@ class LayerDetail(BaseLayerDetailView):
         else:
             serializer = TaxonOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
         if feature:
-            self.__instance = feature
-            self.__version = feature.version
+            self.instance = feature
+            self.version = feature.version
         return Response(serializer.data)
 
     def put(self, request, occurrence_maincat, pk, format=None):
@@ -319,22 +342,28 @@ class LayerDetail(BaseLayerDetailView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class LayerVersionDetail(BaseLayerDetailView):
+    """
+    Retrieve, update or delete a specific version of an occurrence instance.
+    """
     permission_classes = [ IsAuthenticated ]
+
+    def __init__ (self) :
+        BaseLayerDetailView.__init__(self)
 
     def get(self, request, occurrence_maincat, pk, version, format=None):
         try:
             (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
-            instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
-            if instance:
-                self.__instance = instance
-                self.__version = version
+            feature = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+            if feature:
+                self.instance = feature
+                self.version = version
             serializer = OccurrenceVersionSerializer()
             excude_unreleased = not (is_writer or is_publisher)
-            serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
+            serialized_feature = serializer.get_version(feature, int(version), excude_unreleased)
             if serialized_feature.get('released', False) == False and excude_unreleased:
                 return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
             serialized_feature['featuretype'] = occurrence_maincat
-            serialized_feature['featuresubtype'] = instance.occurrence_cat.code
+            serialized_feature['featuresubtype'] = feature.occurrence_cat.code
             return Response(serialized_feature)
         except ObjectDoesNotExist:
             raise
