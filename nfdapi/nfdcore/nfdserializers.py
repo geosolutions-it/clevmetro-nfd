@@ -128,7 +128,6 @@ MANAGEMENT_FORM_ITEMS_PUBLISHER = [{
         'readonly': True
     }]
 
-
 LAND_ANIMAL_TYPE = [
     (_('species'), Species, ['species.element_species']),
     (_('species.element_species'), ElementSpecies, []),
@@ -175,7 +174,6 @@ PONDLAKE_ANIMAL_TYPE = [
     (_('location'), TaxonLocation, []),
     ]
 PONDLAKE_ANIMAL_TYPE_DICT = get_form_dict(PONDLAKE_ANIMAL_TYPE)
-
 
 WETLAND_ANIMAL_TYPE = [
     (_('species'), Species, ['species.element_species']),
@@ -304,7 +302,6 @@ NATURAL_AREA_TYPE = [
     ]
 NATURAL_AREA_TYPE_DICT = get_form_dict(NATURAL_AREA_TYPE)
 
-
 del _
 from django.utils.translation import ugettext_lazy as _
 
@@ -347,7 +344,6 @@ def is_deletable_field(f):
     if issubclass(f.related_model, Species):
         return False
     return True
-
 
 def delete_object_and_children(parent_instance):
 
@@ -817,13 +813,9 @@ class UpdateOccurrenceMixin(object):
             for (form_name, model_class, children) in self.get_toplevel_forms():
                 if form_name == 'species':
                     try:
-                        print("1. ************** {} / {} *************".format(form_name, validated_data['species']))
                         species_id = validated_data['species']['id']
-                        print("2. ************** {} *************".format(species_id))
                         selected_species = Species.objects.get(pk=species_id)
-                        print("3. ************** {} *************".format(selected_species))
                         instance.species = selected_species
-                        print("4. ************** {} *************".format(instance.species))
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
@@ -1134,7 +1126,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, Serializer):
         result['is_writer'] = self.is_writer
         result['is_publisher'] = self.is_publisher
         result['geom'] = instance.geom.geojson
-        
+
         if instance.location and isinstance(instance.location.polygon, Polygon):
             result['polygon'] = instance.location.polygon.geojson
         return result
