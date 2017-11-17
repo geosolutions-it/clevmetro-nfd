@@ -5,7 +5,7 @@ Created on 17 nov. 2017
 @author: Alessio Fabiani
 '''
 
-from easy_pdf.rendering import render_to_pdf_response
+from easy_pdf.rendering import render_to_pdf
 from collections import OrderedDict
 from io import BytesIO
 from pyexcel import PyExcelBaseRenderer
