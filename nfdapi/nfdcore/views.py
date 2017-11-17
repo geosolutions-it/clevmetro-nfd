@@ -224,124 +224,12 @@ class NaturalAreaList(NfdList):
     def get_main_cat(self):
         return "naturalarea"
 
-class LayerDetail(APIView):
-    permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
-    """
-    Retrieve, update or delete an occurrence instance.
-    """
+class BaseLayerDetailView(APIView):
 
     def __init__(self, *args, **kwargs):
-        super(LayerDetail, self).__init__(*args, **kwargs)
-        self.__instance = None
-
-    def get_object(self, occurrence_maincat, pk):
-
-        try:
-            return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
-        except ObjectDoesNotExist:
-            raise Http404
-
-    def get(self, request, occurrence_maincat, pk, format=None):
-        (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
-        feature = self.get_object(occurrence_maincat, pk)
-        if feature.released == False and not (is_writer or is_publisher):
-            return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
-        if isinstance(feature, OccurrenceNaturalArea):
-            serializer = NaturalAreaOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
-        else:
-            serializer = TaxonOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
-        if feature:
-            self.__instance = feature
-        return Response(serializer.data)
-
-    def put(self, request, occurrence_maincat, pk, format=None):
-        (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
-        feature = self.get_object(occurrence_maincat, pk)
-        if isinstance(feature, OccurrenceNaturalArea):
-            serializer = NaturalAreaOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
-        else:
-            serializer = TaxonOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, occurrence_maincat, pk, format=None):
-        feature = self.get_object(occurrence_maincat, pk)
-        with reversion.create_revision():
-            delete_object_and_children(feature)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def finalize_response(self, request, response, *args, **kwargs):
-        """
-        Returns the final response object.
-        """
-        # Make the error obvious if a proper response is not returned
-        assert isinstance(response, HttpResponseBase), (
-            'Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` '
-            'to be returned from the view, but received a `%s`'
-            % type(response)
-        )
-
-        if isinstance(response, Response):
-            if not getattr(request, 'accepted_renderer', None):
-                neg = self.perform_content_negotiation(request, force=True)
-                request.accepted_renderer, request.accepted_media_type = neg
-
-            response.accepted_renderer = request.accepted_renderer
-            file_name = 'download'
-            if self.__instance:
-                file_name = '{}_tsn-{}'.format(
-                    self.__instance.occurrence_cat.main_cat,
-                    self.__instance.species.tsn)
-                if self.__instance.version:
-                    file_name += '.v.{}'.format(self.__instance.version)
-
-            if response.accepted_renderer.format == 'csv':
-                response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
-            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'zip':
-                response['Content-type'] = 'application/x-zip-compressed'
-                response['Content-disposition'] = 'attachment; filename={}.zip'.format(file_name)
-            if response.accepted_renderer.format == 'xlsx':
-                response['Content-disposition'] = 'attachment; filename={}.xlsx'.format(file_name)
-            if response.accepted_renderer.format == 'pdf':
-                response['Content-type'] = 'application/pdf'
-                response['Content-disposition'] = 'attachment; filename={}.pdf'.format(file_name)
-
-            response.accepted_media_type = request.accepted_media_type
-            response.renderer_context = self.get_renderer_context()
-
-        for key, value in self.headers.items():
-            response[key] = value
-
-        return response
-
-class LayerVersionDetail(APIView):
-    permission_classes = [ IsAuthenticated ]
-
-    def __init__(self, *args, **kwargs):
-        super(LayerVersionDetail, self).__init__(*args, **kwargs)
+        super(BaseLayerDetailView, self).__init__(*args, **kwargs)
         self.__instance = None
         self.__version = None
-
-    def get(self, request, occurrence_maincat, pk, version, format=None):
-        try:
-            (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
-            instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
-            if instance:
-                self.__instance = instance
-                self.__version = version
-            serializer = OccurrenceVersionSerializer()
-            excude_unreleased = not (is_writer or is_publisher)
-            serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
-            if serialized_feature.get('released', False) == False and excude_unreleased:
-                return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
-            serialized_feature['featuretype'] = occurrence_maincat
-            serialized_feature['featuresubtype'] = instance.occurrence_cat.code
-            return Response(serialized_feature)
-        except ObjectDoesNotExist:
-            raise
-            #raise Http404
 
     def finalize_response(self, request, response, *args, **kwargs):
         """
@@ -386,6 +274,71 @@ class LayerVersionDetail(APIView):
             response[key] = value
 
         return response
+
+class LayerDetail(BaseLayerDetailView):
+    permission_classes = [ IsAuthenticated, CanUpdateFeatureType ]
+    """
+    Retrieve, update or delete an occurrence instance.
+    """
+    def get_object(self, occurrence_maincat, pk):
+        try:
+            return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            raise Http404
+
+    def get(self, request, occurrence_maincat, pk, format=None):
+        (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
+        feature = self.get_object(occurrence_maincat, pk)
+        if feature.released == False and not (is_writer or is_publisher):
+            return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
+        if isinstance(feature, OccurrenceNaturalArea):
+            serializer = NaturalAreaOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
+        else:
+            serializer = TaxonOccurrenceSerializer(feature, is_writer=is_writer, is_publisher=is_publisher)
+        if feature:
+            self.__instance = feature
+            self.__version = feature.version
+        return Response(serializer.data)
+
+    def put(self, request, occurrence_maincat, pk, format=None):
+        (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
+        feature = self.get_object(occurrence_maincat, pk)
+        if isinstance(feature, OccurrenceNaturalArea):
+            serializer = NaturalAreaOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
+        else:
+            serializer = TaxonOccurrenceSerializer(feature, data=request.data, is_writer=is_writer, is_publisher=is_publisher)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, occurrence_maincat, pk, format=None):
+        feature = self.get_object(occurrence_maincat, pk)
+        with reversion.create_revision():
+            delete_object_and_children(feature)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class LayerVersionDetail(BaseLayerDetailView):
+    permission_classes = [ IsAuthenticated ]
+
+    def get(self, request, occurrence_maincat, pk, version, format=None):
+        try:
+            (is_writer, is_publisher) = get_permissions(request.user, occurrence_maincat)
+            instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+            if instance:
+                self.__instance = instance
+                self.__version = version
+            serializer = OccurrenceVersionSerializer()
+            excude_unreleased = not (is_writer or is_publisher)
+            serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
+            if serialized_feature.get('released', False) == False and excude_unreleased:
+                return Response({_("error"): _("You don't have permissions to access the occurrence")}, status=status.HTTP_403_FORBIDDEN)
+            serialized_feature['featuretype'] = occurrence_maincat
+            serialized_feature['featuresubtype'] = instance.occurrence_cat.code
+            return Response(serialized_feature)
+        except ObjectDoesNotExist:
+            raise
+            #raise Http404
 
 class PhotoViewSet(ModelViewSet):
     permission_classes = [ IsAuthenticated, CanWriteOrUpdateAny ]
