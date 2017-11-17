@@ -292,7 +292,7 @@ class LayerDetail(APIView):
             file_name = 'download'
             if self.__instance:
                 file_name = '{}_tsn-{}'.format(
-                    self.__instance.occurrence_cat.main_cat
+                    self.__instance.occurrence_cat.main_cat,
                     self.__instance.species.tsn)
                 if self.__instance.version:
                     file_name += '.v.{}'.format(self.__instance.version)
@@ -314,6 +314,7 @@ class LayerVersionDetail(APIView):
     def __init__(self, *args, **kwargs):
         super(LayerVersionDetail, self).__init__(*args, **kwargs)
         self.__instance = None
+        self.__version = None
 
     def get(self, request, occurrence_maincat, pk, version, format=None):
         try:
@@ -321,6 +322,7 @@ class LayerVersionDetail(APIView):
             instance = get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
             if instance:
                 self.__instance = instance
+                self.__version = version
             serializer = OccurrenceVersionSerializer()
             excude_unreleased = not (is_writer or is_publisher)
             serialized_feature = serializer.get_version(instance, int(version), excude_unreleased)
@@ -353,10 +355,10 @@ class LayerVersionDetail(APIView):
             file_name = 'download'
             if self.__instance:
                 file_name = '{}_tsn-{}'.format(
-                    self.__instance.occurrence_cat.main_cat
+                    self.__instance.occurrence_cat.main_cat,
                     self.__instance.species.tsn)
-                if self.__instance.version:
-                    file_name += '.v.{}'.format(self.__instance.version)
+                if self.__version:
+                    file_name += '.v.{}'.format(self.__version)
 
             if response.accepted_renderer.format == 'csv':
                 response['content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
