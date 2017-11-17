@@ -813,13 +813,9 @@ class UpdateOccurrenceMixin(object):
             for (form_name, model_class, children) in self.get_toplevel_forms():
                 if form_name == 'species':
                     try:
-                        print("1. ************** {} / {} *************".format(form_name, validated_data['species']))
                         species_id = validated_data['species']['id']
-                        print("2. ************** {} *************".format(species_id))
                         selected_species = Species.objects.get(pk=species_id)
-                        print("3. ************** {} *************".format(selected_species))
                         instance.species = selected_species
-                        print("4. ************** {} *************".format(instance.species))
                     except:
                         raise ValidationError({"species": [_("No species was selected")]})
                 elif form_name != MANAGEMENT_FORM_NAME:
