@@ -64,8 +64,8 @@ INSTALLED_APPS = [
     'rest_auth',
     'nfdcore',
     'nfdusers',
-    'nfdrenderers'
-    
+    'nfdrenderers',
+    'easy_pdf'
 ]
 
 MIDDLEWARE = [
@@ -119,7 +119,7 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
-    
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -138,6 +138,7 @@ REST_FRAMEWORK = {
         'nfdrenderers.XlsxRenderer',
         'nfdrenderers.CsvRenderer',
         'nfdrenderers.ShpRenderer',
+        'nfdrenderers.PdfRenderer',
     )
 }
 

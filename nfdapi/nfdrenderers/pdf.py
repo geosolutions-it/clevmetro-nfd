@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 '''
-Created on 10 oct. 2017
+Created on 17 nov. 2017
 
-@author: Cesar Martinez Izquierdo
+@author: Alessio Fabiani
 '''
 
-from pyexcel_io import save_data
+import easy_pdf
 from collections import OrderedDict
 from io import BytesIO
 from pyexcel import PyExcelBaseRenderer
 
-class CsvRenderer(PyExcelBaseRenderer):
-    media_type = "text/csv"
-    format = "csv"
+class PdfRenderer(PyExcelBaseRenderer):
+    media_type = "application/pdf"
+    format = "pdf"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         sheet_data = OrderedDict()
@@ -21,6 +21,4 @@ class CsvRenderer(PyExcelBaseRenderer):
         for record in features:
             matrix.append(self._get_row(record))
         sheet_data.update({"Sheet 1": matrix})
-        with BytesIO() as xlsx_io:
-            save_data(xlsx_io, sheet_data, encoding="UTF-8")
-            return xlsx_io.getvalue()
+        return easy_pdf.rendering.render_to_pdf('hello_pdf.html', context={})
