@@ -13,6 +13,8 @@ Install native requirements (required for Python LDAP modules):
 ```shell
 #Debian/Ubuntu:
 sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+sudo apt-get install -y --no-install-recommends gettext libcairo2 libffi-dev libpango1.0-0 \
+  libgdk-pixbuf2.0-0 libxml2-dev libxslt1-dev shared-mime-info
 #RedHat/CentOS:
 sudo yum install python-devel openldap-devel
 ```
