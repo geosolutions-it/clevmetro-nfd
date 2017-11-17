@@ -299,11 +299,14 @@ class LayerDetail(APIView):
 
             if response.accepted_renderer.format == 'csv':
                 response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
-            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'shp':
+            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'zip':
                 response['Content-type'] = 'application/x-zip-compressed'
                 response['Content-disposition'] = 'attachment; filename={}.zip'.format(file_name)
             if response.accepted_renderer.format == 'xlsx':
                 response['Content-disposition'] = 'attachment; filename={}.xlsx'.format(file_name)
+            if response.accepted_renderer.format == 'pdf':
+                response['Content-type'] = 'application/pdf'
+                response['Content-disposition'] = 'attachment; filename={}.pdf'.format(file_name)
 
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
@@ -367,11 +370,14 @@ class LayerVersionDetail(APIView):
 
             if response.accepted_renderer.format == 'csv':
                 response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
-            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'shp':
+            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'zip':
                 response['Content-type'] = 'application/x-zip-compressed'
                 response['Content-disposition'] = 'attachment; filename={}.zip'.format(file_name)
             if response.accepted_renderer.format == 'xlsx':
                 response['Content-disposition'] = 'attachment; filename={}.xlsx'.format(file_name)
+            if response.accepted_renderer.format == 'pdf':
+                response['Content-type'] = 'application/pdf'
+                response['Content-disposition'] = 'attachment; filename={}.pdf'.format(file_name)
 
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
