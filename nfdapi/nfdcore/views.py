@@ -298,7 +298,12 @@ class LayerDetail(APIView):
                     file_name += '.v.{}'.format(self.__instance.version)
 
             if response.accepted_renderer.format == 'csv':
-                response['content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+                response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'shp':
+                response['Content-type'] = 'application/x-zip-compressed')
+                response['Content-disposition'] = 'attachment; filename={}.zip'.format(file_name)
+            if response.accepted_renderer.format == 'xlsx':
+                response['Content-disposition'] = 'attachment; filename={}.xlsx'.format(file_name)
 
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
@@ -361,7 +366,12 @@ class LayerVersionDetail(APIView):
                     file_name += '.v.{}'.format(self.__version)
 
             if response.accepted_renderer.format == 'csv':
-                response['content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+                response['Content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+            if response.accepted_renderer.format == 'shp' or response.accepted_renderer.format == 'shp':
+                response['Content-type'] = 'application/x-zip-compressed')
+                response['Content-disposition'] = 'attachment; filename={}.zip'.format(file_name)
+            if response.accepted_renderer.format == 'xlsx':
+                response['Content-disposition'] = 'attachment; filename={}.xlsx'.format(file_name)
 
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
