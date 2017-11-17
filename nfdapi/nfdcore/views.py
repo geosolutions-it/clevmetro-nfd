@@ -289,9 +289,17 @@ class LayerDetail(APIView):
                 request.accepted_renderer, request.accepted_media_type = neg
 
             response.accepted_renderer = request.accepted_renderer
+            file_name = 'download'
+            if self.__instance:
+                file_name = '{}_tsn-{}'.format(
+                    self.__instance.occurrence_cat.main_cat
+                    self.__instance.species.tsn)
+                if self.__instance.version:
+                    file_name += '.v.{}'.format(self.__instance.version)
+
             if response.accepted_renderer.format == 'csv':
-                print("0. ****************** {} **** ".format(self.__instance))
-                response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
+                response['content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
 
@@ -342,9 +350,17 @@ class LayerVersionDetail(APIView):
                 request.accepted_renderer, request.accepted_media_type = neg
 
             response.accepted_renderer = request.accepted_renderer
+            file_name = 'download'
+            if self.__instance:
+                file_name = '{}_tsn-{}'.format(
+                    self.__instance.occurrence_cat.main_cat
+                    self.__instance.species.tsn)
+                if self.__instance.version:
+                    file_name += '.v.{}'.format(self.__instance.version)
+
             if response.accepted_renderer.format == 'csv':
-                print("0. ****************** {} **** ".format(self.__instance))
-                response['content-disposition'] = 'attachment; filename={}.csv'.format('download')
+                response['content-disposition'] = 'attachment; filename={}.csv'.format(file_name)
+
             response.accepted_media_type = request.accepted_media_type
             response.renderer_context = self.get_renderer_context()
 
