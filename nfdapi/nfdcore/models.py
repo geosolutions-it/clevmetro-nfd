@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.db import models
-import reversion
-from django.contrib.gis.db.models.fields import PointField, PolygonField
-from  django.utils import timezone
-from django.contrib import admin
-from django.db.models.fields.files import ImageField
+from datetime import datetime
+import logging
+import os
+import tempfile
+import time
 
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.db.models.fields import PointField
+from django.contrib.gis.db.models.fields import PolygonField
+from django.db import models
 from django.db.models.fields import PositiveIntegerField
-from PIL import Image
-import os, time
-from datetime import datetime
-from nfdapi.settings import MEDIA_ROOT
+from django.db.models.fields.files import ImageField
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils import crypto
-import logging
-import tempfile
+from PIL import Image
+import reversion
+
+from nfdapi.settings import MEDIA_ROOT
+
 
 @python_2_unicode_compatible
 class DictionaryTable(models.Model):
@@ -94,7 +95,7 @@ def get_img_format(extension):
     if extension[1:].upper() in ('JPG', 'JPEG', 'JPE'):
         return 'JPEG'
     return 'PNG'
-    
+
 def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_SIZE, PHOTO_THUMB_SIZE)):
     """
     Create a thumbnail of an existing image
@@ -122,12 +123,12 @@ def get_thumbnail_and_date(input_image, input_path, thumbnail_size=(PHOTO_THUMB_
     try:
         if not date:
             date = timezone.now()
-        
+
         # create target directory
         thumb_dirname = os.path.join(MEDIA_ROOT, time.strftime(PHOTO_UPLOAD_TO))
         if not os.path.exists(thumb_dirname):
             os.makedirs(thumb_dirname, mode=0775)
-                
+
         # create thumbnail
         image.thumbnail(thumbnail_size)
         basename = os.path.basename(input_path)
@@ -272,6 +273,7 @@ class ElementSpecies(Element):
     epa_numeric_code = models.TextField(blank=True, null=True, default='')
     mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
 
+
 @reversion.register()
 class Species(models.Model):
     first_common = models.TextField()
@@ -285,6 +287,10 @@ class Species(models.Model):
     phylum = models.TextField(blank=True, default='')
     phylum_common = models.TextField(blank=True, default='')
     element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.name_sci
+
 
 class Preservative(DictionaryTable):
     pass

@@ -1,0 +1,45 @@
+{% extends "nfdrenderers/pdf/base.html" %}
+{% load i18n %}
+
+{% block layout_style %}
+<style type="text/css">
+    @page {
+        size: landscape;
+        margin-top: 2.5cm;
+        margin-right: 0.8cm;
+        margin-left: 0.8cm;
+        margin-bottom: 1cm;
+    }
+    table {
+        border: #0a0b30 solid 1px;
+    }
+
+</style>
+{% endblock%}
+
+
+{% block content %}
+
+<h1>{{ title }} </h1>
+<p>{{ total }} Registered Occurrences</p>
+
+<table>
+    {% for row in header_rows %}
+    <tr>
+        {% for cell in row %}
+            <th rowspan="{{ cell.rowspan }}" colspan="{{ cell.colspan }}">{{ cell.value }}</th>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    {% for row in content_rows %}
+    <tr>
+        {% for cell in row %}
+            <td rowspan="{{ cell.rowspan }}">{{ cell.value }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+
+</table>
+
+{% endblock content %}

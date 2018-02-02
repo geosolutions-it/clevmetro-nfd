@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django_filters',
+    'easy_pdf',
     'reversion',
     'rest_framework',
     'rest_framework_gis',

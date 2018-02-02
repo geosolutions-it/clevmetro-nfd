@@ -1,0 +1,120 @@
+@startuml
+
+class AnimalLifeStages
+class AnimalDetails
+class AquaticAnimalDetails
+class AquaticHabitatCategory
+abstract class Element {
+    cm_status: CmStatus
+    s_rank: SRank
+    n_rank: NRank
+    g_rank: GRank
+
+}
+class ElementNaturalAreas {
+    natural_area_code_nac: TextField
+    general_description: TextField
+    notable_features: TextField
+    area : FloatField
+    aspect : Aspect
+    slope : Slope
+    type : NaturalAreaType
+    sensitivity: CMSensitivity
+    condition: NaturalAreaCondition
+    leap_land_cover_category: LeapLandCover
+    disturbance_type: DisturbanceType
+    earthworm_evidence: EarthwormEvidence
+    landscape_position: LandscapePosition
+    glaciar_diposit: GlacialDeposit
+    pleistocene_glaciar_diposit: GlacialDepositPleistoceneAge
+    bedrock_and_outcrops: BedrockAndOutcrops
+    regional_frequency: RegionalFrequency
+}
+
+abstract class Location {
+    site_description: TextField
+    directions: TextField
+    polygon: PolygonField
+    reservation: Reservation
+    watershed: Watershed
+}
+
+class NaturalAreaLocation
+
+abstract class Occurrence {
+    geom: PointField
+    occurrence_cat: OccurrenceCategory
+    version: IntegerField
+    released_versions: IntegerField
+    released: BooleanField
+    verified: BooleanField
+    inclusion_date: DateTimeField
+}
+class OccurrenceObservation
+class OccurrenceNaturalArea
+class OccurrenceTaxon
+class Photograph
+class PlantDetails
+class PointOfContact
+
+class SlimeMoldDetails {
+    slime_mold_class: SlimeMoldClass
+    slime_mold_media: SlimeMoldMedia
+}
+
+class SlimeMoldLifestages {
+}
+
+class Species
+class StreamAnimalDetails
+class TaxonDetails
+class TaxonLocation {
+    parcel: TextField
+    city_township: TextField
+    county: TextField
+    quad_name: TextField
+    quad_number: TextField
+}
+class Voucher {
+    voucher_number: PositiveIntegerField
+    specimen_collected: NullBooleanField
+    specimen_number: NullBooleanField
+    parts_collected: NullBooleanField
+    preservative: Preservative
+    repository: TextField
+    storage: Storage
+}
+class Watershed
+
+AnimalDetails <|-- AquaticAnimalDetails
+AnimalDetails <|-- LandAnimalDetails
+AquaticAnimalDetails <|-- StreamAnimalDetails
+TaxonDetails <|-- AnimalDetails
+TaxonDetails <|-- SlimeMoldDetails
+TaxonDetails <|-- PlantDetails
+TaxonDetails <|-- FungusDetails
+PlantDetails <|-- ConiferDetails
+PlantDetails <|-- FernDetails
+PlantDetails <|-- FloweringPlantDetails
+PlantDetails <|-- MossDetails
+Element <|-- ElementNaturalAreas
+Element <|-- ElementSpecies
+Occurrence <|-- OccurrenceTaxon
+Occurrence <|-- OccurrenceNaturalArea
+Location <|-- NaturalAreaLocation
+Location <|-- TaxonLocation
+
+OccurrenceObservation -- PointOfContact : reporter
+Occurrence <-- OccurrenceObservation : observation
+OccurrenceTaxon <- Species : species
+Species <- ElementSpecies : element_species
+OccurrenceTaxon <-- TaxonDetails : details
+OccurrenceTaxon <-- Voucher : voucher
+OccurrenceTaxon <-- TaxonLocation : location
+OccurrenceTaxon <-- Photograph : photographs
+OccurrenceNaturalArea <-- Photograph : photographs
+OccurrenceNaturalArea <-- ElementNaturalAreas : element
+OccurrenceNaturalArea <-- NaturalAreaLocation : location
+SlimeMoldDetails <-- SlimeMoldLifestages : lifestages
+
+@enduml
