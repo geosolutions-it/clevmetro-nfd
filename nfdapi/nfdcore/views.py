@@ -627,9 +627,6 @@ class LayerDetail(APIView):
 class LayerVersionDetail(APIView):
     permission_classes = [IsAuthenticated, ]
 
-    def __init__ (self) :
-        BaseLayerDetailView.__init__(self)
-
     def get(self, request, occurrence_maincat, pk, version, format=None):
         try:
             (is_writer, is_publisher) = get_permissions(request.user,
