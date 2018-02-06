@@ -135,10 +135,9 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
-        'nfdrenderers.XlsxRenderer',
-        'nfdrenderers.CsvRenderer',
-        'nfdrenderers.ShpRenderer',
-        'nfdrenderers.PdfRenderer',
+        'nfdrenderers.xlsx.XlsxRenderer',
+        'nfdrenderers.csv.CsvRenderer',
+        'nfdrenderers.shp.ShpRenderer',
     )
 }
 

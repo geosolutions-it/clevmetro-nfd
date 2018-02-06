@@ -55,24 +55,7 @@
                 }
             },
             "features" : []
-        }, {
-            "type": "clustermarker",
-            "queryable": true,
-            "visibility": true,
-            "group": "Natural features",
-            "name": "Plants",
-            "hideLoading": true,
-            "id": "plant",
-            "styleName": "marker",
-            "style": {
-                "html":{
-                    "className": "marker-plant",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
-                }
-            },
-            "features" : []
-        }, {
+        },{
             "type": "clustermarker",
             "queryable": true,
             "visibility": true,
@@ -84,23 +67,6 @@
             "style": {
                 "html":{
                     "className": "marker-slimemold",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
-                }
-            },
-            "features" : []
-        }, {
-            "type": "clustermarker",
-            "queryable": true,
-            "visibility": true,
-            "group": "Natural features",
-            "name": "Fungi",
-            "hideLoading": true,
-            "id": "fungus",
-            "styleName": "marker",
-            "style": {
-                "html":{
-                    "className": "marker-fungus",
                     "iconSize": [30, 30],
                     "iconAnchor": [15, 15]
                 }
@@ -123,6 +89,40 @@
                 }
             },
             "features" : []
-        }]
+        },{
+            "type": "clustermarker",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Fungi",
+            "hideLoading": true,
+            "id": "fungus",
+            "styleName": "marker",
+            "style": {
+                "html":{
+                    "className": "marker-fungus",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
+            },
+            "features" : []
+        },  {
+            "type": "clustermarker",
+            "queryable": true,
+            "visibility": true,
+            "group": "Natural features",
+            "name": "Plants",
+            "hideLoading": true,
+            "id": "plant",
+            "styleName": "marker",
+            "style": {
+                "html":{
+                    "className": "marker-plant",
+                    "iconSize": [30, 30],
+                    "iconAnchor": [15, 15]
+                }
+            },
+            "features" : []
+        } ]
     }
 }

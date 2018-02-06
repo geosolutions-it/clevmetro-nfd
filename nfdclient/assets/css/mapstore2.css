@@ -61,3 +61,7 @@ html, body, #map {
     opacity: 0.7;
     top: 5px;
 }
+
+span.toc-layer-tool.toc-legendTool.glyphicon.glyphicon-1-menu-manage {
+    visibility: hidden;
+}

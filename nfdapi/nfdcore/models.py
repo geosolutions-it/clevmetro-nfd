@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.db import models
-import reversion
-from django.contrib.gis.db.models.fields import PointField, PolygonField
-from  django.utils import timezone
-from django.contrib import admin
-from django.db.models.fields.files import ImageField
+from datetime import datetime
+import logging
+import os
+import tempfile
+import time
 
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.db.models.fields import PointField
+from django.contrib.gis.db.models.fields import PolygonField
+from django.db import models
 from django.db.models.fields import PositiveIntegerField
+from django.db.models.fields.files import ImageField
+from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from PIL import Image
-import os, time
-from datetime import datetime
+import reversion
+
 from nfdapi.settings import MEDIA_ROOT
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import crypto
@@ -273,6 +277,7 @@ class ElementSpecies(Element):
     epa_numeric_code = models.TextField(blank=True, null=True, default='')
     mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
 
+
 @reversion.register()
 class Species(models.Model):
     first_common = models.TextField()
@@ -293,6 +298,7 @@ class Species(models.Model):
                 smart_text(self.name_sci), smart_text(self.synonym))
         else:
             return u'{} - {}'.format(smart_text(self.first_common), smart_text(self.name_sci))
+
 
 class Preservative(DictionaryTable):
     pass

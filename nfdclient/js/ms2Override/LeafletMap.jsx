@@ -217,12 +217,6 @@ let LeafletMap = React.createClass({
                 {children}
                 <div id="nfd-legend" className="nfd-legend">
                     <div className="row flex-center">
-                        <div className="marker-animal col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Animals</label>
-                        </div>
-                    </div>
-                    <div className="row flex-center">
                         <div className="marker-plant col-xs-2"/>
                         <div className="col-xs-9">
                             <label>Plants</label>
@@ -232,6 +226,12 @@ let LeafletMap = React.createClass({
                         <div className="marker-fungus col-xs-2"/>
                         <div className="col-xs-9">
                             <label>Fungi</label>
+                        </div>
+                    </div>
+                    <div className="row flex-center">
+                        <div className="marker-animal col-xs-2"/>
+                        <div className="col-xs-9">
+                            <label>Animals</label>
                         </div>
                     </div>
                     <div className="row flex-center">

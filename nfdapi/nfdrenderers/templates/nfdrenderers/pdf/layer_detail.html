@@ -1,0 +1,33 @@
+{% extends "nfdrenderers/pdf/base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<h1>{{ species.common_name }}({{ species.name }})</h1>
+<p>TSN: <strong>{{ species.tsn }}</strong><br>
+    Family: <strong><em>{{ species.family }}</em></strong>
+</p>
+
+<h2>Individual Characteristics</h2>
+<p>
+    Gender: {{ details.gender }}<br>
+    Marks: {{ details.marks }}<br>
+    Diseases and Abnormalities: {{ details.abnormalities }}<br>
+</p>
+<h2>Observation details</h2>
+<p>
+    Location: {{ location.lat }} {{ location.lon }}<br>
+    Date: {{ observation.observation_date }}<br>
+    Daytime: {{ observation.daytime }}<br>
+    Season: {{ observation.season }}<br>
+    Reported by: {{ observation.reporter_name }} ({{ observation.reporter_email}})<br>
+</p>
+<h2>Photos</h2>
+{% for image in images %}
+    <img src="{{ image }}" style="width: 400px; display: block;">
+{% endfor %}
+
+
+
+{% endblock content %}
+
