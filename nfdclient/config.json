@@ -50,8 +50,8 @@
             "style": {
                 "html":{
                     "className": "marker-naturalarea",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
+                    "iconSize": [24, 24],
+                    "iconAnchor": [12, 12]
                 }
             },
             "features" : []
@@ -67,8 +67,8 @@
             "style": {
                 "html":{
                     "className": "marker-slimemold",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
+                    "iconSize": [24, 24],
+                    "iconAnchor": [12, 12]
                 }
             },
             "features" : []
@@ -84,8 +84,8 @@
             "style": {
                 "html":{
                     "className": "marker-animal",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
+                    "iconSize": [24, 24],
+                    "iconAnchor": [22, 22]
                 }
             },
             "features" : []
@@ -101,8 +101,8 @@
             "style": {
                 "html":{
                     "className": "marker-fungus",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
+                    "iconSize": [24, 24],
+                    "iconAnchor": [12, 12]
                 }
             },
             "features" : []
@@ -118,8 +118,8 @@
             "style": {
                 "html":{
                     "className": "marker-plant",
-                    "iconSize": [30, 30],
-                    "iconAnchor": [15, 15]
+                    "iconSize": [24, 24],
+                    "iconAnchor": [12, 12]
                 }
             },
             "features" : []

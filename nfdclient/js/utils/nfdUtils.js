@@ -7,8 +7,8 @@
  */
 const baseUrl = '../../assets/img/';
 const baseStyle = {
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
 };
 module.exports = {
     getIcon: (ftType) => {
