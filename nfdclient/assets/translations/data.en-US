@@ -70,7 +70,7 @@
         "cancel": "Cancel",
         "confirm": "Confirm",
         "confirmTitle": "Do you confirm?",
-        "pageInfo": "{total, plural, =0 {No items} =1 {{total} Item of {total}} other {Items {start}-{end} of {total}}}",
+        "pageInfo": "{total, plural, =0 {No Features} =1 {{total} Feature of {total}} other {Features {start}-{end} of {total}}}",
         "loading": "Loading...",
         "group": "Group",
         "groups": "Groups",
