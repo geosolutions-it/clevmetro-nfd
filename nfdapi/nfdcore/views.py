@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 from collections import namedtuple
 import logging
+import traceback
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Count
+from django.db.models import Q
 from django.db.models.fields import DateField
 from django.db.models.functions import TruncMonth
 from django.http import Http404
@@ -33,6 +35,9 @@ from rest_framework.viewsets import ModelViewSet
 import reversion
 
 from nfdrenderers import pdf as pdfrenderers
+from nfdrenderers import csv as csvrenderers
+from nfdrenderers import xlsx as xlsrenderers
+from nfdrenderers import shp as shprenderers
 
 from . import models
 from .models import (
@@ -562,10 +567,12 @@ class LayerDetail(APIView):
         JSONRenderer,
         BrowsableAPIRenderer,
         pdfrenderers.PdfLayerDetailRenderer,
+        csvrenderers.CsvRenderer,
+        xlsrenderers.XlsxRenderer,
+        shprenderers.ShpRenderer,
     )
 
     def get_object(self, occurrence_maincat, pk):
-
         try:
             return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
         except ObjectDoesNotExist:
@@ -676,7 +683,7 @@ def get_feature_type(request, occurrence_subcat, feature_id=None):
 
 
 class SpeciesPaginationClass(PageNumberPagination):
-    page_size = 15
+    page_size = 100
 
     def get_paginated_response(self, data):
         return Response(data)
@@ -686,6 +693,7 @@ class SpeciesSearch(ListAPIView):
     queryset = Species.objects.all()
     serializer_class = nfdserializers.SpeciesSearchSerializer
     filter_backends = (SearchFilter,)
+    # filter_class = SpeciesFilter
     pagination_class = SpeciesPaginationClass
     search_fields = (
         'first_common',
@@ -695,6 +703,37 @@ class SpeciesSearch(ListAPIView):
         'synonym',
     )
 
+    def get_queryset(self):
+        queryset = Species.objects.all()
+
+        request = self.request
+        if request and request.query_params:
+            try:
+                search_params = request.query_params.getlist('search')
+                for filter_param in search_params:
+                    queryset = queryset.filter(
+                        Q(first_common__icontains=filter_param) |
+                        Q(second_common__icontains=filter_param) |
+                        Q(third_common__icontains=filter_param) |
+                        Q(name_sci__icontains=filter_param) |
+                        Q(synonym__icontains=filter_param) |
+                        # startswith
+                        Q(first_common__startswith=filter_param) |
+                        Q(second_common__startswith=filter_param) |
+                        Q(third_common__startswith=filter_param) |
+                        Q(name_sci__startswith=filter_param) |
+                        Q(synonym__startswith=filter_param) |
+                        # endswith
+                        Q(first_common__endswith=filter_param) |
+                        Q(second_common__endswith=filter_param) |
+                        Q(third_common__endswith=filter_param) |
+                        Q(name_sci__endswith=filter_param) |
+                        Q(synonym__endswith=filter_param)
+                        )
+            except:
+                traceback.print_exc()
+
+        return queryset.order_by('first_common')
 
 class SpeciesDetail(RetrieveAPIView):
     queryset = Species.objects.all()

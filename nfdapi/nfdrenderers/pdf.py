@@ -62,6 +62,7 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
                     group_by_month=group_by_month
                 ),
             }
+        print("context: {}".format(context))
         return render_to_pdf(
             "nfdrenderers/pdf/aggregation_stats.html",
             context
@@ -92,6 +93,7 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
 
     def get_content_rows(self, items, group_by_month=False):
         counts = self._get_counts(items)
+        print("counts: {}".format(counts))
         already_there = []
         content_rows = []
         for item in items:
@@ -102,10 +104,11 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
                 except KeyError:
                     continue
                 if value not in already_there and parameter in item.keys():
-                    rowspan = counts[value]
+                    rowspan = counts.get(value, 1)
                     row.append(
                         TableCell(value=value, rowspan=rowspan, colspan=1))
-                    already_there.append(value)
+                    if value != "Not Specified":
+                        already_there.append(value)
             else:
                 if group_by_month:
                     for month, occurrences in item["months"].items():
@@ -139,7 +142,7 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
         counts = {}
         for occurrence in occurrences:
             for param, value in occurrence.items():
-                if param not in ("occurrences", "months"):
+                if param not in ("occurrences", "months",) and value != "Not Specified":
                     counts.setdefault(value, 0)
                     counts[value] += 1
         return counts
@@ -158,8 +161,22 @@ class PdfLayerDetailRenderer(BaseRenderer):
         else:
             lat = None
             lon = None
-        gender = models.Gender.objects.get(code=data["details.gender"])
         no_data = "-"
+        if data.get("details") is not None:
+            details = {
+                "gender": models.Gender.objects.get(
+                    code=data["details.gender"]),
+                "marks": data["details.marks"] or no_data,
+                "abnormalities": data[
+                    "details.diseases_and_abnormalities"] or no_data,
+            }
+        else:
+            details = {
+                "gender":  no_data,
+                "marks":  no_data,
+                "abnormalities":  no_data,
+            }
+
         return render_to_pdf(
             "nfdrenderers/pdf/layer_detail.html",
             {
@@ -176,12 +193,7 @@ class PdfLayerDetailRenderer(BaseRenderer):
                     "reporter_name": data["observation.reporter.name"],
                     "reporter_email": data["observation.reporter.email"],
                 },
-                "details": {
-                    "gender": gender.name.capitalize(),
-                    "marks": data["details.marks"] or no_data,
-                    "abnormalities": data[
-                        "details.diseases_and_abnormalities"] or no_data,
-                },
+                "details": details,
                 "location": {
                     "lat": lat,
                     "lon": lon,

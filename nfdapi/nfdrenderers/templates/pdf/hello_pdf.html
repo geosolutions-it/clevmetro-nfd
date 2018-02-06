@@ -1,0 +1,19 @@
+{% extends "easy_pdf/base.html" %}
+
+{% block extra_style %}
+    <style type="text/css">
+        body {
+            font-family: "Helvetica", "sans-serif";
+            color: #333333;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content">
+        <div class="main">
+            <h1>Hi there!</h1>
+            <img src="file:///STATIC_ROOT/img/hello.png" />
+        </div>
+    </div>
+{% endblock %}

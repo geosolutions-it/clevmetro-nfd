@@ -1,10 +1,4 @@
-#!/bin/bash
-set -e
-
-npm install
-npm run compile
-npm run lint
-mvn clean install
+./manage.py createinitialrevisions
 
 sudo systemctl restart slapd
 sudo systemctl restart apache2

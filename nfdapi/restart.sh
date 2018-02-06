@@ -1,10 +1,7 @@
-#!/bin/bash
-set -e
-
-npm install
-npm run compile
-npm run lint
-mvn clean install
+./manage.py makemigrations
+./manage.py migrate
+# ./manage.py compilemessages
+./manage.py collectstatic --noinput
 
 sudo systemctl restart slapd
 sudo systemctl restart apache2

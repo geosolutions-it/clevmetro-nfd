@@ -4,7 +4,7 @@ Created on 10 oct. 2017
 
 @author: Cesar Martinez Izquierdo
 '''
-    
+
 from pyexcel_io import save_data
 from collections import OrderedDict
 from io import BytesIO
@@ -13,7 +13,7 @@ from pyexcel import PyExcelBaseRenderer
 class CsvRenderer(PyExcelBaseRenderer):
     media_type = "text/csv"
     format = "csv"
-    
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         sheet_data = OrderedDict()
         features = self._get_features(data)

@@ -1,0 +1,17 @@
+Downloaded from https://www.itis.gov/downloads/
+
+Citation:
+Species information Retrieved [05, 29, 2017], from the Integrated Taxonomic Information System on-line database, http://www.itis.gov.
+
+https://en.wikipedia.org/wiki/Integrated_Taxonomic_Information_System
+
+Before loading in Postgres:
+- convert to UTF-8
+iconv -f ISO-8859-1 -t UTF-8 ITIS.sql > itisutf8.sql
+- edit and remove any latin1 declarations
+vim itisutf8.sql
+:%s/LATIN1/UTF-8/g
+:%s/en_US.ISO8859-1/en_US.UTF-8/g
+
+Then load using:
+psql -U postgres -f itisutf8.sql

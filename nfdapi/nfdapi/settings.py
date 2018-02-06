@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django_filters',
-    'easy_pdf',
     'reversion',
     'rest_framework',
     'rest_framework_gis',
@@ -65,8 +64,8 @@ INSTALLED_APPS = [
     'rest_auth',
     'nfdcore',
     'nfdusers',
-    'nfdrenderers'
-    
+    'nfdrenderers',
+    'easy_pdf'
 ]
 
 MIDDLEWARE = [
@@ -109,8 +108,8 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         #'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'metroparksnfd',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': 'metroparksnfd',
+        'PASSWORD': 'metroparksnfd',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -120,7 +119,7 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
-    
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -136,9 +135,9 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
-        'nfdrenderers.XlsxRenderer',
-        'nfdrenderers.CsvRenderer',
-        'nfdrenderers.ShpRenderer',
+        'nfdrenderers.xlsx.XlsxRenderer',
+        'nfdrenderers.csv.CsvRenderer',
+        'nfdrenderers.shp.ShpRenderer',
     )
 }
 
@@ -176,41 +175,41 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_PASSWORD_VALIDATORS = [
 ]
 
-AUTH_LDAP_SERVER_URI = "ldap://dev.nfd.geo-solutions.it:389"
+AUTH_LDAP_SERVER_URI = "ldap://localhost:389"
 
 
 """
 Configuration for OpenLDAP
 """
-AUTH_LDAP_BIND_DN = "cn=admin,dc=Metroparks,dc=local"
-AUTH_LDAP_BIND_PASSWORD = "kwNw8iqzr9p"
-AUTH_LDAP_USER_SEARCH = LDAPSearch("dc=Metroparks,dc=local",
+AUTH_LDAP_BIND_DN = "cn=admin,dc=nfd,dc=geo-solutions,dc=it"
+AUTH_LDAP_BIND_PASSWORD = "1geosolutions2"
+AUTH_LDAP_USER_SEARCH = LDAPSearch("dc=nfd,dc=geo-solutions,dc=it",
     ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
 
 
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=groups,dc=Metroparks,dc=local",
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=groups,dc=nfd,dc=geo-solutions,dc=it",
     ldap.SCOPE_SUBTREE
 )
 AUTH_LDAP_GROUP_TYPE = PosixGroupType()
 
-#AUTH_LDAP_FIND_GROUP_PERMS = True
-#AUTH_LDAP_CACHE_GROUPS = True
-#AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
+AUTH_LDAP_FIND_GROUP_PERMS = True
+AUTH_LDAP_CACHE_GROUPS = True
+AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
 AUTH_LDAP_MIRROR_GROUPS = True
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_staff": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
-    "is_superuser": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
-    "is_plant_writer": "cn=plant_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_animal_writer": "cn=animal_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_animal_publisher": "cn=animal_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_slimemold_writer": "cn=slimemold_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_slimemold_publisher": "cn=slimemold_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_fungus_writer": "cn=fungus_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_fungus_publisher": "cn=fungus_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_naturalarea_writer": "cn=naturalarea_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_naturalarea_publisher": "cn=naturalarea_publisher,ou=groups,dc=Metroparks,dc=local"
+    "is_staff": "cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_superuser": "cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_plant_writer": "cn=plant_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_animal_writer": "cn=animal_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_animal_publisher": "cn=animal_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_slimemold_writer": "cn=slimemold_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_slimemold_publisher": "cn=slimemold_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_fungus_writer": "cn=fungus_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_fungus_publisher": "cn=fungus_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_naturalarea_writer": "cn=naturalarea_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_naturalarea_publisher": "cn=naturalarea_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it"
 }
 
 AUTH_LDAP_USER_ATTR_MAP = {
@@ -223,30 +222,30 @@ AUTH_LDAP_USER_ATTR_MAP = {
 Configuration for Active Directory:
 """
 """
-AUTH_LDAP_BIND_DN = "cn=Bind_User,ou=Users,dc=Metroparks,dc=local"
+AUTH_LDAP_BIND_DN = "cn=Bind_User,ou=Users,dc=nfd,dc=geo-solutions,dc=it"
 AUTH_LDAP_BIND_PASSWORD = "kwNw8iqzr9p"
-AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=Users,dc=Metroparks,dc=local",
+AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=Users,dc=nfd,dc=geo-solutions,dc=it",
     ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
 
 
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=Metroparks,dc=local",
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=nfd,dc=geo-solutions,dc=it",
     ldap.SCOPE_SUBTREE, "(objectClass=group)")
 )
 AUTH_LDAP_GROUP_TYPE = NestedActiveDirectoryGroupType()
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_staff": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
-    "is_superuser": "cn=nfdadmins,ou=groups,dc=Metroparks,dc=local",
-    "is_plant_writer": "cn=plant_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_animal_writer": "cn=animal_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_animal_publisher": "cn=animal_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_slimemold_writer": "cn=slimemold_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_slimemold_publisher": "cn=slimemold_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_fungus_writer": "cn=fungus_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_fungus_publisher": "cn=fungus_publisher,ou=groups,dc=Metroparks,dc=local",
-    "is_naturalarea_writer": "cn=naturalarea_writer,ou=groups,dc=Metroparks,dc=local",
-    "is_naturalarea_publisher": "cn=naturalarea_publisher,ou=groups,dc=Metroparks,dc=local"
+    "is_staff": "cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_superuser": "cn=nfdadmins,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_plant_writer": "cn=plant_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_plant_publisher": "cn=plant_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_animal_writer": "cn=animal_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_animal_publisher": "cn=animal_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_slimemold_writer": "cn=slimemold_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_slimemold_publisher": "cn=slimemold_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_fungus_writer": "cn=fungus_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_fungus_publisher": "cn=fungus_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_naturalarea_writer": "cn=naturalarea_writer,ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    "is_naturalarea_publisher": "cn=naturalarea_publisher,ou=groups,dc=nfd,dc=geo-solutions,dc=it"
 }
 
 AUTH_LDAP_USER_ATTR_MAP = {
@@ -258,7 +257,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
 """
 
 
-#AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=nfdusers,dc=Metroparks,dc=local"
+#AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=nfdusers,dc=nfd,dc=geo-solutions,dc=it"
 #AUTH_LDAP_START_TLS = True
 
 # Internationalization
