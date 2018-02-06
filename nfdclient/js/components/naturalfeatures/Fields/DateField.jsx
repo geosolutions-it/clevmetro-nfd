@@ -18,14 +18,16 @@ class DateField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         onChange: PropTypes.func,
-        isMobile: PropTypes.bool
+        isMobile: PropTypes.bool,
+        dateFormat: React.PropTypes.string
     }
     static defaultProps = {
       editable: false,
       horizontal: false,
       feature: {},
       isMobile: false,
-      onChange: () => {}
+      onChange: () => {},
+      dateFormat: "MM-DD-YYYY"
     }
     componentDidMount() {
         const el = document.getElementById(`datepicker.${this.props.item.key}`);
@@ -46,7 +48,7 @@ class DateField extends React.Component {
             <FormGroup controlId={`datepicker.${item.key}`}>
                 <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
                 <DatePicker
-                    dateFormat="YYYY-MM-DD"
+                    dateFormat={this.props.dateFormat}
                     disabled={readonly}
                     value={getValue(feature, item.key, null)}
                     onChange={this.handleChange}/>
