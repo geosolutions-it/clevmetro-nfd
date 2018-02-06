@@ -1028,3 +1028,11 @@ select.form-control option {
 .application-version-label {
 		font-weight: bold;
 }
+
+button[disabled] {
+    cursor: not-allowed;
+    pointer-events: visible;
+}
+button[disabled] span {
+    opacity: 0.6;
+}
