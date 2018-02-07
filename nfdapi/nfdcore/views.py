@@ -667,18 +667,16 @@ def get_feature_type(request, occurrence_subcat, feature_id=None):
             feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
         else:
             feat = OccurrenceTaxon.objects.get(pk=feature_id)
-        serializer = nfdserializers.FeatureTypeSerializer(feat.occurrence_cat)
-    else:
-        # in this case we get the category code instead of the main category
+        ftdata = nfdserializers.serialize_feature_types(feat.occurrence_cat)
+    else:  # get category code instead of the main category
         occurrence_cat = OccurrenceCategory.objects.get(code=occurrence_subcat)
-        (is_writer, is_publisher) = get_permissions(request.user,
-                                                    occurrence_cat.main_cat)
-        serializer = nfdserializers.FeatureTypeSerializer(
+        is_writer, is_publisher = get_permissions(
+            request.user, occurrence_cat.main_cat)
+        ftdata = nfdserializers.serialize_feature_types(
             occurrence_cat,
             is_writer=is_writer,
             is_publisher=is_publisher
         )
-    ftdata = serializer.get_feature_type()
     return Response(ftdata)
 
 
