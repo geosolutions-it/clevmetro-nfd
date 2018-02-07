@@ -45,5 +45,10 @@ module.exports = {
                 defaultOperator: '>'
             }
         }
+    },
+    storeOpts: {
+        persist: {
+            whitelist: ['security']
+        }
     }
 };

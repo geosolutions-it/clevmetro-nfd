@@ -15,7 +15,8 @@ const {setControlProperty} = require('../../MapStore2/web/client/actions/control
 const {
     TOGGLE_EXPORT,
     EXPORT_FEATURES,
-    downloadingFeatures
+    downloadingFeatures,
+    DOWNLOAD_REPORT
 } = require('../actions/exportfeatures');
 const {
     userNotAuthenticatedError
@@ -35,6 +36,20 @@ const getExt = (format) => {
     }
 };
 const exportFt = (promise, filename) => {
+    return Rx.Observable.fromPromise(promise)
+            .do(({data, headers}) => {
+                fileDownload(data, filename, headers && headers["content-type"]);
+            })
+            .map(() => downloadingFeatures(false))
+            .startWith(downloadingFeatures())
+            .catch((e) => {
+                const action = e.status === 401 ? userNotAuthenticatedError(e) : error({title: "Export error", message: `Exporting error ${e.statusText}`});
+                return Rx.Observable.of(action);
+            }).concat([downloadingFeatures(false)]);
+};
+
+
+const getReport = (promise, filename) => {
     return Rx.Observable.fromPromise(promise)
             .do(({data, headers}) => {
                 fileDownload(data, filename, headers && headers["content-type"]);
@@ -70,5 +85,11 @@ module.exports = {
             }
             const page = singlePage && featuresearch[featureType] && featuresearch[featureType].page ? `&page=${featuresearch[featureType].page}` : '';
             return exportFt(Api.exportFeatureList(featureType, format, filter, page), `${featureType}.${getExt(format)}`);
+        }),
+    downloadReport: (action$) =>
+        action$.ofType(DOWNLOAD_REPORT)
+        .switchMap(a => {
+            const {featureType, id} = a;
+            return getReport(Api.downloadReport(featureType, id), `${featureType}${id ? `_${id}` : ''}.${'pdf'}`);
         })
 };

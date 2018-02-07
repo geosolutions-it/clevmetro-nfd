@@ -10,6 +10,15 @@ const EXPORT_OPTIONS_CHANGE = 'EXPORT_OPTIONS_CHANGE';
 const EXPORT_FEATURES = 'EXPORT_FEATURES';
 const DOWNLOADING_FEATURES = 'DOWNLOADING_FEATURES';
 const DOWNLOADING_FEATURES_ERROR = 'DOWNLOADING_FEATURES_ERROR';
+const DOWNLOAD_REPORT = 'DOWNLOAD_REPORT';
+
+function downloadReport(featureType, id) {
+    return {
+        type: DOWNLOAD_REPORT,
+        featureType,
+        id
+    };
+}
 
 function downloadingError(e) {
     return {
@@ -53,5 +62,6 @@ module.exports = {
     EXPORT_OPTIONS_CHANGE, onDownloadOptionChange,
     EXPORT_FEATURES, downloadFeatures,
     DOWNLOADING_FEATURES, downloadingFeatures,
-    DOWNLOADING_FEATURES_ERROR, downloadingError
+    DOWNLOADING_FEATURES_ERROR, downloadingError,
+    DOWNLOAD_REPORT, downloadReport
 };

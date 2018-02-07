@@ -19,6 +19,8 @@ const getAccept = (format) => {
             return {'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
         case 'shp':
             return {'Accept': 'application/zip'};
+        case 'pdf':
+                return {'Accept': 'application/pdf'};
         default :
             return {'Accept': 'application/zip'};
     }
@@ -118,6 +120,11 @@ const Api = {
     },
     exportFeatureList: function(featureType, format, filter, page) {
         let url = `/nfdapi/list/${featureType}/?format=${format}${page}${filter}`;
+        const headers = assign({}, (getOptions()).headers, getAccept(format));
+        return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
+    },
+    downloadReport: function(featureType, id, format = 'pdf') {
+        let url = id ? `/nfdapi/stats/${featureType}/${id}/?format=${format}` : `/nfdapi/stats/${featureType}?format=${format}`;
         const headers = assign({}, (getOptions()).headers, getAccept(format));
         return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
     }
