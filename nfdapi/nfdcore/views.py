@@ -667,17 +667,24 @@ def get_feature_type(request, occurrence_subcat, feature_id=None):
             feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
         else:
             feat = OccurrenceTaxon.objects.get(pk=feature_id)
-        ftdata = nfdserializers.serialize_feature_types(feat.occurrence_cat)
+        try:
+            result = nfdserializers.serialize_feature_types(
+                feat.occurrence_cat)
+        except RuntimeError as exc:
+            result = {"error": str(exc)}
     else:  # get category code instead of the main category
         occurrence_cat = OccurrenceCategory.objects.get(code=occurrence_subcat)
         is_writer, is_publisher = get_permissions(
             request.user, occurrence_cat.main_cat)
-        ftdata = nfdserializers.serialize_feature_types(
-            occurrence_cat,
-            is_writer=is_writer,
-            is_publisher=is_publisher
-        )
-    return Response(ftdata)
+        try:
+            result = nfdserializers.serialize_feature_types(
+                occurrence_cat,
+                is_writer=is_writer,
+                is_publisher=is_publisher
+            )
+        except RuntimeError as exc:
+            result = {"error": str(exc)}
+    return Response(result)
 
 
 class SpeciesPaginationClass(PageNumberPagination):
