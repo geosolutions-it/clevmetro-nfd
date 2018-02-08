@@ -107,10 +107,6 @@ def get_sub_category_detail(subcategory_code, parameter_name):
             "serializer": NaturalAreaElementSerializer,
             "form_definitions": formdefinitions.NATURAL_AREA,
         },
-        "pl": {  # FIXME
-            "serializer": serializers.Serializer,
-            "form_definitions": None,
-        },
         "sl": {
             "serializer": SlimeMoldDetailsSerializer,
             "form_definitions": formdefinitions.SLIMEMOLD,
@@ -232,7 +228,10 @@ def get_serializer_fields(form_name, model):
 
 
 def init_forms(category_code):
-    forms = get_sub_category_detail(category_code, "form_definitions")
+    try:
+        forms = get_sub_category_detail(category_code, "form_definitions")
+    except KeyError:
+        raise RuntimeError("Invalid category: {!r}".format(category_code))
     forms_dict = formdefinitions.get_form_dict(forms)
     return forms, forms_dict
 

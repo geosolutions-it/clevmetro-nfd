@@ -48,7 +48,6 @@ occurrence_cat_dict = {
 occurrence_subcat = [('co', _('Conifer'), 'plant'),
                      ('fe', _('Fern'), 'plant'),
                      ('fl', _('Flowering plant'), 'plant'),
-                     ('pl', _('Plant - generic'), 'plant'), # for other kind of plants such as non-conifer trees
                      ('mo', _('Moss'), 'plant'),
                      ('fu', _('Fungus'), 'fungus'),
                      ('sl', _('Slime mold'), 'slimemold', ),
