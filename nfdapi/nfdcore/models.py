@@ -207,6 +207,27 @@ class TaxonLocation(Location):
     quad_name = models.TextField(blank=True, null=True, default='')
     quad_number = models.TextField(blank=True, null=True, default='')
 
+
+@python_2_unicode_compatible
+class Note(models.Model):
+    """Represents notes set on the UI for each form page"""
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    occurrence = GenericForeignKey("content_type", "object_id")
+    ui_tab = models.CharField(
+        max_length=50,
+        help_text="Identifier of the UI page where this note should be shown",
+    )
+    note = models.TextField(
+        blank=True,
+        help_text="Note to show together with the UI page"
+    )
+
+    def __str__(self):
+        return "{} - {}".format(self.ui_tab, self.note)
+
+
 class Occurrence(models.Model):
     geom = PointField()
     version = models.IntegerField(default=0)
@@ -216,6 +237,8 @@ class Occurrence(models.Model):
     verified = models.BooleanField(default=False)
     inclusion_date = models.DateTimeField(default=timezone.now)
     observation = models.OneToOneField(OccurrenceObservation, on_delete=models.CASCADE)
+    notes = GenericRelation(Note)
+
     class Meta:
         abstract = True
 

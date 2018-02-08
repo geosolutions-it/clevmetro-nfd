@@ -66,6 +66,14 @@ def to_flat_representation(values_dict, parent_path=None):
     return result
 
 
+def _flatten_notes_representation(nested_representation):
+    result = {}
+    for note in nested_representation:
+        key = "notes.note.{}".format(note["ui_tab"])
+        result[key] = note["note"]
+    return result
+
+
 def get_sub_category_detail(subcategory_code, parameter_name):
     """Return the relevant objects for working with the input subcategory
 
@@ -260,30 +268,37 @@ def serialize_feature_types(occurrence_cat, is_writer=False,
             "formlabel": _(form_name),
             "formitems": _get_form_items(name, model, is_writer, is_publisher)
         }
-        print("form: {}".format(form))
         result["forms"].append(form)
     return result
 
 
 def _get_form_items(name, model, is_writer, is_publisher):
     if name == "species":
-        result = _get_form_featuretype(
+        form_items = _get_form_featuretype(
             name, model, is_writer, is_publisher,
             model_serializer=SpeciesSerializer()
         )
     elif name == 'species.element_species':
-        result = _get_form_featuretype(
+        form_items = _get_form_featuretype(
             name, model, is_writer, is_publisher,
             model_serializer=ElementSpeciesSerializer()
         )
     elif name == formdefinitions.MANAGEMENT_FORM_NAME:
         if is_publisher:
-            result = formdefinitions.MANAGEMENT_FORM_ITEMS_PUBLISHER
+            form_items = formdefinitions.MANAGEMENT_FORM_ITEMS_PUBLISHER
         else:
-            result = formdefinitions.MANAGEMENT_FORM_ITEMS
+            form_items = formdefinitions.MANAGEMENT_FORM_ITEMS
     else:
-        result = _get_form_featuretype(name, model, is_writer, is_publisher)
-    return result
+        form_items = _get_form_featuretype(
+            name, model, is_writer, is_publisher)
+    form_items.append({
+        "mandatory": False,
+        "readonly": False,
+        "type": "string",
+        "key": "notes.note.{}".format(name.split(".")[-1]),
+        "label": "notes"
+    })
+    return form_items
 
 
 def _get_form_featuretype(form_name, model, is_writer, is_publisher,
@@ -596,24 +611,14 @@ class UpdateOccurrenceMixin(object):
                 setattr(parent_instance, self._get_local_name(form_name), related_instance)
         return any_saved
 
-    def _get_form_dict(self):
-        """
-        Gets the definition of forms for the current instance type
-        """
-        if not self._form_dict:
-            self._form_dict = formdefinitions.get_form_dict(self.forms)
-        return self._form_dict
-
     def _get_form_def_tree(self, form_name, model_class, children):
-        """
-        Gets the definition of a form and its related objects (children)
-        """
+        """Recursively get the definition of a form and its children"""
         complete_children_def = []
         for child in children:
-            (child_form_name, child_model_class, child_children) = self._get_form_dict()[child]
-            child_def = self._get_form_def_tree(child_form_name, child_model_class, child_children)
-            complete_children_def.append(child_def)
-        return (form_name, model_class, complete_children_def)
+            child_form_dict = formdefinitions.get_form_dict(self.forms)[child]
+            definition = self._get_form_def_tree(*child_form_dict)
+            complete_children_def.append(definition)
+        return form_name, model_class, complete_children_def
 
     def get_toplevel_forms(self):
         """
@@ -621,10 +626,9 @@ class UpdateOccurrenceMixin(object):
         form contains also the definition of its related objects (as children)
         """
         forms = []
-        for (form_name, model_class, children) in self.forms:
-            if "." not in form_name:
-                # only for top-level objects
-                form_def = self._get_form_def_tree(form_name, model_class, children)
+        for name, model_class, children in self.forms:
+            if "." not in name:  # only for top-level objects
+                form_def = self._get_form_def_tree(name, model_class, children)
                 forms.append(form_def)
         return forms
 
@@ -672,6 +676,24 @@ class UpdateOccurrenceMixin(object):
         else:
             instance.photographs.all().delete()
 
+    def process_notes(self, instance, validated_data):
+        """Create or update the notes associated with the instance"""
+        for note_data in validated_data.get("notes"):
+            instance_type = ContentType.objects.get_for_model(instance)
+            try:
+                note = models.Note.objects.get(
+                    content_type__pk=instance_type.id,
+                    object_id=instance.id,
+                    ui_tab=note_data["ui_tab"]
+                )
+            except models.Note.DoesNotExist:
+                note = models.Note(
+                    occurrence=instance,
+                    ui_tab=note_data["ui_tab"],
+                )
+            note.note = note_data["note"]
+            note.save()
+
     def update(self, instance, validated_data):
         with reversion.create_revision():
             for (form_name, model_class, children) in self.get_toplevel_forms():
@@ -686,17 +708,19 @@ class UpdateOccurrenceMixin(object):
                     self._update_form(form_name, model_class, validated_data, instance, children)
 
             instance.geom = validated_data.get("geom") or instance.geom
-            instance.version = instance.version + 1
+            instance.version += 1
             instance.verified = validated_data.get("verified", False) or False
             if self.is_publisher:
-                instance.released = validated_data.get("released", False) or False
+                instance.released = validated_data.get(
+                    "released", False) or False
                 if instance.released:
-                    instance.released_versions = instance.released_versions + 1
+                    instance.released_versions += 1
             else:
                 instance.released = False
             instance.save()
             # ensure the instance has been saved before associating photos
             self.process_photos(instance, validated_data)
+            self.process_notes(instance, validated_data)
         return instance
 
     def create(self, validated_data):
@@ -770,28 +794,36 @@ class AnimalLifestagesSerializer(CustomModelSerializerMixin,
         model = models.AnimalLifestages
         exclude = ('id',)
 
+
 class BaseDetailsSerializer(serializers.ModelSerializer):
+
     def to_representation(self, instance):
         if instance:
             #self.set_model_class(instance.occurrencetaxon.get_details_class())
             instance = instance.occurrencetaxon.get_details()
         return super(BaseDetailsSerializer, self).to_representation(instance)
 
+
 class LandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
+
     class Meta:
         model = models.LandAnimalDetails
         exclude = ('id',)
 
+
 class WetlandVetegationStructureSerializer(CustomModelSerializerMixin,
                                            serializers.ModelSerializer):
+
     class Meta:
         model = models.WetlandVetegationStructure
         exclude = ('id',)
 
+
 class WetlandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
     vegetation = WetlandVetegationStructureSerializer(required=False)
+
     class Meta:
         model = models.WetlandAnimalDetails
         exclude = ('id',)
@@ -952,9 +984,14 @@ class PhotographSerializer(serializers.ModelSerializer):
         read_only_fields = ('image', 'thumbnail', 'image_width', 'image_height','thumb_width', 'thumb_height', 'date')
         #exclude = ('occurrence_fk', 'occurrence', 'content_type')
 
-""" -------------------------------------------
-OCCURRENCE SERIALIZER
----------------------------------------------- """
+
+class NoteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Note
+        fields = ("note", "ui_tab",)
+
+
 class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
     """
     Manages serialization/deserialization of Occurrences
@@ -973,6 +1010,7 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
     observation = OccurrenceObservationSerializer(required=True)
     images = PhotographSerializer(required=False, many=True)
     species = SpeciesSerializer(required=True)
+    notes = NoteSerializer(required=False, many=True)
 
     def get_fields(self):
         fields = serializers.Serializer.get_fields(self)
@@ -988,10 +1026,11 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
             details_name = instance.get_details_class().__name__.lower()
             setattr(instance, details_name, instance.get_details())
         r = serializers.Serializer.to_representation(self, instance)
-
         result = to_flat_representation(r)
+        nested_notes = result.pop("notes")
+        flattened_notes = _flatten_notes_representation(nested_notes)
+        result.update(flattened_notes)
         result["id"] = r["id"]
-
         if self.is_writer or self.is_publisher:
             result["version"] = instance.version
             result["total_versions"] = instance.version
@@ -1012,28 +1051,40 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
         return result
 
     def to_nested_representation(self, data):
+        """Transforms the flat ``data`` input into a dictionary of forms"""
         formvalues = OrderedDict()
-        for global_field_name in data: # transform the flat object to a set of dictionaries of forms
+        for global_field_name in data:
             field_parts = global_field_name.split(".")
-            if len(field_parts)>1:
+            if len(field_parts) > 1:
                 base = formvalues
                 for local_field_name in field_parts[:-1]:
                     base[local_field_name] = base.get(local_field_name, {})
                     if base[local_field_name] is None:
                         base[local_field_name] = {}
                     base = base[local_field_name]
-                if not (isinstance(base.get(field_parts[-1]), dict) and data[global_field_name] is None):  # avoid overwritting new values with old empty forms
+                # avoid overwriting new values with old empty forms
+                is_a_dict = isinstance(base.get(field_parts[-1]), dict)
+                if not (is_a_dict and data[global_field_name] is None):
                     base[field_parts[-1]] = data[global_field_name]
             else:
-                if not (isinstance(formvalues.get(global_field_name), dict) and data[global_field_name] is None): # avoid overwritting new values with old empty forms
+                # avoid overwriting new values with old empty forms
+                is_a_dict = isinstance(formvalues.get(global_field_name), dict)
+                if not (is_a_dict and data[global_field_name] is None):
                     formvalues[global_field_name] = data[global_field_name]
         return formvalues
 
-    def to_internal_value(self, data):
+    def _parse_notes(self, nested_notes):
+        result = []
+        for ui_name_part, note_value in nested_notes.items():
+            if note_value is not None:
+                result.append({
+                    "note": note_value,
+                    "ui_tab": ui_name_part
+                })
+        return result
 
-        """
-        Dict of native values <- Dict of primitive datatypes.
-        """
+    def to_internal_value(self, data):
+        """Dict of native values <- Dict of primitive datatypes."""
         if not isinstance(data, Mapping):
             message = self.error_messages['invalid'].format(
                 datatype=type(data).__name__
@@ -1046,13 +1097,10 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
         errors = OrderedDict()
         self.featuresubtype = data.get("featuresubtype")
         self.to_internal_value_extra(data, validated_formvalues, errors)
-
         fields = self._writable_fields
-
         # transform the flat object to a set of dictionaries of forms
         formvalues = self.to_nested_representation(data)
-
-        for field in fields: # validate values
+        for field in fields:  # validate values
             validate_method = getattr(self, 'validate_' + field.field_name, None)
             if isinstance(field, serializers.ModelSerializer):
                 primitive_value = field.get_value(formvalues)
@@ -1060,6 +1108,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
                     continue
             else:
                 primitive_value = field.get_value(formvalues)
+            if field.field_name == "notes":
+                primitive_value = self._parse_notes(primitive_value["note"])
             try:
                 validated_value = field.run_validation(primitive_value)
                 if validate_method is not None:
@@ -1093,8 +1143,8 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
 
         if errors:
             raise rest_fields.ValidationError(to_flat_representation(errors))
-
         return validated_formvalues
+
 
 class TaxonLocationSerializer(CustomModelSerializerMixin,
                               serializers.ModelSerializer):
@@ -1117,6 +1167,7 @@ class NaturalAreaLocationSerializer(CustomModelSerializerMixin,
         model = models.NaturalAreaLocation
         exclude = ('id', 'polygon')
 
+
 class TaxonOccurrenceSerializer(OccurrenceSerializer):
     species = SpeciesSerializer(required=False)
     voucher = VoucherSerializer(required=False)
@@ -1127,6 +1178,7 @@ class TaxonOccurrenceSerializer(OccurrenceSerializer):
         if not species_id:
             errors["species"] = [_("No species was selected")]
 
+
 class NaturalAreaOccurrenceSerializer(OccurrenceSerializer):
     element = NaturalAreaElementSerializer(required=False)
     location = NaturalAreaLocationSerializer(required=False)
@@ -1134,9 +1186,6 @@ class NaturalAreaOccurrenceSerializer(OccurrenceSerializer):
     def to_internal_value_extra(self, data, result, errors):
         pass
 
-""" -------------------------------------------
-LAYERS
----------------------------------------------- """
 
 class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
@@ -1171,6 +1220,7 @@ class LayerSerializer(gisserializer.GeoFeatureModelSerializer):
         model = models.OccurrenceTaxon
         geo_field = "geom"
         fields = ('id', 'featuretype', 'featuresubtype', 'inclusion_date', 'released', 'verified', 'version', 'total_versions')
+
 
 class ListSerializer(gisserializer.GeoFeatureModelSerializer):
     id = rest_fields.IntegerField(required=False, read_only=True)
