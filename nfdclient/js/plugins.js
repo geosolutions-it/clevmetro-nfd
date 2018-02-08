@@ -28,7 +28,8 @@ module.exports = {
         AddNaturalFeaturesPlugin: require('./plugins/AddNaturalFeatures'),
         ToggleAddEditPanelPlugin: require('./plugins/ToggleAddEditPanel'),
         FeaturesPlugin: require('./plugins/FeaturesPlugin'),
-        ExportFeaturesPlugin: require('./plugins/ExportFeatures')
+        ExportFeaturesPlugin: require('./plugins/ExportFeatures'),
+        FeatureTypeReportMenuPlugin: require('./plugins/FeatureTypeReportMenu')
     },
     requires: {}
 };

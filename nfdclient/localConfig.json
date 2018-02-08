@@ -71,7 +71,8 @@
         "ToggleAddEditPanel",
         "Features",
         "Notifications",
-        "ExportFeatures"
+        "ExportFeatures",
+        "FeatureTypeReportMenu"
       ],
       "mobile": [{
           "name": "Map",
@@ -101,7 +102,6 @@
       ,
       "TOC",
       "OmniBar",
-      "BurgerMenu",
       "NfdLogin",
       "Toolbar",
       "Expander",
@@ -113,7 +113,8 @@
       "ToggleAddEditPanel",
       "Features",
       "Notifications",
-      "ExportFeatures"
+      "ExportFeatures",
+      "FeatureTypeReportMenu"
     ]
 	}
 }
