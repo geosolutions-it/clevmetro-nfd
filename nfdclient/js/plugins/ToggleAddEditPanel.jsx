@@ -55,7 +55,7 @@ module.exports = {
  ToggleAddEditPanelPlugin: assign(ToggleAddEditPanelPlugin, {
          OmniBar: {
              name: 'toggleeditpanel',
-             position: 6,
+             position: 3,
              tool: true,
              priority: 1
          }

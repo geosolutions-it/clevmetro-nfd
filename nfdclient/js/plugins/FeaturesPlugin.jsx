@@ -132,7 +132,7 @@ module.exports = {
     FeaturesPlugin: assign(ToggleFeaturesPanelTool, {
         OmniBar: {
             name: 'featurespanel',
-            position: 2,
+            position: 1,
             tool: true,
             tools: [FeaturesPlugin],
             priority: 1
