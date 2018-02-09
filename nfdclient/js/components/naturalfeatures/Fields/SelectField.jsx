@@ -9,6 +9,18 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const {FormGroup, ControlLabel, Col} = require('react-bootstrap');
 const {getLabel, getValue} = require('./FieldsUtils');
+const Select = require('react-select');
+require('react-select/dist/react-select.css');
+
+/* TODO we have to decide how to pass the value to the backend for multiple values
+*
+* old version
+    handleChange = (e) => {
+        const {onChange, item} = this.props;
+        const val = e.target.value === '' ? null : e.target.value;
+        onChange(item.key, val);
+*/
+
 
 class SelectField extends React.Component {
     static propTypes = {
@@ -17,12 +29,14 @@ class SelectField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         isMobile: PropTypes.bool,
+        multi: PropTypes.bool,
         onChange: PropTypes.func
     }
     static defaultProps = {
       editable: false,
       horizontal: false,
       isMobile: false,
+      multi: false,
       feature: {},
       onChange: () => {}
     }
@@ -33,20 +47,26 @@ class SelectField extends React.Component {
             );
         });
     }
+    getSelect = (item, feature, readonly) => {
+        return (<Select
+                    searchable={false}
+                    multi={this.props.multi}
+                    className="nfd-select"
+                    labelKey="value"
+                    valueKey="key"
+                    disabled={readonly}
+                    value={getValue(feature, item.key)}
+                    onChange={this.handleChange}
+                    options={item.values && item.values.items || []}
+                />);
+    }
     renderVertical = () => {
         const {item, editable, feature} = this.props;
         const readonly = !editable || !!item.readonly;
         return (
             <FormGroup controlId={item.key}>
                 <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
-                <select
-                    disabled={readonly}
-                    className="form-control"
-                    value={getValue(feature, item.key)}
-                    onChange={this.handleChange}>
-                        <option value="">---</option>
-                        {this.getOptions(item.values)}
-                </select>
+                {this.getSelect(item, feature, readonly)}
             </FormGroup>);
     }
     renderHorizontal = () => {
@@ -58,24 +78,20 @@ class SelectField extends React.Component {
                    <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={7}>
-                    <select
-                        disabled={readonly}
-                        className="form-control"
-                        value={getValue(feature, item.key)}
-                        onChange={this.handleChange}>
-                            <option value="">---</option>
-                            {this.getOptions(item.values)}
-                    </select>
+                    {this.getSelect(item, feature, readonly)}
                 </Col>
             </FormGroup>);
     }
     render() {
         return this.props.horizontal && this.renderHorizontal() || this.renderVertical();
     }
-    handleChange = (e) => {
-        const {onChange, item} = this.props;
-        const val = e.target.value === '' ? null : e.target.value;
-        onChange(item.key, val);
+    handleChange = (option) => {
+        const {onChange, item, multi} = this.props;
+        if (!multi) {
+            onChange(item.key, option ? option.key : null);
+        }else {
+            onChange(item.key, option.length > 0 ? option : null);
+        }
     }
 }
 
