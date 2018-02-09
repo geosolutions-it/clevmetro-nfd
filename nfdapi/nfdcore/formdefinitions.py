@@ -110,7 +110,6 @@ MANAGEMENT_FORM_ITEMS_PUBLISHER = [
 LAND_ANIMAL = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -127,12 +126,12 @@ LAND_ANIMAL = [
     ('details', models.LandAnimalDetails, ['details.lifestages']),
     ('details.lifestages', models.AnimalLifestages, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 STREAM_ANIMAL = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -156,12 +155,12 @@ STREAM_ANIMAL = [
     ('details.lifestages', models.AnimalLifestages, []),
     ('details.substrate', models.StreamSubstrate, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 PONDLAKE_ANIMAL = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation, [
@@ -177,12 +176,12 @@ PONDLAKE_ANIMAL = [
     ('details', models.PondLakeAnimalDetails, ['details.lifestages']),
     ('details.lifestages', models.AnimalLifestages, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 WETLAND_ANIMAL = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -207,12 +206,12 @@ WETLAND_ANIMAL = [
     ('details.lifestages', models.AnimalLifestages, []),
     ('details.vegetation', models.WetlandVetegationStructure, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 SLIMEMOLD = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -229,12 +228,12 @@ SLIMEMOLD = [
     ('details', models.SlimeMoldDetails, ['details.lifestages']),
     ('details.lifestages', models.SlimeMoldLifestages, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 CONIFER_PLANT = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -261,12 +260,12 @@ CONIFER_PLANT = [
     ('details.earthworm_evidence', models.EarthwormEvidence, []),
     ('details.disturbance_type', models.DisturbanceType, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 FERN_PLANT = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -291,12 +290,12 @@ FERN_PLANT = [
     ('details.earthworm_evidence', models.EarthwormEvidence, []),
     ('details.disturbance_type', models.DisturbanceType, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 FLOWERING_PLANT = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -321,12 +320,12 @@ FLOWERING_PLANT = [
     ('details.earthworm_evidence', models.EarthwormEvidence, []),
     ('details.disturbance_type', models.DisturbanceType, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 MOSS_PLANT = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -351,12 +350,12 @@ MOSS_PLANT = [
     ('details.earthworm_evidence', models.EarthwormEvidence, []),
     ('details.disturbance_type', models.DisturbanceType, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 FUNGUS = [
     ('species', models.Species, ['species.element_species']),
     ('species.element_species', models.ElementSpecies, []),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation, [
@@ -384,6 +383,7 @@ FUNGUS = [
     ('details.other_observed_associations', models.ObservedAssociations, []),
     ('details.fruiting_bodies_age', models.FruitingBodiesAge, []),
     ('location', models.TaxonLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
 
 NATURAL_AREA = [
@@ -395,7 +395,6 @@ NATURAL_AREA = [
             'element.disturbance_type'
         ]
     ),
-    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
     (
         'observation',
         models.OccurrenceObservation,
@@ -411,4 +410,5 @@ NATURAL_AREA = [
     ('element.earthworm_evidence', models.EarthwormEvidence, []),
     ('element.disturbance_type', models.DisturbanceType, []),
     ('location', models.NaturalAreaLocation, []),
+    (MANAGEMENT_FORM_NAME, models.OccurrenceTaxon, []),
 ]
