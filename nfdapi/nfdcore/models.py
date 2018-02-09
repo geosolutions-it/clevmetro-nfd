@@ -359,8 +359,6 @@ def get_details_class(category_code):
         return FernDetails
     elif category_code=='fl':
         return FloweringPlantDetails
-    elif category_code=='pl':
-        return TaxonDetails #FIXME
     elif category_code=='mo':
         return MossDetails
     elif category_code=='fu':
@@ -444,24 +442,65 @@ class AnimalLifestages(models.Model):
     unknown = models.FloatField(default=0.0, blank=True, null=True)
     na = models.FloatField(default=0.0, blank=True, null=True)
 
+
 class AnimalDetails(TaxonDetails):
-    gender = models.ForeignKey(Gender, on_delete=models.SET_NULL, blank=True, null=True)
-    marks = models.ForeignKey(Marks, on_delete=models.SET_NULL, blank=True, null=True)
-    lifestages = models.OneToOneField(AnimalLifestages, on_delete=models.CASCADE, blank=True, null=True)
-    diseases_and_abnormalities = models.ForeignKey(DiseasesAndAbnormalities, on_delete=models.SET_NULL, blank=True, null=True)
+    genders = models.ManyToManyField(
+        Gender,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    marks = models.ManyToManyField(
+        Marks,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    lifestages = models.OneToOneField(
+        AnimalLifestages,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    diseases_and_abnormalities = models.ManyToManyField(
+        DiseasesAndAbnormalities,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
     #id_marks_description #FIXME
+
     class Meta:
         abstract = True
 
+
 class AquaticAnimalDetails(AnimalDetails):
-    sampler = models.ForeignKey(AquaticSampler, on_delete=models.SET_NULL, blank=True, null=True)
+    sampler = models.ManyToManyField(
+        AquaticSampler,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+
     class Meta:
         abstract = True
+
 
 @reversion.register(follow=['taxondetails_ptr'])
 class LandAnimalDetails(AnimalDetails):
-    sampler = models.ForeignKey(TerrestrialSampler, on_delete=models.SET_NULL, blank=True, null=True)
-    stratum = models.ForeignKey(TerrestrialStratum, on_delete=models.SET_NULL, blank=True, null=True)
+    sampler = models.ManyToManyField(
+        TerrestrialSampler,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    stratum = models.ManyToManyField(
+        TerrestrialStratum,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+
 
 class PondLakeType(DictionaryTable):
     pass
@@ -486,14 +525,42 @@ class LenticSize(models.Model):
     class Meta:
         abstract = True
 
+
 @reversion.register(follow=['taxondetails_ptr'])
 class PondLakeAnimalDetails(AquaticAnimalDetails, LenticSize):
-    pond_lake_name = models.TextField(blank=True, null=True)
-    pond_lake_type = models.ForeignKey(PondLakeType, on_delete=models.SET_NULL, blank=True, null=True)
-    pond_lake_use = models.ForeignKey(PondLakeUse, on_delete=models.SET_NULL, blank=True, null=True)
-    shoreline_type = models.ForeignKey(ShorelineType, on_delete=models.SET_NULL, blank=True, null=True)
-    microhabitat = models.ForeignKey(LakeMicrohabitat, on_delete=models.SET_NULL, blank=True, null=True)
-    microhabitat_comments = models.TextField(default='', blank=True, null=True)
+    pond_lake_name = models.TextField(
+        blank=True,
+        null=True
+    )
+    pond_lake_type = models.ForeignKey(
+        PondLakeType,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    pond_lake_use = models.ManyToManyField(
+        PondLakeUse,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    shoreline_type = models.ManyToManyField(
+        ShorelineType,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    microhabitat = models.ManyToManyField(
+        LakeMicrohabitat,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    microhabitat_comments = models.TextField(
+        default='',
+        blank=True,
+        null=True
+    )
 
 
 class StreamDesignatedUse(DictionaryTable):
