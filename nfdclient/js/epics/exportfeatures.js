@@ -69,8 +69,8 @@ module.exports = {
         action$.ofType(EXPORT_FEATURES)
         .filter(a => a.downloadOptions.type === "SINGLE")
         .switchMap( a => {
-            const {featureType, id, selectedFormat: format} = a.downloadOptions;
-            return exportFt(Api.exportFeature(featureType, id, format), `${featureType}_${id}.${getExt(format)}`);
+            const {featureType, id, selectedFormat: format, version} = a.downloadOptions;
+            return exportFt(Api.exportFeature(featureType, id, version, format), `${featureType}_${id}_${version}.${getExt(format)}`);
         }),
     exportFeatureList: (action$, store) =>
         action$.ofType(EXPORT_FEATURES)
@@ -89,7 +89,7 @@ module.exports = {
     downloadReport: (action$) =>
         action$.ofType(DOWNLOAD_REPORT)
         .switchMap(a => {
-            const {featureType, id} = a;
-            return getReport(Api.downloadReport(featureType, id), `${featureType}${id ? `_${id}` : ''}.${'pdf'}`);
+            const {featureType, id, version} = a;
+            return getReport(Api.downloadReport(featureType, id, version), `${featureType}${id ? `_${id}_${version}` : ''}.${'pdf'}`);
         })
 };

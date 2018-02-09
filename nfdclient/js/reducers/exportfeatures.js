@@ -15,7 +15,8 @@ const {
 function exportfeatures(state = {}, action) {
     switch (action.type) {
         case TOGGLE_EXPORT: {
-            const options = assign({}, state.options, {type: action.exportType, featureType: action.featureType, id: action.id});
+            const {exportType: type, featureType, id, version} = action;
+            const options = assign({}, state.options, {type, featureType, id, version});
             return assign({}, state, {options});
         }
         case EXPORT_OPTIONS_CHANGE: {

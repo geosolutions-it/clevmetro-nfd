@@ -10,7 +10,7 @@ const {connect} = require('react-redux');
 const PropTypes = require('prop-types');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 const {updateNaturalFeature, deleteNaturalFeature, getSpecies, nextVersion, previousVersion, cancel, imageError, addImage, removeImage, onFeaturePropertyChange, editFeature} = require('../actions/naturalfeatures');
-const {onToggleExport} = require('../actions/exportfeatures');
+const {onToggleExport, downloadReport} = require('../actions/exportfeatures');
 const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/actions/draw');
 const {isPublisher, isWriter} = require('./naturalfeatures/securityutils');
 
@@ -45,7 +45,8 @@ const SmartDockedNaturalFeatures = connect((state) => ({
     removeImage: removeImage,
     exportFt: onToggleExport,
     onFeaturePropertyChange,
-    editFeature
+    editFeature,
+    onDownloadReport: downloadReport
 })(DockedNaturalFeatures);
 
 class ViewEditNaturalFeatures extends React.Component {

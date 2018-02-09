@@ -12,11 +12,12 @@ const DOWNLOADING_FEATURES = 'DOWNLOADING_FEATURES';
 const DOWNLOADING_FEATURES_ERROR = 'DOWNLOADING_FEATURES_ERROR';
 const DOWNLOAD_REPORT = 'DOWNLOAD_REPORT';
 
-function downloadReport(featureType, id) {
+function downloadReport(featureType, id, version) {
     return {
         type: DOWNLOAD_REPORT,
         featureType,
-        id
+        id,
+        version
     };
 }
 
@@ -48,12 +49,13 @@ function onDownloadOptionChange(key, value) {
         value
     };
 }
-function onToggleExport(exportType, featureType, id ) {
+function onToggleExport(exportType, featureType, id, version) {
     return {
         type: TOGGLE_EXPORT,
         exportType,
         featureType,
-        id
+        id,
+        version
     };
 }
 

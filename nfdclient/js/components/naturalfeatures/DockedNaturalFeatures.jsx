@@ -63,7 +63,8 @@ const DockedNaturalFeatures = React.createClass({
         exportFt: React.PropTypes.func,
         onFeaturePropertyChange: React.PropTypes.func,
         editFeature: React.PropTypes.func,
-        isEditable: React.PropTypes.bool
+        isEditable: React.PropTypes.bool,
+        onDownloadReport: React.PropTypes.func
     },
     getDefaultProps() {
         return {
@@ -93,7 +94,8 @@ const DockedNaturalFeatures = React.createClass({
             cancel: () => {},
             exportFt: () => {},
             onFeaturePropertyChange: () => {},
-            editFeature: () => {}
+            editFeature: () => {},
+            onDownloadReport: () => {}
         };
     },
     getInitialState() {
@@ -223,9 +225,18 @@ const DockedNaturalFeatures = React.createClass({
                         <Message msgId="naturalfeatures.edit" />
                     </Button>, <Button key="exportFt" bsSize="small"
                     bsStyle="primary"
+                    disabled={!this.props.currentFeature.featuretype}
                     onClick={this.exportFt}
+                    style={{marginRight: "2px"}}
                     >
                     <Glyphicon glyph="download" style={{fontSize: 18}}/>
+                </Button>,
+                <Button key="reportPdf" bsSize="small"
+                    bsStyle="primary"
+                    disabled={!this.props.currentFeature.featuretype}
+                    onClick={this.downloadReport}
+                    >
+                    <Glyphicon glyph="1-pdf" style={{fontSize: 18}}/>
                 </Button>]);
     },
     renderHistoric() {
@@ -296,7 +307,7 @@ const DockedNaturalFeatures = React.createClass({
         const {forms = [], width, height, dockSize, mode, dockProps, isVisible} = this.props;
         const tabRows = Math.ceil((forms.length + 1) / Math.floor((width * dockSize) / 58));
         const horizontalForm = (width * dockSize) > 400;
-        const footerHeight = (mode === 'EDIT') ? 70 : 41;
+        const footerHeight = (mode !== 'ADD') ? 70 : 41;
         const tabContentHeigth = height - 40 - footerHeight - (45 * tabRows) + 1;
         return (
             <Dock {...dockProps} size={dockSize}
@@ -306,7 +317,7 @@ const DockedNaturalFeatures = React.createClass({
                         {this.renderTabs(tabContentHeigth, horizontalForm)}
                 </Tabs>
                 <div className="dock-panel-footer" style={{height: footerHeight}}>
-                    {(mode === 'EDIT') ? this.renderHistoric() : null}
+                   {mode !== 'ADD' ? this.renderHistoric() : null}
                     <div className="dock-panel-footer-buttons">
                     {this.renderButtons()}
                     </div>
@@ -335,7 +346,7 @@ const DockedNaturalFeatures = React.createClass({
             .then(json => this.setState({options: json}));
     },
     exportFt() {
-        this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id);
+        this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id, this.props.currentFeature.version);
     },
     handleDelete() {
         this.props.onDelete(this.props.featuretype, this.props.currentFeature.id);
@@ -347,6 +358,10 @@ const DockedNaturalFeatures = React.createClass({
     },
     handleEdit() {
         return this.props.editFeature(this.props.currentFeature);
+    },
+    downloadReport() {
+        const {featuretype, id, version} = this.props.currentFeature;
+        this.props.onDownloadReport(featuretype, id, version);
     }
 });
 
