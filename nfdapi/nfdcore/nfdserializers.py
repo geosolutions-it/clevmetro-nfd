@@ -294,7 +294,7 @@ def _get_form_items(name, model, is_writer, is_publisher):
     form_items.append({
         "mandatory": False,
         "readonly": False,
-        "type": "string",
+        "type": "textarea",
         "key": "notes.note.{}".format(name.split(".")[-1]),
         "label": "notes"
     })
