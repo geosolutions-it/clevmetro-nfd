@@ -136,7 +136,7 @@ module.exports = {
     })(AddNaturalFeatures), {
         OmniBar: {
             name: "addnf",
-            position: 5,
+            position: 2,
             tool: true,
             priority: 1
         }

@@ -56,7 +56,7 @@ module.exports = {
     })(ReportMenu), {
         OmniBar: {
             name: "pdfFt",
-            position: 6,
+            position: 4,
             tool: true,
             priority: 1
         }

@@ -52,7 +52,7 @@ module.exports = {
     NfdLoginPlugin: assign(LoginTool, {
         OmniBar: {
             name: "login",
-            position: 3,
+            position: 5,
             tool: LoginNav,
             tools: [UserDetails, Login],
             priority: 1
