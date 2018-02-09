@@ -113,8 +113,8 @@ const Api = {
         data.append("image", blob, image.name);
         return axios.post(url, data, getOptions()).then(function(response) {return response.data; });
     },
-    exportFeature: function(featureType, id, format) {
-        let url = `/nfdapi/layers/${featureType}/${id}/?format=${format}`;
+    exportFeature: function(featureType, id, version = 1, format) {
+        let url = `/nfdapi/layers/${featureType}/${id}/version/${version}?format=${format}`;
         const headers = assign({}, (getOptions()).headers, getAccept(format));
         return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
     },
@@ -123,8 +123,8 @@ const Api = {
         const headers = assign({}, (getOptions()).headers, getAccept(format));
         return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
     },
-    downloadReport: function(featureType, id, format = 'pdf') {
-        let url = id ? `/nfdapi/stats/${featureType}/${id}/?format=${format}` : `/nfdapi/stats/${featureType}?format=${format}`;
+    downloadReport: function(featureType, id, version, format = 'pdf') {
+        let url = id ? `/nfdapi/layers/${featureType}/${id}/?version=${version}&format=${format}` : `/nfdapi/stats/${featureType}?format=${format}`;
         const headers = assign({}, (getOptions()).headers, getAccept(format));
         return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
     }

@@ -16,7 +16,7 @@ const FilterUtils = require('../../utils/FilterUtils');
 const dataSelector = (state) => state.featuresearch && state.featuresearch.animal || {};
 const dataFilterSelector = (state) => state.featuresearch && state.featuresearch.animal_filters || {};
 
-const toggleExport = onToggleExport.bind(null, 'LIST', 'animal', null);
+const toggleExport = onToggleExport.bind(null, 'LIST', 'animal', null, null);
 const FeatureTypePanel = connect(() => ({}), {
     toggleExport
 })(require('../../components/naturalfeatures/FeatureTypePanel'));
