@@ -6,12 +6,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 const Rx = require('rxjs');
+const {get} = require('lodash');
 const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 const {toggleControl, setControlProperty} = require('../../MapStore2/web/client/actions/controls');
 const {error} = require('../../MapStore2/web/client/actions/notifications');
 const {
-    CREATE_NATURAL_FEATURE, NFD_LOGIN_SUCCESS, ADD_FEATURE,
+    CREATE_NATURAL_FEATURE, NFD_LOGIN_SUCCESS, ADD_FEATURE, FEATURE_PROPERTY_CHANGE,
     NATURAL_FEATURES_LOADED, LOAD_NATURAL_FEATURES, naturalFeaturesLoaded, naturalFeaturesLoading, naturalFeaturesError, naturalFeatureGeomAdded,
     USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
     IMAGE_ERROR,
@@ -154,5 +155,11 @@ uploadImage: (action$) =>
 // Sowhs error message if user tries to add wrong image
 onImageEr: (action$) =>
     action$.ofType(IMAGE_ERROR)
-    .map((a) => error({title: 'Wrong Image', message: `Wrong ${a.errors.join(" and ")}`}))
+    .map((a) => error({title: 'Wrong Image', message: `Wrong ${a.errors.join(" and ")}`})),
+// Update position if manually edited
+updatePos: (action$, store) =>
+    action$.ofType(FEATURE_PROPERTY_CHANGE)
+    .debounceTime(400)
+    .filter((a) => a.property === 'location.lat' || a.property === 'location.lng')
+    .map(() => changeDrawingStatus("updatePos", "Marker", "dockednaturalfeatures", [], {properties: get(store.getState(), "naturalfeatures.selectedFeature")}))
 };

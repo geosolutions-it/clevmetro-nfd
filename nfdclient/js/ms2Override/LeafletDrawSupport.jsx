@@ -76,6 +76,9 @@ const LeafletDrawSupport = React.createClass({
                 this.drawMarker(newProps.options.properties);
                 this.drawPolygon(newProps.options.properties);
                 break;
+            case ("updatePos"):
+                this.drawMarker(newProps.options.properties);
+                break;
             default :
                 return;
         }
