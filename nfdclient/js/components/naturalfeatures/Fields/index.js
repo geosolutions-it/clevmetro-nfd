@@ -1,5 +1,6 @@
 module.exports = {
     _string: require('./TextField'),
+    _textarea: require('./TextField'),
     _stringcombo: require('./SelectField'),
     _integer: require('./NumericField'),
     _double: require('./NumericField'),

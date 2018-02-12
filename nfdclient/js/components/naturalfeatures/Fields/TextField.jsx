@@ -32,6 +32,7 @@ class TextField extends React.Component {
     renderVertical = () => {
         const {item, editable, feature} = this.props;
         const readonly = !editable || !!item.readonly;
+        const type = item.type === 'string' && 'textarea' || item.type;
         const comp = (
             <FormGroup controlId={item.key}>
                 <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
@@ -40,16 +41,18 @@ class TextField extends React.Component {
                     inputRef={this.addRef}
                     value={getValue(feature, item.key)}
                     readOnly={readonly}
+                    rows={3}
                     onChange={this.handleChange}
-                    componentClass="input"
+                    componentClass={item.type === "textarea" && item.type || "input"}
                     onFocus={this.enterFull}
-                    type="text"/>
+                    type={type}/>
             </FormGroup>);
         return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} </div>) : comp;
     }
     renderHorizontal = () => {
         const {item, editable, feature} = this.props;
         const readonly = !editable || !!item.readonly;
+
         const comp = (
             <FormGroup controlId={item.key}>
                 <Col xs={5} className="label-col">
@@ -61,9 +64,10 @@ class TextField extends React.Component {
                     inputRef={this.addRef}
                     value={getValue(feature, item.key)}
                     readOnly={readonly}
+                    rows={3}
                     onChange={this.handleChange}
                     onFocus={this.enterFull}
-                    componentClass="input"
+                    componentClass={item.type === "textarea" && item.type || "input"}
                     type="text"/>
                 </Col>
             </FormGroup>);

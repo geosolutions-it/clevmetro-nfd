@@ -87,6 +87,12 @@ padding: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.nf-tab-content textarea.form-control{
+    max-width: 100%;
+    min-width: 100%;
+    height: auto;
+}
+
 /* tablets and desktop */
 @media only screen and (min-width: 768px) {
     .nf-tab-content {
