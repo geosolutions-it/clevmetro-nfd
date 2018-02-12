@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 const assign = require('object-assign');
+const {isObject} = require('lodash');
+
 const {
     NATURAL_FEATURE_TYPE_LOADED,
     UPDATE_NATURAL_FEATURE_FORM,
@@ -26,6 +28,7 @@ const {
     NATURAL_FEATURES_LOADING
 } = require('../actions/naturalfeatures');
 
+
 function naturalfeatures(state = {}, action) {
     switch (action.type) {
         case "CLEAN_FORM": {
@@ -42,9 +45,11 @@ function naturalfeatures(state = {}, action) {
             });
         }
         case UPDATE_NATURAL_FEATURE_FORM: {
+            let newF = isObject(action.feature.geom) ? action.feature : assign({}, action.feature, {geom: JSON.parse(action.feature.geom)});
+            newF = assign({}, newF, {"location.lat": newF.geom && newF.geom.coordinates[1], "location.lng": newF.geom && newF.geom.coordinates[0]});
             return assign({}, state, {
-                selectedFeature: action.feature,
-                images: action.feature.images || [],
+                selectedFeature: newF,
+                images: newF.images || [],
                 errors: {}
             });
         }
@@ -72,13 +77,20 @@ function naturalfeatures(state = {}, action) {
             });
         }
         case NATURAL_FEATURE_MARKER_REPLACED: {
-            const selectedFeature = assign({}, state.selectedFeature, {geom: action.geometry});
+            const selectedFeature = assign({}, state.selectedFeature, {geom: action.geometry, "location.lng": action.geometry && action.geometry.coordinates[0], "location.lat": action.geometry && action.geometry.coordinates[1]});
             return assign({}, state, {
                 selectedFeature: selectedFeature
             });
         }
         case FEATURE_PROPERTY_CHANGE: {
-            const selectedFeature = assign({}, state.selectedFeature, {[action.property]: action.value});
+
+            let selectedFeature = assign({}, state.selectedFeature, {[action.property]: action.value});
+            if (action.property === "location.lng" || action.property === "location.lat") {
+                const lat = action.property === "location.lat" ? parseFloat(action.value) : selectedFeature.geom.coordinates[1];
+                const lng = action.property === "location.lng" ? parseFloat(action.value) : selectedFeature.geom.coordinates[0];
+                const geom = assign({}, selectedFeature.geom, {coordinates: [lng, lat]});
+                selectedFeature = assign({}, selectedFeature, {geom});
+            }
             return assign({}, state, {selectedFeature});
         }
         case ADD_FEATURE:

@@ -138,7 +138,35 @@ const DockedNaturalFeatures = React.createClass({
                     isMobile={this.props.isMobile}
                     />) : null;
         });
-
+        if (tab.formname === 'location') {
+            const latItem = {
+                key: "location.lat",
+                label: "latitude",
+                mandatory: false,
+                type: "double"};
+            const lngItem = {
+                key: "location.lng",
+                label: "longitude",
+                mandatory: false,
+                type: "double"};
+            const LatF = Fields._double;
+            const LngF = Fields._double;
+            items = items.concat([<LatF
+                key={latItem.key}
+                item={latItem}
+                editable={isEditable}
+                horizontal={horizontalForm}
+                feature={currentFeature}
+                onChange={this.props.onFeaturePropertyChange}
+                isMobile={this.props.isMobile}/>, <LngF
+                key={lngItem.key}
+                item={lngItem}
+                editable={isEditable}
+                horizontal={horizontalForm}
+                feature={currentFeature}
+                onChange={this.props.onFeaturePropertyChange}
+                isMobile={this.props.isMobile}/>]);
+        }
         searchDiv = tabindex <= 2 && this.props.mode !== 'VIEW' && this.props.featuresubtype !== 'na';
         return (
             <div className="nf-tab-content" style={{height: tabContentHeigth, overflow: "auto"}}>

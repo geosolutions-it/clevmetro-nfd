@@ -43,7 +43,7 @@ class NumericField extends React.Component {
                     onChange={this.handleChange}
                     componentClass="input"
                     onFocus={this.enterFull}
-                    min="0"
+                    min={(item.type !== 'double') ? "any" : undefined}
                     step={(item.type === 'double') && "any" || "1"}
                     type="number"/>
             </FormGroup>);
@@ -66,7 +66,7 @@ class NumericField extends React.Component {
                         onChange={this.handleChange}
                         componentClass="input"
                         onFocus={this.enterFull}
-                        min="0"
+                        min={(item.type !== 'double') ? "any" : undefined}
                         step={(item.type === 'double') && "any" || "1"}
                         type="number"/>
                 </Col>

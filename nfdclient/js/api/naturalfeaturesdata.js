@@ -53,8 +53,11 @@ const Api = {
         });
     },
     updateNaturalFeature: function(featuretype, feature) {
+        let fatureToPost = {...feature};
+        delete fatureToPost["location.lat"];
+        delete fatureToPost["location.lng"];
         let url = '/nfdapi/layers/' + featuretype + '/' + feature.id + '/';
-        return axios.put(url, feature, getOptions()).then(function(response) {return response.data; });
+        return axios.put(url, fatureToPost, getOptions()).then(function(response) {return response.data; });
     },
     deleteNaturalFeature: function(layerId, nfid) {
         let url = '/nfdapi/layers/' + layerId + '/' + nfid + '/';
