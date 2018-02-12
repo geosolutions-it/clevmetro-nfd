@@ -285,9 +285,9 @@ def _get_form_items(name, model, is_writer, is_publisher):
         )
     elif name == formdefinitions.MANAGEMENT_FORM_NAME:
         if is_publisher:
-            form_items = formdefinitions.MANAGEMENT_FORM_ITEMS_PUBLISHER
+            form_items = list(formdefinitions.MANAGEMENT_FORM_ITEMS_PUBLISHER)
         else:
-            form_items = formdefinitions.MANAGEMENT_FORM_ITEMS
+            form_items = list(formdefinitions.MANAGEMENT_FORM_ITEMS)
     else:
         form_items = _get_form_featuretype(
             name, model, is_writer, is_publisher)
