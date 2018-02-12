@@ -676,9 +676,9 @@ class UpdateOccurrenceMixin(object):
         else:
             instance.photographs.all().delete()
 
-    def process_notes(self, instance, validated_data):
+    def process_notes(self, instance, validated_notes):
         """Create or update the notes associated with the instance"""
-        for note_data in validated_data.get("notes"):
+        for note_data in validated_notes:
             instance_type = ContentType.objects.get_for_model(instance)
             try:
                 note = models.Note.objects.get(
@@ -720,7 +720,7 @@ class UpdateOccurrenceMixin(object):
             instance.save()
             # ensure the instance has been saved before associating photos
             self.process_photos(instance, validated_data)
-            self.process_notes(instance, validated_data)
+            self.process_notes(instance, validated_data.get("notes", []))
         return instance
 
     def create(self, validated_data):
@@ -1109,7 +1109,9 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
             else:
                 primitive_value = field.get_value(formvalues)
             if field.field_name == "notes":
-                primitive_value = self._parse_notes(primitive_value["note"])
+                if primitive_value is not rest_fields.empty:
+                    primitive_value = self._parse_notes(
+                        primitive_value["note"])
             try:
                 validated_value = field.run_validation(primitive_value)
                 if validate_method is not None:
