@@ -7,9 +7,9 @@
 */
 
 module.exports = {
-    animal: require('./Animal'),
-    plant: require('./Plant'),
-    slimemold: require('./Slimemold'),
-    fungus: require('./Fungus'),
+    animal: require('./Category')('animal'),
+    plant: require('./Category')('plant'),
+    slimemold: require('./Category')('slimemold'),
+    fungus: require('./Category')('fungus'),
     naturalarea: require('./NaturalArea')
 };

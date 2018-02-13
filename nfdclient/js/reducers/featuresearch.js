@@ -14,7 +14,8 @@ const {
  SEARCH_SPECIES_RESULT,
  SEARCH_SPECIES_ERROR,
  SET_FILTER_PROP,
- RESET_FEATURETYPE_FILTERS
+ RESET_FEATURETYPE_FILTERS,
+ UPDATE_FILTERS_OPTIONS
 } = require('../actions/featuresearch');
 
 function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
@@ -53,6 +54,8 @@ function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
         case RESET_FEATURETYPE_FILTERS:
             prop = `${action.fttype}_filters`;
             return assign({}, state, {[prop]: undefined});
+        case UPDATE_FILTERS_OPTIONS:
+            return assign({}, state, {filters: action.items});
         default:
             return state;
     }

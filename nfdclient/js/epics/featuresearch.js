@@ -28,7 +28,9 @@ const {
     SEARCH_SPECIES,
     onSearchSepciesResult,
     onSearchSepciesError,
-    RESET_FEATURETYPE_FILTERS
+    RESET_FEATURETYPE_FILTERS,
+    TOGGLE_FEATURETYPE,
+    UPDATE_FILTERS_OPTIONS
 } = require('../actions/featuresearch');
 
 const {zoomToPoint} = require('../../MapStore2/web/client/actions/map');
@@ -46,14 +48,35 @@ const load = (ftType, store, page = 1) => {
             .map(val => listLoaded(ftType, val, page, filters))
             .catch((e) => Rx.Observable.from([error({title: Utils.getPrettyFeatureType(ftType), message: `Loading error ${e.statusText}`}), onLoadListError(ftType, e)]));
 };
+const getFilterOptions = (ftType) => {
+    return Rx.Observable.fromPromise(
+        Api.getFeatureSubtype(ftType))
+        .map(resp => {
+            if (resp.forms && resp.forms[0]) {
+                const filters = ["reservation", "watershed", "cm_status"];
+                const items = resp.forms.reduce((fields, f) => fields.concat(f.formitems.filter(({label}) => filters.indexOf(label) !== -1)), [])
+                              .map((i) => ({name: i.label, options: i.values.items}));
+                return {type: UPDATE_FILTERS_OPTIONS, items};
+            }
+        });
+};
 
 module.exports = {
+    fetchFiltersOptions: (action$) =>
+    action$.ofType(TOGGLE_FEATURETYPE)
+    .switchMap(({activekey}) => getFilterOptions(Utils.getSubCatByCat(activekey))
+                                .startWith(onListLoading(true))
+                                .concat([onListLoading(false)])
+                                ),
     fetchLists: (action$, store) =>
         action$.ofType(NFD_LOGIN_SUCCESS)
             .switchMap(() => {
-                const {featureTypes = []} = (store.getState()).featuresearch;
-                return Rx.Observable.from(featureTypes.map((ft) => load(ft, store))).mergeAll().
-                startWith(onListLoading(true)).concat([onListLoading(false)]);
+                const {featureTypes = [], activeFt} = (store.getState()).featuresearch;
+                const ftType = activeFt || featureTypes.length > 0 && featureTypes[0];
+                return Rx.Observable.from(featureTypes.map((ft) => load(ft, store)).concat(getFilterOptions(Utils.getSubCatByCat(ftType))))
+                        .mergeAll()
+                        .startWith(onListLoading(true))
+                        .concat([onListLoading(false)]);
             }),
     fetchList: (action$, store) =>
         action$.ofType(LOAD_LIST)
