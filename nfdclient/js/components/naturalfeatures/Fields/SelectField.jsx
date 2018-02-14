@@ -91,7 +91,7 @@ class SelectField extends React.Component {
         if (!this.isMulti()) {
             onChange(item.key, option ? option.key : null);
         }else {
-            onChange(item.key, option.length > 0 ? option : null);
+            onChange(item.key, option.length > 0 ? option.map(({key}) => key) : null);
         }
     }
     enterFull = () => {
