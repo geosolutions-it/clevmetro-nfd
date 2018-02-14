@@ -113,3 +113,37 @@ padding: 2px;
         padding: 2px;
     }
 }
+
+.nfd-select{
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.nfd-select.is-disabled {
+    
+    opacity: 0.5;
+
+}
+.nfd-select.is-disabled .Select-control{
+    cursor: not-allowed;
+}
+.nfd-select .Select-input, .nfd-select .Select-control{
+    height: 28px;
+}
+.nfd-select .Select-placeholder, .nfd-select .Select-value{
+    line-height: 28px!important;
+}
+
+.nfd-select .Select-control {
+    height: 28px;
+}
+
+.nfd-select.Select--multi .Select-value{
+    line-height: 20px!important;
+    margin-top: 1px;
+
+}
+
+
+

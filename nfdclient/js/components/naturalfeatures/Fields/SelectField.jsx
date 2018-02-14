@@ -8,7 +8,13 @@
 const React = require('react');
 const PropTypes = require('prop-types');
 const {FormGroup, ControlLabel, Col} = require('react-bootstrap');
+const isMobile = require('ismobilejs');
+const Select = require('react-select');
+
 const {getLabel, getValue} = require('./FieldsUtils');
+
+require('react-select/dist/react-select.css');
+
 
 class SelectField extends React.Component {
     static propTypes = {
@@ -26,6 +32,10 @@ class SelectField extends React.Component {
       feature: {},
       onChange: () => {}
     }
+    constructor(props) {
+        super(props);
+        this.state = {full: false};
+    }
     getOptions(values) {
         return values.items.map((item, index) => {
             return (
@@ -33,49 +43,71 @@ class SelectField extends React.Component {
             );
         });
     }
+    getSelect = (item, feature, readonly) => {
+        return (<Select
+                    searchable={false}
+                    multi={this.isMulti()}
+                    className="nfd-select"
+                    labelKey="value"
+                    valueKey="key"
+                    disabled={readonly}
+                    value={getValue(feature, item.key)}
+                    onChange={this.handleChange}
+                    options={item.values && item.values.items || []}
+                    onOpen={this.enterFull}
+                    onClose={this.exitFull}
+                />);
+    }
     renderVertical = () => {
         const {item, editable, feature} = this.props;
         const readonly = !editable || !!item.readonly;
-        return (
+        const comp = (
             <FormGroup controlId={item.key}>
                 <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
-                <select
-                    disabled={readonly}
-                    className="form-control"
-                    value={getValue(feature, item.key)}
-                    onChange={this.handleChange}>
-                        <option value="">---</option>
-                        {this.getOptions(item.values)}
-                </select>
+                {this.getSelect(item, feature, readonly)}
             </FormGroup>);
+        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp} </div>) : comp;
     }
     renderHorizontal = () => {
         const {item, editable, feature} = this.props;
         const readonly = !editable || !!item.readonly;
-        return (
+        const comp = (
             <FormGroup controlId={item.key}>
                 <Col xs={5} className="label-col">
                    <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={7}>
-                    <select
-                        disabled={readonly}
-                        className="form-control"
-                        value={getValue(feature, item.key)}
-                        onChange={this.handleChange}>
-                            <option value="">---</option>
-                            {this.getOptions(item.values)}
-                    </select>
+                    {this.getSelect(item, feature, readonly)}
                 </Col>
             </FormGroup>);
+        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp} </div>) : comp;
     }
     render() {
         return this.props.horizontal && this.renderHorizontal() || this.renderVertical();
     }
-    handleChange = (e) => {
+    isMulti = () => this.props.item.type === "stringcombo_multiple"
+    handleChange = (option) => {
         const {onChange, item} = this.props;
-        const val = e.target.value === '' ? null : e.target.value;
-        onChange(item.key, val);
+        if (!this.isMulti()) {
+            onChange(item.key, option ? option.key : null);
+        }else {
+            onChange(item.key, option.length > 0 ? option : null);
+        }
+    }
+    enterFull = () => {
+        if (isMobile.any && !this.state.full) {
+            this.setState(() => ({full: true}));
+        }
+    }
+    clickExit = (e) => {
+        if (e.target.className && e.target.className === 'spec-selector-full') {
+            this.exitFull();
+        }
+    }
+    exitFull = () => {
+        if (this.state.full) {
+            this.setState(() => ({full: false}));
+        }
     }
 }
 
