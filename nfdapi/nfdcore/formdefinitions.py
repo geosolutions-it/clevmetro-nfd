@@ -114,7 +114,7 @@ LAND_ANIMAL = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
