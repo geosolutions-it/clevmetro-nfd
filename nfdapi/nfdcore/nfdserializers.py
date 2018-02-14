@@ -21,6 +21,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.fields import PolygonField
+from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
@@ -319,8 +320,15 @@ def _get_form_featuretype(form_name, model, is_writer, is_publisher,
             "key":  "{form}.{field}".format(form=form_name, field=f.name),
             "label": _(f.name),
         }
-        if type_ == "stringcombo":
+        if type_ == "stringcombo" :
             fdef["values"] = {"items": _get_related_items(f)}
+        elif type_ == "stringcombo_multiple":
+            fdef["values"] = {
+                "items": models.get_jsonfield_validation_choices(
+                    model=model,
+                    field_name=f.name
+                )
+            }
         mfield = model_fields.get(f.name)
         if mfield:
             fdef['readonly'] = getattr(mfield, "read_only", False)
@@ -350,13 +358,16 @@ def _get_related_items(field):
 
 
 def _get_field_type(field):
-    try:
+    related_model = field.related_model
+    if isinstance(field, JSONField):
+        result = "stringcombo_multiple"
+    elif related_model is not None:
         is_dict_table = issubclass(
             field.related_model,
             (models.DictionaryTable, models.DictionaryTableExtended)
         )
         result = "stringcombo" if is_dict_table else None
-    except TypeError:
+    else:
         type_map = {
             "string": (CharField, TextField),
             "boolean": (BooleanField, NullBooleanField),
@@ -372,6 +383,43 @@ def _get_field_type(field):
         else:
             result = None
     return result
+
+
+def validate_json_field(values, model_class, model_field_name):
+    """Perform validation on a JSONField
+
+    This function chacks that the input values are legal, according to the
+    defined json field mappings. Since we are using JSONFields in order to
+    emulate a many-to-many relation from a model to another
+    ``models.DictionaryTable`` model, it is necessary to enforce validation
+    explicitly, by querying the related model and checking if all of the
+    values in the input ``values`` iterable are there.
+
+    Parameters
+    ----------
+    values: list
+        An iterable with the values that are to be validated
+    model_class: django.db.models.Model
+        Model in which the JSONField has been defined
+    model_field_name: str
+        Name of the JSONField being validated
+
+    Raises
+    ------
+    serializers.ValidationError:
+        When there are illegal values
+
+    """
+
+    choices = models.get_jsonfield_validation_choices(
+        model_class, model_field_name)
+    errors = []
+    for item in values or []:
+        if item not in choices:
+            errors.append("Invalid value {!r}".format(item))
+    if any(errors):
+        raise serializers.ValidationError(", ".join(errors))
+    return values
 
 
 class DictionaryField(rest_fields.CharField):
@@ -738,6 +786,13 @@ class UpdateOccurrenceMixin(object):
 
 class VoucherSerializer(CustomModelSerializerMixin,
                         serializers.ModelSerializer):
+
+    def validate_preservative(self, value):
+        return validate_json_field(value, models.Voucher, "preservative")
+
+    def validate_storage(self, value):
+        return validate_json_field(value, models.Voucher, "storage")
+
     class Meta:
         model = models.Voucher
         exclude = ('id',)
@@ -770,6 +825,7 @@ class SpeciesSerializer(CustomModelSerializerMixin,
         fields = "__all__"
         read_only_fields = ("name_sci", "tsn")
 
+
 class PointOfContactSerializer(CustomModelSerializerMixin,
                                serializers.ModelSerializer):
         
@@ -777,11 +833,16 @@ class PointOfContactSerializer(CustomModelSerializerMixin,
         model = models.PointOfContact
         exclude = ('id',)
 
+
 class OccurrenceObservationSerializer(CustomModelSerializerMixin,
                                       serializers.ModelSerializer):
     reporter = PointOfContactSerializer(required=True)
     recorder = PointOfContactSerializer(required=False)
     verifier = PointOfContactSerializer(required=False)
+
+    def validate_record_origin(self, value):
+        return validate_json_field(
+            value, models.OccurrenceObservation, "record_origin")
 
     class Meta:
         model = models.OccurrenceObservation
@@ -807,6 +868,24 @@ class BaseDetailsSerializer(serializers.ModelSerializer):
 class LandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
 
+    def validate_marks(self, value):
+        return validate_json_field(value, models.AnimalDetails, "marks")
+
+    def validate_gender(self, value):
+        return validate_json_field(value, models.AnimalDetails, "gender")
+
+    def validate_diseases_and_abnormalities(self, value):
+        return validate_json_field(
+            value, models.AnimalDetails, "diseases_and_abnormalities")
+
+    def validate_sampler(self, value):
+        return validate_json_field(
+            value, models.LandAnimalDetails, "sampler")
+
+    def validate_stratum(self, value):
+        return validate_json_field(
+            value, models.LandAnimalDetails, "stratum")
+
     class Meta:
         model = models.LandAnimalDetails
         exclude = ('id',)
@@ -820,9 +899,26 @@ class WetlandVetegationStructureSerializer(CustomModelSerializerMixin,
         exclude = ('id',)
 
 
-class WetlandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+class WetlandAnimalDetailsSerializer(CustomModelSerializerMixin,
+                                     BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
     vegetation = WetlandVetegationStructureSerializer(required=False)
+
+    def validate_sampler(self, value):
+        return validate_json_field(
+            value, models.AquaticAnimalDetails, "sampler")
+
+    def validate_water_source(self, value):
+        return validate_json_field(
+            value, models.WetlandAnimalDetails, "water_source")
+
+    def validate_habitat_feature(self, value):
+        return validate_json_field(
+            value, models.WetlandAnimalDetails, "habitat_feature")
+
+    def validate_wetland_type(self, value):
+        return validate_json_field(
+            value, models.WetlandAnimalDetails, "wetland_type")
 
     class Meta:
         model = models.WetlandAnimalDetails
@@ -835,18 +931,57 @@ class StreamSubstrateSerializer(CustomModelSerializerMixin,
         model = models.StreamSubstrate
         exclude = ('id',)
 
-class StreamAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+
+class StreamAnimalDetailsSerializer(CustomModelSerializerMixin,
+                                    BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
     substrate = StreamSubstrateSerializer(required=False)
+
+    def validate_sampler(self, value):
+        return validate_json_field(
+            value, models.AquaticAnimalDetails, "sampler")
+
+    def validate_channel_type(self, value):
+        return validate_json_field(
+            value, models.StreamAnimalDetails, "channel_type")
+
+    def validate_hmfei_local_abundance(self, value):
+        return validate_json_field(
+            value, models.StreamAnimalDetails, "hmfei_local_abundance")
+
+    def validate_lotic_habitat_type(self, value):
+        return validate_json_field(
+            value, models.StreamAnimalDetails, "lotic_habitat_type")
+
     class Meta:
         model = models.StreamAnimalDetails
         exclude = ('id',)
 
-class PondLakeAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+
+class PondLakeAnimalDetailsSerializer(CustomModelSerializerMixin,
+                                      BaseDetailsSerializer):
     lifestages = AnimalLifestagesSerializer(required=False)
+
+    def validate_sampler(self, value):
+        return validate_json_field(
+            value, models.AquaticAnimalDetails, "sampler")
+
+    def validate_microhabitat(self, value):
+        return validate_json_field(
+            value, models.PondLakeAnimalDetails, "microhabitat")
+
+    def validate_pond_lake_use(self, value):
+        return validate_json_field(
+            value, models.PondLakeAnimalDetails, "pond_lake_use")
+
+    def validate_shoreline_type(self, value):
+        return validate_json_field(
+            value, models.PondLakeAnimalDetails, "shoreline_type")
+
     class Meta:
         model = models.PondLakeAnimalDetails
         exclude = ('id',)
+
 
 class ConiferLifestagesSerializer(CustomModelSerializerMixin,
                                   serializers.ModelSerializer):
@@ -867,35 +1002,150 @@ class EarthwormEvidenceSerializer(CustomModelSerializerMixin,
         model = models.EarthwormEvidence
         exclude = ('id',)
 
+
 class ConiferDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     lifestages = ConiferLifestagesSerializer(required=False)
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
 
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "aspect")
+
+    def validate_general_habitat_category(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "general_habitat_category")
+
+    def validate_ground_surface(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "ground_surface")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "landscape_position")
+
+    def validate_moisture_regime(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "moisture_regime")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "slope")
+
     class Meta:
         model = models.ConiferDetails
         exclude = ('id',)
+
 
 class FernDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
     #lifestages = FernLifestages(required=False) # FIXME
+
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "aspect")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(
+            value, models.FernDetails, "lifestages")
+
+    def validate_general_habitat_category(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "general_habitat_category")
+
+    def validate_ground_surface(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "ground_surface")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "landscape_position")
+
+    def validate_moisture_regime(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "moisture_regime")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "slope")
+
     class Meta:
         model = models.FernDetails
         exclude = ('id',)
+
 
 class FloweringPlantDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
     #lifestages = FloweringPlantLifestages(required=False) # FIXME
+
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "aspect")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(
+            value, models.FloweringPlantDetails, "lifestages")
+
+    def validate_general_habitat_category(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "general_habitat_category")
+
+    def validate_ground_surface(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "ground_surface")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "landscape_position")
+
+    def validate_moisture_regime(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "moisture_regime")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "slope")
+
     class Meta:
         model = models.FloweringPlantDetails
         exclude = ('id',)
+
 
 class MossDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
     #lifestages = MossLifestages(required=False) # FIXME
+
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "aspect")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(
+            value, models.MossDetails, "lifestages")
+
+    def validate_general_habitat_category(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "general_habitat_category")
+
+    def validate_ground_surface(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "ground_surface")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "landscape_position")
+
+    def validate_moisture_regime(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "moisture_regime")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.PlantDetails, "slope")
+
     class Meta:
         model = models.MossDetails
         exclude = ('id',)
@@ -907,11 +1157,23 @@ class SlimeMoldLifestagesSerializer(CustomModelSerializerMixin,
         model = models.SlimeMoldLifestages
         exclude = ('id',)
 
-class SlimeMoldDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+
+class SlimeMoldDetailsSerializer(CustomModelSerializerMixin,
+                                 BaseDetailsSerializer):
     lifestages = SlimeMoldLifestagesSerializer(required=False)
+
     class Meta:
         model = models.SlimeMoldDetails
         exclude = ('id',)
+
+    def validate_slime_mold_class(self, value):
+        return validate_json_field(
+            value, models.SlimeMoldDetails, "slime_mold_class")
+
+    def validate_slime_mold_media(self, value):
+        return validate_json_field(
+            value, models.SlimeMoldDetails, "slime_mold_media")
+
 
 class FruitingBodiesAgeSerializer(CustomModelSerializerMixin,
                                   serializers.ModelSerializer):
@@ -919,25 +1181,117 @@ class FruitingBodiesAgeSerializer(CustomModelSerializerMixin,
         model = models.FruitingBodiesAge
         exclude = ('id',)
 
+
 class ObservedAssociationsSerializer(CustomModelSerializerMixin,
                                      serializers.ModelSerializer):
+
+    def validate_gnat_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "gnat_association")
+
+    def validate_ants_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "ants_association")
+
+    def validate_termite_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "termite_association")
+
+    def validate_beetles_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "beetles_association")
+
+    def validate_snow_flea_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "snow_flea_association")
+
+    def validate_slug_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "slug_association")
+
+    def validate_snail_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "snail_association")
+
+    def validate_skunk_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "skunk_association")
+
+    def validate_badger_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "badger_association")
+
+    def validate_easter_gray_squirrel_association(self, value):
+        return validate_json_field(
+            value,
+            models.ObservedAssociations,
+            "easter_gray_squirrel_association"
+        )
+
+    def validate_chipmunk_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "chipmunk_association")
+
+    def validate_other_small_rodent_association(self, value):
+        return validate_json_field(
+            value,
+            models.ObservedAssociations,
+            "other_small_rodent_association"
+        )
+
+    def validate_turtle_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "turtle_association")
+
+    def validate_deer_association(self, value):
+        return validate_json_field(
+            value, models.ObservedAssociations, "deer_association")
+
     class Meta:
         model = models.ObservedAssociations
         exclude = ('id',)
 
-class FungusDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
+
+class FungusDetailsSerializer(CustomModelSerializerMixin,
+                              BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
     fruiting_bodies_age = FruitingBodiesAgeSerializer(required=False)
-    other_observed_associations = ObservedAssociationsSerializer(required=False)
+    other_observed_associations = ObservedAssociationsSerializer(
+        required=False)
+
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "aspect")
+
+    def validate_apparent_substrate(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "apparent_substrate")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "landscape_position")
+
+    def validate_mushroom_growth_form(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "mushroom_growth_form")
+
+    def validate_mushroom_odor(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "mushroom_odor")
+
+    def validate_mushroom_vertical_location(self, value):
+        return validate_json_field(
+            value, models.FungusDetails, "mushroom_vertical_location")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.Slope, "slope")
+
     class Meta:
         model = models.FungusDetails
         exclude = ('id',)
 
-
-""" --------------------------------------------
-PHOTOGRAPHS
------------------------------------------------- """
 
 class PhotographPublishSerializer(serializers.Serializer):
     """
@@ -1154,20 +1508,79 @@ class TaxonLocationSerializer(CustomModelSerializerMixin,
         model = models.TaxonLocation
         exclude = ('id', 'polygon')
 
+    def validate_reservation(self, value):
+        return validate_json_field(value, models.Location, "reservation")
+
+    def validate_watershed(self, value):
+        return validate_json_field(value, models.Location, "watershed")
+
+
 class NaturalAreaElementSerializer(CustomModelSerializerMixin,
                                    serializers.ModelSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
     #lifestages = MossLifestages(required=False) # FIXME
+
     class Meta:
         model = models.ElementNaturalAreas
         exclude = ('id',)
+
+    def validate_aspect(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "aspect")
+
+    def validate_bedrock_and_outcrops(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "bedrock_and_outcrops")
+
+    def validate_sensitivity(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "sensitivity")
+
+    def validate_glaciar_diposit(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "glaciar_diposit")
+
+    def validate_pleistocene_glaciar_diposit(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "pleistocene_glaciar_diposit")
+
+    def validate_landscape_position(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "landscape_position")
+
+    def validate_leap_land_cover_category(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "leap_land_cover_category")
+
+    def validate_condition(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "condition")
+
+    def validate_type(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "type")
+
+    def validate_regional_frequency(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "regional_frequency")
+
+    def validate_slope(self, value):
+        return validate_json_field(
+            value, models.ElementNaturalAreas, "slope")
+
 
 class NaturalAreaLocationSerializer(CustomModelSerializerMixin,
                                     serializers.ModelSerializer):
     class Meta:
         model = models.NaturalAreaLocation
         exclude = ('id', 'polygon')
+
+    def validate_reservation(self, value):
+        return validate_json_field(value, models.Location, "reservation")
+
+    def validate_watershed(self, value):
+        return validate_json_field(value, models.Location, "watershed")
 
 
 class TaxonOccurrenceSerializer(OccurrenceSerializer):
