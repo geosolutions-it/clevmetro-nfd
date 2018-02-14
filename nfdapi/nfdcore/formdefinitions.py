@@ -119,7 +119,7 @@ LAND_ANIMAL = [
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
