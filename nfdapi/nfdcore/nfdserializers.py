@@ -323,12 +323,7 @@ def _get_form_featuretype(form_name, model, is_writer, is_publisher,
         if type_ == "stringcombo" :
             fdef["values"] = {"items": _get_related_items(f)}
         elif type_ == "stringcombo_multiple":
-            fdef["values"] = {
-                "items": models.get_jsonfield_validation_choices(
-                    model=model,
-                    field_name=f.name
-                )
-            }
+            fdef["values"] = {"items": _get_jsonfield_items(model, f)}
         mfield = model_fields.get(f.name)
         if mfield:
             fdef['readonly'] = getattr(mfield, "read_only", False)
@@ -354,6 +349,19 @@ def _get_related_items(field):
             "key": instance.code,
             "value": instance.name,
         })
+    return result
+
+
+def _get_jsonfield_items(model, field):
+    choices = models.get_jsonfield_validation_choices(model, field.name,
+                                                      include_values=True)
+    result = []
+    if choices is not None:
+        for code, name in choices:
+            result.append({
+                "key": code,
+                "value": name
+            })
     return result
 
 

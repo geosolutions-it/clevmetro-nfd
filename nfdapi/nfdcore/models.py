@@ -32,7 +32,7 @@ PHOTO_THUMB_SIZE=300
 FILENAME_MAX_LENGTH=2048
 
 
-def get_jsonfield_validation_choices(model, field_name):
+def get_jsonfield_validation_choices(model, field_name, include_values=False):
     """Return the set of legal values for a given JSONField
 
     In this project we are using JSONField to store arrays of values in order
@@ -48,6 +48,8 @@ def get_jsonfield_validation_choices(model, field_name):
         The model where the JSONField is defined
     field_name: str
         Name of the JSONField on the model
+    include_values: bool, optional
+        Whether or not to include both the code and the name for each choice
 
     """
 
@@ -127,8 +129,12 @@ def get_jsonfield_validation_choices(model, field_name):
         lookup_name = ".".join((model_class.__name__.lower(), field_name))
         dictionary_table_model = jsonfield_mapping.get(lookup_name)
         try:
-            choices = dictionary_table_model.objects.values_list(
-                "code", flat=True)
+            if include_values:
+                choices = dictionary_table_model.objects.values_list(
+                    "code", "name")
+            else:
+                choices = dictionary_table_model.objects.values_list(
+                    "code", flat=True)
         except AttributeError:
             choices = None
         if choices is not None:
