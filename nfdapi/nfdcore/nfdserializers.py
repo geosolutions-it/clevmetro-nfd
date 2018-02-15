@@ -51,6 +51,29 @@ def check_all_null(field_dict):
     return True
 
 
+def get_field_values(instance, field, form_validated_data):
+    if isinstance(field, (CharField, TextField)):
+        old_value =  getattr(instance, field.name, '')
+        new_value = form_validated_data.get(field.name, '')
+    elif isinstance(field, (DateTimeField, DateField)):
+        old_value =  getattr(instance, field.name, None)
+        new_value = form_validated_data.get(field.name, '')
+    elif isinstance(field, (BooleanField, NullBooleanField, FloatField,
+                            DecimalField, IntegerField)):
+        old_value =  getattr(instance, field.name, None)
+        new_value = form_validated_data.get(field.name)
+    elif isinstance(field, PolygonField):
+        old_value =  getattr(instance, field.name, None)
+        new_value = form_validated_data.get(field.name)
+    elif isinstance(field, JSONField):
+        old_value = getattr(instance, field.name, None)
+        new_value = form_validated_data.get(field.name)
+    else:
+        old_value = getattr(instance, field.name, None)
+        new_value = getattr(instance, field.name, None)
+    return old_value, new_value
+
+
 def to_flat_representation(values_dict, parent_path=None):
     result = OrderedDict()
     for fname, fvalue in values_dict.items():
@@ -554,7 +577,9 @@ class CustomModelSerializerMixin(object):
 
 
 class UpdateOccurrenceMixin(object):
-    def __init__(self, instance=None, data=rest_fields.empty, is_writer=False, is_publisher=False, **kwargs):
+
+    def __init__(self, instance=None, data=rest_fields.empty,
+                 is_writer=False, is_publisher=False, **kwargs):
         self.is_writer = is_writer
         self.is_publisher = is_publisher
         if instance and instance.occurrence_cat:
@@ -598,65 +623,41 @@ class UpdateOccurrenceMixin(object):
                         return None
             return subdict
 
-    def set_form_values(self, form_name, instance, form_validated_data, force_save=False):
-        """
-        Updates the values of the provided instance using validated data
-        """
-        if instance:
-            if form_validated_data:
-                fields = self._get_form_fields(form_name, instance)
-                modified = False
-                for f in fields:
-                    if getattr(f, 'primary_key', False):
-                        pass
-                    elif getattr(f, 'related_model', False):
-                        if issubclass(f.related_model, models.DictionaryTable) or issubclass(f.related_model, models.DictionaryTableExtended):
-                            new_value = form_validated_data.get(f.name)
-                            old_value =  getattr(instance, f.name, None)
-                            if old_value != new_value and (old_value is None or new_value != old_value.code):
-                                try:
-                                    if new_value != None:
-                                        dict_entry = f.related_model.objects.get(code=new_value)
-                                    else:
-                                        dict_entry = None
-                                    modified = True
-                                    setattr(instance, f.name, dict_entry)
-                                except Exception as exc:
-                                    setattr(instance, f.name, None)
-                    else:
-                        if isinstance(f, CharField) or isinstance(f, TextField):
-                            new_value = form_validated_data.get(f.name, '')
-                            if new_value is None:
-                                new_value = ''
-                            old_value =  getattr(instance, f.name, '')
-                            if old_value is None:
-                                old_value = ''
-                        elif isinstance(f, DateTimeField) or isinstance(f, DateField):
-                            new_value = form_validated_data.get(f.name, '')
-                            old_value =  getattr(instance, f.name, None)
-                        elif isinstance(f, BooleanField) or isinstance(f, NullBooleanField) or \
-                                isinstance(f, FloatField) or isinstance(f, DecimalField) or isinstance(f, IntegerField):
-                            new_value = form_validated_data.get(f.name)
-                            old_value =  getattr(instance, f.name, None)
-                        elif isinstance(f, PolygonField):
-                            new_value = form_validated_data.get(f.name)
-                            old_value =  getattr(instance, f.name, None)
-                        #if new_value != None and new_value != old_value:
-                        if new_value != old_value:
+    def set_form_values(self, form_name, instance, form_validated_data,
+                        force_save=False):
+        """Update the values of provided instance using validated data"""
+        modified = False
+        for field in self._get_form_fields(form_name, instance):
+            if getattr(field, 'primary_key', False):
+                pass
+            elif getattr(field, 'related_model', None) is not None:
+                is_dict_table_model = issubclass(
+                    field.related_model,
+                    (models.DictionaryTable, models.DictionaryTableExtended)
+                )
+                if is_dict_table_model:
+                    new_value = form_validated_data.get(field.name)
+                    old_value = getattr(instance, field.name, None)
+                    if old_value != new_value and (old_value is None or new_value != old_value.code):
+                        try:
+                            if new_value != None:
+                                dict_entry = field.related_model.objects.get(
+                                    code=new_value)
+                            else:
+                                dict_entry = None
                             modified = True
-                            setattr(instance, f.name, new_value)
-
-                if force_save or modified:
-                    instance.save()
-                    return True
+                            setattr(instance, field.name, dict_entry)
+                        except Exception:
+                            setattr(instance, field.name, None)
             else:
-                # if the form is empty and instance exists, delete instance
-                try:
-                    instance.delete()
-                except:
-                    pass
-                return True
-        return False
+                old_value, new_value = get_field_values(
+                    instance, field, form_validated_data)
+                if new_value != old_value:
+                    modified = True
+                    setattr(instance, field.name, new_value)
+        if force_save or modified:
+            instance.save()
+            return True
 
     def _get_form_model_instance(self, form_name, model_class, parent_instance):
         """
@@ -669,15 +670,15 @@ class UpdateOccurrenceMixin(object):
                 related_instance = getattr(parent_instance, self._get_local_name(form_name), None)
             return related_instance
 
-    def _update_form(self, form_name, model_class, validated_data, parent_instance, child_forms=[]):
+    def _update_form(self, form_name, model_class, validated_data, parent_instance, child_forms=None):
         """
         Updates the appropriate instance according to the provided form_name and model instance. All
         related objects are also updated if modified.
 
         Returns True if the instance has been modified and saved, False if there were no changes.
         """
+        child_forms = list(child_forms) if child_forms is not None else []
         form_validated_data = self._get_validated_data_form(validated_data, form_name)
-
         related_instance = self._get_form_model_instance(form_name, model_class, parent_instance)
         if form_validated_data and not related_instance:
             related_instance = model_class()
@@ -687,9 +688,19 @@ class UpdateOccurrenceMixin(object):
             saved = self._update_form(child_form_name, child_model_class, validated_data, related_instance, child_child_forms)
             any_saved = any_saved or saved
 
-        saved = self.set_form_values(form_name, related_instance, form_validated_data, any_saved)
+        if related_instance:
+            if form_validated_data:
+                saved = self.set_form_values(form_name, related_instance,
+                                             form_validated_data, any_saved)
+            else:  # if the form is empty and instance exists, delete instance
+                try:
+                    related_instance.delete()
+                except:
+                    pass
+                saved = True
+        else:
+            saved = False
         any_saved = any_saved or saved
-
         if any_saved:
             if form_validated_data is None:
                 setattr(parent_instance, self._get_local_name(form_name), None)
@@ -841,10 +852,6 @@ class ElementSpeciesSerializer(CustomModelSerializerMixin,
     class Meta:
         model = models.ElementSpecies
         exclude = ('id',)
-        # read_only_fields = ("native", "oh_status", "usfws_status", "iucn_red_list_category", \
-        #                     "other_code", "ibp_english", "ibp_scientific", "bblab_number", "nrcs_usda_symbol", \
-        #                     "synonym_nrcs_usda_symbol", "epa_numeric_code", "mushroom_group", \
-        #                     "cm_status", "s_rank", "n_rank", "g_rank")
 
 
 class SpeciesSerializer(CustomModelSerializerMixin,
