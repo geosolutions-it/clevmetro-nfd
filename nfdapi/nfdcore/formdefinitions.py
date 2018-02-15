@@ -136,12 +136,12 @@ STREAM_ANIMAL = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -164,12 +164,12 @@ PONDLAKE_ANIMAL = [
     (
         'observation',
         models.OccurrenceObservation, [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -186,12 +186,12 @@ WETLAND_ANIMAL = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -216,12 +216,12 @@ SLIMEMOLD = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -238,12 +238,12 @@ CONIFER_PLANT = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -270,12 +270,12 @@ FERN_PLANT = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -300,12 +300,12 @@ FLOWERING_PLANT = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -330,12 +330,12 @@ MOSS_PLANT = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -359,12 +359,12 @@ FUNGUS = [
     (
         'observation',
         models.OccurrenceObservation, [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('voucher', models.Voucher, []),
@@ -399,12 +399,12 @@ NATURAL_AREA = [
         'observation',
         models.OccurrenceObservation,
         [
-            'observation.reporter',
+            'Observer',
             'observation.verifier',
             'observation.recorder'
         ]
     ),
-    ('observation.reporter', models.PointOfContact, []),
+    ('Observer', models.PointOfContact, []),
     ('observation.verifier', models.PointOfContact, []),
     ('observation.recorder', models.PointOfContact, []),
     ('element.earthworm_evidence', models.EarthwormEvidence, []),
