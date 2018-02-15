@@ -85,7 +85,7 @@
                 "html":{
                     "className": "marker-animal",
                     "iconSize": [24, 24],
-                    "iconAnchor": [22, 22]
+                    "iconAnchor": [12, 12]
                 }
             },
             "features" : []
