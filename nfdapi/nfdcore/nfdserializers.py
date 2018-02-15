@@ -324,6 +324,7 @@ def _get_form_featuretype(form_name, model, is_writer, is_publisher,
             fdef["values"] = {"items": _get_related_items(f)}
         elif type_ == "stringcombo_multiple":
             fdef["values"] = {"items": _get_jsonfield_items(model, f)}
+        fdef.update(_check_for_code_name_fields(model, f.name))
         mfield = model_fields.get(f.name)
         if mfield:
             fdef['readonly'] = getattr(mfield, "read_only", False)
@@ -340,6 +341,35 @@ def _get_form_featuretype(form_name, model, is_writer, is_publisher,
             fdef['readonly'] = True
         result.append(fdef)
     return result
+
+
+def _check_for_code_name_fields(model, name):
+    """Check if the input field should be presented with code and name.
+
+    Parameters
+    ----------
+    model: django.db.models.Model
+        Model where the field is defined
+    name: str
+        Name of the field that is being compared
+
+    Returns
+    -------
+    dict
+        A (possibly empty) dict that specifies whether the field is to be
+        presented in the UI as needing to show both its code and value
+
+    """
+
+    fields_that_should_include_code_name = {
+        models.ElementSpecies: [
+            "g_rank",
+            "s_rank",
+            "n_rank"
+        ],
+    }
+    code_name_fields = fields_that_should_include_code_name.get(model, [])
+    return {"show_key_with_value": True} if name in code_name_fields else {}
 
 
 def _get_related_items(field):
