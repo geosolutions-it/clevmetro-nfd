@@ -9,7 +9,8 @@
 const React = require('react');
 const PropTypes = require('prop-types');
 const assign = require('object-assign');
-const {Button, Glyphicon} = require('react-bootstrap');
+const {Button, Glyphicon, Tooltip, OverlayTrigger} = require('react-bootstrap');
+const Message = require('../../MapStore2/web/client/plugins/locale/Message');
 const {connect} = require('react-redux');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 class ToggleAddEditPanel extends React.Component {
@@ -31,14 +32,17 @@ class ToggleAddEditPanel extends React.Component {
     }
     render() {
         const {disabled} = this.props;
+        let tooltip = <Tooltip id="toolbar-add-edit-panel">{<Message msgId={"clevmetro.tooltip.togglepanel"}/>}</Tooltip>;
         return (
+            <OverlayTrigger placement="bottom" overlay={tooltip}>
             <Button
                 disabled={disabled}
                 onClick={this.onToggle}
                 id="add-edit-button"
                 className="square-button"
                 bsStyle="primary"
-            ><Glyphicon glyph="list-alt"/></Button>);
+            ><Glyphicon glyph="list-alt"/></Button>
+            </OverlayTrigger>);
     }
 }
 

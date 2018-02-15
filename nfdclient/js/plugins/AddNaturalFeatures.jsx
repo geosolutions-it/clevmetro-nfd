@@ -17,7 +17,7 @@ const {changeDrawingStatus, endDrawing} = require('../../MapStore2/web/client/ac
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
 
-const {DropdownButton, MenuItem, Glyphicon} = require('react-bootstrap');
+const {DropdownButton, MenuItem, Glyphicon, Tooltip, OverlayTrigger} = require('react-bootstrap');
 
 // const NfdImage  = require('../components/naturalfeatures/NfdImage');
 const SmartDockedNaturalFeatures = connect((state) => ({
@@ -80,8 +80,10 @@ const AddNaturalFeatures = React.createClass({
         };
     },
     render() {
+        let tooltip = <Tooltip id="toolbar-tutorial-button">{<Message msgId={"clevmetro.tooltip.add"}/>}</Tooltip>;
         return (
             <div>
+            <OverlayTrigger placement="bottom" overlay={tooltip}>
                 <DropdownButton disabled={this.props.disabled} id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
                     {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
@@ -117,6 +119,7 @@ const AddNaturalFeatures = React.createClass({
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "naturalarea", "featuresubtype": "na"})}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
                     }
                 </DropdownButton>
+                </OverlayTrigger>
                 { this.props.active ? (<SmartDockedNaturalFeatures/>) : null}
             </div>);
     }
