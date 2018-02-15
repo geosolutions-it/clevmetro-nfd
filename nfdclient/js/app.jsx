@@ -13,6 +13,7 @@ const appReducers = {
     selection: require('../MapStore2/web/client/reducers/selection')
 };
 
+require('./ms2Override/ClevMetroLayer');
 const dEpics = require('./epics/naturalfeatures');
 require('./components/map/LeafletClusterMarker.js');
 

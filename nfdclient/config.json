@@ -5,27 +5,35 @@
         "center": {"x": -9090996.041556, "y": 5057073.790709, "crs": "EPSG:900913"},
         "zoom":10,
         "maxExtent": [-20037508.34, -20037508.34,20037508.34, 20037508.34],
-        "layers": [{
+        "layers": [ {
+                      "type": "clevmetro",
+                      "title": "Metroparks Map",
+                      "name": "Map",
+                      "visibility": true,
+                      "group": "background",
+                      "maxZoom": 20,
+                      "minZoom":0
+                  }, {
+                    "type": "clevmetro",
+                    "title": "Metroparks Arial",
+                    "name": "Arial",
+                    "visibility": false,
+                    "group": "background",
+                    "maxZoom": 20,
+                    "minZoom":0
+                },
+            {
             "type": "osm",
             "title": "Open Street Map",
             "name": "mapnik",
             "source": "osm",
             "group": "background",
-            "visibility": true
+            "visibility": false
         }, {
         "type": "google",
         "title": "Google HYBRID",
         "name": "HYBRID",
         "source": "google",
-        "group": "background",
-        "visibility": false
-      },
-      {
-        "type": "tileprovider",
-        "title": "NASAGIBS Night 2012",
-        "provider": "NASAGIBS.ViirsEarthAtNight2012",
-        "name": "Night2012",
-        "source": "nasagibs",
         "group": "background",
         "visibility": false
       },
