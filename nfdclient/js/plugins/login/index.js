@@ -10,8 +10,8 @@ const {connect} = require('../../../MapStore2/web/client/utils/PluginsUtils');
 const {userLoginSubmit, nfdLogout} = require('../../actions/naturalfeatures');
 const {loginFail, logoutWithReload, resetError} = require('../../../MapStore2/web/client/actions/security');
 const {setControlProperty} = require('../../../MapStore2/web/client/actions/controls');
-const {Glyphicon} = require('react-bootstrap');
-
+const {Glyphicon, Tooltip, OverlayTrigger} = require('react-bootstrap');
+const Message = require('../../../MapStore2/web/client/components/I18N/Message');
 const closeLogin = () => {
     return (dispatch) => {
         dispatch(setControlProperty('LoginForm', 'enabled', false));
@@ -51,7 +51,12 @@ const LoginNav = connect((state) => ({
     user: state.security && state.security.user,
     nav: false,
     renderButtonText: false,
-    renderButtonContent: () => {return <Glyphicon glyph="user" />; },
+    renderButtonContent: () => {
+        let tooltip = <Tooltip id="toolbar-tutorial-button">{<Message msgId={"clevmetro.tooltip.login"}/>}</Tooltip>;
+        return (<OverlayTrigger placement="bottom" overlay={tooltip}>
+            <Glyphicon glyph="user" />
+        </OverlayTrigger>);
+    },
     bsStyle: "primary",
     className: "square-button"
 }), {

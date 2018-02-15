@@ -1,6 +1,15 @@
 {
     "locale": "en-US",
     "messages": {
+        "clevmetro": {
+            "tooltip": {
+                "report": "Report",
+                "search": "Search Categories",
+                "add": "Add new feature",
+                "tooglepanel": "Open view/edit panel",
+                "login": "Login/Logout"
+            }
+        },
         "Language": "Language",
         "msgId0": "{name} took {numPhotos, plural, =0 {no photos} =1 {one photo} other {# photos}} on {takenDate, date, long}.",
         "htmlTest": "{name} {surname}",

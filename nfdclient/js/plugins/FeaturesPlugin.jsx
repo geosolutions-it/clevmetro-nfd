@@ -11,9 +11,10 @@ const PropTypes = require('prop-types');
 const assign = require('object-assign');
 const {connect} = require('react-redux');
 
-const {Glyphicon, Tabs, Tab, Button} = require('react-bootstrap');
+const {Glyphicon, Tabs, Tab, Button, Tooltip, OverlayTrigger} = require('react-bootstrap');
 const Dock = require('react-dock');
 
+const Message = require('../../MapStore2/web/client/components/I18N/Message');
 const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 const {toggleFeatureType} = require('../actions/featuresearch');
 const featuresearch = require('../reducers/featuresearch');
@@ -99,14 +100,17 @@ class ToggleFeaturesPanel extends React.Component {
         active: false
     }
     render() {
+        let tooltip = <Tooltip id="toolbar-tutorial-button">{<Message msgId={"clevmetro.tooltip.search"}/>}</Tooltip>;
         return (
+        <OverlayTrigger placement="bottom" overlay={tooltip}>
             <Button
                 active={this.props.active}
                 onClick={this.props.onToggle}
                 id="features-button"
                 className="square-button"
                 bsStyle="primary"
-            ><Glyphicon glyph="search"/></Button>);
+            ><Glyphicon glyph="search"/></Button>
+        </OverlayTrigger>);
     }
 }
 const ToggleFeaturesPanelTool = connect((state) => ({
