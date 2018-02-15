@@ -78,39 +78,39 @@ module.exports = {
     },
     getFormIcon(formname) {
         let icon = 'question-sign';
-        if (formname === 'species') {
+        if (formname.toLowerCase() === 'species') {
             icon = 'question-sign';
-        } else if (formname === 'species.element_species') {
+        } else if (formname.toLowerCase() === 'species.element_species') {
             icon = 'star';
-        } else if (formname === 'details') {
+        } else if (formname.toLowerCase() === 'details') {
             icon = 'th-list';
-        } else if (formname === 'details.lifestages') {
+        } else if (formname.toLowerCase() === 'details.lifestages') {
             icon = 'refresh';
-        } else if (formname === 'occurrencemanagement') {
+        } else if (formname.toLowerCase() === 'occurrencemanagement') {
             icon = 'cog';
-        } else if (formname === 'observation') {
+        } else if (formname.toLowerCase() === 'observation') {
             icon = 'eye-open';
-        } else if (formname === 'observation.reporter') {
+        } else if (formname.toLowerCase() === 'observer') {
             icon = 'reporter';
-        } else if (formname === 'observation.recorder') {
+        } else if (formname.toLowerCase() === 'observation.recorder') {
             icon = 'recorder';
-        } else if (formname === 'observation.verifier') {
+        } else if (formname.toLowerCase() === 'observation.verifier') {
             icon = 'verifier';
-        } else if (formname === 'voucher') {
+        } else if (formname.toLowerCase() === 'voucher') {
             icon = 'tag';
-        } else if (formname === 'location') {
+        } else if (formname.toLowerCase() === 'location') {
             icon = 'uniE062';
-        } else if (formname === 'details.vegetation') {
+        } else if (formname.toLowerCase() === 'details.vegetation') {
             icon = 'uniE103';
-        } else if (formname === 'details.substrate') {
+        } else if (formname.toLowerCase() === 'details.substrate') {
             icon = 'uniE135';
-        } else if (formname.includes('earthworm')) {
+        } else if (formname.toLowerCase().includes('earthworm')) {
             icon = 'uniE232';
-        } else if (formname.includes('disturbance')) {
+        } else if (formname.toLowerCase().includes('disturbance')) {
             icon = 'uniE162';
-        } else if (formname.includes('association')) {
+        } else if (formname.toLowerCase().includes('association')) {
             icon = 'uni4C';
-        } else if (formname.includes('fruit')) {
+        } else if (formname.toLowerCase().includes('fruit')) {
             icon = 'uniF8FF';
         }
         return icon;
