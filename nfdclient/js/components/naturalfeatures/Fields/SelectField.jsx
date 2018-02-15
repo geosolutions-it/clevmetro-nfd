@@ -36,12 +36,8 @@ class SelectField extends React.Component {
         super(props);
         this.state = {full: false};
     }
-    getOptions(values) {
-        return values.items.map((item, index) => {
-            return (
-                <option style={{fontSize: "12px"}} value={item.key} key={index}>{item.value}</option>
-            );
-        });
+    getOptions(item) {
+        return item.show_key_with_value && item.values.items.map(({key, value}) => ({key, value: `${key} - ${value}`})) || item.values.items;
     }
     getSelect = (item, feature, readonly) => {
         return (<Select
@@ -53,7 +49,7 @@ class SelectField extends React.Component {
                     disabled={readonly}
                     value={getValue(feature, item.key)}
                     onChange={this.handleChange}
-                    options={item.values && item.values.items || []}
+                    options={item.values && item.values.items && this.getOptions(item) || []}
                     onOpen={this.enterFull}
                     onClose={this.exitFull}
                 />);

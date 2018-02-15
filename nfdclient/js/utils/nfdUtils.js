@@ -78,7 +78,7 @@ module.exports = {
     },
     getFormIcon(formname) {
         let icon = 'question-sign';
-        if (formname.toLowerCase() === 'species') {
+        if (formname.toLowerCase() === 'features') {
             icon = 'question-sign';
         } else if (formname.toLowerCase() === 'species.element_species') {
             icon = 'star';
