@@ -1,0 +1,195 @@
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: visible mycelium
+      field: details.visible_mycelium
+      widget: boolean
+    - label: areal extent
+      field: details.areal_extent
+    - label: mycelium description
+      field: details.mycelium_description
+    - label: canopy cover
+      field: details.canopy_cover
+      widget: select
+      choices: nfdcore.models.CanopyCover
+    - label: aspect
+      field: details.aspect
+      widget: select_multiple
+      choices: nfdcore.models.Aspect
+    - label: slope
+      field: details.slope
+      widget: select_multiple
+      choices: nfdcore.models.Slope
+    - label: landscape position
+      field: details.landscape_position
+      widget: select_multiple
+      choices: nfdcore.models.LandscapePosition
+    - label: apparent substrate
+      field: details.apparent_substrate
+      widget: select_multiple
+      choices: nfdcore.models.FungusApparentSubstrate
+    - label: mushroom vertical location
+      field: details.mushroom_vertical_location
+      widget: select_multiple
+      choices: nfdcore.models.MushroomVerticalLocation
+    - label: mushroom growth form
+      field: details.mushroom_growth_form
+      widget: select_multiple
+      choices: nfdcore.models.MushroomGrowthForm
+    - label: mushroom odor
+      field: details.mushroom_odor
+      widget: select_multiple
+      choices: nfdcore.models.MushroomOdor
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.earthworm_evidence
+  label: Earthworm evidence
+  common: earthworm_evidence
+
+- id: details.disturbance_type
+  label: Disturbance type
+  common: disturbance_type
+
+- id: details.other_observed_association
+  label: Other observed associations
+  fields:
+    - label: gnat association
+      field: details.other_observed_associations.gnat_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: ants association
+      field: details.other_observed_associations.ants_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: termite association
+      field: details.other_observed_associations.termite_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: beetles association
+      field: details.other_observed_associations.beetles_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: snow flea association
+      field: details.other_observed_associations.snow_flea_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: slug association
+      field: details.other_observed_associations.slug_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: snail association
+      field: details.other_observed_associations.snail_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: skunk association
+      field: details.other_observed_associations.skunk_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: badger association
+      field: details.other_observed_associations.badger_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: easter gray squirrel association
+      field: details.other_observed_associations.easter_gray_squirrel_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: chipmunk association
+      field: details.other_observed_associations.chipmunk_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: other small rodent association
+      field: details.other_observed_associations.other_small_rodent_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: turtle association
+      field: details.other_observed_associations.turtle_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: deer association
+      field: details.other_observed_associations.deer_association
+      widget: select_multiple
+      choices: nfdcore.models.FungalAssociationType
+    - label: Notes
+      field: notes.note.other_observed_association
+      widget: textarea
+
+- id: details.fruiting_bodies_age
+  label: Fruiting bodies age
+  fields:
+    - label: aged diam cm
+      field: details.fruiting_bodies_age.aged_diam_cm
+      widget: double
+    - label: aged count
+      field: details.fruiting_bodies_age.aged_count
+      widget: integer
+    - label: buttons diam cm
+      field: details.fruiting_bodies_age.buttons_diam_cm
+      widget: double
+    - label: buttons count
+      field: details.fruiting_bodies_age.buttons_count
+      widget: integer
+    - label: decomposing diam cm
+      field: details.fruiting_bodies_age.decomposing_diam_cm
+      widget: double
+    - label: decomposing count
+      field: details.fruiting_bodies_age.decomposing_count
+      widget: integer
+    - label: emergents diam cm
+      field: details.fruiting_bodies_age.emergents_diam_cm
+      widget: double
+    - label: emergents count
+      field: details.fruiting_bodies_age.emergents_count
+      widget: integer
+    - label: mature diam cm
+      field: details.fruiting_bodies_age.mature_diam_cm
+      widget: double
+    - label: mature count
+      field: details.fruiting_bodies_age.mature_count
+      widget: integer
+    - label: young diam cm
+      field: details.fruiting_bodies_age.young_diam_cm
+      widget: double
+    - label: young count
+      field: details.fruiting_bodies_age.young_count
+      widget: integer
+    - label: Notes
+      field: notes.note.fruiting_bodies_age
+      widget: textarea
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

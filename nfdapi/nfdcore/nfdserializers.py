@@ -1,8 +1,10 @@
 from collections import Mapping
 from collections import OrderedDict
 import datetime as dt
+import importlib
 import logging
 
+from django.db import models as django_models
 from django.db.models.fields import (
     BooleanField,
     CharField,
@@ -16,6 +18,7 @@ from django.db.models.fields import (
     NOT_PROVIDED,
 )
 from django.db.models.query import QuerySet
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.geos import Polygon
@@ -32,9 +35,9 @@ from rest_framework_gis import serializers as gisserializer
 import reversion
 from reversion.models import Version
 from rest_framework.exceptions import ValidationError
+import yaml
 
 from . import models
-from . import formdefinitions
 
 logger = logging.getLogger(__name__)
 
@@ -98,62 +101,21 @@ def _flatten_notes_representation(nested_representation):
     return result
 
 
-def get_sub_category_detail(subcategory_code, parameter_name):
-    """Return the relevant objects for working with the input subcategory
-
-    This function acts as a registry for getting relevant objects for each
-    subcategory.
-
-    """
-
-    details = {
-        "co": {
-            "serializer": ConiferDetailsSerializer,
-            "form_definitions":formdefinitions.CONIFER_PLANT
-        },
-        "fe": {
-            "serializer": FernDetailsSerializer,
-            "form_definitions": formdefinitions.FERN_PLANT,
-        },
-        "fl": {
-            "serializer": FloweringPlantDetailsSerializer,
-            "form_definitions": formdefinitions.FLOWERING_PLANT,
-        },
-        "fu": {
-            "serializer": FungusDetailsSerializer,
-            "form_definitions": formdefinitions.FUNGUS,
-        },
-        "lk": {
-            "serializer": PondLakeAnimalDetailsSerializer,
-            "form_definitions": formdefinitions.PONDLAKE_ANIMAL,
-        },
-        "ln": {
-            "serializer": LandAnimalDetailsSerializer,
-            "form_definitions": formdefinitions.LAND_ANIMAL,
-        },
-        "mo": {
-            "serializer": MossDetailsSerializer,
-            "form_definitions": formdefinitions.MOSS_PLANT,
-        },
-        "na": {
-            "serializer": NaturalAreaElementSerializer,
-            "form_definitions": formdefinitions.NATURAL_AREA,
-        },
-        "sl": {
-            "serializer": SlimeMoldDetailsSerializer,
-            "form_definitions": formdefinitions.SLIMEMOLD,
-        },
-        "st": {
-            "serializer": StreamAnimalDetailsSerializer,
-            "form_definitions": formdefinitions.STREAM_ANIMAL,
-        },
-        "we": {
-            "serializer": WetlandAnimalDetailsSerializer,
-            "form_definitions": formdefinitions.WETLAND_ANIMAL,
-        },
-    }
-    subcategory_details = details.get(subcategory_code, {})
-    return subcategory_details[parameter_name]
+def get_sub_category_serializer(subcategory_code):
+    """Return the relevant serializer class for the input subcategory"""
+    return {
+        "co": ConiferDetailsSerializer,
+        "fe": FernDetailsSerializer,
+        "fl": FloweringPlantDetailsSerializer,
+        "fu": FungusDetailsSerializer,
+        "lk": PondLakeAnimalDetailsSerializer,
+        "ln": LandAnimalDetailsSerializer,
+        "mo": MossDetailsSerializer,
+        "na": NaturalAreaElementSerializer,
+        "sl": SlimeMoldDetailsSerializer,
+        "st": StreamAnimalDetailsSerializer,
+        "we": WetlandAnimalDetailsSerializer,
+    }.get(subcategory_code)
 
 
 def is_deletable_field(f):
@@ -256,193 +218,6 @@ def get_serializer_fields(form_name, model):
                 result[form_name + "." + f.name] = fdef
             else:
                 result[f.name] = fdef
-    return result
-
-
-def init_forms(category_code):
-    try:
-        forms = get_sub_category_detail(category_code, "form_definitions")
-    except KeyError:
-        raise RuntimeError("Invalid category: {!r}".format(category_code))
-    forms_dict = formdefinitions.get_form_dict(forms)
-    return forms, forms_dict
-
-
-def serialize_feature_types(occurrence_cat, is_writer=False,
-                            is_publisher=False):
-    """Return contents for the frontend to be able to build its UI
-
-    This function returns a list of form definitions that are parsed by the
-    frontend. With it the frontend is able to build its own UI for viewing
-    and editing an occurrence's details
-
-    """
-
-    forms, form_dict = init_forms(occurrence_cat.code)
-    result = {
-        "featuretype": occurrence_cat.main_cat,
-        "featuresubtype": occurrence_cat.code,
-        "forms": []
-    }
-    for formdef in forms:
-        name, model = formdef[:2]
-        form_name = name if name != "species" else _("Features")
-        form = {
-            "formname": form_name,
-            "formlabel": _(form_name),
-            "formitems": _get_form_items(name, model, is_writer, is_publisher)
-        }
-        result["forms"].append(form)
-    return result
-
-
-def _get_form_items(name, model, is_writer, is_publisher):
-    if name == "species":
-        form_items = _get_form_featuretype(
-            name, model, is_writer, is_publisher,
-            model_serializer=SpeciesSerializer()
-        )
-    elif name == 'species.element_species':
-        form_items = _get_form_featuretype(
-            name, model, is_writer, is_publisher,
-            model_serializer=ElementSpeciesSerializer()
-        )
-    elif name == formdefinitions.MANAGEMENT_FORM_NAME:
-        if is_publisher:
-            form_items = list(formdefinitions.MANAGEMENT_FORM_ITEMS_PUBLISHER)
-        else:
-            form_items = list(formdefinitions.MANAGEMENT_FORM_ITEMS)
-    else:
-        form_items = _get_form_featuretype(
-            name, model, is_writer, is_publisher)
-    form_items.append({
-        "mandatory": False,
-        "readonly": False,
-        "type": "textarea",
-        "key": "notes.note.{}".format(name.split(".")[-1]),
-        "label": "notes"
-    })
-    return form_items
-
-
-def _get_form_featuretype(form_name, model, is_writer, is_publisher,
-                          model_serializer=None):
-    model_fields = (
-        model_serializer.get_fields() if model_serializer else {})
-    result = []
-    for f in model._meta.get_fields():
-        is_primary_key = getattr(f, 'primary_key', False)
-        is_geometry = isinstance(f, GeometryField)
-        if is_primary_key or is_geometry:
-            continue
-        type_ = _get_field_type(f)
-        if type_ is None:
-            continue
-        fdef = {
-            "type": type_,
-            "key":  "{form}.{field}".format(form=form_name, field=f.name),
-            "label": _(f.name),
-        }
-        if type_ == "stringcombo" :
-            fdef["values"] = {"items": _get_related_items(f)}
-        elif type_ == "stringcombo_multiple":
-            fdef["values"] = {"items": _get_jsonfield_items(model, f)}
-        fdef.update(_check_for_code_name_fields(model, f.name))
-        mfield = model_fields.get(f.name)
-        if mfield:
-            fdef['readonly'] = getattr(mfield, "read_only", False)
-            fdef['mandatory'] = (
-                    not getattr(mfield, "allow_null", True) and
-                    not getattr(mfield, "allow_blank", True)
-            )
-        else:
-            fdef['mandatory'] = (
-                    not getattr(f, "null", True) and
-                    not getattr(f, "blank", True)
-            )
-        if not (is_writer or is_publisher):
-            fdef['readonly'] = True
-        result.append(fdef)
-    return result
-
-
-def _check_for_code_name_fields(model, name):
-    """Check if the input field should be presented with code and name.
-
-    Parameters
-    ----------
-    model: django.db.models.Model
-        Model where the field is defined
-    name: str
-        Name of the field that is being compared
-
-    Returns
-    -------
-    dict
-        A (possibly empty) dict that specifies whether the field is to be
-        presented in the UI as needing to show both its code and value
-
-    """
-
-    fields_that_should_include_code_name = {
-        models.ElementSpecies: [
-            "g_rank",
-            "s_rank",
-            "n_rank"
-        ],
-    }
-    code_name_fields = fields_that_should_include_code_name.get(model, [])
-    return {"show_key_with_value": True} if name in code_name_fields else {}
-
-
-def _get_related_items(field):
-    result = []
-    for instance in field.related_model.objects.all():
-        result.append({
-            "key": instance.code,
-            "value": instance.name,
-        })
-    return result
-
-
-def _get_jsonfield_items(model, field):
-    choices = models.get_jsonfield_validation_choices(model, field.name,
-                                                      include_values=True)
-    result = []
-    if choices is not None:
-        for code, name in choices:
-            result.append({
-                "key": code,
-                "value": name
-            })
-    return result
-
-
-def _get_field_type(field):
-    related_model = field.related_model
-    if isinstance(field, JSONField):
-        result = "stringcombo_multiple"
-    elif related_model is not None:
-        is_dict_table = issubclass(
-            field.related_model,
-            (models.DictionaryTable, models.DictionaryTableExtended)
-        )
-        result = "stringcombo" if is_dict_table else None
-    else:
-        type_map = {
-            "string": (CharField, TextField),
-            "boolean": (BooleanField, NullBooleanField),
-            "date": (BooleanField, DateField),
-            "datetime": (BooleanField, DateTimeField),
-            "double": (FloatField, DecimalField),
-            "integer": (IntegerField,),
-        }
-        for type_, field_types in type_map.items():
-            if isinstance(field, field_types):
-                result = type_
-                break
-        else:
-            result = None
     return result
 
 
@@ -574,263 +349,6 @@ class CustomModelSerializerMixin(object):
         if not self.required and check_all_null(data):
             raise rest_fields.SkipField("Non required empty form")
         return super(CustomModelSerializerMixin, self).run_validation(data)
-
-
-class UpdateOccurrenceMixin(object):
-
-    def __init__(self, instance=None, data=rest_fields.empty,
-                 is_writer=False, is_publisher=False, **kwargs):
-        self.is_writer = is_writer
-        self.is_publisher = is_publisher
-        if instance and instance.occurrence_cat:
-            self.forms, self._form_dict = init_forms(
-                instance.occurrence_cat.code)
-        super(UpdateOccurrenceMixin, self).__init__(instance, data, **kwargs)
-
-    def _get_local_name(self, global_field_name):
-        """
-        Gets the local name of the provided attrib
-        Example _get_local_name("species.element_species.native") returns "native"
-        """
-        parts = global_field_name.split(".")
-        if len(parts)>0:
-            return parts[-1]
-
-    def _get_form_fields(self, form_name, instance):
-        """
-        Gets the field names of the given instance, using global name notation (e.g. "observation.reporter.name" )
-        """
-        result = []
-        if (instance):
-            return instance._meta.get_fields()
-        return result
-
-    def _get_validated_data_form(self, validated_data, form_name):
-        """
-        validated_data:
-        form_name: dictionary key including subdicts (e.g. "species.element_species")
-        Returns the data located on validated_data['species']['element_species'] or None if does not exist
-        """
-        if validated_data:
-            if form_name == formdefinitions.MANAGEMENT_FORM_NAME:
-                return validated_data
-            else:
-                parts = form_name.split(".")
-                subdict = validated_data
-                for part in parts:
-                    subdict = subdict.get(part)
-                    if subdict is None:
-                        return None
-            return subdict
-
-    def set_form_values(self, form_name, instance, form_validated_data,
-                        force_save=False):
-        """Update the values of provided instance using validated data"""
-        modified = False
-        for field in self._get_form_fields(form_name, instance):
-            if getattr(field, 'primary_key', False):
-                pass
-            elif getattr(field, 'related_model', None) is not None:
-                is_dict_table_model = issubclass(
-                    field.related_model,
-                    (models.DictionaryTable, models.DictionaryTableExtended)
-                )
-                if is_dict_table_model:
-                    new_value = form_validated_data.get(field.name)
-                    old_value = getattr(instance, field.name, None)
-                    if old_value != new_value and (old_value is None or new_value != old_value.code):
-                        try:
-                            if new_value != None:
-                                dict_entry = field.related_model.objects.get(
-                                    code=new_value)
-                            else:
-                                dict_entry = None
-                            modified = True
-                            setattr(instance, field.name, dict_entry)
-                        except Exception:
-                            setattr(instance, field.name, None)
-            else:
-                old_value, new_value = get_field_values(
-                    instance, field, form_validated_data)
-                if new_value != old_value:
-                    modified = True
-                    setattr(instance, field.name, new_value)
-        if force_save or modified:
-            instance.save()
-            return True
-
-    def _get_form_model_instance(self, form_name, model_class, parent_instance):
-        """
-        Gets the related instance for the provided form name and parent instance.
-        """
-        if parent_instance is not None:
-            if form_name == 'details':
-                related_instance = parent_instance.get_details()
-            else:
-                related_instance = getattr(parent_instance, self._get_local_name(form_name), None)
-            return related_instance
-
-    def _update_form(self, form_name, model_class, validated_data, parent_instance, child_forms=None):
-        """
-        Updates the appropriate instance according to the provided form_name and model instance. All
-        related objects are also updated if modified.
-
-        Returns True if the instance has been modified and saved, False if there were no changes.
-        """
-        child_forms = list(child_forms) if child_forms is not None else []
-        form_validated_data = self._get_validated_data_form(validated_data, form_name)
-        related_instance = self._get_form_model_instance(form_name, model_class, parent_instance)
-        if form_validated_data and not related_instance:
-            related_instance = model_class()
-
-        any_saved = False
-        for (child_form_name, child_model_class, child_child_forms) in child_forms:
-            saved = self._update_form(child_form_name, child_model_class, validated_data, related_instance, child_child_forms)
-            any_saved = any_saved or saved
-
-        if related_instance:
-            if form_validated_data:
-                saved = self.set_form_values(form_name, related_instance,
-                                             form_validated_data, any_saved)
-            else:  # if the form is empty and instance exists, delete instance
-                try:
-                    related_instance.delete()
-                except:
-                    pass
-                saved = True
-        else:
-            saved = False
-        any_saved = any_saved or saved
-        if any_saved:
-            if form_validated_data is None:
-                setattr(parent_instance, self._get_local_name(form_name), None)
-            else:
-                setattr(parent_instance, self._get_local_name(form_name), related_instance)
-        return any_saved
-
-    def _get_form_def_tree(self, form_name, model_class, children):
-        """Recursively get the definition of a form and its children"""
-        complete_children_def = []
-        for child in children:
-            child_form_dict = formdefinitions.get_form_dict(self.forms)[child]
-            definition = self._get_form_def_tree(*child_form_dict)
-            complete_children_def.append(definition)
-        return form_name, model_class, complete_children_def
-
-    def get_toplevel_forms(self):
-        """
-        Gets the definition of the forms which are directly related to Occurrence objects. Each
-        form contains also the definition of its related objects (as children)
-        """
-        forms = []
-        for name, model_class, children in self.forms:
-            if "." not in name:  # only for top-level objects
-                form_def = self._get_form_def_tree(name, model_class, children)
-                forms.append(form_def)
-        return forms
-
-    def process_photos(self, instance, validated_data):
-        images = validated_data.get('images')
-        if images:
-            try:
-                updated_ids = [i.get('id') for i in images]
-                instance.photographs.exclude(pk__in=updated_ids).delete()
-
-                for photo_data in validated_data.get('images'):
-                    try:
-                        photo = models.Photograph.objects.get(pk=photo_data.get('id'))
-                    except:
-                        if Version.objects.get_for_object_reference(models.Photograph, photo_data.get('id')).count() > 0:
-                            # we are restoring a removed photo
-                            last_version = Version.objects.get_for_object_reference(models.Photograph, photo_data.get('id'))[0]
-                            # ensure the photo matches current instance
-                            if last_version.field_dict.get('occurrence_fk') != instance.id:
-                                raise ValidationError({"images": [_("Tried to restore an invalid image")]})
-                            if last_version.field_dict.get('content_type_id') != ContentType.objects.get_for_model(instance._meta.model).pk:
-                                raise ValidationError({"images": [_("Tried to restore an invalid image")]})
-                            last_version.revert()
-                            photo = models.Photograph.objects.get(pk=photo_data.get('id'))
-                    updated = False
-                    if not photo.occurrence:
-                        photo.occurrence = instance
-                        updated = True
-                    elif photo.occurrence != instance:
-                        raise ValidationError({"images": [_("Invalid images were specified")]})
-                    notes = photo_data.get('notes')
-                    if photo.notes != notes:
-                        photo.notes = notes
-                        updated = True
-                    desc = photo_data.get('description')
-                    if photo.description != desc:
-                        photo.description = desc
-                        updated = True
-                    if updated:
-                        photo.save()
-            except ValidationError:
-                raise
-            except:
-                raise ValidationError({"images": [_("Invalid images were specified")]})
-        else:
-            instance.photographs.all().delete()
-
-    def process_notes(self, instance, validated_notes):
-        """Create or update the notes associated with the instance"""
-        for note_data in validated_notes:
-            instance_type = ContentType.objects.get_for_model(instance)
-            try:
-                note = models.Note.objects.get(
-                    content_type__pk=instance_type.id,
-                    object_id=instance.id,
-                    ui_tab=note_data["ui_tab"]
-                )
-            except models.Note.DoesNotExist:
-                note = models.Note(
-                    occurrence=instance,
-                    ui_tab=note_data["ui_tab"],
-                )
-            note.note = note_data["note"]
-            note.save()
-
-    def update(self, instance, validated_data):
-        with reversion.create_revision():
-            for (form_name, model_class, children) in self.get_toplevel_forms():
-                if form_name == 'species':
-                    try:
-                        species_id = validated_data['species']['id']
-                        selected_species = models.Species.objects.get(pk=species_id)
-                        instance.species = selected_species
-                    except:
-                        raise ValidationError({"species": [_("No species was selected")]})
-                elif form_name != formdefinitions.MANAGEMENT_FORM_NAME:
-                    self._update_form(form_name, model_class, validated_data, instance, children)
-
-            instance.geom = validated_data.get("geom") or instance.geom
-            instance.version += 1
-            instance.verified = validated_data.get("verified", False) or False
-            if self.is_publisher:
-                instance.released = validated_data.get(
-                    "released", False) or False
-                if instance.released:
-                    instance.released_versions += 1
-            else:
-                instance.released = False
-            instance.save()
-            # ensure the instance has been saved before associating photos
-            self.process_photos(instance, validated_data)
-            self.process_notes(instance, validated_data.get("notes", []))
-        return instance
-
-    def create(self, validated_data):
-        code = validated_data.get('featuresubtype')
-        if code == 'na':
-            instance = models.OccurrenceNaturalArea()
-        else:
-            instance = models.OccurrenceTaxon()
-        instance.occurrence_cat = models.OccurrenceCategory.objects.get(code=code)
-        instance.geom = validated_data.get('geom')
-        self.forms, self._form_dict = init_forms(
-            instance.occurrence_cat.code)
-        return self.update(instance, validated_data)
 
 
 class VoucherSerializer(CustomModelSerializerMixin,
@@ -1331,7 +849,7 @@ class FungusDetailsSerializer(CustomModelSerializerMixin,
 
     def validate_slope(self, value):
         return validate_json_field(
-            value, models.Slope, "slope")
+            value, models.FungusDetails, "slope")
 
     class Meta:
         model = models.FungusDetails
@@ -1391,10 +909,8 @@ class NoteSerializer(serializers.ModelSerializer):
         fields = ("note", "ui_tab",)
 
 
-class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
-    """
-    Manages serialization/deserialization of Occurrences
-    """
+class OccurrenceSerializer(serializers.Serializer):
+    """Manages serialization/deserialization of Occurrences"""
     id = rest_fields.IntegerField(required=False, read_only=True)
     featuretype = rest_fields.CharField(required=False, read_only=True)
     featuresubtype = rest_fields.CharField(read_only=True)
@@ -1408,15 +924,22 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
     polygon = gisserializer.GeometryField(required=False)
     observation = OccurrenceObservationSerializer(required=True)
     images = PhotographSerializer(required=False, many=True)
-    species = SpeciesSerializer(required=True)
     notes = NoteSerializer(required=False, many=True)
+
+    def __init__(self, instance=None, data=rest_fields.empty,
+                 is_writer=False, is_publisher=False, **kwargs):
+        self.is_writer = is_writer
+        self.is_publisher = is_publisher
+        # if instance and instance.occurrence_cat:
+        #     self.forms, self._form_dict = init_forms(
+        #         instance.occurrence_cat.code)
+        super(OccurrenceSerializer, self).__init__(instance, data, **kwargs)
 
     def get_fields(self):
         fields = serializers.Serializer.get_fields(self)
         if self.instance and self.instance.occurrence_cat:
             self.featuresubtype = self.instance.occurrence_cat.code
-        details_serializer = get_sub_category_detail(
-            self.featuresubtype, "serializer")
+        details_serializer = get_sub_category_serializer(self.featuresubtype)
         fields['details'] = details_serializer(required=False)
         return fields
 
@@ -1546,6 +1069,269 @@ class OccurrenceSerializer(UpdateOccurrenceMixin, serializers.Serializer):
             raise rest_fields.ValidationError(to_flat_representation(errors))
         return validated_formvalues
 
+    def process_photos(self, instance, validated_data):
+        images = validated_data.get('images')
+        if images:
+            try:
+                updated_ids = [i.get('id') for i in images]
+                instance.photographs.exclude(pk__in=updated_ids).delete()
+
+                for photo_data in validated_data.get('images'):
+                    try:
+                        photo = models.Photograph.objects.get(
+                            pk=photo_data.get('id'))
+                    except models.Photograph.DoesNotExist:
+                        num_photos =Version.objects.get_for_object_reference(
+                            models.Photograph,
+                            photo_data.get('id')
+                        ).count()
+                        if num_photos > 0:  # we are restoring a removed photo
+                            last_version = (
+                                Version.objects.get_for_object_reference(
+                                    models.Photograph,
+                                    photo_data.get('id')
+                                )[0]
+                            )
+                            # ensure the photo matches current instance
+                            matches_current = (
+                                    last_version.field_dict.get(
+                                        'occurrence_fk') == instance.id
+                            )
+                            if not matches_current:
+                                raise ValidationError({
+                                    "images": [
+                                        _("Tried to restore an invalid image")
+                                    ]
+                                })
+                            ct_id = last_version.field_dict.get(
+                                'content_type_id')
+                            matches_instance = (
+                                    ct_id == ContentType.objects.get_for_model(
+                                instance._meta.model).pk
+                            )
+                            if not matches_instance:
+                                raise ValidationError({
+                                    "images": [
+                                        _("Tried to restore an invalid image")
+                                    ]
+                                })
+                            last_version.revert()
+                            photo = models.Photograph.objects.get(
+                                pk=photo_data.get('id'))
+                    updated = False
+                    if not photo.occurrence:
+                        photo.occurrence = instance
+                        updated = True
+                    elif photo.occurrence != instance:
+                        raise ValidationError(
+                            {"images": [_("Invalid images were specified")]})
+                    notes = photo_data.get('notes')
+                    if photo.notes != notes:
+                        photo.notes = notes
+                        updated = True
+                    desc = photo_data.get('description')
+                    if photo.description != desc:
+                        photo.description = desc
+                        updated = True
+                    if updated:
+                        photo.save()
+            except ValidationError:
+                raise
+            except:
+                raise ValidationError(
+                    {"images": [_("Invalid images were specified")]})
+        else:
+            instance.photographs.all().delete()
+
+    def process_notes(self, instance, validated_notes):
+        """Create or update the notes associated with the instance"""
+        for note_data in validated_notes:
+            instance_type = ContentType.objects.get_for_model(instance)
+            try:
+                note = models.Note.objects.get(
+                    content_type__pk=instance_type.id,
+                    object_id=instance.id,
+                    ui_tab=note_data["ui_tab"]
+                )
+            except models.Note.DoesNotExist:
+                note = models.Note(
+                    occurrence=instance,
+                    ui_tab=note_data["ui_tab"],
+                )
+            note.note = note_data["note"]
+            note.save()
+
+    def _update_field_from_dict_model(self, instance, field, validated_data):
+        """Update a field that specifies a related DictionaryModel relation
+
+        Parameters
+        ----------
+        instance: django.db.models.Model
+            The django model being updated
+        field: django.db.models.fields.Field
+            Django field that is being updated
+        validated_data: dict
+            The data being used to update the ``instance``
+
+        """
+
+        new_value = validated_data.get(field.name)
+        old_value = getattr(instance, field.name, None)
+        is_different = old_value != new_value
+        if is_different and (old_value is None or new_value != old_value.code):
+            try:
+                if new_value != None:
+                    dict_entry = field.related_model.objects.get(
+                        code=new_value)
+                else:
+                    dict_entry = None
+                setattr(instance, field.name, dict_entry)
+            except Exception:
+                setattr(instance, field.name, None)
+
+    def _update_related_not_dict_model(self, instance, field, validated_data,
+                                       visited):
+        try:
+            sub_instance = getattr(instance, field.name)
+        except (django_models.ObjectDoesNotExist, AttributeError) as exc:
+            logger.debug("Skipping this field, could not retrieve "
+                         "sub_instance due to {}".format(exc))
+            raise RuntimeError
+        if instance.__class__.__name__ == "TaxonDetails":
+            # needs special handling due to how models are setup
+            sub_validated_data = validated_data
+        else:
+            sub_validated_data = validated_data.get(field.name, {})
+        if sub_instance is None and len(sub_validated_data) > 0:
+            # there's data to add but no sub model exists, so create one
+            related_name = field.related_fields[0][0].name
+            sub_instance = field.related_model()
+            self._update_instance(
+                sub_instance, sub_validated_data, visited=visited)
+            try:
+                related_manager = getattr(sub_instance, related_name)
+                related_manager.add(instance)
+            except AttributeError:  # its a onetoone relation, not a foreignkey
+                setattr(instance, field.name, sub_instance)
+        elif not isinstance(sub_instance, django_models.Model):
+            raise RuntimeError
+        else:
+            self._update_instance(
+                sub_instance, sub_validated_data, visited=visited)
+
+    def _update_related_model(self, instance, field, validated_data, visited):
+        """Update an instance's related model"""
+        is_dict_table_model = issubclass(
+            field.related_model,
+            (
+                models.DictionaryTable,
+                models.DictionaryTableExtended
+            )
+        )
+        if is_dict_table_model:
+            self._update_field_from_dict_model(
+                instance, field, validated_data)
+        else:
+            self._update_related_not_dict_model(
+                instance, field, validated_data, visited)
+
+    def _update_instance(self, instance, validated_data, visited=None):
+        """Update an instance's attributes with the input validated data
+
+        This method will go through the instance's fields and see if they
+        need to be updated, according with the data supplied in the
+        ``validated_data`` mapping. It also goes through the instance's
+        related models, updating them accordingly.
+        This is a recursive function.
+
+        Parameters
+        ----------
+        instance: nfd.core.models.Occurrence
+            The occurrence to be updated
+        validated_data: dict
+            The data that will be used to update the occurrence
+        visited: list, optional
+            A list of django field names that occur either on the
+            ``instance`` or on one o its related models that should not be
+            updated, even if there is data for them in ``validated_data``
+
+        """
+
+        visited = list(visited) if visited is not None else []
+        to_visit = (
+            f for f in instance._meta.get_fields() if f.name not in visited)
+        for field in to_visit:
+            visited.append(field.name)
+            if getattr(field, 'primary_key', False):
+                continue
+            elif field.related_model is not None:
+                try:
+                    self._update_related_model(
+                        instance, field, validated_data, visited)
+                except RuntimeError:
+                    continue
+            else:  # simple field
+                old_value, new_value = get_field_values(
+                    instance, field, validated_data)
+                if new_value != old_value:
+                    setattr(instance, field.name, new_value)
+        instance.save()
+
+    def update(self, instance, validated_data):
+        with reversion.create_revision():
+            try:
+                species_validated_data = validated_data.pop("species", {})
+                species_id = species_validated_data['id']
+                selected_species = models.Species.objects.get(pk=species_id)
+                instance.species = selected_species
+            except (KeyError, models.Species.DoesNotExist):
+                if instance.occurrence_cat.main_cat != "naturalarea":
+                    raise ValidationError(
+                        {"species": [_("No species was selected")]}
+                    )
+            instance.geom = validated_data.pop("geom", None) or instance.geom
+            instance.version += 1
+            instance.verified = validated_data.pop("verified", False)
+            if self.is_publisher:
+                instance.released = validated_data.pop("released", False)
+                if instance.released:
+                    instance.released_versions += 1
+            else:
+                instance.released = False
+            fields_to_skip_update = [
+                "occurrencetaxon",
+                "occurrencenaturalarea",
+                "occurrence_cat",
+                "inclusion_date",
+                # the next fields have already been handled
+                "species",
+                "geom",
+                "version",
+                "released_versions",
+                "verified",
+                "released",
+                # the next fields are m2m relations and are handled elsewhere
+                "photographs",
+                "notes",
+            ]
+            self._update_instance(
+                instance, validated_data, visited=fields_to_skip_update)
+            self.process_photos(instance, validated_data)
+            self.process_notes(instance, validated_data.get("notes", []))
+        return instance
+
+    def create(self, validated_data):
+        code = validated_data.get('featuresubtype')
+        if code == 'na':
+            instance = models.OccurrenceNaturalArea()
+        else:
+            instance = models.OccurrenceTaxon()
+        instance.occurrence_cat = models.OccurrenceCategory.objects.get(code=code)
+        instance.geom = validated_data.get('geom')
+        # self.forms, self._form_dict = init_forms(
+        #     instance.occurrence_cat.code)
+        return self.update(instance, validated_data)
+
 
 class TaxonLocationSerializer(CustomModelSerializerMixin,
                               serializers.ModelSerializer):
@@ -1629,7 +1415,7 @@ class NaturalAreaLocationSerializer(CustomModelSerializerMixin,
 
 
 class TaxonOccurrenceSerializer(OccurrenceSerializer):
-    species = SpeciesSerializer(required=False)
+    species = SpeciesSerializer(required=True)
     voucher = VoucherSerializer(required=False)
     location = TaxonLocationSerializer(required=False)
 
@@ -1920,3 +1706,102 @@ class OccurrenceAggregatorSerializer(serializers.BaseSerializer):
                 if k not in ("month", "num_occurrences"):
                     new_entry[k] = v
         return grouped_entries.values()
+
+
+class FormDefinitionsSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, instance):
+        form_definition = get_complete_form_definition(
+            self.context["subtype"])
+        occurrence_category = models.OccurrenceCategory.objects.get(
+            code=self.context["subtype"])
+        return get_form_representation(
+            form_definition,
+            feature_type=occurrence_category.main_cat,
+            sub_type=self.context["subtype"]
+        )
+
+
+def get_form_representation(form_definition, feature_type, sub_type):
+    return {
+        "featuretype": feature_type,
+        "featuresubtype": sub_type,
+        "forms": [
+            get_page_representation(page_def) for page_def in form_definition]
+    }
+
+def get_page_representation(page_definition):
+    page = {
+        "formlabel": page_definition["label"],
+        "formname": page_definition["id"],
+        "formitems": [],
+    }
+    for field_definition in page_definition["fields"]:
+        page["formitems"].append(
+            get_field_representation(field_definition))
+    return page
+
+
+def get_field_representation(field_definition):
+    field = {
+        "type": field_definition.get("widget", "string"),
+        "key": field_definition["field"],
+        "label": field_definition["label"],
+        "mandatory": field_definition.get("mandatory", False),
+        "readonly": field_definition.get("readonly", False),
+    }
+    if field["type"] in ("select", "select_multiple"):
+        choices_dict_model_path = field_definition.get("choices")
+        field["values"] = {"items": []}
+        if choices_dict_model_path is not None:
+            choices = get_form_field_choices(choices_dict_model_path)
+            field["values"]["items"] = [
+                {"key": k, "value": v} for k, v in choices]
+    show_key_with_value = field_definition.get("show_key_with_value")
+    if show_key_with_value is not None:
+        field["show_key_with_value"] = True
+    return field
+
+
+def import_class(python_path):
+    module_path, class_name = python_path.rpartition(".")[::2]
+    module = importlib.import_module(module_path)
+    class_ = getattr(module, class_name)
+    return class_
+
+
+def get_form_field_choices(choices_dict_model_path):
+    class_ = import_class(choices_dict_model_path)
+    return class_.objects.values_list("code", "name")
+
+
+def get_complete_form_definition(category_subtype_code):
+    form_definition = get_plain_form_definition(category_subtype_code)
+    needs_common_defs = any((i.has_key("common") for i in form_definition))
+    if needs_common_defs:
+        common_defs = get_common_form_definitions()
+        for page_def in form_definition:
+            common_field_definitions = common_defs.get(page_def.get("common"))
+            if common_field_definitions is not None:
+                del page_def["common"]
+                page_def.update(common_field_definitions)
+    return form_definition
+
+
+def get_plain_form_definition(category_subtype_code):
+    """Get the form definition without updating the ``common`` pages."""
+    category_path = settings.NFDCORE_FORM_DEFINITIONS[category_subtype_code]
+    with open(category_path) as fh:
+        definition = yaml.safe_load(fh)
+    return definition
+
+
+def get_common_form_definitions():
+    common_path = settings.NFDCORE_FORM_DEFINITIONS.get("common")
+    try:
+        with open(common_path) as fh:
+            common_definitions = yaml.safe_load(fh)
+    except (IOError, TypeError):
+        common_definitions = None
+    return common_definitions
+

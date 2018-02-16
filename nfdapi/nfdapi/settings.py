@@ -311,3 +311,31 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_REFERRALS: 0,
 }
 """
+
+NFDCORE_FORM_DEFINITIONS = {
+    "common": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "common-pages.yml"),
+    "ln": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "land-animal-forms.yml"),
+    "st": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "stream-animal-forms.yml"),
+    "lk": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "pond-lake-animal-forms.yml"),
+    "we": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "wetland-animal-forms.yml"),
+    "sl": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "slimemold-forms.yml"),
+    "co": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "conifer-plant-forms.yml"),
+    "fe": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "fern-plant-forms.yml"),
+    "fl": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "flowering-plant-forms.yml"),
+    "mo": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "moss-plant-forms.yml"),
+    "fu": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "fungus-forms.yml"),
+    "na": os.path.join(
+        BASE_DIR, "nfdcore", "form_definitions", "natural-area-forms.yml"),
+}
+

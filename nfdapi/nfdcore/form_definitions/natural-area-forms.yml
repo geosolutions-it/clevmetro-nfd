@@ -1,0 +1,108 @@
+- id: element
+  label: Element
+  fields:
+    - label: CM status
+      field: element.cm_status
+      widget: select
+      choices: nfdcore.models.CmStatus
+    - label: S rank
+      field: element.s_rank
+      widget: select
+      choices: nfdcore.models.SRank
+    - label: N rank
+      field: element.n_rank
+      widget: select
+      choices: nfdcore.models.NRank
+    - label: G rank
+      field: element.g_rank
+      widget: select
+      choices: nfdcore.models.GRank
+    - label: natural area code
+      field: element.natural_area_code_nac
+    - label: general description
+      field: element.general_description
+      widget: textarea
+    - label: element type
+      field: element.type
+      widget: select_multiple
+      choices: nfdcore.models.NaturalAreaType
+    - label: notable features
+      field: element.notable_features
+    - label: area
+      field: element.area
+      widget: double
+    - label: aspect
+      field: element.aspect
+      widget: select_multiple
+      choices: nfdcore.models.Aspect
+    - label: slope
+      field: element.slope
+      widget: select_multiple
+      choices: nfdcore.models.Slope
+    - label: sensitivity
+      field: element.sensitivity
+      widget: select_multiple
+      choices: nfdcore.models.CMSensitivity
+    - label: condition
+      field: element.condition
+      widget: select_multiple
+      choices: nfdcore.models.NaturalAreaCondition
+    - label: leap landcover category
+      field: element.leap_land_cover_category
+      widget: select_multiple
+      choices: nfdcore.models.LeapLandCover
+    - label: landscape position
+      field: element.landscape_position
+      widget: select_multiple
+      choices: nfdcore.models.LandscapePosition
+    - label: glaciar diposit
+      field: element.glaciar_diposit
+      widget: select_multiple
+      choices: nfdcore.models.GlacialDeposit
+    - label: pleistocene glaciar diposit
+      field: element.pleistocene_glaciar_diposit
+      widget: select_multiple
+      choices: nfdcore.models.GlacialDepositPleistoceneAge
+    - label: bedrock and outcrops
+      field: element.bedrock_and_outcrops
+      widget: select_multiple
+      choices: nfdcore.models.BedrockAndOutcrops
+    - label: regional frequency
+      field: element.regional_frequency
+      widget: select_multiple
+      choices: nfdcore.models.RegionalFrequency
+    - label: Notes
+      field: notes.note.element
+      widget: textarea
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: details.earthworm_evidence
+  label: Earthworm evidence
+  common: earthworm_evidence
+
+- id: details.disturbance_type
+  label: Disturbance type
+  common: disturbance_type
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

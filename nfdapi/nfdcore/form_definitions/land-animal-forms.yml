@@ -1,0 +1,101 @@
+# for each entry in the `fields` lists, an object with the following structure
+# is expected:
+#
+# - id - mandatory. An identifier for this page
+#
+# - label - mandatory. The label to show in the frontend
+#
+# - field - mandatory. The name of the field to show, as returned by the
+#   `OccurrenceSerializer`
+#
+# - mandatory - optional (defaults to false). Whether this field must be filled
+#
+# - widget - optional (defaults to string). The valid values are:
+#
+#   - string
+#   - textarea
+#   - boolean
+#   - date
+#   - datetime
+#   - integer
+#   - double
+#   - select
+#   - select_multiple
+#
+# - readonly - optional (defaults to false). Whether the frontend should allow
+#   editing this field's value
+#
+# - choices - optional (defaults to null). This should be used together with
+#   widget of type `select` or `select_multiple` and it should be the name of
+#   a models.DictionaryTable subclass
+#
+# - show_key_with_value - optional (defaults to false)
+#
+
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: Gender
+      field: details.gender
+      widget: select_multiple
+      choices: nfdcore.models.Gender
+    - label: Marks
+      field: details.marks
+      widget: select_multiple
+      choices: nfdcore.models.Marks
+    - label: Diseases and abnormalities
+      field: details.diseases_and_abnormalities
+      widget: select_multiple
+      choices: nfdcore.models.DiseasesAndAbnormalities
+    - label: Sampler
+      field: details.sampler
+      widget: select_multiple
+      choices: nfdcore.models.TerrestrialSampler
+    - label: Stratum
+      field: details.stratum
+      widget: select_multiple
+      choices: nfdcore.models.TerrestrialStratum
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  common: animal_lifestages
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management
+

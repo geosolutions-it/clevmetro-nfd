@@ -207,6 +207,109 @@ class TaxonomyFilterer(object):
         return parameters
 
 
+class FeatureTypeFormViewSet(viewsets.ViewSet):
+    """ViewSet for featuretype forms"""
+    randerer_classes = (
+        JSONRenderer,
+        BrowsableAPIRenderer,
+    )
+    serializer_class = nfdserializers.FormDefinitionsSerializer
+
+    # This attribute exists in order to satisfy django_rest_framework's
+    # requirement of needing to pass something as the ``instance`` argument
+    # when creating a serializer, in order for it to allow accessing its
+    # ``data`` property later on
+    SOMETHING = "just something other than None"
+
+    @list_route()
+    def ln(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "ln"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def st(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "st"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def lk(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "lk"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def we(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "we"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def sl(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "sl"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def co(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "co",}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def fe(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "fe"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def fl(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "fl"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def mo(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "mo"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def fu(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "fu"}
+        )
+        return Response(serializer.data)
+
+    @list_route()
+    def na(self, request):
+        serializer = self.serializer_class(
+            instance=self.SOMETHING,
+            context={"subtype": "na"}
+        )
+        return Response(serializer.data)
+
+
 class OccurrenceAggregatorViewSet(viewsets.ViewSet):
     """ViewSet for occurrence stats"""
 
@@ -599,8 +702,8 @@ class LayerDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, occurrence_maincat, pk, format=None):
-        (is_writer, is_publisher) = get_permissions(request.user,
-                                                    occurrence_maincat)
+        is_writer, is_publisher = get_permissions(
+            request.user, occurrence_maincat)
         feature = self.get_object(occurrence_maincat, pk)
         if isinstance(feature, OccurrenceNaturalArea):
             serializer = nfdserializers.NaturalAreaOccurrenceSerializer(
@@ -614,8 +717,11 @@ class LayerDetail(APIView):
             )
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            result = Response(serializer.data)
+        else:
+            result = Response(serializer.errors,
+                              status=status.HTTP_400_BAD_REQUEST)
+        return result
 
     def delete(self, request, occurrence_maincat, pk, format=None):
         feature = self.get_object(occurrence_maincat, pk)
@@ -658,33 +764,6 @@ class PhotoViewSet(ModelViewSet):
     serializer_class = nfdserializers.PhotographPublishSerializer
     parser_classes = (MultiPartParser, FormParser,)
     queryset = Photograph.objects.all()
-
-
-@api_view(['GET'])
-def get_feature_type(request, occurrence_subcat, feature_id=None):
-    if feature_id:
-        if occurrence_subcat[0] == 'n':  # natural areas
-            feat = OccurrenceNaturalArea.objects.get(pk=feature_id)
-        else:
-            feat = OccurrenceTaxon.objects.get(pk=feature_id)
-        try:
-            result = nfdserializers.serialize_feature_types(
-                feat.occurrence_cat)
-        except RuntimeError as exc:
-            result = {"error": str(exc)}
-    else:  # get category code instead of the main category
-        occurrence_cat = OccurrenceCategory.objects.get(code=occurrence_subcat)
-        is_writer, is_publisher = get_permissions(
-            request.user, occurrence_cat.main_cat)
-        try:
-            result = nfdserializers.serialize_feature_types(
-                occurrence_cat,
-                is_writer=is_writer,
-                is_publisher=is_publisher
-            )
-        except RuntimeError as exc:
-            result = {"error": str(exc)}
-    return Response(result)
 
 
 class SpeciesPaginationClass(PageNumberPagination):

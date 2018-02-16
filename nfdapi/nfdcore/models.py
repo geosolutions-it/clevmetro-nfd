@@ -506,30 +506,20 @@ class TaxonDetails(models.Model):
 
 
 def get_details_class(category_code):
-    if category_code=='co':
-        return ConiferDetails
-    elif category_code=='fe':
-        return FernDetails
-    elif category_code=='fl':
-        return FloweringPlantDetails
-    elif category_code=='pl':
-        return TaxonDetails  # FIXME
-    elif category_code=='mo':
-        return MossDetails
-    elif category_code=='fu':
-        return FungusDetails
-    elif category_code=='sl':
-        return SlimeMoldDetails
-    elif category_code=='ln':
-        return LandAnimalDetails
-    elif category_code=='lk':
-        return PondLakeAnimalDetails
-    elif category_code=='st':
-        return StreamAnimalDetails
-    elif category_code=='we':
-        return WetlandAnimalDetails
-    elif category_code=='na':
-        return ElementNaturalAreas
+    return {
+        "co": ConiferDetails,
+        "fe": FernDetails,
+        "fl": FloweringPlantDetails,
+        "fu": FungusDetails,
+        "lk": PondLakeAnimalDetails,
+        "ln": LandAnimalDetails,
+        "pl": TaxonDetails,  # FIXME
+        "mo": MossDetails,
+        "na": ElementNaturalAreas,
+        "sl": SlimeMoldDetails,
+        "st": StreamAnimalDetails,
+        "we": WetlandAnimalDetails,
+    }.get(category_code)
 
 
 @reversion.register(follow=['photographs'])

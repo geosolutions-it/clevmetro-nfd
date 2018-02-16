@@ -1,0 +1,72 @@
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: slime mold class
+      field: details.slime_mold_class
+      widget: select_multiple
+      choices: nfdcore.models.SlimeMoldClass
+    - label: slime mold media
+      field: details.slime_mold_media
+      widget: select_multiple
+      choices: nfdcore.models.SlimeMoldMedia
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  fields:
+    - label: sclerotium color
+      field: details.lifestages.sclerotium_color
+    - label: sclerotium size
+      field: details.lifestages.sclerotium_size
+      widget: double
+    - label: sporangia color
+      field: details.lifestages.sporangia_color
+    - label: sporangia size
+      field: details.lifestages.sporangia_size
+      widget: double
+    - label: streaming body color
+      field: details.lifestages.streaming_body_color
+    - label: streaming body size
+      field: details.lifestages.streaming_body_size
+      widget: double
+    - label: Notes
+      field: notes.note.lifestages
+      widget: textarea
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

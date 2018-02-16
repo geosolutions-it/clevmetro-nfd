@@ -1,0 +1,388 @@
+# TODO: Add a common reporter
+# TODO: Add a common verifier
+# TODO: Add a common recorder
+management:
+  fields:
+    - label: id
+      field: id
+      widget: integer
+      readonly: True
+    - label: feature type
+      field: featuretype
+      widget: string
+      readonly: True
+    - label: feature sub-type
+      field: featuresubtype
+      widget: string
+      readonly: True
+    - label: released
+      field: released
+      widget: boolean
+      readonly: True
+    - label: verified
+      field: verified
+      widget: boolean
+      readonly: True
+    - label: inclusion date
+      field: inclusion_date
+      widget: string
+      readonly: True
+    - label: version date
+      field: version_date
+      widget: string
+      readonly: True
+
+species:
+  fields:
+    - label: First Common
+      field: species.first_common
+      mandatory: true
+      readonly: true
+    - label: Scientific Name
+      field: species.name_sci
+      mandatory: true
+      readonly: true
+    - label: TSN
+      field: species.tsn
+      readonly: true
+    - label: Synonym
+      field: species.synonym
+      readonly: true
+    - label: Second Common
+      field: species.second_common
+      readonly: true
+    - label: Third Common
+      field: species.third_common
+      readonly: true
+    - label: Family
+      field: species.family
+      readonly: true
+    - label: Family Common
+      field: species.family_common
+      readonly: true
+    - label: Phylum
+      field: species.phylum
+      readonly: true
+    - label: Phylum Common
+      field: species.phylum_common
+      readonly: true
+    - label: Notes
+      field: notes.note.species
+      widget: textarea
+
+element_species:
+  fields:
+    - label: CM Status
+      field: species.element_species.cm_status
+      readonly: true
+    - label: S Rank
+      field: species.element_species.s_rank
+      readonly: true
+      show_key_with_value: true
+    - label: N Rank
+      field: species.element_species.n_rank
+      readonly: true
+      show_key_with_value: true
+    - label: G Rank
+      field: species.element_species.g_rank
+      readonly: true
+      show_key_with_value: true
+    - label: Native
+      field: species.element_species.native
+      widget: boolean
+      readonly: true
+    - label: OH Status
+      field: species.element_species.oh_status
+      readonly: true
+    - label: USFWS Status
+      field: species.element_species.usfws_status
+      readonly: true
+    - label: IUCN Red List Category
+      field: species.element_species.iucn_red_list_category
+      readonly: true
+    - label: IUCN Red List Category
+      field: species.element_species.iucn_red_list_category
+      readonly: true
+    - label: Other code
+      field: species.element_species.other_code
+      readonly: true
+    - label: IBP english
+      field: species.element_species.ibp_english
+      readonly: true
+    - label: IBP scientific
+      field: species.element_species.ibp_scientific
+      readonly: true
+    - label: BBLAB number
+      field: species.element_species.bblab_number
+      readonly: true
+    - label: NRCS USDA symbol
+      field: species.element_species.nrcs_usda_symbol
+      readonly: true
+    - label: Synonym NRCS USDA symbol
+      field: species.element_species.synonym_nrcs_usda_symbol
+      readonly: true
+    - label: EPA numeric code
+      field: species.element_species.epa_numeric_code
+      readonly: true
+    - label: Mushroom group
+      field: species.element_species.mushroom_group
+      readonly: true
+    - label: Notes
+      field: notes.note.element_species
+      widget: textarea
+
+observation:
+  fields:
+    - label: Observation date
+      field: observation.observation_date
+      widget: date
+    - label: Recording datetime
+      field: observation.recording_datetime
+      widget: datetime
+    - label: Daytime
+      field: observation.daytime
+      widget: select
+      choices: nfdcore.models.DayTime
+    - label: Season
+      field: observation.season
+      widget: select
+      choices: nfdcore.models.Season
+    - label: Record origin
+      field: observation.record_origin
+      widget: select_multiple
+      choices: nfdcore.models.RecordOrigin
+    - label: Notes
+      field: notes.note.observation
+      widget: textarea
+
+reporter:
+  fields:
+    - label: Name
+      field: observation.reporter.name
+      mandatory: true
+    - label: Affiliation
+      field: observation.reporter.affiliation
+    - label: Phone1
+      field: observation.reporter.phone1
+    - label: Phone2
+      field: observation.reporter.phone2
+    - label: email
+      field: observation.reporter.email
+    - label: Street address
+      field: observation.reporter.street_address
+    - label: Notes
+      field: notes.note.reporter
+      widget: textarea
+
+verifier:
+  fields:
+    - label: Name
+      field: observation.verifier.name
+      mandatory: true
+    - label: Affiliation
+      field: observation.verifier.affiliation
+    - label: Phone1
+      field: observation.verifier.phone1
+    - label: Phone2
+      field: observation.verifier.phone2
+    - label: email
+      field: observation.verifier.email
+    - label: Street address
+      field: observation.verifier.street_address
+    - label: Notes
+      field: notes.note.verifier
+      widget: textarea
+
+recorder:
+  fields:
+    - label: Name
+      field: observation.recorder.name
+      mandatory: true
+    - label: Affiliation
+      field: observation.recorder.affiliation
+    - label: Phone1
+      field: observation.recorder.phone1
+    - label: Phone2
+      field: observation.recorder.phone2
+    - label: email
+      field: observation.recorder.email
+    - label: Street address
+      field: observation.recorder.street_address
+    - label: Notes
+      field: notes.note.recorder
+      widget: textarea
+
+voucher:
+  fields:
+    - label: Voucher number
+      field: voucher.voucher_number
+      widget: integer
+    - label: Specimen collected
+      field: voucher.specimen_collected
+      widget: boolean
+    - label: Parts collected
+      field: voucher.parts_collected
+      widget: boolean
+    - label: Specimen number
+      field: voucher.specimen_number
+      widget: boolean
+    - label: Preservative
+      field: voucher.preservative
+      widget: select_multiple
+      choices: nfdcore.models.Preservative
+    - label: Storage
+      field: voucher.storage
+      widget: select_multiple
+      choices: nfdcore.models.Storage
+    - label: Repository
+      field: voucher.repository
+      widget: string
+      choices: nfdcore.models.Repository
+    - label: Notes
+      field: notes.note.voucher
+      widget: textarea
+
+animal_lifestages:
+  fields:
+    - label: egg
+      field: lifestages.egg
+      widget: double
+    - label: egg mass
+      field: lifestages.egg_mass
+      widget: double
+    - label: nest
+      field: lifestages.nest
+      widget: double
+    - label: early instar larva
+      field: lifestages.early_instar_larva
+      widget: double
+    - label: larva
+      field: lifestages.larva
+      widget: double
+    - label: late instar larva
+      field: lifestages.late_instar_larva
+      widget: double
+    - label: early instar nymph
+      field: lifestages.early_instar_nymph
+      widget: double
+    - label: nymph
+      field: lifestages.nymph
+      widget: double
+    - label: late instar nymph
+      field: lifestages.late_instar_nymph
+      widget: double
+    - label: early pupa
+      field: lifestages.early_pupa
+      widget: double
+    - label: pupa
+      field: lifestages.pupa
+      widget: double
+    - label: late pupa
+      field: lifestages.late_pupa
+      widget: double
+    - label: juvenile
+      field: lifestages.juvenile
+      widget: double
+    - label: immature
+      field: lifestages.immature
+      widget: double
+    - label: subadult
+      field: lifestages.subadult
+      widget: double
+    - label: adult
+      field: lifestages.adult
+      widget: double
+    - label: adult pregnant or young
+      field: lifestages.adult_pregnant_or_young
+      widget: double
+    - label: senescent
+      field: lifestages.senescent
+      widget: double
+    - label: unknown
+      field: lifestages.unknown
+      widget: double
+    - label: not available
+      field: lifestages.na
+      widget: double
+    - label: Notes
+      field: notes.note.lifestages
+      widget: textarea
+
+location:
+  fields:
+    - label: site description
+      field: location.site_description
+    - label: reservation
+      field: location.reservation
+      widget: select_multiple
+      choices: nfdcore.models.Reservation
+    - label: watershed
+      field: location.watershed
+      widget: select_multiple
+      choices: nfdcore.models.Watershed
+    - label: directions
+      field: location.directions
+    - label: parcel
+      field: location.parcel
+    - label: city township
+      field: location.city_township
+    - label: county
+      field: location.county
+    - label: quad name
+      field: location.quad_name
+    - label: quad number
+      field: location.quad_number
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+earthworm_evidence:
+  fields:
+    - label: casting piles
+      field: details.earthworm_evidence.casting_piles
+      widget: double
+    - label: compacted soil
+      field: details.earthworm_evidence.compacted_soil
+      widget: double
+    - label: individuals
+      field: details.earthworm_evidence.individuals
+      widget: double
+    - label: layered castings
+      field: details.earthworm_evidence.layered_castings
+      widget: double
+    - label: middens
+      field: details.earthworm_evidence.middens
+      widget: double
+    - label: no evidence
+      field: details.earthworm_evidence.no_evidence
+      widget: double
+    - label: Notes
+      field: notes.note.earthworm_evidence
+      widget: textarea
+
+disturbance_type:
+  fields:
+    - label: browse
+      field: details.disturbance_type.browse
+      widget: double
+    - label: collecting
+      field: details.disturbance_type.collecting
+      widget: double
+    - label: disease pest
+      field: details.disturbance_type.disease_pest
+      widget: double
+    - label: mowing
+      field: details.disturbance_type.mowing
+      widget: double
+    - label: trampling
+      field: details.disturbance_type.trampling
+      widget: double
+    - label: vehicle traffic
+      field: details.disturbance_type.vehicle_traffic
+      widget: double
+    - label: woody plant removal
+      field: details.disturbance_type.woody_plant_removal
+      widget: double
+    - label: Notes
+      field: notes.note.disturbance_type
+      widget: textarea
