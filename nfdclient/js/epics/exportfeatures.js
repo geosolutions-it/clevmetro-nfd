@@ -8,7 +8,9 @@
 const Rx = require('rxjs');
 const Api = require('../api/naturalfeaturesdata');
 const FilterUtils = require('../utils/FilterUtils');
-var fileDownload = require('react-file-download');
+const fileDownload = require('react-file-download');
+const copy = require('copy-to-clipboard');
+const url = require('url');
 
 
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
@@ -16,12 +18,13 @@ const {
     TOGGLE_EXPORT,
     EXPORT_FEATURES,
     downloadingFeatures,
-    DOWNLOAD_REPORT
+    DOWNLOAD_REPORT,
+    ADD_PERMALINK
 } = require('../actions/exportfeatures');
 const {
     userNotAuthenticatedError
 } = require('../actions/naturalfeatures');
-const {error} = require('../../MapStore2/web/client/actions/notifications');
+const {error, info} = require('../../MapStore2/web/client/actions/notifications');
 
 const getExt = (format) => {
     switch (format) {
@@ -91,5 +94,16 @@ module.exports = {
         .switchMap(a => {
             const {featureType, id, version} = a;
             return getReport(Api.downloadReport(featureType, id, version), `${featureType}${id ? `_${id}_${version}` : ''}.${'pdf'}`);
+        }),
+    addPermalink: (action$) =>
+        action$.ofType(ADD_PERMALINK)
+        .switchMap(({ft, sb, id, v}) => {
+            let currentUrl = url.parse(window.location.href, true);
+            currentUrl.query = {...currentUrl.query, ft, sb, id, v};
+            delete currentUrl.search;
+            delete currentUrl.hash;
+            const link = url.format(currentUrl);
+            copy(link);
+            return Rx.Observable.of(info({title: "Link", message: `Permalink adde to clipboard ${link}`}));
         })
 };

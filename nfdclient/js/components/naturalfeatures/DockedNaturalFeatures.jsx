@@ -64,7 +64,8 @@ const DockedNaturalFeatures = React.createClass({
         onFeaturePropertyChange: React.PropTypes.func,
         editFeature: React.PropTypes.func,
         isEditable: React.PropTypes.bool,
-        onDownloadReport: React.PropTypes.func
+        onDownloadReport: React.PropTypes.func,
+        addPermalink: React.PropTypes.func
     },
     getDefaultProps() {
         return {
@@ -95,7 +96,8 @@ const DockedNaturalFeatures = React.createClass({
             exportFt: () => {},
             onFeaturePropertyChange: () => {},
             editFeature: () => {},
-            onDownloadReport: () => {}
+            onDownloadReport: () => {},
+            addPermalink: () => {}
         };
     },
     getInitialState() {
@@ -263,8 +265,16 @@ const DockedNaturalFeatures = React.createClass({
                     bsStyle="primary"
                     disabled={!this.props.currentFeature.featuretype}
                     onClick={this.downloadReport}
+                    style={{marginRight: "2px"}}
                     >
                     <Glyphicon glyph="1-pdf" style={{fontSize: 18}}/>
+                </Button>,
+                <Button key="permalinkBtn" bsSize="small"
+                    bsStyle="primary"
+                    disabled={!this.props.currentFeature.featuretype}
+                    onClick={this.addPermalink}
+                    >
+                    <Glyphicon glyph="link" style={{fontSize: 18}}/>
                 </Button>]);
     },
     renderHistoric() {
@@ -390,6 +400,11 @@ const DockedNaturalFeatures = React.createClass({
     downloadReport() {
         const {featuretype, id, version} = this.props.currentFeature;
         this.props.onDownloadReport(featuretype, id, version);
+    },
+    addPermalink() {
+        const {featuretype, featuresubtype, id, version} = this.props.currentFeature;
+        this.props.addPermalink(featuretype, featuresubtype, id, version);
+
     }
 });
 

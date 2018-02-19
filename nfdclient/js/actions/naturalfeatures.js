@@ -55,6 +55,7 @@ const IMAGE_ERROR = 'IMAGE_ERROR';
 const REMOVE_IMAGE = 'REMOVE_IMAGE';
 const IMAGE_UPLOADED = 'IMAGE_UPLOADED';
 const FEATURE_PROPERTY_CHANGE = 'FEATURE_PROPERTY_CHANGE';
+const NATURAL_FEATURES_INITIALIZED = 'NATURAL_FEATURES_INITIALIZED';
 
 function onFeaturePropertyChange(property, value) {
     return {
@@ -553,5 +554,6 @@ module.exports = {
     userNotAuthenticatedError,
     createNaturalFeatureError,
     imageUploaded, IMAGE_UPLOADED,
-    FEATURE_PROPERTY_CHANGE, onFeaturePropertyChange
+    FEATURE_PROPERTY_CHANGE, onFeaturePropertyChange,
+    NATURAL_FEATURES_INITIALIZED
 };
