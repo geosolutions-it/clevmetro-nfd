@@ -35,9 +35,39 @@
                         "selector": "#drawer-menu-button"
                     },
                     {
+                        "title": "Background layers",
+                        "text": "<div>Click on the map miniature to switch between background layers</div>",
+                        "selector": ".background-plugin-position"
+                    },
+                    {
                         "title": "Legend",
-                        "text": "Displays the legend of the layers",
+                        "text": "<div>Displays the legend of the layers</div>",
                         "selector": "#nfd-legend"
+                    },
+                    {
+                        "title": "Search categories",
+                        "text": "<div>Search and filter nfd categories</div>",
+                        "selector": "#features-button"
+                    },
+                    {
+                        "title": "Add new observation",
+                        "text": "<div><ol><li>When the user has logged in as an admin, the add icon is activated</li><li>Select a subspecies from the drop-down menu</li><li>Click on the map to add the marker in the desired location</li><li>The edit panel opens</li><li>Click on the input field to edit and type to add new informations</li><li>Click on a different tab to add more informations</li><li>Click on save button to finish the edit and save</li></ol></div>",
+                        "selector": "#addnf-menu-button"
+                    },
+                    {
+                        "title": "Toggle feature panel",
+                        "text": "<div>Enable a user to toggle the feature panel</div>",
+                        "selector": "#add-edit-button"
+                    },
+                    {
+                        "title": "Reports",
+                        "text": "<div>Enable a logged user to download category statistical report</div>",
+                        "selector": "#pdf-menu-button"
+                    },
+                    {
+                        "title": "Login/out",
+                        "text": "<div>It shows user info and login/out button</div>",
+                        "selector": "#loginButton"
                     },
                     {
                         "title": "Visualization",
@@ -45,10 +75,19 @@
                         "selector": "#map"
                     },
                     {
-                        "title": "Add new observation",
-                        "text": "<div><ol><li>When the user has logged in as an admin, the add icon is activated</li><li>Select a subspecies from the drop-down menu</li><li>Click on the map to add the marker in the desired location</li><li>The edit panel opens</li><li>Click on the input field to edit and type to add new informations</li><li>Click on a different tab to add more informations</li><li>Click on save button to finish the edit and save</li></ol></div>",
-                        "selector": "#addnf-menu-button"
+                        "title": "Zoom In",
+                        "text": "<div>Click to enlarge the map</div>",
+                        "selector": "#zoomin-btn"
+                    },{
+                        "title": "Zoom Out",
+                        "text": "<div>Click to reduce the map</div>",
+                        "selector": "#zoomout-btn"
+                    },{
+                        "title": "Full Screen",
+                        "text": "<div>Click to go full screen</div>",
+                        "selector": "#mapstore-zoomtomaxextent"
                     }
+                    
                 ]}
               ]
             }
