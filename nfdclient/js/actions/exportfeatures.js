@@ -11,6 +11,17 @@ const EXPORT_FEATURES = 'EXPORT_FEATURES';
 const DOWNLOADING_FEATURES = 'DOWNLOADING_FEATURES';
 const DOWNLOADING_FEATURES_ERROR = 'DOWNLOADING_FEATURES_ERROR';
 const DOWNLOAD_REPORT = 'DOWNLOAD_REPORT';
+const ADD_PERMALINK = 'ADD_PERMALINK';
+
+function addPermalink(ft, sb, id, v) {
+    return {
+        type: ADD_PERMALINK,
+        ft,
+        id,
+        sb,
+        v
+    };
+}
 
 function downloadReport(featureType, id, version) {
     return {
@@ -65,5 +76,6 @@ module.exports = {
     EXPORT_FEATURES, downloadFeatures,
     DOWNLOADING_FEATURES, downloadingFeatures,
     DOWNLOADING_FEATURES_ERROR, downloadingError,
-    DOWNLOAD_REPORT, downloadReport
+    DOWNLOAD_REPORT, downloadReport,
+    ADD_PERMALINK, addPermalink
 };

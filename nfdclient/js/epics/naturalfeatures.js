@@ -10,13 +10,17 @@ const {get} = require('lodash');
 const Api = require('../api/naturalfeaturesdata');
 const {changeLayerProperties} = require('../../MapStore2/web/client/actions/layers');
 const {toggleControl, setControlProperty} = require('../../MapStore2/web/client/actions/controls');
+const url = require('url');
+const params = url.parse(window.location.href, true).query;
 const {error} = require('../../MapStore2/web/client/actions/notifications');
+const {zoomToPoint} = require('../../MapStore2/web/client/actions/map');
 const {
     CREATE_NATURAL_FEATURE, NFD_LOGIN_SUCCESS, ADD_FEATURE, FEATURE_PROPERTY_CHANGE,
-    NATURAL_FEATURES_LOADED, LOAD_NATURAL_FEATURES, naturalFeaturesLoaded, naturalFeaturesLoading, naturalFeaturesError, naturalFeatureGeomAdded,
-    USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing, naturalFeatureSelected, viewFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED, userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage,
-    IMAGE_ERROR,
-    CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR
+    NATURAL_FEATURES_LOADED, LOAD_NATURAL_FEATURES, naturalFeaturesLoaded, naturalFeaturesLoading, naturalFeaturesError,
+    naturalFeatureGeomAdded, USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing,
+    naturalFeatureSelected, viewFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED,
+    userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage, IMAGE_ERROR, NATURAL_FEATURES_INITIALIZED,
+    CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR, updateNaturalFeatureForm, naturalFeatureTypeLoaded
 } = require('../actions/naturalfeatures');
 const {SELECT_FEATURE} = require('../actions/featuresearch');
 
@@ -51,7 +55,7 @@ getDataEpic: (action$, store) =>
     switchMap(() => {
         const {featureTypes = []} = (store.getState()).featuresearch;
         return Rx.Observable.from(featureTypes.map((ft) => fetchFeatures(ft))).mergeAll().
-        startWith(naturalFeaturesLoading(true)).concat([naturalFeaturesLoading(false)]);
+        startWith(naturalFeaturesLoading(true)).concat([naturalFeaturesLoading(false), {type: NATURAL_FEATURES_INITIALIZED}]);
     }),
 
 unauthorizedUserErrorEpic: action$ =>
@@ -161,5 +165,24 @@ updatePos: (action$, store) =>
     action$.ofType(FEATURE_PROPERTY_CHANGE)
     .debounceTime(400)
     .filter((a) => a.property === 'location.lat' || a.property === 'location.lng')
-    .map(() => changeDrawingStatus("updatePos", "Marker", "dockednaturalfeatures", [], {properties: get(store.getState(), "naturalfeatures.selectedFeature")}))
+    .map(() => changeDrawingStatus("updatePos", "Marker", "dockednaturalfeatures", [], {properties: get(store.getState(), "naturalfeatures.selectedFeature")})),
+initPermalink: (action$) =>
+    action$.ofType(NATURAL_FEATURES_INITIALIZED)
+    .filter(() => params.id && params.sb && params.v && params.ft)
+    .switchMap(() => {
+        const {ft, id, v} = params;
+        return Rx.Observable.from([setControlProperty('vieweditnaturalfeatures', 'enabled', true), viewFeature()])
+        .merge(Rx.Observable.fromPromise(Api.getVersion(ft, id, v))
+                .mergeMap((feature) => Rx.Observable.from([updateNaturalFeatureForm(feature), zoomToPoint(feature.geom.coordinates.slice(), 16, "EPSG:4326")])
+                                .merge(Rx.Observable.fromPromise(Api.getFeatureSubtype(feature.featuresubtype))
+                                        .map((resp) => naturalFeatureTypeLoaded(resp.forms, resp.featuretype, resp.featuresubtype, "viewedit"))
+                                )
+                        )
+                )
+        .startWith(naturalFeaturesLoading(true))
+        .concat([naturalFeaturesLoading(false)])
+        .catch(e => Rx.Observable.from([error({title: 'Permalink failed', message: `Error: ${e.statusText}`}), setControlProperty('vieweditnaturalfeatures', 'enabled', false)]));
+
+    })
+
 };
