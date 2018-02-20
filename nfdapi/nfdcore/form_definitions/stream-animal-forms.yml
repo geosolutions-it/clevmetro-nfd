@@ -31,19 +31,19 @@
   fields:
     - label: Gender
       field: details.gender
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Gender
     - label: Marks
       field: details.marks
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Marks
     - label: Diseases and abnormalities
       field: details.diseases_and_abnormalities
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
     - label: sampler
       field: details.sampler
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.AquaticSampler
     - label: stream name 1
       field: details.stream_name_1
@@ -53,23 +53,23 @@
       field: details.pemso_code
     - label: designated use
       field: details.designated_use
-      widget: select
+      widget: stringcombo
       choices: nfdcore.models.StreamDesignatedUse
     - label: channel type
       field: details.channel_type
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.ChannelType
     - label: HMFEI local abundance
       field: details.hmfei_local_abundance
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.HmfeiLocalAbundance
     - label: lotic habitat type
       field: details.lotic_habitat_type
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.LoticHabitatType
     - label: water flow type
       field: details.water_flow_type
-      widget: select
+      widget: stringcombo
       choices: nfdcore.models.WaterFlowType
     - label: Notes
       field: notes.note.details

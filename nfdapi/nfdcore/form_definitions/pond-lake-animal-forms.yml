@@ -31,19 +31,19 @@
   fields:
     - label: Gender
       field: details.gender
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Gender
     - label: Marks
       field: details.marks
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Marks
     - label: Diseases and abnormalities
       field: details.diseases_and_abnormalities
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
     - label: sampler
       field: details.sampler
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.AquaticSampler
     - label: lentic size approx (acres)
       field: details.lentic_size_acres_aprox
@@ -61,19 +61,19 @@
       field: details.pond_lake_name
     - label: pond lake type
       field: details.pond_lake_type
-      widget: select
+      widget: stringcombo
       choices: nfdcore.models.PondLakeType
     - label: pond lake use
       field: details.pond_lake_use
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.PondLakeUse
     - label: shoreline type
       field: details.shoreline_type
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.ShorelineType
     - label: microhabitat
       field: details.microhabitat
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.LakeMicrohabitat
     - label: microhabitat comments
       field: details.microhabitat_comments

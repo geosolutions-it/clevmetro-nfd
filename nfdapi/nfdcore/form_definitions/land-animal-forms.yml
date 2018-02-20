@@ -19,14 +19,14 @@
 #   - datetime
 #   - integer
 #   - double
-#   - select
-#   - select_multiple
+#   - stringcombo
+#   - stringcombo_multiple
 #
 # - readonly - optional (defaults to false). Whether the frontend should allow
 #   editing this field's value
 #
 # - choices - optional (defaults to null). This should be used together with
-#   widget of type `select` or `select_multiple` and it should be the name of
+#   widget of type `stringcombo` or `stringcombo_multiple` and it should be the name of
 #   a models.DictionaryTable subclass
 #
 # - show_key_with_value - optional (defaults to false)
@@ -65,23 +65,23 @@
   fields:
     - label: Gender
       field: details.gender
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Gender
     - label: Marks
       field: details.marks
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Marks
     - label: Diseases and abnormalities
       field: details.diseases_and_abnormalities
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
     - label: Sampler
       field: details.sampler
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.TerrestrialSampler
     - label: Stratum
       field: details.stratum
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.TerrestrialStratum
     - label: Notes
       field: notes.note.details
