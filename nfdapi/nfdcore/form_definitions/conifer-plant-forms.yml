@@ -1,0 +1,114 @@
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: plant count
+      field: details.plant_count
+      widget: select
+      choices: nfdcore.models.PlantCount
+    - label: area ranges
+      field: details.area_ranges
+    - label: moisture regime
+      field: details.moisture_regime
+      widget: select_multiple
+      choices: nfdcore.models.MoistureRegime
+    - label: ground surface
+      field: details.ground_surface
+      widget: select_multiple
+      choices: nfdcore.models.GroundSurface
+    - label: tree canopy cover
+      field: details.tree_canopy_cover
+      widget: select
+      choices: nfdcore.models.CanopyCover
+    - label: general habitat category
+      field: details.general_habitat_category
+      widget: select_multiple
+      choices: nfdcore.models.GeneralHabitatCategory
+    - label: leap landcover category
+      field: details.leap_land_cover_category
+    - label: landscape position
+      field: details.landscape_position
+      widget: select_multiple
+      choices: nfdcore.models.LandscapePosition
+    - label: aspect
+      field: details.aspect
+      widget: select_multiple
+      choices: nfdcore.models.Aspect
+    - label: slope
+      field: details.slope
+      widget: select_multiple
+      choices: nfdcore.models.Slope
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  fields:
+    - label: vegetative
+      field: details.lifestages.vegetative
+      widget: double
+    - label: immature ovulate cones
+      field: details.lifestages.immature_ovulate_cones
+      widget: double
+    - label: mature ovulate cones
+      field: details.lifestages.mature_ovulate_cones
+      widget: double
+    - label: spent ovulate cones
+      field: details.lifestages.spent_ovulate_cones
+      widget: double
+    - label: immature pollen cones
+      field: details.lifestages.immature_pollen_cones
+      widget: double
+    - label: mature pollen cones
+      field: details.lifestages.mature_pollen_cones
+      widget: double
+    - label: spent pollen cones
+      field: details.lifestages.spent_pollen_cones
+      widget: double
+    - label: Notes
+      field: notes.note.lifestages
+      widget: textarea
+
+- id: details.earthworm_evidence
+  label: Earthworm evidence
+  common: earthworm_evidence
+
+- id: details.disturbance_type
+  label: Disturbance type
+  common: disturbance_type
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

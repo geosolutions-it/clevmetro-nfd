@@ -1,0 +1,131 @@
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: Gender
+      field: details.gender
+      widget: select_multiple
+      choices: nfdcore.models.Gender
+    - label: Marks
+      field: details.marks
+      widget: select_multiple
+      choices: nfdcore.models.Marks
+    - label: Diseases and abnormalities
+      field: details.diseases_and_abnormalities
+      widget: select_multiple
+      choices: nfdcore.models.DiseasesAndAbnormalities
+    - label: sampler
+      field: details.sampler
+      widget: select_multiple
+      choices: nfdcore.models.AquaticSampler
+    - label: stream name 1
+      field: details.stream_name_1
+    - label: stream name 2
+      field: details.stream_name_2
+    - label: PEMSO code
+      field: details.pemso_code
+    - label: designated use
+      field: details.designated_use
+      widget: select
+      choices: nfdcore.models.StreamDesignatedUse
+    - label: channel type
+      field: details.channel_type
+      widget: select_multiple
+      choices: nfdcore.models.ChannelType
+    - label: HMFEI local abundance
+      field: details.hmfei_local_abundance
+      widget: select_multiple
+      choices: nfdcore.models.HmfeiLocalAbundance
+    - label: lotic habitat type
+      field: details.lotic_habitat_type
+      widget: select_multiple
+      choices: nfdcore.models.LoticHabitatType
+    - label: water flow type
+      field: details.water_flow_type
+      widget: select
+      choices: nfdcore.models.WaterFlowType
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  common: animal_lifestages
+
+- id: details.substrate
+  label: Substrate
+  fields:
+    - label: artificial
+      field: details.substrate.artificial
+      widget: double
+    - label: bedrock
+      field: details.substrate.bedrock
+      widget: double
+    - label: boulder
+      field: details.substrate.boulder
+      widget: double
+    - label: boulder slab
+      field: details.substrate.boulder_slab
+      widget: double
+    - label: clay hardpan
+      field: details.substrate.clay_hardpan
+      widget: double
+    - label: cobble
+      field: details.substrate.cobble
+      widget: double
+    - label: fine detritus
+      field: details.substrate.fine_detritus
+      widget: double
+    - label: gravel
+      field: details.substrate.gravel
+      widget: double
+    - label: leafpack woody debris
+      field: details.substrate.leafpack_woody_debris
+      widget: double
+    - label: muck
+      field: details.substrate.muck
+      widget: double
+    - label: sand
+      field: details.substrate.sand
+      widget: double
+    - label: silt
+      field: details.substrate.silt
+      widget: double
+    - label: Notes
+      field: notes.note.substrate
+      widget: textarea
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

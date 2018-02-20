@@ -1,0 +1,124 @@
+- id: species
+  label: Features
+  common: species
+
+- id: element_species
+  label: Element Species
+  common: element_species
+
+- id: observation
+  label: Observation
+  common: observation
+
+- id: observation.reporter
+  label: Observer
+  common: reporter
+
+- id: observation.verifier
+  label: Observation Verifier
+  common: verifier
+
+- id: observation.recorder
+  label: Observation Recorder
+  common: recorder
+
+- id: voucher
+  label: Voucher
+  common: voucher
+
+- id: details
+  label: Details
+  fields:
+    - label: Gender
+      field: details.gender
+      widget: select_multiple
+      choices: nfdcore.models.Gender
+    - label: Marks
+      field: details.marks
+      widget: select_multiple
+      choices: nfdcore.models.Marks
+    - label: Diseases and abnormalities
+      field: details.diseases_and_abnormalities
+      widget: select_multiple
+      choices: nfdcore.models.DiseasesAndAbnormalities
+    - label: sampler
+      field: details.sampler
+      widget: select_multiple
+      choices: nfdcore.models.AquaticSampler
+    - label: lentic size approx (acres)
+      field: details.lentic_size_acres_aprox
+      widget: integer
+    - label: lentic size approx (square meters)
+      field: details.lentic_size_squaremeters
+      widget: integer
+    - label: lentic size exact (acres)
+      field: details.lentic_size_acres_exact
+      widget: double
+    - label: lentic size exact (squaremeters)
+      field: details.lentic_size_squaremeters_exact
+      widget: double
+    - label: wetland name
+      field: details.wetland_name
+    - label: wetland type
+      field: details.wetland_type
+      widget: select
+      choices: nfdcore.models.WetlandType
+    - label: active management
+      field: details.active_management
+      widget: boolean
+    - label: wetland location
+      field: details.wetland_location
+      widget: select
+      choices: nfdcore.models.WetlandLocation
+    - label: connectivity
+      field: details.connectivity
+      widget: select
+      choices: nfdcore.models.WetlandConnectivity
+    - label: water source
+      field: details.water_source
+      widget: select_multiple
+      choices: nfdcore.models.WaterSource
+    - label: habitat feature
+      field: details.habitat_feature
+      widget: select_multiple
+      choices: nfdcore.models.WetlandHabitatFeature
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  common: animal_lifestages
+
+- id: details.vegetation
+  label: Vegetation
+  fields:
+    - label: buttonbush
+      field: details.vegetation.buttonbush
+      widget: double
+    - label: cattail
+      field: details.vegetation.cattail
+      widget: double
+    - label: ferns
+      field: details.vegetation.ferns
+      widget: double
+    - label: forbs
+      field: details.vegetation.forbs
+      widget: double
+    - label: phragmites
+      field: details.vegetation.phragmites
+      widget: double
+    - label: sedges
+      field: details.vegetation.sedges
+      widget: double
+    - label: Notes
+      field: notes.note.vegetation
+      widget: textarea
+
+- id: location
+  label: Location
+  common: location
+
+- id: management
+  label: Management
+  common: management

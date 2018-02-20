@@ -11,6 +11,7 @@ from .settings import APP_NAME
 router = DefaultRouter()
 router.register('images', views.PhotoViewSet, 'images')
 router.register('stats', views.OccurrenceAggregatorViewSet, "stats")
+router.register('featuretypes', views.FeatureTypeFormViewSet, "featuretypes")
 
 urlpatterns = [
     url(r'^'+APP_NAME+r'api-token-auth/', obtain_jwt_token),
@@ -40,9 +41,6 @@ urlpatterns = [
 
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', views.LayerDetail.as_view()),
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/version/([0-9]+)/$', views.LayerVersionDetail.as_view()),
-
-    url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/([0-9]+)/$', views.get_feature_type),
-    url(r'^'+APP_NAME+r'featuretypes/([a-z]+)/$', views.get_feature_type),
     url(r'^'+APP_NAME+r'species/$', views.SpeciesSearch.as_view()),
     url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', views.SpeciesDetail.as_view()),
     url(r'^'+APP_NAME, include(router.urls)),
