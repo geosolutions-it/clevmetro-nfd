@@ -124,9 +124,6 @@ element_species:
     - label: EPA numeric code
       field: species.element_species.epa_numeric_code
       readonly: true
-    - label: Mushroom group
-      field: species.element_species.mushroom_group
-      readonly: true
     - label: Notes
       field: notes.note.element_species
       widget: textarea

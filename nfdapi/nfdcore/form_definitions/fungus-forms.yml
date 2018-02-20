@@ -56,6 +56,10 @@
       field: details.apparent_substrate
       widget: stringcombo_multiple
       choices: nfdcore.models.FungusApparentSubstrate
+    - label: Mushroom group
+      field: details.mushroom_group
+      widget: stringcombo
+      choices: nfdcore.models.MushroomGroup
     - label: mushroom vertical location
       field: details.mushroom_vertical_location
       widget: stringcombo_multiple
