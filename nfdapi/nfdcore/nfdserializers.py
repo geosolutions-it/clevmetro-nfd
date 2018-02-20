@@ -1750,7 +1750,7 @@ def get_field_representation(field_definition):
         "mandatory": field_definition.get("mandatory", False),
         "readonly": field_definition.get("readonly", False),
     }
-    if field["type"] in ("select", "select_multiple"):
+    if field["type"] in ("stringcombo", "stringcombo_multiple"):
         choices_dict_model_path = field_definition.get("choices")
         field["values"] = {"items": []}
         if choices_dict_model_path is not None:

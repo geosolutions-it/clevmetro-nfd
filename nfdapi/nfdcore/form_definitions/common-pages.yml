@@ -136,20 +136,17 @@ observation:
     - label: Observation date
       field: observation.observation_date
       widget: date
-    - label: Recording datetime
-      field: observation.recording_datetime
-      widget: datetime
     - label: Daytime
       field: observation.daytime
-      widget: select
+      widget: stringcombo
       choices: nfdcore.models.DayTime
     - label: Season
       field: observation.season
-      widget: select
+      widget: stringcombo
       choices: nfdcore.models.Season
     - label: Record origin
       field: observation.record_origin
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.RecordOrigin
     - label: Notes
       field: notes.note.observation
@@ -208,6 +205,12 @@ recorder:
       field: observation.recorder.email
     - label: Street address
       field: observation.recorder.street_address
+    - label: Recording datetime
+      field: observation.recording_datetime
+      widget: date
+    - label: Recording station
+      field: observation.recording_station
+      widget: textarea
     - label: Notes
       field: notes.note.recorder
       widget: textarea
@@ -228,11 +231,11 @@ voucher:
       widget: boolean
     - label: Preservative
       field: voucher.preservative
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Preservative
     - label: Storage
       field: voucher.storage
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Storage
     - label: Repository
       field: voucher.repository
@@ -314,11 +317,11 @@ location:
       field: location.site_description
     - label: reservation
       field: location.reservation
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Reservation
     - label: watershed
       field: location.watershed
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.Watershed
     - label: directions
       field: location.directions

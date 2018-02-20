@@ -31,11 +31,11 @@
   fields:
     - label: slime mold class
       field: details.slime_mold_class
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.SlimeMoldClass
     - label: slime mold media
       field: details.slime_mold_media
-      widget: select_multiple
+      widget: stringcombo_multiple
       choices: nfdcore.models.SlimeMoldMedia
     - label: Notes
       field: notes.note.details
