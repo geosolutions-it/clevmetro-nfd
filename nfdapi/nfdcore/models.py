@@ -445,7 +445,6 @@ class ElementSpecies(Element):
     nrcs_usda_symbol = models.TextField(blank=True, null=True, default='')
     synonym_nrcs_usda_symbol = models.TextField(blank=True, null=True, default='')
     epa_numeric_code = models.TextField(blank=True, null=True, default='')
-    mushroom_group = models.ForeignKey(MushroomGroup, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 @reversion.register()
@@ -967,22 +966,82 @@ class ObservedAssociations(models.Model):
 @reversion.register(follow=['taxondetails_ptr'])
 class FungusDetails(TaxonDetails):
     visible_mycelium = models.NullBooleanField(default=False)
-    areal_extent = models.TextField(blank=True, null=True, default='') #FIXME
-    mycelium_description = models.TextField(blank=True, null=True, default='') #FIXME
-    canopy_cover = models.ForeignKey(CanopyCover, on_delete=models.SET_NULL, blank=True, null=True)
-    aspect = JSONField(blank=True, null=True)
-    slope = JSONField(blank=True, null=True)
-    landscape_position = JSONField(blank=True, null=True)
-    disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, blank=True, null=True)
-    earthworm_evidence = models.ForeignKey(EarthwormEvidence, on_delete=models.CASCADE, blank=True, null=True)
+    areal_extent = models.TextField(
+        blank=True,
+        null=True,
+        default=''
+    )  # FIXME
+    mycelium_description = models.TextField(
+        blank=True,
+        null=True,
+        default=''
+    )  # FIXME
+    canopy_cover = models.ForeignKey(
+        CanopyCover,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    aspect = JSONField(
+        blank=True,
+        null=True
+    )
+    slope = JSONField(
+        blank=True,
+        null=True
+    )
+    landscape_position = JSONField(
+        blank=True,
+        null=True
+    )
+    disturbance_type = models.ForeignKey(
+        DisturbanceType,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    earthworm_evidence = models.ForeignKey(
+        EarthwormEvidence,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
     #spore_print boolean, # flag for associated photos
-    apparent_substrate = JSONField(blank=True, null=True)
+    apparent_substrate = JSONField(
+        blank=True,
+        null=True
+    )
     #potential_plant_hosts character varying, # invasive plants # FIXME
-    other_observed_associations = models.ForeignKey(ObservedAssociations, on_delete=models.CASCADE, blank=True, null=True)
-    mushroom_vertical_location = JSONField(blank=True, null=True)
-    fruiting_bodies_age = models.ForeignKey(FruitingBodiesAge, on_delete=models.CASCADE, blank=True, null=True)
-    mushroom_growth_form = JSONField(blank=True, null=True)
-    mushroom_odor = JSONField(blank=True, null=True)
+    other_observed_associations = models.ForeignKey(
+        ObservedAssociations,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    mushroom_vertical_location = JSONField(
+        blank=True,
+        null=True
+    )
+    fruiting_bodies_age = models.ForeignKey(
+        FruitingBodiesAge,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    mushroom_growth_form = JSONField(
+        blank=True,
+        null=True
+    )
+    mushroom_odor = JSONField(
+        blank=True,
+        null=True
+    )
+    mushroom_group = models.ForeignKey(
+        MushroomGroup,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
 
 
 class CMSensitivity(DictionaryTable):
