@@ -67,10 +67,6 @@
       field: details.gender
       widget: stringcombo_multiple
       choices: nfdcore.models.Gender
-    - label: Marks
-      field: details.marks
-      widget: stringcombo_multiple
-      choices: nfdcore.models.Marks
     - label: Diseases and abnormalities
       field: details.diseases_and_abnormalities
       widget: stringcombo_multiple
@@ -94,6 +90,11 @@
 - id: location
   label: Location
   common: location
+  fields:
+    - label: Marks
+      field: details.marks
+      widget: stringcombo_multiple
+      choices: nfdcore.models.Marks
 
 - id: management
   label: Management
