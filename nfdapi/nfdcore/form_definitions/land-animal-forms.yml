@@ -75,10 +75,6 @@
       field: details.diseases_and_abnormalities
       widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
-    - label: Sampler
-      field: details.sampler
-      widget: stringcombo_multiple
-      choices: nfdcore.models.TerrestrialSampler
     - label: Stratum
       field: details.stratum
       widget: stringcombo_multiple
@@ -86,6 +82,10 @@
     - label: Notes
       field: notes.note.details
       widget: textarea
+    - label: Sampler
+      field: details.sampler
+      widget: stringcombo_multiple
+      choices: nfdcore.models.TerrestrialSampler
 
 - id: details.lifestages
   label: Lifestages
