@@ -59,11 +59,37 @@
 - id: voucher
   label: Voucher
   fields:
+    - label: Voucher number
+      field: voucher.voucher_number
+      widget: integer
+    - label: Specimen collected
+      field: voucher.specimen_collected
+      widget: boolean
+    - label: Parts collected
+      field: voucher.parts_collected
+      widget: boolean
+    - label: Specimen number
+      field: voucher.specimen_number
+      widget: boolean
+    - label: Preservative
+      field: voucher.preservative
+      widget: stringcombo_multiple
+      choices: nfdcore.models.Preservative
+    - label: Storage
+      field: voucher.storage
+      widget: stringcombo_multiple
+      choices: nfdcore.models.Storage
+    - label: Repository
+      field: voucher.repository
+      widget: string
+      choices: nfdcore.models.Repository
+    - label: Notes
+      field: notes.note.voucher
+      widget: textarea
     - label: Marks
       field: details.marks
       widget: stringcombo_multiple
       choices: nfdcore.models.Marks
-  common: voucher
 
 - id: details
   label: Details
