@@ -58,6 +58,11 @@
 
 - id: voucher
   label: Voucher
+  fields:
+    - label: Marks
+      field: details.marks
+      widget: stringcombo_multiple
+      choices: nfdcore.models.Marks
   common: voucher
 
 - id: details
@@ -90,11 +95,6 @@
 - id: location
   label: Location
   common: location
-  fields:
-    - label: Marks
-      field: details.marks
-      widget: stringcombo_multiple
-      choices: nfdcore.models.Marks
 
 - id: management
   label: Management
