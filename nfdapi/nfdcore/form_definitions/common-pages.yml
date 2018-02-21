@@ -1,6 +1,3 @@
-# TODO: Add a common reporter
-# TODO: Add a common verifier
-# TODO: Add a common recorder
 management:
   fields:
     - label: id
@@ -31,44 +28,6 @@ management:
       field: version_date
       widget: string
       readonly: True
-
-species:
-  fields:
-    - label: First Common
-      field: species.first_common
-      mandatory: true
-      readonly: true
-    - label: Scientific Name
-      field: species.name_sci
-      mandatory: true
-      readonly: true
-    - label: TSN
-      field: species.tsn
-      readonly: true
-    - label: Synonym
-      field: species.synonym
-      readonly: true
-    - label: Second Common
-      field: species.second_common
-      readonly: true
-    - label: Third Common
-      field: species.third_common
-      readonly: true
-    - label: Family
-      field: species.family
-      readonly: true
-    - label: Family Common
-      field: species.family_common
-      readonly: true
-    - label: Phylum
-      field: species.phylum
-      readonly: true
-    - label: Phylum Common
-      field: species.phylum_common
-      readonly: true
-    - label: Notes
-      field: notes.note.species
-      widget: textarea
 
 element_species:
   fields:
@@ -126,6 +85,364 @@ element_species:
       readonly: true
     - label: Notes
       field: notes.note.element_species
+      widget: textarea
+
+animal_taxon:
+  fields:
+    - label: TSN
+      field: taxon.tsn
+      readonly: true
+    - label: scientific name
+      field: taxon.name
+      readonly: true
+    - label: rank
+      field: taxon.rank
+      readonly: true
+    - label: common names
+      field: taxon.common_names.English
+      readonly: true
+    - label: kingdom
+      field: taxon.kingdom
+      readonly: true
+    - label: subkingdom
+      field: taxon.subkingdom
+      readonly: true
+    - label: infrakingdom
+      field: taxon.infrakingdom
+      readonly: true
+    - label: superphylum
+      field: taxon.superphylum
+      readonly: true
+    - label: phylum
+      field: taxon.phylum
+      readonly: true
+    - label: subphylum
+      field: taxon.subphylum
+      readonly: true
+    - label: infraphylum
+      field: taxon.infraphylum
+      readonly: true
+    - label: superclass
+      field: taxon.superclass
+      readonly: true
+    - label: class
+      field: taxon.class
+      readonly: true
+    - label: subclass
+      field: taxon.subclass
+      readonly: true
+    - label: infraclass
+      field: taxon.infraclass
+      readonly: true
+    - label: superorder
+      field: taxon.superorder
+      readonly: true
+    - label: order
+      field: taxon.order
+      readonly: true
+    - label: suborder
+      field: taxon.suborder
+      readonly: true
+    - label: infraorder
+      field: taxon.infraorder
+      readonly: true
+    - label: section
+      field: taxon.section
+      readonly: true
+    - label: subsection
+      field: taxon.subsection
+      readonly: true
+    - label: superfamily
+      field: taxon.superfamily
+      readonly: true
+    - label: family
+      field: taxon.family
+      readonly: true
+    - label: subfamily
+      field: taxon.subfamily
+      readonly: true
+    - label: tribe
+      field: taxon.tribe
+      readonly: true
+    - label: subtribe
+      field: taxon.subtribe
+      readonly: true
+    - label: genus
+      field: taxon.genus
+      readonly: true
+    - label: subgenus
+      field: taxon.subgenus
+      readonly: true
+    - label: species
+      field: taxon.species
+      readonly: true
+    - label: subspecies
+      field: taxon.subspecies
+      readonly: true
+    - label: variety
+      field: taxon.variety
+      readonly: true
+    - label: form
+      field: taxon.form
+      readonly: true
+    - label: race
+      field: taxon.race
+      readonly: true
+    - label: stirp
+      field: taxon.stirp
+      readonly: true
+    - label: morph
+      field: taxon.morph
+      readonly: true
+    - label: aberration
+      field: taxon.aberration
+      readonly: true
+    - label: Notes
+      field: notes.note.taxon
+      widget: textarea
+
+plant_taxon:
+  fields:
+    - label: TSN
+      field: taxon.tsn
+      readonly: true
+    - label: scientific name
+      field: taxon.name
+      readonly: true
+    - label: rank
+      field: taxon.rank
+      readonly: true
+    - label: common names
+      field: taxon.common_names.English
+      readonly: true
+    - label: kingdom
+      field: taxon.kingdom
+      readonly: true
+    - label: subkingdom
+      field: taxon.subkingdom
+      readonly: true
+    - label: infrakingdom
+      field: taxon.infrakingdom
+      readonly: true
+    - label: superdivision
+      field: taxon.superdivision
+      readonly: true
+    - label: division
+      field: taxon.division
+      readonly: true
+    - label: subdivision
+      field: taxon.subdivision
+      readonly: true
+    - label: infradivision
+      field: taxon.infradivision
+      readonly: true
+    - label: superclass
+      field: taxon.superclass
+      readonly: true
+    - label: class
+      field: taxon.class
+      readonly: true
+    - label: subclass
+      field: taxon.subclass
+      readonly: true
+    - label: infraclass
+      field: taxon.infraclass
+      readonly: true
+    - label: superorder
+      field: taxon.superorder
+      readonly: true
+    - label: order
+      field: taxon.order
+      readonly: true
+    - label: suborder
+      field: taxon.suborder
+      readonly: true
+    - label: family
+      field: taxon.family
+      readonly: true
+    - label: subfamily
+      field: taxon.subfamily
+      readonly: true
+    - label: tribe
+      field: taxon.tribe
+      readonly: true
+    - label: subtribe
+      field: taxon.subtribe
+      readonly: true
+    - label: genus
+      field: taxon.genus
+      readonly: true
+    - label: subgenus
+      field: taxon.subgenus
+      readonly: true
+    - label: section
+      field: taxon.section
+      readonly: true
+    - label: subsection
+      field: taxon.subsection
+      readonly: true
+    - label: species
+      field: taxon.species
+      readonly: true
+    - label: subspecies
+      field: taxon.subspecies
+      readonly: true
+    - label: variety
+      field: taxon.variety
+      readonly: true
+    - label: subvariety
+      field: taxon.subvariety
+      readonly: true
+    - label: form
+      field: taxon.form
+      readonly: true
+    - label: subform
+      field: taxon.subform
+      readonly: true
+    - label: Notes
+      field: notes.note.taxon
+      widget: textarea
+
+fungus_taxon:
+  fields:
+    - label: TSN
+      field: taxon.tsn
+      readonly: true
+    - label: scientific name
+      field: taxon.name
+      readonly: true
+    - label: rank
+      field: taxon.rank
+      readonly: true
+    - label: common names
+      field: taxon.common_names.English
+      readonly: true
+    - label: kingdom
+      field: taxon.kingdom
+      readonly: true
+    - label: subkingdom
+      field: taxon.subkingdom
+      readonly: true
+    - label: division
+      field: taxon.division
+      readonly: true
+    - label: subdivision
+      field: taxon.subdivision
+      readonly: true
+    - label: class
+      field: taxon.class
+      readonly: true
+    - label: subclass
+      field: taxon.subclass
+      readonly: true
+    - label: superorder
+      field: taxon.superorder
+      readonly: true
+    - label: order
+      field: taxon.order
+      readonly: true
+    - label: suborder
+      field: taxon.suborder
+      readonly: true
+    - label: family
+      field: taxon.family
+      readonly: true
+    - label: subfamily
+      field: taxon.subfamily
+      readonly: true
+    - label: tribe
+      field: taxon.tribe
+      readonly: true
+    - label: subtribe
+      field: taxon.subtribe
+      readonly: true
+    - label: genus
+      field: taxon.genus
+      readonly: true
+    - label: subgenus
+      field: taxon.subgenus
+      readonly: true
+    - label: section
+      field: taxon.section
+      readonly: true
+    - label: subsection
+      field: taxon.subsection
+      readonly: true
+    - label: species
+      field: taxon.species
+      readonly: true
+    - label: subspecies
+      field: taxon.subspecies
+      readonly: true
+    - label: variety
+      field: taxon.variety
+      readonly: true
+    - label: subvariety
+      field: taxon.subvariety
+      readonly: true
+    - label: form
+      field: taxon.form
+      readonly: true
+    - label: subform
+      field: taxon.subform
+      readonly: true
+    - label: Notes
+      field: notes.note.taxon
+      widget: textarea
+
+taxon_status:
+  fields:
+    - label: CM Status
+      field: taxon.cm_status
+      readonly: true
+    - label: S Rank
+      field: taxon.s_rank
+      readonly: true
+      show_key_with_value: true
+    - label: N Rank
+      field: taxon.n_rank
+      readonly: true
+      show_key_with_value: true
+    - label: G Rank
+      field: taxon.g_rank
+      readonly: true
+      show_key_with_value: true
+    - label: Native
+      field: taxon.native
+      widget: boolean
+      readonly: true
+    - label: OH Status
+      field: taxon.oh_status
+      readonly: true
+    - label: USFWS Status
+      field: taxon.usfws_status
+      readonly: true
+    - label: IUCN Red List Category
+      field: taxon.iucn_red_list_category
+      readonly: true
+    - label: Other code
+      field: taxon.other_code
+      readonly: true
+    - label: IBP english
+      field: taxon.ibp_english
+      readonly: true
+    - label: IBP scientific
+      field: taxon.ibp_scientific
+      readonly: true
+    - label: BBLAB number
+      field: taxon.bblab_number
+      readonly: true
+    - label: NRCS USDA symbol
+      field: taxon.nrcs_usda_symbol
+      readonly: true
+    - label: Synonym NRCS USDA symbol
+      field: taxon.synonym_nrcs_usda_symbol
+      readonly: true
+    - label: EPA numeric code
+      field: taxon.epa_numeric_code
+      readonly: true
+    - label: Notes
+      field: notes.note.taxon_status
       widget: textarea
 
 observation:
@@ -244,69 +561,10 @@ voucher:
 
 animal_lifestages:
   fields:
-    - label: egg
-      field: lifestages.egg
-      widget: double
-    - label: egg mass
-      field: lifestages.egg_mass
-      widget: double
-    - label: nest
-      field: lifestages.nest
-      widget: double
-    - label: early instar larva
-      field: lifestages.early_instar_larva
-      widget: double
-    - label: larva
-      field: lifestages.larva
-      widget: double
-    - label: late instar larva
-      field: lifestages.late_instar_larva
-      widget: double
-    - label: early instar nymph
-      field: lifestages.early_instar_nymph
-      widget: double
-    - label: nymph
-      field: lifestages.nymph
-      widget: double
-    - label: late instar nymph
-      field: lifestages.late_instar_nymph
-      widget: double
-    - label: early pupa
-      field: lifestages.early_pupa
-      widget: double
-    - label: pupa
-      field: lifestages.pupa
-      widget: double
-    - label: late pupa
-      field: lifestages.late_pupa
-      widget: double
-    - label: juvenile
-      field: lifestages.juvenile
-      widget: double
-    - label: immature
-      field: lifestages.immature
-      widget: double
-    - label: subadult
-      field: lifestages.subadult
-      widget: double
-    - label: adult
-      field: lifestages.adult
-      widget: double
-    - label: adult pregnant or young
-      field: lifestages.adult_pregnant_or_young
-      widget: double
-    - label: senescent
-      field: lifestages.senescent
-      widget: double
-    - label: unknown
-      field: lifestages.unknown
-      widget: double
-    - label: not available
-      field: lifestages.na
-      widget: double
-    - label: Notes
-      field: notes.note.lifestages
-      widget: textarea
+    - label: lifestages
+      field: lifestages
+      widget: stringcombo_multiple
+      choices: nfdcore.models.AnimalLifestages
 
 location:
   fields:

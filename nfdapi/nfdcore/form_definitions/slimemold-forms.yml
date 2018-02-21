@@ -1,10 +1,10 @@
 - id: species
-  label: Element
-  common: species
+  label: Features
+  common: fungus_taxon
 
-- id: element_species
-  label: Element Status
-  common: element_species
+- id: taxon_status
+  label: Element status
+  common: taxon_status
 
 - id: observation
   label: Observation

@@ -39,14 +39,13 @@ from nfdrenderers import csv as csvrenderers
 from nfdrenderers import xlsx as xlsrenderers
 from nfdrenderers import shp as shprenderers
 
+from . import itis
 from . import models
 from .models import (
     get_occurrence_model,
-    OccurrenceCategory,
     OccurrenceNaturalArea,
     OccurrenceTaxon,
     Photograph,
-    Species,
 )
 from . import nfdserializers
 from .permissions import (
@@ -84,7 +83,7 @@ class TaxonomyFilterer(object):
     def __init__(self, year=None, released=None,
                  daytime=None, season=None, location=None,
                  reporter=None, category=None, subcategory=None, phylum=None,
-                 family=None, species=None, aggregate_by=None,
+                 family=None, taxon=None, aggregate_by=None,
                  split_by_month=False, include_subcategories=False):
         geom_location = self._get_geom(location) if location else None
         year = int(year) if year is not None else None
@@ -106,11 +105,11 @@ class TaxonomyFilterer(object):
             FilterField("subcategory", subcategory,
                         "occurrence_cat__name"),
             FilterField("phylum", phylum,
-                        "species__phylum"),
+                        "taxon__phylum"),
             FilterField("family", family,
-                        "species__family"),
-            FilterField("species", species,
-                        "species__name_sci"),
+                        "taxon__family"),
+            FilterField("taxon", taxon,
+                        "taxon__name"),
         ]
         self.split_by_month = split_by_month
         self.include_subcategories = include_subcategories
@@ -130,8 +129,8 @@ class TaxonomyFilterer(object):
             subcategory=query_params.get("subcategory"),
             phylum=query_params.get("phylum"),
             family=query_params.get("family"),
-            species=query_params.get("species"),
-            aggregate_by=query_params.get("aggregate_by", "species"),
+            taxon=query_params.get("taxon"),
+            aggregate_by=query_params.get("aggregate_by", "taxon"),
             split_by_month=query_params.get("split_by_month"),
             include_subcategories=query_params.get(
                 "include_subcategories", False),
@@ -187,24 +186,31 @@ class TaxonomyFilterer(object):
         elif self.aggregate_by == "phylum":
             parameters = [
                 "occurrence_cat__main_cat",
-                "species__phylum",
+                "taxon__phylum",
             ]
         elif self.aggregate_by == "family":
             parameters = [
                 "occurrence_cat__main_cat",
-                "species__phylum",
-                "species__family",
+                "taxon__phylum",
+                "taxon__family",
             ]
         else:
             parameters = [
                 "occurrence_cat__main_cat",
-                "species__phylum",
-                "species__family",
-                "species__name_sci",
+                "taxon__phylum",
+                "taxon__family",
+                "taxon__name_sci",
             ]
         if self.include_subcategories and self.aggregate_by != "category":
             parameters.append("occurrence_cat__name")
         return parameters
+
+
+FeatureTypeFormCategory = namedtuple("FeatureTypeFormCategory", [
+    "subtype",
+    "is_writer",
+    "is_publisher",
+])
 
 
 class FeatureTypeFormViewSet(viewsets.ViewSet):
@@ -215,99 +221,168 @@ class FeatureTypeFormViewSet(viewsets.ViewSet):
     )
     serializer_class = nfdserializers.FormDefinitionsSerializer
 
-    # This attribute exists in order to satisfy django_rest_framework's
-    # requirement of needing to pass something as the ``instance`` argument
-    # when creating a serializer, in order for it to allow accessing its
-    # ``data`` property later on
-    SOMETHING = "just something other than None"
-
     @list_route()
     def ln(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "animal")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "ln"}
-        )
+            FeatureTypeFormCategory("ln", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def st(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "animal")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "st"}
-        )
+            FeatureTypeFormCategory("st", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def lk(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "animal")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "lk"}
-        )
+            FeatureTypeFormCategory("lk", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def we(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "animal")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "we"}
-        )
+            FeatureTypeFormCategory("we", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def sl(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "slimemold")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "sl"}
-        )
+            FeatureTypeFormCategory("sl", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def co(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "plant")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "co",}
-        )
+            FeatureTypeFormCategory("co", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def fe(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "plant")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "fe"}
-        )
+            FeatureTypeFormCategory("fe", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def fl(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "plant")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "fl"}
-        )
+            FeatureTypeFormCategory("fl", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def mo(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "plant")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "mo"}
-        )
+            FeatureTypeFormCategory("mo", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def fu(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "fungus")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "fu"}
-        )
+            FeatureTypeFormCategory("fu", is_writer, is_publisher))
         return Response(serializer.data)
 
     @list_route()
     def na(self, request):
+        is_writer, is_publisher = get_permissions(request.user, "naturalarea")
         serializer = self.serializer_class(
-            instance=self.SOMETHING,
-            context={"subtype": "na"}
-        )
+            FeatureTypeFormCategory("na", is_writer, is_publisher))
         return Response(serializer.data)
+
+
+class ItisBackedSearchViewSet(viewsets.ViewSet):
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    renderer_classes = (
+        JSONRenderer,
+        BrowsableAPIRenderer,
+    )
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            result = nfdserializers.ItisTaxonSearchSerializer
+        elif self.action == "retrieve":
+            result = nfdserializers.ItisTaxonHierarchySerializer
+        else:
+            raise RuntimeError("Invalid action")
+        return result
+
+    def list(self, request):
+        """Search for taxa on the ITIS database"""
+        kingdoms = request.query_params.get(
+            "kingdoms",
+            "Animalia,Plantae,Fungi"
+        ).split(",")
+        search_results = itis.search_taxon(
+            request.query_params.get("search", ""),
+            kingdoms,
+            page_size=20,
+        )
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(search_results, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        """
+        Retrieve a taxon
+
+        If we have a ``models.Taxon`` instance in the DB, return it.
+        Otherwise search for the taxon details in ITIS DB, generate an
+        in-memory ``models.Taxon`` instance and return that.
+
+        """
+
+        if pk is not None:
+            try:
+                taxon_instance = models.Taxon.objects.get(pk=pk)
+                serializer_class = nfdserializers.TaxonDetailSerializer
+            except models.Taxon.DoesNotExist:
+                taxon_instance = models.Taxon(tsn=pk)
+                taxon_instance.populate_attributes_from_itis()
+                serializer_class = self.get_serializer_class()
+            serializer = serializer_class(taxon_instance)
+            namespaced = {
+                "taxon.{}".format(k): v for k, v in serializer.data.items()}
+            result = Response(namespaced)
+        else:
+            result = Response({
+                _("error"): _("Could not find taxon identifier")
+            })
+        return result
+
+
+class TaxonViewSet(viewsets.ReadOnlyModelViewSet):
+
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+    renderer_classes = (
+        JSONRenderer,
+        BrowsableAPIRenderer,
+    )
+
+    queryset = models.Taxon.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            result = nfdserializers.TaxonListSerializer
+        elif self.action == "retrieve":
+            result = nfdserializers.TaxonDetailSerializer
+        else:
+            raise RuntimeError("Invalid action")
+        return result
 
 
 class OccurrenceAggregatorViewSet(viewsets.ViewSet):
@@ -424,8 +499,15 @@ class NfdLayer(ListCreateAPIView):
         if self.request.method == 'POST':
             if data is not empty:
                 serializer_class = self.get_post_serializer_class()
-                return serializer_class(data=data, is_writer=is_writer,
-                                        is_publisher=is_publisher)
+                request_data = data.copy()
+                tsn = request_data.pop("taxon.tsn", None)
+                context = {"tsn": tsn,} if tsn is not None else {}
+                return serializer_class(
+                    data=request_data,
+                    is_writer=is_writer,
+                    is_publisher=is_publisher,
+                    context=context
+                )
             else:
                 is_writer_or_publisher = (is_writer or is_publisher)
                 return nfdserializers.LayerSerializer(
@@ -467,7 +549,7 @@ class TaxonFilter(FilterSet):
 
     class Meta:
         model = OccurrenceTaxon
-        fields = ['released', 'verified', 'species']
+        fields = ['released', 'verified', 'taxon']
 
 
 class NaturalAreaFilter(FilterSet):
@@ -608,46 +690,46 @@ class NfdList(ListAPIView):
                                 is_writer_or_publisher=is_writer_or_publisher)
 
 
-class TaxonList(NfdList):
+class OccurrenceTaxonList(NfdList):
     filter_class = TaxonFilter
 
     def get_serializer_class(self):
-        return nfdserializers.TaxonListSerializer
+        return nfdserializers.TaxonOccurrenceListSerializer
 
     def get_base_queryset(self):
         return OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
 
-class PlantList(TaxonList):
+class OccurrencePlantList(OccurrenceTaxonList):
     permission_classes = [IsAuthenticated, CanCreatePlants]
 
     def get_main_cat(self):
         return "plant"
 
 
-class AnimalList(TaxonList):
+class OccurrenceAnimalList(OccurrenceTaxonList):
     # permission_classes = [IsAuthenticated, CanCreateAnimals]
 
     def get_main_cat(self):
         return "animal"
 
 
-class FungusList(TaxonList):
+class OccurrenceFungusList(OccurrenceTaxonList):
     permission_classes = [IsAuthenticated, CanCreateFungus]
 
     def get_main_cat(self):
         return "fungus"
 
 
-class SlimeMoldList(TaxonList):
+class OccurrenceSlimeMoldList(OccurrenceTaxonList):
     permission_classes = [IsAuthenticated, CanCreateSlimeMold]
 
     def get_main_cat(self):
         return "slimemold"
 
 
-class NaturalAreaList(NfdList):
+class OccurrenceNaturalAreaList(NfdList):
     permission_classes = [IsAuthenticated, CanCreateNaturalAreas]
     filter_class = NaturalAreaFilter
 
@@ -655,7 +737,7 @@ class NaturalAreaList(NfdList):
         return OccurrenceNaturalArea.objects.all()
 
     def get_serializer_class(self):
-        return nfdserializers.NaturalAreaListSerializer
+        return nfdserializers.NaturalAreaOccurrenceListSerializer
 
     def get_main_cat(self):
         return "naturalarea"
@@ -711,9 +793,14 @@ class LayerDetail(APIView):
                 is_publisher=is_publisher
             )
         else:
+            request_data = request.data.copy()
+            tsn = request_data.pop("taxon.tsn")
             serializer = nfdserializers.TaxonOccurrenceSerializer(
-                feature, data=request.data, is_writer=is_writer,
-                is_publisher=is_publisher
+                feature,
+                data=request.data,
+                is_writer=is_writer,
+                is_publisher=is_publisher,
+                context={"tsn": tsn}
             )
         if serializer.is_valid():
             serializer.save()
@@ -764,68 +851,3 @@ class PhotoViewSet(ModelViewSet):
     serializer_class = nfdserializers.PhotographPublishSerializer
     parser_classes = (MultiPartParser, FormParser,)
     queryset = Photograph.objects.all()
-
-
-class SpeciesPaginationClass(PageNumberPagination):
-    page_size = 100
-
-    def get_paginated_response(self, data):
-        return Response(data)
-
-
-class SpeciesSearch(ListAPIView):
-    queryset = Species.objects.all()
-    serializer_class = nfdserializers.SpeciesSearchSerializer
-    filter_backends = (SearchFilter,)
-    # filter_class = SpeciesFilter
-    pagination_class = SpeciesPaginationClass
-    search_fields = (
-        'first_common',
-        'name_sci',
-        'second_common',
-        'third_common',
-        'synonym',
-    )
-
-    def get_queryset(self):
-        queryset = Species.objects.all()
-
-        request = self.request
-        if request and request.query_params:
-            try:
-                search_params = request.query_params.getlist('search')
-                for filter_param in search_params:
-                    queryset = queryset.filter(
-                        Q(first_common__icontains=filter_param) |
-                        Q(second_common__icontains=filter_param) |
-                        Q(third_common__icontains=filter_param) |
-                        Q(name_sci__icontains=filter_param) |
-                        Q(synonym__icontains=filter_param) |
-                        # startswith
-                        Q(first_common__startswith=filter_param) |
-                        Q(second_common__startswith=filter_param) |
-                        Q(third_common__startswith=filter_param) |
-                        Q(name_sci__startswith=filter_param) |
-                        Q(synonym__startswith=filter_param) |
-                        # endswith
-                        Q(first_common__endswith=filter_param) |
-                        Q(second_common__endswith=filter_param) |
-                        Q(third_common__endswith=filter_param) |
-                        Q(name_sci__endswith=filter_param) |
-                        Q(synonym__endswith=filter_param)
-                        )
-            except:
-                traceback.print_exc()
-
-        return queryset.order_by('first_common')
-
-class SpeciesDetail(RetrieveAPIView):
-    queryset = Species.objects.all()
-    serializer_class = nfdserializers.SpeciesSearchResultSerializer
-    search_fields = (
-        'first_common',
-        'name_sci',
-        'second_common',
-        'third_common',
-        'synonym',
-    )

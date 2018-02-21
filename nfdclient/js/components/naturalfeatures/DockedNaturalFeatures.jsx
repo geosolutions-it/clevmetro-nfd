@@ -373,7 +373,7 @@ const DockedNaturalFeatures = React.createClass({
     },
     _handleSpeciesChange(specie) {
         if (specie) {
-            this.props.getSpecies(specie.id);
+            this.props.getSpecies(specie.tsn);
         }
     },
     _handleSearch(query) {

@@ -9,9 +9,11 @@ from nfdcore import views
 from .settings import APP_NAME
 
 router = DefaultRouter()
-router.register('images', views.PhotoViewSet, 'images')
-router.register('stats', views.OccurrenceAggregatorViewSet, "stats")
-router.register('featuretypes', views.FeatureTypeFormViewSet, "featuretypes")
+router.register("images", views.PhotoViewSet, "images")
+router.register("stats", views.OccurrenceAggregatorViewSet, "stats")
+router.register("featuretypes", views.FeatureTypeFormViewSet, "featuretypes")
+router.register("taxon", views.TaxonViewSet, "taxon")
+router.register("taxon_search", views.ItisBackedSearchViewSet, "taxon_search")
 
 urlpatterns = [
     url(r'^'+APP_NAME+r'api-token-auth/', obtain_jwt_token),
@@ -33,15 +35,35 @@ urlpatterns = [
     url(r'^'+APP_NAME+r'layers/slimemold/$', views.SlimeMoldLayer.as_view(), name='slimemoldLayer'),
     url(r'^'+APP_NAME+r'layers/fungus/$', views.FungusLayer.as_view(), name="fungusLayer"),
 
-    url(r'^'+APP_NAME+r'list/naturalarea/$', views.NaturalAreaList.as_view(), name='naturalareaList'),
-    url(r'^'+APP_NAME+r'list/plant/$', views.PlantList.as_view(), name="plantList"),
-    url(r'^'+APP_NAME+r'list/animal/$', views.AnimalList.as_view(), name="animalList"),
-    url(r'^'+APP_NAME+r'list/slimemold/$', views.SlimeMoldList.as_view(), name='slimemoldList'),
-    url(r'^'+APP_NAME+r'list/fungus/$', views.FungusList.as_view(), name="fungusList"),
+    url(
+        r'^'+APP_NAME+r'list/naturalarea/$',
+        views.OccurrenceNaturalAreaList.as_view(),
+        name='naturalareaList'
+    ),
+    url(
+        r'^'+APP_NAME+r'list/plant/$',
+        views.OccurrencePlantList.as_view(),
+        name="plantList"
+    ),
+    url(
+        r'^'+APP_NAME+r'list/animal/$',
+        views.OccurrenceAnimalList.as_view(),
+        name="animalList"
+    ),
+    url(
+        r'^'+APP_NAME+r'list/slimemold/$',
+        views.OccurrenceSlimeMoldList.as_view(),
+        name='slimemoldList'
+    ),
+    url(
+        r'^'+APP_NAME+r'list/fungus/$',
+        views.OccurrenceFungusList.as_view(),
+        name="fungusList"
+    ),
 
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/$', views.LayerDetail.as_view()),
     url(r'^'+APP_NAME+r'layers/(plant|animal|slimemold|fungus|naturalarea)/([0-9]+)/version/([0-9]+)/$', views.LayerVersionDetail.as_view()),
-    url(r'^'+APP_NAME+r'species/$', views.SpeciesSearch.as_view()),
-    url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', views.SpeciesDetail.as_view()),
+    # url(r'^'+APP_NAME+r'species/$', views.SpeciesSearch.as_view()),
+    # url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', views.SpeciesDetail.as_view()),
     url(r'^'+APP_NAME, include(router.urls)),
 ]
