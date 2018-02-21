@@ -3,7 +3,7 @@
   common: species
 
 - id: element_species
-  label: Element Species
+  label: Element Status
   common: element_species
 
 - id: observation
