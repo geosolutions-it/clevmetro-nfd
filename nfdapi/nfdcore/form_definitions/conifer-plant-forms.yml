@@ -97,13 +97,13 @@
       field: notes.note.lifestages
       widget: textarea
 
-- id: details.earthworm_evidence
-  label: Earthworm evidence
-  common: earthworm_evidence
-
 - id: details.disturbance_type
   label: Disturbance type
   common: disturbance_type
+  
+- id: details.earthworm_evidence
+  label: Earthworm evidence
+  common: earthworm_evidence
 
 - id: location
   label: Location
