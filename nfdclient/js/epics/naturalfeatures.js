@@ -125,6 +125,10 @@ removeAddEditedFeature: (action$, store) =>
 onCancel: action$ =>
         action$.ofType(CANCEL_EDITING)
         .mapTo(endEditing()),
+        
+onToggleOrCancel: (action$, {getState}) => action$.ofType("TOGGLE_CONTROL")
+    .filter((a) => a.control === 'vieweditnaturalfeatures' && get(getState(), "naturalfeatures.mode") === "VIEW")
+    .mapTo(changeDrawingStatus("clean", null, "dockednaturalfeatures", [], {})),
 
 addNaturalFeature: (action$) =>
     action$.ofType(CREATE_NATURAL_FEATURE)
