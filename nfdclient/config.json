@@ -8,15 +8,15 @@
         "layers": [ {
                       "type": "clevmetro",
                       "title": "Metroparks Map",
-                      "name": "Map",
+                      "name": "metroparks-map",
                       "visibility": true,
                       "group": "background",
                       "maxZoom": 20,
                       "minZoom":0
                   }, {
                     "type": "clevmetro",
-                    "title": "Metroparks Arial",
-                    "name": "Arial",
+                    "title": "Metroparks Aerial",
+                    "name": "metroparks-aerial",
                     "visibility": false,
                     "group": "background",
                     "maxZoom": 20,
