@@ -1,5 +1,5 @@
 - id: species
-  label: Features
+  label: Element
   common: species
 
 - id: element_species
