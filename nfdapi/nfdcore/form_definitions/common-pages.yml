@@ -334,30 +334,6 @@ location:
       field: notes.note.details
       widget: textarea
 
-earthworm_evidence:
-  fields:
-    - label: casting piles
-      field: details.earthworm_evidence.casting_piles
-      widget: double
-    - label: compacted soil
-      field: details.earthworm_evidence.compacted_soil
-      widget: double
-    - label: individuals
-      field: details.earthworm_evidence.individuals
-      widget: double
-    - label: layered castings
-      field: details.earthworm_evidence.layered_castings
-      widget: double
-    - label: middens
-      field: details.earthworm_evidence.middens
-      widget: double
-    - label: no evidence
-      field: details.earthworm_evidence.no_evidence
-      widget: double
-    - label: Notes
-      field: notes.note.earthworm_evidence
-      widget: textarea
-
 disturbance_type:
   fields:
     - label: browse
@@ -383,4 +359,25 @@ disturbance_type:
       widget: double
     - label: Notes
       field: notes.note.disturbance_type
+      widget: textarea
+    - label: casting piles
+      field: details.earthworm_evidence.casting_piles
+      widget: double
+    - label: compacted soil
+      field: details.earthworm_evidence.compacted_soil
+      widget: double
+    - label: individuals
+      field: details.earthworm_evidence.individuals
+      widget: double
+    - label: layered castings
+      field: details.earthworm_evidence.layered_castings
+      widget: double
+    - label: middens
+      field: details.earthworm_evidence.middens
+      widget: double
+    - label: no evidence
+      field: details.earthworm_evidence.no_evidence
+      widget: double
+    - label: Notes
+      field: notes.note.earthworm_evidence
       widget: textarea
