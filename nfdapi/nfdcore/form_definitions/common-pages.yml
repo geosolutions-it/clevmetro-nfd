@@ -322,8 +322,6 @@ location:
       choices: nfdcore.models.Watershed
     - label: directions
       field: location.directions
-    - label: parcel
-      field: location.parcel
     - label: city township
       field: location.city_township
     - label: county
