@@ -1872,7 +1872,7 @@ class ItisTaxonHierarchySerializer(serializers.Serializer):
             "tsn": instance.tsn,
             "name": instance.name,
             "rank": instance.rank,
-            instance.rank: instance.name,
+            instance.rank.lower(): instance.name,
         }
         if instance.common_names is not None:
             names = (n[1] for n in instance.common_names if
