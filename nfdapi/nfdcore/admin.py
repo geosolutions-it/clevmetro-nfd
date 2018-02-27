@@ -1,79 +1,152 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
 
 from django.contrib import admin
-from nfdcore.models import *
+from django.utils.safestring import mark_safe
+from pygments import highlight
+from pygments.lexers import JsonLexer
+from pygments.formatters import HtmlFormatter
 
-# Register your models here.
-class SpeciesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_common',
-                     'name_sci',
-                     'tsn',
-                     'synonym',
-                     'second_common',
-                     'third_common'
+from . import models
+
+
+@admin.register(models.Taxon)
+class TaxonAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "rank",
+        "kingdom",
     )
-    search_fields = ['first_common',
-                     'name_sci',
-                     'tsn',
-                     'synonym',
-                     'second_common',
-                     'third_common'
-    ]
-    
-admin.site.register(Species, SpeciesAdmin)
+    readonly_fields = (
+        "name",
+        "common_names",
+        "rank",
+        "kingdom",
+        "_upper_ranks",
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                "classes": (
+                    "wide",
+                ),
+                "fields": (
+                    "tsn",
+                    "name",
+                    "common_names",
+                    "rank",
+                    "kingdom",
+                ),
+            }
+        ),
+        (
+            "Other taxonomic ranks",
+            {
+                "classes": (
+                    "collapse",
+                    "wide",
+                ),
+                "fields": (
+                    "_upper_ranks",
+                ),
+            }
+        ),
+        (
+            "Statuses",
+            {
+                "classes": (
+                    "collapse",
+                    "wide",
+                ),
+                "fields": (
+                    "cm_status",
+                    "s_rank",
+                    "n_rank",
+                    "g_rank",
+                    "oh_status",
+                    "usfws_status",
+                    "iucn_red_list_category",
+                    "other_code",
+                    "ibp_english",
+                    "ibp_scientific",
+                    "bblab_number",
+                    "nrcs_usda_symbol",
+                    "synonym_nrcs_usda_symbol",
+                    "epa_numeric_code",
+                )
+            }
+        )
+    )
 
-admin.site.register(OccurrenceCategory)
-admin.site.register(DayTime)
-admin.site.register(Season)
-admin.site.register(RecordOrigin)
-admin.site.register(RecordingStation)
-admin.site.register(CmStatus)
-admin.site.register(SRank)
-admin.site.register(NRank)
-admin.site.register(GRank)
-admin.site.register(RegionalStatus)
-admin.site.register(UsfwsStatus)
-admin.site.register(IucnRedListCategory)
-admin.site.register(ElementType)
-admin.site.register(MushroomGroup)
-admin.site.register(Preservative)
-admin.site.register(Storage)
-admin.site.register(Repository)
-admin.site.register(AquaticHabitatCategory)
-admin.site.register(Gender)
-admin.site.register(Marks)
-admin.site.register(DiseasesAndAbnormalities)
-admin.site.register(TerrestrialSampler)
-admin.site.register(AquaticSampler)
-admin.site.register(TerrestrialStratum)
-admin.site.register(PondLakeType)
-admin.site.register(PondLakeUse)
-admin.site.register(ShorelineType)
-admin.site.register(LakeMicrohabitat)
-admin.site.register(StreamDesignatedUse)
-admin.site.register(ChannelType)
-admin.site.register(HmfeiLocalAbundance)
-admin.site.register(LoticHabitatType)
-admin.site.register(WaterFlowType)
-admin.site.register(WetlandType)
-admin.site.register(WetlandLocation)
-admin.site.register(WetlandConnectivity)
-admin.site.register(WaterSource)
-admin.site.register(WetlandHabitatFeature)
-admin.site.register(SlimeMoldClass)
-admin.site.register(SlimeMoldMedia)
-admin.site.register(PlantCount)
-admin.site.register(MoistureRegime)
-admin.site.register(GroundSurface)
-admin.site.register(CanopyCover)
-admin.site.register(GeneralHabitatCategory)
-admin.site.register(LandscapePosition)
-admin.site.register(Aspect)
-admin.site.register(Slope)
+    def _upper_ranks(self, instance):
+        upper_ranks = instance.upper_ranks
+        if upper_ranks is not None:
+            result = self._get_pretty_json(upper_ranks)
+        else:
+            result = None
+        return result
+    _upper_ranks.short_description = "Upper ranks"
 
-admin.site.register(FernLifestages)
-admin.site.register(FloweringPlantLifestages)
-admin.site.register(MossLifestages)
+    def _get_pretty_json(self, data):
+        to_prettify = json.dumps(data, indent=4)
+        formatter = HtmlFormatter(style="colorful")
+        highlighted = highlight(to_prettify, JsonLexer(), formatter)
+        style = "<style>{}</style><br>".format(formatter.get_style_defs())
+        return mark_safe(style + highlighted)
+
+
+admin.site.register(models.OccurrenceCategory)
+admin.site.register(models.DayTime)
+admin.site.register(models.Season)
+admin.site.register(models.RecordOrigin)
+admin.site.register(models.RecordingStation)
+admin.site.register(models.CmStatus)
+admin.site.register(models.SRank)
+admin.site.register(models.NRank)
+admin.site.register(models.GRank)
+admin.site.register(models.RegionalStatus)
+admin.site.register(models.UsfwsStatus)
+admin.site.register(models.IucnRedListCategory)
+admin.site.register(models.ElementType)
+admin.site.register(models.MushroomGroup)
+admin.site.register(models.Preservative)
+admin.site.register(models.Storage)
+admin.site.register(models.Repository)
+admin.site.register(models.AquaticHabitatCategory)
+admin.site.register(models.Gender)
+admin.site.register(models.Marks)
+admin.site.register(models.DiseasesAndAbnormalities)
+admin.site.register(models.TerrestrialSampler)
+admin.site.register(models.AquaticSampler)
+admin.site.register(models.TerrestrialStratum)
+admin.site.register(models.PondLakeType)
+admin.site.register(models.PondLakeUse)
+admin.site.register(models.ShorelineType)
+admin.site.register(models.LakeMicrohabitat)
+admin.site.register(models.StreamDesignatedUse)
+admin.site.register(models.ChannelType)
+admin.site.register(models.HmfeiLocalAbundance)
+admin.site.register(models.LoticHabitatType)
+admin.site.register(models.WaterFlowType)
+admin.site.register(models.WetlandType)
+admin.site.register(models.WetlandLocation)
+admin.site.register(models.WetlandConnectivity)
+admin.site.register(models.WaterSource)
+admin.site.register(models.WetlandHabitatFeature)
+admin.site.register(models.SlimeMoldClass)
+admin.site.register(models.SlimeMoldMedia)
+admin.site.register(models.PlantCount)
+admin.site.register(models.MoistureRegime)
+admin.site.register(models.GroundSurface)
+admin.site.register(models.CanopyCover)
+admin.site.register(models.GeneralHabitatCategory)
+admin.site.register(models.LandscapePosition)
+admin.site.register(models.Aspect)
+admin.site.register(models.Slope)
+admin.site.register(models.FernLifestages)
+admin.site.register(models.FloweringPlantLifestages)
+admin.site.register(models.MossLifestages)
 
 

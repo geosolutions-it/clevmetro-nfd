@@ -7,17 +7,16 @@ def get_permissions(user, featuretype_name):
     Gets the permissions for the provided user and feature type.
     Returns a tuple (can_write, can_publish)
     """
-    if featuretype_name[0]=="a":
-        return (user.is_animal_writer, user.is_animal_publisher) 
-    if featuretype_name[0]=="s":
-        return (user.is_slimemold_writer, user.is_slimemold_publisher)
-    if featuretype_name[0]=="p":
-        return (user.is_plant_writer, user.is_plant_publisher)
-    if featuretype_name[0]=="f":
-        return (user.is_fungus_writer, user.is_fungus_publisher)
-    if featuretype_name[0]=="n":
-        return (user.is_naturalarea_writer, user.is_naturalarea_publisher)
-    return (False, False)
+
+    return {
+        "animal": (user.is_animal_writer, user.is_animal_publisher),
+        "slimemold": (user.is_slimemold_writer, user.is_slimemold_publisher),
+        "plant": (user.is_plant_writer, user.is_plant_publisher),
+        "fungis": (user.is_fungus_writer, user.is_fungus_publisher),
+        "naturalarea": (
+            user.is_naturalarea_writer, user.is_naturalarea_publisher),
+    }.get(featuretype_name, (False, False))
+
 
 def can_create_feature_type(user, featuretype_name):
     if featuretype_name[0]=="a":

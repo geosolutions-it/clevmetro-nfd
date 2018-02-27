@@ -26,7 +26,6 @@ from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.postgres.fields import JSONField
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -126,8 +125,6 @@ def is_deletable_field(f):
     if issubclass(f.related_model, models.DictionaryTable):
         return False
     if issubclass(f.related_model, models.DictionaryTableExtended):
-        return False
-    if issubclass(f.related_model, models.Species):
         return False
     return True
 
@@ -365,28 +362,80 @@ class VoucherSerializer(CustomModelSerializerMixin,
         exclude = ('id',)
 
 
-class ElementSpeciesSerializer(CustomModelSerializerMixin,
-                               serializers.ModelSerializer):
+# class ElementSpeciesSerializer(CustomModelSerializerMixin,
+#                                serializers.ModelSerializer):
+#     class Meta:
+#         model = models.ElementSpecies
+#         exclude = ('id',)
+
+
+class TaxonListSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
-        model = models.ElementSpecies
-        exclude = ('id',)
+        model = models.Taxon
+        fields = (
+            "url",
+            "tsn",
+            "name",
+            "rank",
+            "kingdom",
+        )
 
 
-class SpeciesSerializer(CustomModelSerializerMixin,
-                        serializers.ModelSerializer):
-    element_species = ElementSpeciesSerializer(required=False, read_only=True)
+class TaxonDetailSerializer(serializers.ModelSerializer):
 
-    def to_internal_value(self, data):
-        result = super(SpeciesSerializer, self).to_internal_value(data)
-        if data.get("id"):
-            # We need the id of the new species to set it in the occurrence
-            result['id'] = data.get('id')
+    def to_representation(self, instance):
+        """Serialize the instance
+
+        In addition to the fields defined in Meta.fields this will include
+        also the upper taxonomic ranks in a flat structure
+
+        """
+
+        result = OrderedDict()
+        for field_name in self.fields:
+            result[field_name] = getattr(instance, field_name)
+        for rank in instance.upper_ranks:
+            result[rank["rank"].lower()] = rank["name"]
+        result[instance.rank.lower()] = instance.name
         return result
 
     class Meta:
-        model = models.Species
-        fields = "__all__"
-        read_only_fields = ("name_sci", "tsn")
+        model = models.Taxon
+        fields = (
+            "tsn",
+            "name",
+            "common_names",
+            "rank",
+            "native",
+            "oh_status",
+            "usfws_status",
+            "iucn_red_list_category",
+            "other_code",
+            "ibp_english",
+            "ibp_scientific",
+            "bblab_number",
+            "nrcs_usda_symbol",
+            "synonym_nrcs_usda_symbol",
+            "epa_numeric_code",
+        )
+        read_only_fields = (
+            "tsn",
+            "name",
+            "common_names",
+            "rank",
+            "native",
+            "oh_status",
+            "usfws_status",
+            "iucn_red_list_category",
+            "other_code",
+            "ibp_english",
+            "ibp_scientific",
+            "bblab_number",
+            "nrcs_usda_symbol",
+            "synonym_nrcs_usda_symbol",
+            "epa_numeric_code",
+        )
 
 
 class PointOfContactSerializer(CustomModelSerializerMixin,
@@ -546,13 +595,6 @@ class PondLakeAnimalDetailsSerializer(CustomModelSerializerMixin,
         exclude = ('id',)
 
 
-class ConiferLifestagesSerializer(CustomModelSerializerMixin,
-                                  serializers.ModelSerializer):
-    class Meta:
-        model = models.ConiferLifestages
-        exclude = ('id',)
-
-
 class DisturbanceTypeSerializer(CustomModelSerializerMixin,
                                 serializers.ModelSerializer):
     class Meta:
@@ -567,7 +609,6 @@ class EarthwormEvidenceSerializer(CustomModelSerializerMixin,
 
 
 class ConiferDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
-    lifestages = ConiferLifestagesSerializer(required=False)
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
 
@@ -586,6 +627,10 @@ class ConiferDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer
     def validate_landscape_position(self, value):
         return validate_json_field(
             value, models.PlantDetails, "landscape_position")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(
+            value, models.ConiferDetails, "lifestages")
 
     def validate_moisture_regime(self, value):
         return validate_json_field(
@@ -985,9 +1030,12 @@ class OccurrenceSerializer(serializers.Serializer):
                         base[local_field_name] = {}
                     base = base[local_field_name]
                 # avoid overwriting new values with old empty forms
-                is_a_dict = isinstance(base.get(field_parts[-1]), dict)
-                if not (is_a_dict and data[global_field_name] is None):
-                    base[field_parts[-1]] = data[global_field_name]
+                try:
+                    is_a_dict = isinstance(base.get(field_parts[-1]), dict)
+                    if not (is_a_dict and data[global_field_name] is None):
+                        base[field_parts[-1]] = data[global_field_name]
+                except AttributeError:
+                    pass
             else:
                 # avoid overwriting new values with old empty forms
                 is_a_dict = isinstance(formvalues.get(global_field_name), dict)
@@ -1018,7 +1066,10 @@ class OccurrenceSerializer(serializers.Serializer):
         validated_formvalues = OrderedDict()
         errors = OrderedDict()
         self.featuresubtype = data.get("featuresubtype")
-        self.to_internal_value_extra(data, validated_formvalues, errors)
+        try:
+            self.to_internal_value_extra(data, validated_formvalues, errors)
+        except AttributeError:
+            pass
         fields = self._writable_fields
         # transform the flat object to a set of dictionaries of forms
         formvalues = self.to_nested_representation(data)
@@ -1034,6 +1085,9 @@ class OccurrenceSerializer(serializers.Serializer):
                 if primitive_value is not rest_fields.empty:
                     primitive_value = self._parse_notes(
                         primitive_value["note"])
+            if field.field_name == "tsn":
+                # skip validation
+                validated_value = primitive_value
             try:
                 validated_value = field.run_validation(primitive_value)
                 if validate_method is not None:
@@ -1191,17 +1245,25 @@ class OccurrenceSerializer(serializers.Serializer):
 
     def _update_related_not_dict_model(self, instance, field, validated_data,
                                        visited):
-        try:
-            sub_instance = getattr(instance, field.name)
-        except (django_models.ObjectDoesNotExist, AttributeError) as exc:
-            logger.debug("Skipping this field, could not retrieve "
-                         "sub_instance due to {}".format(exc))
-            raise RuntimeError
         if instance.__class__.__name__ == "TaxonDetails":
-            # needs special handling due to how models are setup
             sub_validated_data = validated_data
+            details_class = instance.occurrencetaxon.get_details_class()
+            try:
+                sub_instance = validated_data.get(details_class.lower())
+            except django_models.ObjectDoesNotExist:
+                if len(sub_validated_data) > 0:
+                    sub_instance = details_class()
+                    instance.details = sub_instance
         else:
             sub_validated_data = validated_data.get(field.name, {})
+            try:
+                sub_instance = getattr(instance, field.name)
+            except (django_models.ObjectDoesNotExist, AttributeError) as exc:
+                logger.debug("Skipping this field, could not retrieve "
+                             "sub_instance due to {}".format(exc))
+                raise RuntimeError
+
+
         if sub_instance is None and len(sub_validated_data) > 0:
             # there's data to add but no sub model exists, so create one
             related_name = field.related_fields[0][0].name
@@ -1277,48 +1339,51 @@ class OccurrenceSerializer(serializers.Serializer):
                     setattr(instance, field.name, new_value)
         instance.save()
 
-    def update(self, instance, validated_data):
-        with reversion.create_revision():
-            try:
-                species_validated_data = validated_data.pop("species", {})
-                species_id = species_validated_data['id']
-                selected_species = models.Species.objects.get(pk=species_id)
-                instance.species = selected_species
-            except (KeyError, models.Species.DoesNotExist):
-                if instance.occurrence_cat.main_cat != "naturalarea":
-                    raise ValidationError(
-                        {"species": [_("No species was selected")]}
-                    )
-            instance.geom = validated_data.pop("geom", None) or instance.geom
-            instance.version += 1
-            instance.verified = validated_data.pop("verified", False)
-            if self.is_publisher:
-                instance.released = validated_data.pop("released", False)
-                if instance.released:
-                    instance.released_versions += 1
-            else:
-                instance.released = False
-            fields_to_skip_update = [
-                "occurrencetaxon",
-                "occurrencenaturalarea",
-                "occurrence_cat",
-                "inclusion_date",
-                # the next fields have already been handled
-                "species",
-                "geom",
-                "version",
-                "released_versions",
-                "verified",
-                "released",
-                # the next fields are m2m relations and are handled elsewhere
-                "photographs",
-                "notes",
-            ]
-            self._update_instance(
-                instance, validated_data, visited=fields_to_skip_update)
-            self.process_photos(instance, validated_data)
-            self.process_notes(instance, validated_data.get("notes", []))
+    def _process_point_of_contact(self, name="", email="", affiliation="",
+                                  phone1="", phone2="", street_address=""):
+        return models.PointOfContact(
+            name=name,
+            email=email,
+            affiliation = affiliation,
+            phone1 = phone1,
+            phone2 = phone2,
+            street_address = street_address,
+        )
+
+    def _process_observation(self, reporter, **validated_data):
+        """Generate or update an occurrence's observation"""
+        reporter_instance = self._process_point_of_contact(**reporter)
+        reporter_instance.save()
+        observation = models.OccurrenceObservation.objects.get_or_create(
+            reporter=reporter_instance,
+        )[0]
+        reporter_instance.save()
+        verifier_data = validated_data.pop("verifier", None)
+        if verifier_data is not None:
+            verifier = self._process_point_of_contact(**verifier_data)
+            verifier.save()
+            observation.verifier = verifier
+        recorder_data = validated_data.pop("recorder", None)
+        if recorder_data is not None:
+            recorder = self._process_point_of_contact(**recorder_data)
+            recorder.save()
+            observation.recorder = recorder
+        instance, remaining_fields = _process_model_fields(
+            observation,
+            json_fields=(
+                "record_origin",
+            ),
+            dict_table_fields={
+                "daytime": models.DayTime,
+                "season": models.Season,
+            },
+            field_values=validated_data.copy()
+        )
+        instance = _process_featuretype_details(instance, **remaining_fields)
         return instance
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError
 
     def create(self, validated_data):
         code = validated_data.get('featuresubtype')
@@ -1326,10 +1391,9 @@ class OccurrenceSerializer(serializers.Serializer):
             instance = models.OccurrenceNaturalArea()
         else:
             instance = models.OccurrenceTaxon()
-        instance.occurrence_cat = models.OccurrenceCategory.objects.get(code=code)
+        instance.occurrence_cat = models.OccurrenceCategory.objects.get(
+            code=code)
         instance.geom = validated_data.get('geom')
-        # self.forms, self._form_dict = init_forms(
-        #     instance.occurrence_cat.code)
         return self.update(instance, validated_data)
 
 
@@ -1415,21 +1479,182 @@ class NaturalAreaLocationSerializer(CustomModelSerializerMixin,
 
 
 class TaxonOccurrenceSerializer(OccurrenceSerializer):
-    species = SpeciesSerializer(required=True)
+    taxon = TaxonDetailSerializer(required=True)
     voucher = VoucherSerializer(required=False)
     location = TaxonLocationSerializer(required=False)
 
-    def to_internal_value_extra(self, data, result, errors):
-        species_id = data.get('species.id')
-        if not species_id:
-            errors["species"] = [_("No species was selected")]
+    def update(self, instance, validated_data):
+        with reversion.create_revision():
+            taxon, created = models.Taxon.objects.get_or_create(
+                tsn=self.context.get("tsn"))
+            instance.taxon = taxon
+            observation_data = validated_data.pop("observation", {})
+            if len(observation_data) > 0:
+                observation = self._process_observation(
+                    reporter=observation_data.pop("reporter"),
+                    **observation_data
+                )
+                observation.save()
+                instance.observation = observation
+            details_data = validated_data.pop("details", {})
+            details_data["lifestages"] = validated_data.pop("lifestages", None)
+            if len(details_data) > 1 or details_data["lifestages"] is not None:
+                details = self._process_details(instance, details_data)
+                details.save()
+                instance.details = details
+            instance.geom = validated_data.pop("geom", None) or instance.geom
+            instance.version += 1
+            instance.verified = validated_data.pop("verified", None) or False
+            if self.is_publisher:
+                instance.released = validated_data.pop(
+                    "released", None) or False
+                if instance.released:
+                    instance.released_versions += 1
+            else:
+                instance.released = False
+            fields_to_skip_update = [
+                "occurrencetaxon",
+                "occurrencenaturalarea",
+                "occurrence_cat",
+                "inclusion_date",
+                # the next fields have already been handled
+                "details",
+                "taxon",
+                "observation",
+                "geom",
+                "version",
+                "released_versions",
+                "verified",
+                "released",
+                # the next fields are m2m relations and are handled elsewhere
+                "photographs",
+                "notes",
+            ]
+            self._update_instance(
+                instance, validated_data, visited=fields_to_skip_update)
+            self.process_photos(instance, validated_data)
+            self.process_notes(instance, validated_data.get("notes", []))
+        return instance
+
+    def _process_details(self, occurrence_instance, validated_data):
+        """Generate or update an occurrence's details"""
+        details_class = occurrence_instance.get_details_class()
+        try:
+            existent_details = getattr(
+                occurrence_instance.details, details_class.__name__.lower())
+        except (AttributeError, details_class.DoesNotExist):
+            existent_details = details_class(
+                occurrencetaxon=occurrence_instance)
+            existent_details.save()
+        details_processor = {
+            models.ConiferDetails: _process_plant_details,
+            models.FernDetails: _process_plant_details,
+            models.FloweringPlantDetails: _process_plant_details,
+            models.PondLakeAnimalDetails: _process_pond_lake_animal_details,
+            models.LandAnimalDetails: _process_land_animal_details,
+            models.MossDetails: _process_plant_details,
+            models.FungusDetails: _process_fungus_details,
+            models.SlimeMoldDetails: _process_slimemold_details,
+            models.StreamAnimalDetails: _process_stream_animal_details,
+            models.WetlandAnimalDetails: _process_wetland_animal_details,
+        }.get(details_class)
+        return details_processor(existent_details, **validated_data)
 
 
 class NaturalAreaOccurrenceSerializer(OccurrenceSerializer):
     element = NaturalAreaElementSerializer(required=False)
     location = NaturalAreaLocationSerializer(required=False)
 
-    def to_internal_value_extra(self, data, result, errors):
+    def _process_natural_area(self, **validated_data):
+        element, created = models.ElementNaturalAreas.objects.get_or_create(
+            natural_area_code_nac=validated_data.pop("natural_area_code_nac"))
+        element, remaining_fields = _process_model_fields(
+            element,
+            json_fields=(
+                "type",
+                "aspect",
+                "slop",
+                "sensitivity",
+                "condition",
+                "leap_land_cover_category",
+                "landscape_position",
+                "glaciar_diposit",
+                "pleistocene_glaciar_diposit",
+                "bedrock_and_outcrops",
+                "regional_frequency",
+            ),
+            dict_table_fields={
+                "cm_status": models.CmStatus,
+                "s_rank": models.SRank,
+                "n_rank": models.NRank,
+                "g_rank": models.GRank,
+            },
+            related_fields={
+                "disturbance_type": models.DisturbanceType,
+                "earthworm_evidence": models.EarthwormEvidence,
+            },
+            field_values=validated_data.copy()
+        )
+        _process_featuretype_details(element, **remaining_fields)
+        return element
+
+    def update(self, instance, validated_data):
+        with reversion.create_revision():
+            natural_element_data = validated_data.pop("element", {})
+            if len(natural_element_data) > 0:
+                natural_area = self._process_natural_area(
+                    **natural_element_data)
+                natural_area.save()
+                instance.element = natural_area
+            observation_data = validated_data.pop("observation", {})
+            if len(observation_data) > 0:
+                observation = self._process_observation(
+                    reporter=observation_data.pop("reporter"),
+                    **observation_data
+                )
+                observation.save()
+                instance.observation = observation
+            element_data = validated_data.pop("element", {})
+            if len(element_data) > 0:
+                element = self._process_element(instance, **element_data)
+                element.save()
+                instance.element = element
+            instance.geom = validated_data.pop("geom", None) or instance.geom
+            instance.version += 1
+            instance.verified = validated_data.pop("verified", None) or False
+            if self.is_publisher:
+                instance.released = validated_data.pop(
+                    "released", None) or False
+                if instance.released:
+                    instance.released_versions += 1
+            else:
+                instance.released = False
+            fields_to_skip_update = [
+                "occurrencetaxon",
+                "occurrencenaturalarea",
+                "occurrence_cat",
+                "inclusion_date",
+                # the next fields have already been handled
+                "element",
+                "details",
+                "taxon",
+                "observation",
+                "geom",
+                "version",
+                "released_versions",
+                "verified",
+                "released",
+                # the next fields are m2m relations and are handled elsewhere
+                "photographs",
+                "notes",
+            ]
+            self._update_instance(
+                instance, validated_data, visited=fields_to_skip_update)
+            self.process_photos(instance, validated_data)
+            self.process_notes(instance, validated_data.get("notes", []))
+        return instance
+
+    def _process_element(self, instance, **validated_data):
         pass
 
 
@@ -1489,7 +1714,7 @@ class ListSerializer(gisserializer.GeoFeatureModelSerializer):
         fields = ('id', 'featuretype', 'featuresubtype', 'inclusion_date', 'released', 'verified', 'version', 'total_versions')
 
 
-class TaxonListSerializer(ListSerializer):
+class TaxonOccurrenceListSerializer(ListSerializer):
     def get_properties(self, instance, fields):
         result = {}
         if self.is_writer_or_publisher:
@@ -1503,14 +1728,13 @@ class TaxonListSerializer(ListSerializer):
         result['verified'] = instance.verified
         result['inclusion_date'] = instance.inclusion_date
         result['id'] = instance.id
-        result['species.id'] = instance.species.id
-        result['species.first_common'] = instance.species.first_common
-        result['species.name_sci'] = instance.species.name_sci
+        result["taxon.tsn"] = instance.taxon.tsn
+        result["taxon.name"] = instance.taxon.name
         result['observation.observation_date'] = instance.observation.observation_date
         return result
 
 
-class NaturalAreaListSerializer(ListSerializer):
+class NaturalAreaOccurrenceListSerializer(ListSerializer):
     def get_properties(self, instance, fields):
         result = {}
         if self.is_writer_or_publisher:
@@ -1632,30 +1856,32 @@ class OccurrenceVersionSerializer():
         return to_flat_representation(result)
 
 
-class SpeciesSearchSerializer(serializers.ModelSerializer):
-    name = rest_fields.SerializerMethodField()
-
-    def get_name(self, obj):
-        if obj.synonym:
-            return u'{} - {} ({})'.format(smart_text(obj.first_common),
-                smart_text(obj.name_sci), smart_text(obj.synonym))
-        else:
-            return u'{} - {}'.format(smart_text(obj.first_common), smart_text(obj.name_sci))
-
-    class Meta:
-        model = models.Species
-        fields = ('id', 'name')
-
-class SpeciesSearchResultSerializer(serializers.ModelSerializer):
-    element_species = ElementSpeciesSerializer(required=False)
-
-    class Meta:
-        model = models.Species
-        fields = "__all__"
+class ItisTaxonSearchSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
-        r = super(SpeciesSearchResultSerializer, self).to_representation(instance)
-        return to_flat_representation(r, 'species')
+        return {
+            "tsn": instance.tsn,
+            "name": "{0.tsn} - {0.name} - {0.rank}".format(instance),
+        }
+
+
+class ItisTaxonHierarchySerializer(serializers.Serializer):
+
+    def to_representation(self, instance):
+        result = {
+            "tsn": instance.tsn,
+            "name": instance.name,
+            "rank": instance.rank,
+            instance.rank: instance.name,
+        }
+        if instance.common_names is not None:
+            names = (n[1] for n in instance.common_names if
+                     n[0].lower() == "english")
+            english_names = ", ".join(names)
+            result["common_names.English"] = english_names
+        for rank in instance.upper_ranks:
+            result[rank["rank"].lower()] = rank["name"]
+        return result
 
 
 class OccurrenceAggregatorSerializer(serializers.BaseSerializer):
@@ -1711,15 +1937,29 @@ class OccurrenceAggregatorSerializer(serializers.BaseSerializer):
 class FormDefinitionsSerializer(serializers.BaseSerializer):
 
     def to_representation(self, instance):
-        form_definition = get_complete_form_definition(
-            self.context["subtype"])
+        form_definition = get_complete_form_definition(instance.subtype)
+        try:
+            management_page = [
+                p for p in form_definition if p["id"] == "management"][0]
+            self._adjust_management_page(
+                management_page, instance.is_writer, instance.is_publisher)
+        except KeyError:
+            pass
         occurrence_category = models.OccurrenceCategory.objects.get(
-            code=self.context["subtype"])
+            code=instance.subtype)
         return get_form_representation(
             form_definition,
             feature_type=occurrence_category.main_cat,
-            sub_type=self.context["subtype"]
+            sub_type=instance.subtype
         )
+
+    def _adjust_management_page(self, management_page, is_writer,
+                                is_publisher):
+        for field in management_page["fields"]:
+            if field["field"] == "released" and is_publisher:
+                field["readonly"] = False
+            elif field["field"] == "verified" and (is_publisher or is_writer):
+                field["readonly"] = False
 
 
 def get_form_representation(form_definition, feature_type, sub_type):
@@ -1805,3 +2045,237 @@ def get_common_form_definitions():
         common_definitions = None
     return common_definitions
 
+
+
+def _process_json_fields(instance, fields, **field_values):
+    for field_name in fields:
+        value = field_values.get(field_name)
+        if value is not None:
+            setattr(instance, field_name, value)
+            field_values.pop(field_name)
+    return field_values
+
+
+def _process_dict_table_foreign_key_fields(instance, fields,
+                                           **field_values):
+    for field_name, dict_model in fields.items():
+        value = field_values.get(field_name)
+        if value is not None:
+            dict_table_instance = dict_model.objects.get(code=value)
+            setattr(instance, field_name, dict_table_instance)
+            field_values.pop(field_name)
+    return field_values
+
+
+def _process_foreign_key_fields(instance, fields, **field_values):
+    for field_name, related_model in fields.items():
+        field_data = field_values.pop(field_name, {})
+        if len(field_data) > 0:
+            related_instance = related_model(**field_data)
+            related_instance.save()
+            setattr(instance, field_name, related_instance)
+    return field_values
+
+
+def _process_model_fields(instance, json_fields=None, dict_table_fields=None,
+                          related_fields=None, field_values=None):
+    json_fields = list(json_fields) if json_fields is not None else []
+    dict_table_fields = dict(
+        dict_table_fields) if dict_table_fields is not None else {}
+    related_fields = dict(related_fields) if related_fields is not None else {}
+    values = field_values.copy() if field_values is not None else {}
+    remaining_fields = _process_json_fields(instance, json_fields, **values)
+    remaining_fields = _process_dict_table_foreign_key_fields(
+        instance, dict_table_fields, **remaining_fields)
+    remaining_fields = _process_foreign_key_fields(
+        instance, related_fields, **remaining_fields)
+    return instance, remaining_fields
+
+
+def _process_featuretype_details(instance, **validated_fields):
+    for field_name, field_value in validated_fields.items():
+        current_value = getattr(instance, field_name, None)
+        if current_value != field_value and field_value is not None:
+            setattr(instance, field_name, field_value)
+    return instance
+
+
+def _process_plant_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "moisture_regime",
+            "ground_surface",
+            "general_habitat_category",
+            "disturbance_type",
+            "landscape_position",
+            "aspect",
+            "slope",
+            "lifestages",
+        ),
+        dict_table_fields={
+            "plant_count": models.PlantCount,
+            "tree_canopy_cover": models.CanopyCover,
+            "disturbance_type": models.DisturbanceType,
+            "earthworm_evidence": models.EarthwormEvidence
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_featuretype_details(instance, **remaining_fields)
+
+
+def _process_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "gender",
+            "marks",
+            "lifestages",
+            "diseases_and_abnormalities",
+            "lifestages",
+        ),
+        field_values=validated_fields.copy()
+    )
+    return _process_featuretype_details(instance, **remaining_fields)
+
+
+def _process_aquatic_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "sampler",
+        ),
+        field_values=validated_fields.copy()
+    )
+    return _process_animal_details(instance, **remaining_fields)
+
+
+def _process_land_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "sampler",
+            "stratum",
+        ),
+        field_values=validated_fields.copy()
+    )
+    return _process_animal_details(instance, **remaining_fields)
+
+
+def _process_pond_lake_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "pond_lake_use",
+            "shoreline_type",
+            "microhabitat",
+        ),
+        dict_table_fields={
+            "pond_lake_type": models.PondLakeType
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_aquatic_animal_details(instance, **remaining_fields)
+
+
+def _process_stream_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "channel_type",
+            "hmfei_local_abundance",
+            "lotic_habitat_type",
+        ),
+        dict_table_fields={
+            "designated_use": models.StreamDesignatedUse,
+            "substrate": models.StreamSubstrate,
+            "water_flow_type": models.WaterFlowType,
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_aquatic_animal_details(instance, **remaining_fields)
+
+
+def _process_wetland_animal_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "wetland_type",
+            "water_source",
+            "habitat_feature",
+        ),
+        dict_table_fields={
+            "wetland_location": models.WetlandLocation,
+            "connectivity": models.WetlandConnectivity,
+        },
+        related_fields={
+            "vegetation": models.WetlandVetegationStructure,
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_aquatic_animal_details(instance, **remaining_fields)
+
+
+def _process_fungus_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "aspect",
+            "slope",
+            "landscape_position",
+            "apparent_substrate",
+            "mushroom_vertical_location",
+            "mushroom_growth_form",
+            "mushroom_odor",
+        ),
+        dict_table_fields={
+            "canopy_cover": models.CanopyCover,
+            "mushroom_group": models.MushroomGroup,
+        },
+        related_fields={
+            "other_observed_associations": models.ObservedAssociations,
+            "earthworm_evidence": models.EarthwormEvidence,
+            "fruiting_bodies_age": models.FruitingBodiesAge,
+            "disturbance_type": models.DisturbanceType,
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_featuretype_details(instance, **remaining_fields)
+
+
+def _process_slimemold_details(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "slime_mold_class",
+            "slime_mold_media",
+            "lifestages",
+        ),
+        field_values=validated_fields.copy()
+    )
+    return _process_featuretype_details(instance, **remaining_fields)
+
+
+def _process_naturalarea_element(instance, **validated_fields):
+    instance, remaining_fields = _process_model_fields(
+        instance,
+        json_fields=(
+            "type",
+            "aspect",
+            "slope",
+            "sensitivity",
+            "condition",
+            "leap_land_cover_category",
+            "landscape_position",
+            "glaciar_diposit",
+            "pleistocene_glaciar_diposit",
+            "bedrock_and_outcrops",
+            "regional_frequency",
+        ),
+        related_fields={
+            "disturbance_type": models.DisturbanceType,
+            "earthworm_evidence": models.EarthwormEvidence,
+        },
+        field_values=validated_fields.copy()
+    )
+    return _process_featuretype_details(instance, **remaining_fields)

@@ -33,12 +33,12 @@
 #
 
 - id: species
-  label: Element
-  common: species
+  label: Features
+  common: animal_taxon
 
-- id: element_species
+- id: taxon_status
   label: Element Status
-  common: element_species
+  common: taxon_status
 
 - id: observation
   label: Observation

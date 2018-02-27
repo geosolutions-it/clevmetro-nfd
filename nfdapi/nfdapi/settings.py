@@ -112,7 +112,15 @@ DATABASES = {
         'PASSWORD': 'metroparksnfd',
         'HOST': 'localhost',
         'PORT': '5432',
-    }
+    },
+    'itis': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ITIS',
+        'USER': 'metroparksnfd',
+        'PASSWORD': 'metroparksnfd',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
 }
 
 AUTHENTICATION_BACKENDS = (

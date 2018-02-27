@@ -19,6 +19,7 @@
       choices: nfdcore.models.GRank
     - label: natural area code
       field: element.natural_area_code_nac
+      mandatory: true
     - label: general description
       field: element.general_description
       widget: textarea
@@ -91,9 +92,58 @@
   label: Observation Recorder
   common: recorder
 
-- id: details.disturbance_type
+- id: element.earthworm_evidence
+  label: Earthworm evidence
+  fields:
+    - label: casting piles
+      field: element.earthworm_evidence.casting_piles
+      widget: double
+    - label: compacted soil
+      field: element.earthworm_evidence.compacted_soil
+      widget: double
+    - label: individuals
+      field: element.earthworm_evidence.individuals
+      widget: double
+    - label: layered castings
+      field: element.earthworm_evidence.layered_castings
+      widget: double
+    - label: middens
+      field: element.earthworm_evidence.middens
+      widget: double
+    - label: no evidence
+      field: element.earthworm_evidence.no_evidence
+      widget: double
+    - label: Notes
+      field: notes.note.earthworm_evidence
+      widget: textarea
+
+- id: element.disturbance_type
   label: Disturbance type
-  common: disturbance_type
+  fields:
+    - label: browse
+      field: element.disturbance_type.browse
+      widget: double
+    - label: collecting
+      field: element.disturbance_type.collecting
+      widget: double
+    - label: disease pest
+      field: element.disturbance_type.disease_pest
+      widget: double
+    - label: mowing
+      field: element.disturbance_type.mowing
+      widget: double
+    - label: trampling
+      field: element.disturbance_type.trampling
+      widget: double
+    - label: vehicle traffic
+      field: element.disturbance_type.vehicle_traffic
+      widget: double
+    - label: woody plant removal
+      field: element.disturbance_type.woody_plant_removal
+      widget: double
+    - label: Notes
+      field: notes.note.disturbance_type
+      widget: textarea
 
 - id: location
   label: Location

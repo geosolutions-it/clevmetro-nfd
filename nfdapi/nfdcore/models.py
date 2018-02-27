@@ -15,17 +15,16 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields.files import ImageField
+from django.utils import crypto
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import smart_text
 from PIL import Image
 import reversion
 
 from nfdapi.settings import MEDIA_ROOT
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils import crypto
-from django.utils.encoding import smart_text
-import logging
-import tempfile
+
+from . import itis
 
 PHOTO_UPLOAD_TO = 'images/%Y/%m/'
 PHOTO_THUMB_SIZE=300
@@ -62,6 +61,7 @@ def get_jsonfield_validation_choices(model, field_name, include_values=False):
         "animaldetails.diseases_and_abnormalities": DiseasesAndAbnormalities,
         "animaldetails.marks": Marks,
         "animaldetails.gender": Gender,
+        "animaldetails.lifestages": AnimalLifestages,
         "aquaticanimaldetails.sampler": AquaticSampler,
         "landanimaldetails.sampler": TerrestrialSampler,
         "landanimaldetails.stratum": TerrestrialStratum,
@@ -85,22 +85,23 @@ def get_jsonfield_validation_choices(model, field_name, include_values=False):
         "ferndetails.lifestages": FernLifestages,
         "floweringplantdetails.lifestages": FloweringPlantLifestages,
         "mossdetails.lifestages": MossLifestages,
-        "observedassociation.gnat_association": FungalAssociationType,
-        "observedassociation.ants_association": FungalAssociationType,
-        "observedassociation.termite_association": FungalAssociationType,
-        "observedassociation.beetles_association": FungalAssociationType,
-        "observedassociation.snow_flea_association": FungalAssociationType,
-        "observedassociation.slug_association": FungalAssociationType,
-        "observedassociation.snail_association": FungalAssociationType,
-        "observedassociation.skunk_association": FungalAssociationType,
-        "observedassociation.badger_association": FungalAssociationType,
-        "observedassociation.easter_gray_squirrel_association": (
+        "coniferdetails.lifestages": ConiferLifestages,
+        "observedassociations.gnat_association": FungalAssociationType,
+        "observedassociations.ants_association": FungalAssociationType,
+        "observedassociations.termite_association": FungalAssociationType,
+        "observedassociations.beetles_association": FungalAssociationType,
+        "observedassociations.snow_flea_association": FungalAssociationType,
+        "observedassociations.slug_association": FungalAssociationType,
+        "observedassociations.snail_association": FungalAssociationType,
+        "observedassociations.skunk_association": FungalAssociationType,
+        "observedassociations.badger_association": FungalAssociationType,
+        "observedassociations.easter_gray_squirrel_association": (
             FungalAssociationType),
-        "observedassociation.chipmunk_association": FungalAssociationType,
-        "observedassociation.other_small_rodent_association": (
+        "observedassociations.chipmunk_association": FungalAssociationType,
+        "observedassociations.other_small_rodent_association": (
             FungalAssociationType),
-        "observedassociation.turtle_association": FungalAssociationType,
-        "observedassociation.deer_association": FungalAssociationType,
+        "observedassociations.turtle_association": FungalAssociationType,
+        "observedassociations.deer_association": FungalAssociationType,
         "fungusdetails.aspect": Aspect,
         "fungusdetails.apparent_substrate": FungusApparentSubstrate,
         "fungusdetails.landscape_position": LandscapePosition,
@@ -431,42 +432,106 @@ class MushroomGroup(DictionaryTable):
     pass
 
 
+@python_2_unicode_compatible
 @reversion.register()
-class ElementSpecies(Element):
-    native = models.NullBooleanField(default=True)
-    oh_status = models.ForeignKey(RegionalStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    usfws_status = models.ForeignKey(UsfwsStatus, on_delete=models.SET_NULL, blank=True, null=True)
-    iucn_red_list_category = models.ForeignKey(IucnRedListCategory, on_delete=models.SET_NULL, blank=True, null=True)
-    other_code = models.TextField(blank=True, null=True)
-    #species_category = models.ForeignKey(ElementType, on_delete=models.SET_NULL, blank=True, null=True)
-    ibp_english = models.CharField(max_length=4, blank=True, null=True, default='')
-    ibp_scientific = models.CharField(max_length=6, blank=True, null=True, default='')
-    bblab_number = models.CharField(max_length=6, blank=True, null=True, default='')
-    nrcs_usda_symbol = models.TextField(blank=True, null=True, default='')
-    synonym_nrcs_usda_symbol = models.TextField(blank=True, null=True, default='')
-    epa_numeric_code = models.TextField(blank=True, null=True, default='')
+class Taxon(Element):
+    tsn = models.PositiveIntegerField(
+        primary_key=True,
+        help_text="Taxonomic Serial Number, as found on the Integrated "
+                  "Taxonomic Information System (ITIS)"
+    )
+    name = models.CharField(
+        max_length=255,
+        help_text="Scientific name for the taxon",
+        editable=False
+    )
+    common_names = JSONField(
+        blank=True,
+        null=True,
+        editable=False
+    )
+    rank = models.CharField(
+        max_length=15,
+        editable=False
+    )
+    kingdom = models.CharField(
+        max_length=15,
+        editable=False
+    )
+    upper_ranks = JSONField(
+        blank=True,
+        null=True,
+        editable=False
+    )
+    native = models.NullBooleanField(default=False)
+    oh_status = models.ForeignKey(
+        RegionalStatus,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    usfws_status = models.ForeignKey(
+        UsfwsStatus,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    iucn_red_list_category = models.ForeignKey(
+        IucnRedListCategory,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    other_code = models.TextField(blank=True)
+    ibp_english = models.CharField(
+        max_length=4,
+        blank=True,
+    )
+    ibp_scientific = models.CharField(
+        max_length=6,
+        blank=True,
+    )
+    bblab_number = models.CharField(
+        max_length=6,
+        blank=True,
+    )
+    nrcs_usda_symbol = models.TextField(blank=True)
+    synonym_nrcs_usda_symbol = models.TextField(blank=True)
+    epa_numeric_code = models.CharField(
+        max_length=255,
+        blank=True,
+    )
 
+    class Meta:
+        verbose_name_plural = "taxa"
 
-@reversion.register()
-class Species(models.Model):
-    first_common = models.TextField()
-    name_sci = models.TextField()
-    tsn = models.PositiveIntegerField(null=True)
-    synonym = models.TextField(blank=True, default='', null=True)
-    second_common = models.TextField(blank=True, default='', null=True)
-    third_common = models.TextField(blank=True, default='', null=True)
-    family = models.TextField(blank=True, default='')
-    family_common = models.TextField(blank=True, default='')
-    phylum = models.TextField(blank=True, default='')
-    phylum_common = models.TextField(blank=True, default='')
-    element_species = models.ForeignKey(ElementSpecies, on_delete=models.CASCADE, blank=True, null=True)
+    def __str__(self):
+        return "{}(kingdom {}, rank {}, TSN {})".format(
+            self.name, self.kingdom, self.rank, self.tsn)
 
-    def __unicode__(self):
-        if self.synonym:
-            return u'{} - {} ({})'.format(smart_text(self.first_common),
-                smart_text(self.name_sci), smart_text(self.synonym))
-        else:
-            return u'{} - {}'.format(smart_text(self.first_common), smart_text(self.name_sci))
+    def save(self, *args, **kwargs):
+        """Save an instance in the database
+
+        This method retrieves taxon details from the ITIS database before
+        passing control to django's normal save() mechanism
+
+        """
+
+        self.populate_attributes_from_itis()
+        return super(Taxon, self).save(*args, **kwargs)
+
+    def populate_attributes_from_itis(self):
+        details = itis.get_taxon_details(self.tsn)
+        if details is not None:
+            self.name = details.name
+            self.common_names = details.common_names
+            self.rank = details.rank
+            if self.rank.lower() == "kingdom":
+                self.kingdom = details.name
+            else:
+                upper_ranks = itis.get_taxon_upper_ranks(self.tsn)
+                self.upper_ranks = [i.__dict__ for i in upper_ranks[:-1]]
+                self.kingdom = self.upper_ranks[0]["name"]
 
 
 class Preservative(DictionaryTable):
@@ -523,11 +588,32 @@ def get_details_class(category_code):
 
 @reversion.register(follow=['photographs'])
 class OccurrenceTaxon(Occurrence):
-    voucher = models.OneToOneField(Voucher, blank=True, null=True, on_delete=models.CASCADE)
-    species = models.ForeignKey(Species, on_delete=models.SET_NULL, blank=True, null=True)
-    details = models.OneToOneField(TaxonDetails, on_delete=models.CASCADE, null=True)
-    location = models.OneToOneField(TaxonLocation, on_delete=models.CASCADE, null=True)
-    photographs = GenericRelation(Photograph, object_id_field='occurrence_fk')
+    voucher = models.OneToOneField(
+        Voucher,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    details = models.OneToOneField(
+        TaxonDetails,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    location = models.OneToOneField(
+        TaxonLocation,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    photographs = GenericRelation(
+        Photograph,
+        object_id_field='occurrence_fk'
+    )
+    taxon = models.ForeignKey(
+        Taxon,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
 
     def get_details_class(self):
         if self.occurrence_cat:
@@ -571,38 +657,34 @@ class TerrestrialStratum(DictionaryTable):
 
 
 @reversion.register()
-class AnimalLifestages(models.Model):
-    egg = models.FloatField(default=0.0, blank=True, null=True)
-    egg_mass = models.FloatField(default=0.0, blank=True, null=True)
-    nest = models.FloatField(default=0.0, blank=True, null=True)
-    early_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
-    larva = models.FloatField(default=0.0, blank=True, null=True)
-    late_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
-    early_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
-    nymph = models.FloatField(default=0.0, blank=True, null=True)
-    late_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
-    early_pupa = models.FloatField(default=0.0, blank=True, null=True)
-    pupa = models.FloatField(default=0.0, blank=True, null=True)
-    late_pupa = models.FloatField(default=0.0, blank=True, null=True)
-    juvenile = models.FloatField(default=0.0, blank=True, null=True)
-    immature = models.FloatField(default=0.0, blank=True, null=True)
-    subadult = models.FloatField(default=0.0, blank=True, null=True)
-    adult = models.FloatField(default=0.0, blank=True, null=True)
-    adult_pregnant_or_young = models.FloatField(default=0.0, blank=True, null=True)
-    senescent = models.FloatField(default=0.0, blank=True, null=True)
-    unknown = models.FloatField(default=0.0, blank=True, null=True)
-    na = models.FloatField(default=0.0, blank=True, null=True)
+class AnimalLifestages(DictionaryTable):
+    pass
+#    # egg = models.FloatField(default=0.0, blank=True, null=True)
+#    # egg_mass = models.FloatField(default=0.0, blank=True, null=True)
+#    # nest = models.FloatField(default=0.0, blank=True, null=True)
+#    # early_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
+#    # larva = models.FloatField(default=0.0, blank=True, null=True)
+#    # late_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
+#    # early_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
+#    # nymph = models.FloatField(default=0.0, blank=True, null=True)
+#    # late_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
+#    # early_pupa = models.FloatField(default=0.0, blank=True, null=True)
+#    # pupa = models.FloatField(default=0.0, blank=True, null=True)
+#    # late_pupa = models.FloatField(default=0.0, blank=True, null=True)
+#    # juvenile = models.FloatField(default=0.0, blank=True, null=True)
+#    # immature = models.FloatField(default=0.0, blank=True, null=True)
+#    # subadult = models.FloatField(default=0.0, blank=True, null=True)
+#    # adult = models.FloatField(default=0.0, blank=True, null=True)
+#    # adult_pregnant_or_young = models.FloatField(default=0.0, blank=True, null=True)
+#    # senescent = models.FloatField(default=0.0, blank=True, null=True)
+#    # unknown = models.FloatField(default=0.0, blank=True, null=True)
+#    # na = models.FloatField(default=0.0, blank=True, null=True)
 
 
 class AnimalDetails(TaxonDetails):
     gender = JSONField(blank=True, null=True)
     marks = JSONField(blank=True, null=True)
-    lifestages = models.OneToOneField(
-        AnimalLifestages,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
+    lifestages = JSONField(blank=True, null=True)
     diseases_and_abnormalities = JSONField(blank=True, null=True)
     #id_marks_description #FIXME
 
@@ -753,13 +835,14 @@ class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
 
 
 @reversion.register()
-class SlimeMoldLifestages(models.Model):
-    sclerotium_color = models.TextField(blank=True, null=True)
-    sclerotium_size = models.FloatField(default=0.0, blank=True, null=True)
-    sporangia_color = models.TextField(blank=True, null=True)
-    sporangia_size = models.FloatField(default=0.0, blank=True, null=True)
-    streaming_body_color = models.TextField(blank=True, null=True)
-    streaming_body_size = models.FloatField(default=0.0, blank=True, null=True)
+class SlimeMoldLifestages(DictionaryTable):
+    pass
+    # sclerotium_color = models.TextField(blank=True, null=True)
+    # sclerotium_size = models.FloatField(default=0.0, blank=True, null=True)
+    # sporangia_color = models.TextField(blank=True, null=True)
+    # sporangia_size = models.FloatField(default=0.0, blank=True, null=True)
+    # streaming_body_color = models.TextField(blank=True, null=True)
+    # streaming_body_size = models.FloatField(default=0.0, blank=True, null=True)
 
 
 class SlimeMoldClass(DictionaryTableExtended):
@@ -772,31 +855,25 @@ class SlimeMoldMedia(DictionaryTable):
 
 @reversion.register(follow=['taxondetails_ptr'])
 class SlimeMoldDetails(TaxonDetails):
-    lifestages = models.ForeignKey(SlimeMoldLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+    lifestages = JSONField(blank=True, null=True)
     slime_mold_class = JSONField(blank=True, null=True)
     slime_mold_media = JSONField(blank=True, null=True)
 
 
 @reversion.register()
-class ConiferLifestages(models.Model):
-    vegetative = models.FloatField(default=0.0, blank=True, null=True)
-    immature_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
-    mature_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
-    spent_ovulate_cones = models.FloatField(default=0.0, blank=True, null=True)
-    immature_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
-    mature_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
-    spent_pollen_cones = models.FloatField(default=0.0, blank=True, null=True)
-
-
-class FernLifestages(DictionaryTable): # FIXME: probably is not a dict table
+class ConiferLifestages(DictionaryTable):
     pass
 
 
-class FloweringPlantLifestages(DictionaryTable): # FIXME: probably is not a dict table
+class FernLifestages(DictionaryTable):
     pass
 
 
-class MossLifestages(DictionaryTable): # FIXME: probably is not a dict table
+class FloweringPlantLifestages(DictionaryTable):
+    pass
+
+
+class MossLifestages(DictionaryTable):
     pass
 
 
@@ -894,7 +971,7 @@ class PlantDetails(TaxonDetails):
 
 @reversion.register(follow=['taxondetails_ptr'])
 class ConiferDetails(PlantDetails):
-    lifestages = models.ForeignKey(ConiferLifestages, on_delete=models.SET_NULL, blank=True, null=True)
+    lifestages = JSONField(blank=True, null=True)
 
 
 @reversion.register(follow=['taxondetails_ptr'])
@@ -1012,7 +1089,7 @@ class FungusDetails(TaxonDetails):
         null=True
     )
     #potential_plant_hosts character varying, # invasive plants # FIXME
-    other_observed_associations = models.ForeignKey(
+    other_observed_associations = models.OneToOneField(
         ObservedAssociations,
         on_delete=models.CASCADE,
         blank=True,

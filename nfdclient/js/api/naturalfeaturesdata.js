@@ -88,11 +88,11 @@ const Api = {
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     getSpecies: function(id) {
-        let url = '/nfdapi/species/' + id + '/';
+        let url = '/nfdapi/taxon_search/' + id + '/';
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     searchSpecies: function(query) {
-        let url = '/nfdapi/species/?search=' + query;
+        let url = '/nfdapi/taxon_search/?search=' + query;
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
