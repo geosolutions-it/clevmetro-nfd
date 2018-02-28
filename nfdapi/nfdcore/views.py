@@ -16,6 +16,7 @@ from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
+from rest_framework import filters
 from rest_framework.decorators import api_view
 from rest_framework.decorators import list_route
 from rest_framework.generics import ListAPIView
@@ -25,7 +26,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.fields import empty
-from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
@@ -372,6 +372,13 @@ class TaxonViewSet(viewsets.ReadOnlyModelViewSet):
         JSONRenderer,
         BrowsableAPIRenderer,
     )
+    filter_backends = (
+        filters.SearchFilter,
+    )
+    search_fields = (
+        "name",
+        "upper_ranks",
+    )
 
     queryset = models.Taxon.objects.all()
 
@@ -526,51 +533,34 @@ class NfdLayer(ListCreateAPIView):
 
 
 class TaxonFilter(FilterSet):
-    # ?inclusion_date_0=2017-10-01&inclusion_date_1=2017-10-03
-    # inclusion_date = DateFromToRangeFilter()
-    min_inclusion_date = django_filters.filters.DateFilter(
-        name="inclusion_date",
-        lookup_expr='gte'
-    )  # ?min_inclusion_date=2017-10-01
-    max_inclusion_date = django_filters.filters.DateFilter(
-        name="inclusion_date",
-        lookup_expr='lte'
-    )  # ?max_inclusion_date=2017-10-03
-    min_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(
-        name="inclusion_date",
-        lookup_expr='gte'
-    )  # ?min_inclusion_datetime=2017-10-02T23:05:20
-    max_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(
-        name="inclusion_date",
-        lookup_expr='lte'
-    )
     featuresubtype = django_filters.filters.CharFilter(
-        name="occurrence_cat__code")
+        name="occurrence_cat__code"
+    )
+    taxon = django_filters.filters.CharFilter(
+        name="taxon__upper_ranks",
+        lookup_expr="icontains"
+    )
+    reservation = django_filters.filters.CharFilter(
+        name="location__reservation",
+        lookup_expr="icontains",
+    )
+    cm_status = django_filters.filters.ModelChoiceFilter(
+        name="taxon__cm_status__code",
+        queryset=models.CmStatus.objects.all()
+    )
 
     class Meta:
         model = OccurrenceTaxon
-        fields = ['released', 'verified', 'taxon']
+        fields = ['location', 'released', 'verified', 'taxon']
 
 
 class NaturalAreaFilter(FilterSet):
-    min_inclusion_date = django_filters.filters.DateFilter(
-        name="inclusion_date",
-        lookup_expr='gte'
-    )  # ?min_inclusion_date=2017-10-01
-    max_inclusion_date = django_filters.filters.DateFilter(
-        name="inclusion_date",
-        lookup_expr='lte'
-    )  # ?max_inclusion_date=2017-10-03
-    min_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(
-        name="inclusion_date",
-        lookup_expr='gte'
-    )  # ?min_inclusion_datetime=2017-10-02T23:05:20
-    max_inclusion_datetime = django_filters.filters.IsoDateTimeFilter(
-        name="inclusion_date",
-        lookup_expr='lte'
-    )
     featuresubtype = django_filters.filters.CharFilter(
         name="occurrence_cat__code")
+    cm_status = django_filters.filters.ModelChoiceFilter(
+        name="element__cm_status__code",
+        queryset=models.CmStatus.objects.all()
+    )
 
     class Meta:
         model = OccurrenceNaturalArea
