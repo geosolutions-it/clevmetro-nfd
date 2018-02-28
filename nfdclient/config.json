@@ -12,7 +12,8 @@
                       "visibility": true,
                       "group": "background",
                       "maxZoom": 20,
-                      "minZoom":0
+                      "minZoom":0,
+                      "thumbURL": "/static/assets/img/metroparksMap.jpg"
                   }, {
                     "type": "clevmetro",
                     "title": "Metroparks Aerial",
@@ -20,7 +21,8 @@
                     "visibility": false,
                     "group": "background",
                     "maxZoom": 20,
-                    "minZoom":0
+                    "minZoom":0,
+                    "thumbURL": "/static/assets/img/metroparksAerial.jpg"
                 },
             {
             "type": "osm",
