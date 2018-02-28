@@ -17,7 +17,7 @@ module.exports = {
         defaultState: {
             controls: {
                 LoginForm: {
-                    enabled: true
+                    enabled: false
                 }
             },
             naturalfeatures: {

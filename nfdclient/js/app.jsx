@@ -8,46 +8,60 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const {connect} = require('react-redux');
-const appReducers = {
-    naturalfeatures: require('./reducers/naturalfeatures'),
-    selection: require('../MapStore2/web/client/reducers/selection')
+const LocaleUtils = require('../MapStore2/web/client/utils/LocaleUtils');
+
+const startApp = () => {
+
+
+    const appReducers = {
+        naturalfeatures: require('./reducers/naturalfeatures'),
+        selection: require('../MapStore2/web/client/reducers/selection')
+    };
+
+    require('./ms2Override/ClevMetroLayer');
+    const dEpics = require('./epics/naturalfeatures');
+    require('./components/map/LeafletClusterMarker.js');
+
+    const StandardApp = require('../MapStore2/web/client/components/app/StandardApp');
+
+    const {pages, pluginsDef, initialState, storeOpts} = require('./appConfig');
+    const axios = require('../MapStore2/web/client/libs/ajax');
+    const Cookies = require('cookies-js');
+
+    if (Cookies.get('csrftoken')) {
+        axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
+    }
+    const themeCfg = {
+        path: '/static/js'
+    };
+    const StandardRouter = connect((state) => ({
+        locale: state.locale || {},
+        themeCfg,
+        pages
+    }))(require('../MapStore2/web/client/components/app/StandardRouter'));
+
+    const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(null, initialState, appReducers, {...dEpics});
+
+    const initialActions = [];
+
+    const appConfig = {
+        storeOpts,
+        appStore,
+        pluginsDef,
+        initialActions,
+        appComponent: StandardRouter
+    };
+
+    ReactDOM.render(
+        <StandardApp {...appConfig}/>,
+        document.getElementById('container')
+    );
 };
 
-require('./ms2Override/ClevMetroLayer');
-const dEpics = require('./epics/naturalfeatures');
-require('./components/map/LeafletClusterMarker.js');
-
-const StandardApp = require('../MapStore2/web/client/components/app/StandardApp');
-
-const {pages, pluginsDef, initialState, storeOpts} = require('./appConfig');
-const axios = require('../MapStore2/web/client/libs/ajax');
-const Cookies = require('cookies-js');
-
-if (Cookies.get('csrftoken')) {
-    axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
+if (!global.Intl ) {
+    // Ensure Intl is loaded, then call the given callback
+    LocaleUtils.ensureIntl(startApp);
+}else {
+    startApp();
 }
-const themeCfg = {
-    path: '/static/js'
-};
-const StandardRouter = connect((state) => ({
-    locale: state.locale || {},
-    themeCfg,
-    pages
-}))(require('../MapStore2/web/client/components/app/StandardRouter'));
 
-const appStore = require('../MapStore2/web/client/stores/StandardStore').bind(null, initialState, appReducers, {...dEpics});
-
-const initialActions = [];
-
-const appConfig = {
-    storeOpts,
-    appStore,
-    pluginsDef,
-    initialActions,
-    appComponent: StandardRouter
-};
-
-ReactDOM.render(
-    <StandardApp {...appConfig}/>,
-    document.getElementById('container')
-);

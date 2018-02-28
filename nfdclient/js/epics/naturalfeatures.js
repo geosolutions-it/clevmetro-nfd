@@ -20,7 +20,8 @@ const {
     naturalFeatureGeomAdded, USER_NOT_AUTHENTICATED_ERROR, showLogin, END_EDITING, NF_CLICKED, EDIT_FEATURE, endEditing,
     naturalFeatureSelected, viewFeature, CANCEL_EDITING, EDIT_FEATURE_CLICKED, createNaturalFeatureSuccess, NATURAL_FEATURE_CREATED,
     userNotAuthenticatedError, createNaturalFeatureError, imageUploaded, removeImage, IMAGE_ERROR, NATURAL_FEATURES_INITIALIZED,
-    CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR, updateNaturalFeatureForm, naturalFeatureTypeLoaded
+    CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR, updateNaturalFeatureForm, naturalFeatureTypeLoaded,
+    NFD_LOGGED, NATURAL_FEATURES_ERROR
 } = require('../actions/naturalfeatures');
 const {SELECT_FEATURE} = require('../actions/featuresearch');
 
@@ -37,7 +38,13 @@ const fetchFeatures = (featureType) => {
 };
 
 module.exports = {
-
+ start: (action$, {getState}) => action$.ofType("MAP_CONFIG_LOADED")
+    .switchMap(() => {
+        const token = sessionStorage.getItem('nfd-jwt-auth-token');
+        const {security = {}} = getState();
+        const action = token && security.user ? {type: NFD_LOGGED} : setControlProperty("LoginForm", "enabled", true);
+        return Rx.Observable.of(action);
+    }),
 updateFeatureTypeLayer: (action$) =>
     action$.ofType(NATURAL_FEATURES_LOADED)
     .switchMap((a) => Rx.Observable.of(changeLayerProperties(a.featureType, {features: a.features}))),
@@ -51,12 +58,15 @@ fetchNaturalFeatures: (action$) =>
 
 // Load features for all featureTypes
 getDataEpic: (action$, store) =>
-    action$.ofType(NFD_LOGIN_SUCCESS).
+    action$.ofType(NFD_LOGIN_SUCCESS, NFD_LOGGED).
     switchMap(() => {
         const {featureTypes = []} = (store.getState()).featuresearch;
-        return Rx.Observable.from(featureTypes.map((ft) => fetchFeatures(ft))).mergeAll().
-        startWith(naturalFeaturesLoading(true)).concat([naturalFeaturesLoading(false), {type: NATURAL_FEATURES_INITIALIZED}]);
+        return Rx.Observable.from(featureTypes.map((ft) => fetchFeatures(ft))).mergeAll().takeUntil(action$.ofType(NATURAL_FEATURES_ERROR))
+        .startWith(naturalFeaturesLoading(true)).concat([naturalFeaturesLoading(false), {type: NATURAL_FEATURES_INITIALIZED}]);
     }),
+checkAuthError: (action$) => action$.ofType(NATURAL_FEATURES_ERROR)
+    .filter(a => a.error && a.error.status === 401)
+    .switchMap(() => Rx.Observable.of(userNotAuthenticatedError())),
 
 unauthorizedUserErrorEpic: action$ =>
     action$.ofType(USER_NOT_AUTHENTICATED_ERROR)

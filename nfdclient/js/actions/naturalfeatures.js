@@ -56,6 +56,7 @@ const REMOVE_IMAGE = 'REMOVE_IMAGE';
 const IMAGE_UPLOADED = 'IMAGE_UPLOADED';
 const FEATURE_PROPERTY_CHANGE = 'FEATURE_PROPERTY_CHANGE';
 const NATURAL_FEATURES_INITIALIZED = 'NATURAL_FEATURES_INITIALIZED';
+const NFD_LOGGED = 'NFD_LOGGED';
 
 function onFeaturePropertyChange(property, value) {
     return {
@@ -475,7 +476,7 @@ function showLogin() {
 }
 
 function nfdLogout() {
-    sessionStorage.setItem('nfd-jwt-auth-token', null);
+    sessionStorage.removeItem('nfd-jwt-auth-token');
     return (dispatch) => {
         dispatch(changeDrawingStatus('clean', null, 'dockednaturalfeatures', []));
         dispatch(logout(null));
@@ -555,5 +556,6 @@ module.exports = {
     createNaturalFeatureError,
     imageUploaded, IMAGE_UPLOADED,
     FEATURE_PROPERTY_CHANGE, onFeaturePropertyChange,
-    NATURAL_FEATURES_INITIALIZED
+    NATURAL_FEATURES_INITIALIZED,
+    NFD_LOGGED
 };
