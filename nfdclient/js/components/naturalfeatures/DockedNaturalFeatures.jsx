@@ -380,7 +380,7 @@ const DockedNaturalFeatures = React.createClass({
         if (!query) {
             return;
         }
-        Api.searchSpecies(query)
+        Api.searchSpecies(query, this.props.currentFeature.featuretype)
             .then(json => this.setState({options: json}));
     },
     exportFt() {

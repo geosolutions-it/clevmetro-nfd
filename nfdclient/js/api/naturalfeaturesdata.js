@@ -91,8 +91,8 @@ const Api = {
         let url = '/nfdapi/taxon_search/' + id + '/';
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
-    searchSpecies: function(query) {
-        let url = '/nfdapi/taxon_search/?search=' + query;
+    searchSpecies: function(query, featuretype) {
+        let url = `/nfdapi/taxon_search/?search=${query}&featuretype=${featuretype}`;
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
