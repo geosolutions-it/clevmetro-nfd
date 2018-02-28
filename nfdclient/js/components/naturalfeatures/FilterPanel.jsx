@@ -20,7 +20,7 @@ const FilterPanel = ({height, children, onReset, onUpdate, disableSync}) => {
                 <div className="text-center col-xs-12">
                     <ButtonGroup>
                         <Button onClick={onReset}>Clear</Button>
-                        <Button disabled={disableSync} onClick={onUpdate}>Sync</Button>
+                        <Button disabled={disableSync} onClick={onUpdate}>Apply</Button>
                     </ButtonGroup>
                 </div>
             </div>

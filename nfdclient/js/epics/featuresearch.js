@@ -39,10 +39,10 @@ const {toggleControl} = require('../../MapStore2/web/client/actions/controls');
 
 const load = (ftType, store, page = 1) => {
     const {featuresearch} = (store.getState());
-    const filters = featuresearch[`${ftType}_filters`];
+    const filters = featuresearch[`${ftType}_filters`] || {};
     let filter = '';
     if (filters) {
-        filter = FilterUtils.getFilter({operator: featuresearch.defaultOperator, ...filters});
+        filter = FilterUtils.getFilter(filters);
     }
     return Rx.Observable.fromPromise(Api.getData(`/nfdapi/list/${ftType}/?page=${page}${filter}`))
             .map(val => listLoaded(ftType, val, page, filters))

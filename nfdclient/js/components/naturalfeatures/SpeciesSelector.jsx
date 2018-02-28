@@ -26,7 +26,8 @@ class SpeciesSelector extends React.Component {
       paginate: PropTypes.bool,
       clearBtn: PropTypes.bool,
       labelKey: React.PropTypes.string,
-      keyName: React.PropTypes.string
+      keyName: React.PropTypes.string,
+      isLoading: PropTypes.bool
     };
     static defaultProps = {
         onSearch: () => {},
@@ -37,7 +38,8 @@ class SpeciesSelector extends React.Component {
         maxResults: 5,
         labelKey: "name",
         placeholder: "Search for a species...",
-        keyName: "id"
+        keyName: "id",
+        isLoading: false
     }
     constructor(props) {
         super(props);
@@ -58,7 +60,7 @@ class SpeciesSelector extends React.Component {
         this.AsyncTypeahead = null;
     }
     render() {
-        const {options, selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn} = this.props;
+        const {options, selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn, isLoading} = this.props;
         return (
             <div className={this.state.full ? 'spec-selector-full' : ''} onClick={this.exitFull}>
                 <AsyncTypeahead
@@ -76,6 +78,7 @@ class SpeciesSelector extends React.Component {
                     selected={[selectedSpecies]}
                     onChange={this._handleSpeciesChange}
                     minLength={2}
+                    isLoading={isLoading}
                 />
             </div>);
     }

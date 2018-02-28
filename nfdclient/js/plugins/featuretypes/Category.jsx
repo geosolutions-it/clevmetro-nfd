@@ -10,7 +10,7 @@ const React = require('react');
 const {connect} = require('react-redux');
 const {createSelector} = require('reselect');
 
-const {loadList, selectFeature, zooToFeature, searchSpecies, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
+const {loadList, selectFeature, zooToFeature, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
 const {onToggleExport} = require('../../actions/exportfeatures');
 const FilterUtils = require('../../utils/FilterUtils');
 const SelectFilter = require('../../components/naturalfeatures/SelectFilter');
@@ -79,18 +79,15 @@ const category = (type) => {
         onUpdate: upDateFeatureType
     })(require('../../components/naturalfeatures/FilterPanel'));
 
-    const onSearch = searchSpecies.bind(null, type);
-    const onSpeciesChange = setFilterProp.bind(null, type, 'selectedSpecies');
-
-    const SpeciesSelector = connect((state) => {
+    const onRankChange = setFilterProp.bind(null, type, 'taxon');
+    const RankFilter = connect((state) => {
         const data = dataFilterSelector(state);
         return {
-            options: data.species,
-            selectedSpecies: data.selectedSpecies
+            value: data.taxon || ''
     }; }, {
-        onSearch,
-        onChange: onSpeciesChange
-    })(require('../../components/naturalfeatures/SpeciesSelector'));
+        onChange: onRankChange
+    })(require('../../components/naturalfeatures/UpperRankfilter'));
+
 
     const onResChange = setFilterProp.bind(null, type, 'reservation');
     const ReservetionFilter = connect(reservationSelector, {
@@ -120,8 +117,8 @@ const category = (type) => {
                         <FeatureCard/>
                     </FeaturesPanel>
                     <FilterPanel height={this.props.height}>
-                        <FilterElement label="by Species">
-                            <SpeciesSelector/>
+                        <FilterElement label="by Ranks">
+                            <RankFilter/>
                         </FilterElement>
                         <FilterElement label="by Reservetion">
                             <ReservetionFilter placeholder="Search for reservation..." labelKey="value"/>
