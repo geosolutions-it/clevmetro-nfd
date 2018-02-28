@@ -756,7 +756,10 @@ class FloweringPlantDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSer
 class MossDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
-    #lifestages = MossLifestages(required=False) # FIXME
+
+    class Meta:
+        model = models.MossDetails
+        exclude = ('id',)
 
     def validate_aspect(self, value):
         return validate_json_field(
@@ -786,21 +789,9 @@ class MossDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
         return validate_json_field(
             value, models.PlantDetails, "slope")
 
-    class Meta:
-        model = models.MossDetails
-        exclude = ('id',)
-
-
-class SlimeMoldLifestagesSerializer(CustomModelSerializerMixin,
-                                    serializers.ModelSerializer):
-    class Meta:
-        model = models.SlimeMoldLifestages
-        exclude = ('id',)
-
 
 class SlimeMoldDetailsSerializer(CustomModelSerializerMixin,
                                  BaseDetailsSerializer):
-    lifestages = SlimeMoldLifestagesSerializer(required=False)
 
     class Meta:
         model = models.SlimeMoldDetails
@@ -2284,7 +2275,6 @@ def _process_slimemold_details(instance, **validated_fields):
         json_fields=(
             "slime_mold_class",
             "slime_mold_media",
-            "lifestages",
         ),
         field_values=validated_fields.copy()
     )

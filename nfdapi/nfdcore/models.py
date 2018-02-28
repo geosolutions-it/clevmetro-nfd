@@ -813,17 +813,6 @@ class WetlandAnimalDetails(AquaticAnimalDetails, LenticSize):
     habitat_feature = JSONField(blank=True, null=True)
 
 
-@reversion.register()
-class SlimeMoldLifestages(DictionaryTable):
-    pass
-    # sclerotium_color = models.TextField(blank=True, null=True)
-    # sclerotium_size = models.FloatField(default=0.0, blank=True, null=True)
-    # sporangia_color = models.TextField(blank=True, null=True)
-    # sporangia_size = models.FloatField(default=0.0, blank=True, null=True)
-    # streaming_body_color = models.TextField(blank=True, null=True)
-    # streaming_body_size = models.FloatField(default=0.0, blank=True, null=True)
-
-
 class SlimeMoldClass(DictionaryTableExtended):
     pass
 
@@ -834,9 +823,14 @@ class SlimeMoldMedia(DictionaryTable):
 
 @reversion.register(follow=['taxondetails_ptr'])
 class SlimeMoldDetails(TaxonDetails):
-    lifestages = JSONField(blank=True, null=True)
     slime_mold_class = JSONField(blank=True, null=True)
     slime_mold_media = JSONField(blank=True, null=True)
+    sclerotium_color = models.TextField(blank=True, null=True)
+    sclerotium_size = models.FloatField(default=0.0, blank=True, null=True)
+    sporangia_color = models.TextField(blank=True, null=True)
+    sporangia_size = models.FloatField(default=0.0, blank=True, null=True)
+    streaming_body_color = models.TextField(blank=True, null=True)
+    streaming_body_size = models.FloatField(default=0.0, blank=True, null=True)
 
 
 @reversion.register()
