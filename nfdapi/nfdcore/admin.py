@@ -65,6 +65,8 @@ class TaxonAdmin(admin.ModelAdmin):
                     "s_rank",
                     "n_rank",
                     "g_rank",
+                    "native",
+                    "leap_concern",
                     "oh_status",
                     "usfws_status",
                     "iucn_red_list_category",

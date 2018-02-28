@@ -464,6 +464,7 @@ class Taxon(Element):
         editable=False
     )
     native = models.NullBooleanField(default=False)
+    leap_concern = models.NullBooleanField(default=False)
     oh_status = models.ForeignKey(
         RegionalStatus,
         on_delete=models.SET_NULL,
