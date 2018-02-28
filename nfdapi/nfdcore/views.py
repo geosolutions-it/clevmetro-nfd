@@ -544,6 +544,10 @@ class TaxonFilter(FilterSet):
         name="location__reservation",
         lookup_expr="icontains",
     )
+    watershed = django_filters.filters.CharFilter(
+        name="location__watershed",
+        lookup_expr="icontains",
+    )
     cm_status = django_filters.filters.ModelChoiceFilter(
         name="taxon__cm_status__code",
         queryset=models.CmStatus.objects.all()
