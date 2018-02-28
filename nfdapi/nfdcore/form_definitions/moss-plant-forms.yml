@@ -29,10 +29,6 @@
 - id: details
   label: Details
   fields:
-    - label: plant count
-      field: details.plant_count
-      widget: stringcombo
-      choices: nfdcore.models.PlantCount
     - label: area ranges
       field: details.area_ranges
     - label: moisture regime
