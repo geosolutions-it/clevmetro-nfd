@@ -15,10 +15,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields.files import ImageField
-from django.utils import crypto
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.encoding import smart_text
 from PIL import Image
 import reversion
 
@@ -660,26 +658,6 @@ class TerrestrialStratum(DictionaryTable):
 @reversion.register()
 class AnimalLifestages(DictionaryTable):
     pass
-#    # egg = models.FloatField(default=0.0, blank=True, null=True)
-#    # egg_mass = models.FloatField(default=0.0, blank=True, null=True)
-#    # nest = models.FloatField(default=0.0, blank=True, null=True)
-#    # early_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
-#    # larva = models.FloatField(default=0.0, blank=True, null=True)
-#    # late_instar_larva = models.FloatField(default=0.0, blank=True, null=True)
-#    # early_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
-#    # nymph = models.FloatField(default=0.0, blank=True, null=True)
-#    # late_instar_nymph = models.FloatField(default=0.0, blank=True, null=True)
-#    # early_pupa = models.FloatField(default=0.0, blank=True, null=True)
-#    # pupa = models.FloatField(default=0.0, blank=True, null=True)
-#    # late_pupa = models.FloatField(default=0.0, blank=True, null=True)
-#    # juvenile = models.FloatField(default=0.0, blank=True, null=True)
-#    # immature = models.FloatField(default=0.0, blank=True, null=True)
-#    # subadult = models.FloatField(default=0.0, blank=True, null=True)
-#    # adult = models.FloatField(default=0.0, blank=True, null=True)
-#    # adult_pregnant_or_young = models.FloatField(default=0.0, blank=True, null=True)
-#    # senescent = models.FloatField(default=0.0, blank=True, null=True)
-#    # unknown = models.FloatField(default=0.0, blank=True, null=True)
-#    # na = models.FloatField(default=0.0, blank=True, null=True)
 
 
 class AnimalDetails(TaxonDetails):
