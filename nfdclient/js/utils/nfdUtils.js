@@ -11,6 +11,23 @@ const baseStyle = {
         iconAnchor: [12, 12]
 };
 module.exports = {
+    getSubCatByCat: (cat) => {
+        switch (cat) {
+            case 'plant':
+                return 'co';
+            case 'fungus':
+                return 'fu';
+            case 'slimemold':
+                return 'sl';
+            case 'animal':
+                return 'ln';
+            case 'naturalarea':
+                return 'na';
+            default:
+                return false;
+        }
+    },
+
     getIcon: (ftType) => {
         switch (ftType) {
             case 'plant':

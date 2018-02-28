@@ -12,9 +12,19 @@ const {connect} = require('react-redux');
 const {loadList, selectFeature, zooToFeature, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
 const {onToggleExport} = require('../../actions/exportfeatures');
 const FilterUtils = require('../../utils/FilterUtils');
+const SelectFilter = require('../../components/naturalfeatures/SelectFilter');
+const {createSelector} = require('reselect');
 
 const dataSelector = (state) => state.featuresearch && state.featuresearch.naturalarea || {};
 const dataFilterSelector = (state) => state.featuresearch && state.featuresearch.naturalarea_filters || {};
+const filtersSelector = (state) => state.featuresearch && state.featuresearch.filters;
+
+const cmStatusSelector = createSelector([filtersSelector, dataFilterSelector],
+    (filters, values) => ({
+        value: values.cm_status,
+        options: (filters.filter((f) => f.name === 'cm_status')[0] || {}).options || []
+    })
+    );
 
 const toggleExport = onToggleExport.bind(null, 'LIST', 'naturalarea', null, null);
 const FeatureTypePanel = connect(() => ({}), {
@@ -56,39 +66,10 @@ const FilterPanel = connect((state) => {
     onUpdate: upDateFeatureType
 })(require('../../components/naturalfeatures/FilterPanel'));
 
-const onReleasedChange = setFilterProp.bind(null, 'naturalarea', 'released');
-
-const ReleasedFilter = connect((state) => {
-    const data = dataFilterSelector(state);
-    return {
-        value: !!data.released
-    };
-}, {
-    onChange: onReleasedChange
-})(require('../../components/naturalfeatures/CheckFilter'));
-
-const onNotReleasedChange = setFilterProp.bind(null, 'naturalarea', 'notreleased');
-
-const NotReleasedFilter = connect((state) => {
-    const data = dataFilterSelector(state);
-    return {
-        value: !!data.notreleased
-    };
-}, {
-    onChange: onNotReleasedChange
-})(require('../../components/naturalfeatures/CheckFilter'));
-
-const updateFieldValue = setFilterProp.bind(null, 'naturalarea');
-
-const DateFiled = connect((state) => {
-    const data = dataFilterSelector(state);
-    return {
-        operator: data.operator || state.featuresearch && state.featuresearch.defaultOperator,
-        fieldValue: data.includevalue
-    };
-}, {
-    updateFieldValue
-})(require('../../components/naturalfeatures/DateFilter'));
+const onStatusChange = setFilterProp.bind(null, 'naturalarea', 'cm_status');
+const CmStatusFilter = connect(cmStatusSelector, {
+    onChange: onStatusChange
+})(SelectFilter);
 
 class NaturalArea extends React.Component {
     static propTypes = {
@@ -101,12 +82,8 @@ class NaturalArea extends React.Component {
                     <FeatureCard/>
                 </FeaturesPanel>
                 <FilterPanel height={this.props.height}>
-                    <FilterElement label="by Inclusion date">
-                        <DateFiled/>
-                    </FilterElement>
-                    <FilterElement label="by Properties">
-                        <ReleasedFilter label="Released"/>
-                        <NotReleasedFilter label="Not released"/>
+                    <FilterElement label="by Status">
+                        <CmStatusFilter placeholder="Search for status..." labelKey="value"/>
                     </FilterElement>
                 </FilterPanel>
             </FeatureTypePanel>

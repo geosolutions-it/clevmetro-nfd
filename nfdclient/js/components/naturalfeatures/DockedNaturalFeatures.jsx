@@ -101,7 +101,7 @@ const DockedNaturalFeatures = React.createClass({
         };
     },
     getInitialState() {
-        return {showConfirm: false};
+        return {showConfirm: false, isLoading: false};
     },
     onClose: function() {
         this.props.onToggle();
@@ -175,6 +175,7 @@ const DockedNaturalFeatures = React.createClass({
             <div className="form-title">{tabName}</div>
                 {searchDiv ?
                     (<SpeciesSelector
+                        isLoading={this.state.isLoading}
                         options={this.state.options}
                         onSearch={this._handleSearch}
                         selectedSpecies={this.props.selectedSpecie}
@@ -380,8 +381,10 @@ const DockedNaturalFeatures = React.createClass({
         if (!query) {
             return;
         }
-        Api.searchSpecies(query)
-            .then(json => this.setState({options: json}));
+        this.setState(()=>({isLoading: true}));
+        Api.searchSpecies(query, this.props.currentFeature.featuretype)
+            .then(json => this.setState(() => ({options: json, isLoading: false})))
+            .catch(() => this.setState(() => ({isLoading: false})));
     },
     exportFt() {
         this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id, this.props.currentFeature.version);

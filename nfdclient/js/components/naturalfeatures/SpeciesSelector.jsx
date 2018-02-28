@@ -10,8 +10,8 @@ const PropTypes = require('prop-types');
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
 const isMobile = require('ismobilejs');
-function isPresent(options = [], query) {
-    return options.filter( o => o.name.toLowerCase().indexOf(query.toLowerCase()) === 0).length > 0;
+function isPresent(options = [], query, key) {
+    return options.filter( o => o[key].toLowerCase().indexOf(query.toLowerCase()) === 0).length > 0;
 }
 
 class SpeciesSelector extends React.Component {
@@ -24,7 +24,10 @@ class SpeciesSelector extends React.Component {
       onChange: PropTypes.func,
       onSearch: PropTypes.func,
       paginate: PropTypes.bool,
-      clearBtn: PropTypes.bool
+      clearBtn: PropTypes.bool,
+      labelKey: React.PropTypes.string,
+      keyName: React.PropTypes.string,
+      isLoading: PropTypes.bool
     };
     static defaultProps = {
         onSearch: () => {},
@@ -33,7 +36,10 @@ class SpeciesSelector extends React.Component {
         clearBtn: false,
         bsSize: 'small',
         maxResults: 5,
-        placeholder: "Search for a species..."
+        labelKey: "name",
+        placeholder: "Search for a species...",
+        keyName: "id",
+        isLoading: false
     }
     constructor(props) {
         super(props);
@@ -54,7 +60,7 @@ class SpeciesSelector extends React.Component {
         this.AsyncTypeahead = null;
     }
     render() {
-        const {options, selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn} = this.props;
+        const {options, selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn, isLoading} = this.props;
         return (
             <div className={this.state.full ? 'spec-selector-full' : ''} onClick={this.exitFull}>
                 <AsyncTypeahead
@@ -72,6 +78,7 @@ class SpeciesSelector extends React.Component {
                     selected={[selectedSpecies]}
                     onChange={this._handleSpeciesChange}
                     minLength={2}
+                    isLoading={isLoading}
                 />
             </div>);
     }
@@ -79,14 +86,14 @@ class SpeciesSelector extends React.Component {
         this.AsyncTypeahead = ref;
     }
     _onSearch = (query) => {
-        if (!isPresent(this.props.options, query)) {
+        if (!isPresent(this.props.options, query, this.props.labelKey)) {
             this.props.onSearch(query);
         }
     }
     _renderMenuItemChildren = (option) => {
         return (
-            <div key={option.id}>
-                <span>{option.name}</span>
+            <div key={option[this.props.keyName]}>
+                <span>{option[this.props.labelKey]}</span>
             </div>
         );
     }
