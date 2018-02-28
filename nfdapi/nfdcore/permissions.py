@@ -12,7 +12,7 @@ def get_permissions(user, featuretype_name):
         "animal": (user.is_animal_writer, user.is_animal_publisher),
         "slimemold": (user.is_slimemold_writer, user.is_slimemold_publisher),
         "plant": (user.is_plant_writer, user.is_plant_publisher),
-        "fungis": (user.is_fungus_writer, user.is_fungus_publisher),
+        "fungus": (user.is_fungus_writer, user.is_fungus_publisher),
         "naturalarea": (
             user.is_naturalarea_writer, user.is_naturalarea_publisher),
     }.get(featuretype_name, (False, False))

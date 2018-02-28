@@ -134,9 +134,9 @@ def delete_object_and_children(parent_instance):
     children = []
 
     if not getattr(parent_instance, '_meta', None):
-        print parent_instance
-        print type(parent_instance)
-        print repr(parent_instance)
+        print(parent_instance)
+        print(type(parent_instance))
+        print(repr(parent_instance))
     if not isinstance(parent_instance, QuerySet):
         for f in parent_instance._meta.get_fields():
             if is_deletable_field(f):
@@ -463,13 +463,6 @@ class OccurrenceObservationSerializer(CustomModelSerializerMixin,
         exclude = ('id',)
 
 
-class AnimalLifestagesSerializer(CustomModelSerializerMixin,
-                                 serializers.ModelSerializer):
-    class Meta:
-        model = models.AnimalLifestages
-        exclude = ('id',)
-
-
 class BaseDetailsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
@@ -480,7 +473,6 @@ class BaseDetailsSerializer(serializers.ModelSerializer):
 
 
 class LandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
-    lifestages = AnimalLifestagesSerializer(required=False)
 
     def validate_marks(self, value):
         return validate_json_field(value, models.AnimalDetails, "marks")
@@ -491,6 +483,9 @@ class LandAnimalDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSeriali
     def validate_diseases_and_abnormalities(self, value):
         return validate_json_field(
             value, models.AnimalDetails, "diseases_and_abnormalities")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(value, models.AnimalDetails, "lifestages")
 
     def validate_sampler(self, value):
         return validate_json_field(
@@ -515,8 +510,20 @@ class WetlandVetegationStructureSerializer(CustomModelSerializerMixin,
 
 class WetlandAnimalDetailsSerializer(CustomModelSerializerMixin,
                                      BaseDetailsSerializer):
-    lifestages = AnimalLifestagesSerializer(required=False)
     vegetation = WetlandVetegationStructureSerializer(required=False)
+
+    def validate_marks(self, value):
+        return validate_json_field(value, models.AnimalDetails, "marks")
+
+    def validate_gender(self, value):
+        return validate_json_field(value, models.AnimalDetails, "gender")
+
+    def validate_diseases_and_abnormalities(self, value):
+        return validate_json_field(
+            value, models.AnimalDetails, "diseases_and_abnormalities")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(value, models.AnimalDetails, "lifestages")
 
     def validate_sampler(self, value):
         return validate_json_field(
@@ -548,8 +555,20 @@ class StreamSubstrateSerializer(CustomModelSerializerMixin,
 
 class StreamAnimalDetailsSerializer(CustomModelSerializerMixin,
                                     BaseDetailsSerializer):
-    lifestages = AnimalLifestagesSerializer(required=False)
     substrate = StreamSubstrateSerializer(required=False)
+
+    def validate_marks(self, value):
+        return validate_json_field(value, models.AnimalDetails, "marks")
+
+    def validate_gender(self, value):
+        return validate_json_field(value, models.AnimalDetails, "gender")
+
+    def validate_diseases_and_abnormalities(self, value):
+        return validate_json_field(
+            value, models.AnimalDetails, "diseases_and_abnormalities")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(value, models.AnimalDetails, "lifestages")
 
     def validate_sampler(self, value):
         return validate_json_field(
@@ -574,7 +593,19 @@ class StreamAnimalDetailsSerializer(CustomModelSerializerMixin,
 
 class PondLakeAnimalDetailsSerializer(CustomModelSerializerMixin,
                                       BaseDetailsSerializer):
-    lifestages = AnimalLifestagesSerializer(required=False)
+
+    def validate_marks(self, value):
+        return validate_json_field(value, models.AnimalDetails, "marks")
+
+    def validate_gender(self, value):
+        return validate_json_field(value, models.AnimalDetails, "gender")
+
+    def validate_diseases_and_abnormalities(self, value):
+        return validate_json_field(
+            value, models.AnimalDetails, "diseases_and_abnormalities")
+
+    def validate_lifestages(self, value):
+        return validate_json_field(value, models.AnimalDetails, "lifestages")
 
     def validate_sampler(self, value):
         return validate_json_field(
@@ -688,7 +719,6 @@ class FernDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
 class FloweringPlantDetailsSerializer(CustomModelSerializerMixin, BaseDetailsSerializer):
     disturbance_type = DisturbanceTypeSerializer(required=False)
     earthworm_evidence = EarthwormEvidenceSerializer(required=False)
-    #lifestages = FloweringPlantLifestages(required=False) # FIXME
 
     def validate_aspect(self, value):
         return validate_json_field(
@@ -1499,8 +1529,7 @@ class TaxonOccurrenceSerializer(OccurrenceSerializer):
                 observation.save()
                 instance.observation = observation
             details_data = validated_data.pop("details", {})
-            details_data["lifestages"] = validated_data.pop("lifestages", None)
-            if len(details_data) > 1 or details_data["lifestages"] is not None:
+            if len(details_data) > 0:
                 details = self._process_details(instance, details_data)
                 details.save()
                 instance.details = details
@@ -2110,7 +2139,6 @@ def _process_plant_details(instance, **validated_fields):
             "moisture_regime",
             "ground_surface",
             "general_habitat_category",
-            "disturbance_type",
             "landscape_position",
             "aspect",
             "slope",
@@ -2119,8 +2147,10 @@ def _process_plant_details(instance, **validated_fields):
         dict_table_fields={
             "plant_count": models.PlantCount,
             "tree_canopy_cover": models.CanopyCover,
+        },
+        related_fields={
             "disturbance_type": models.DisturbanceType,
-            "earthworm_evidence": models.EarthwormEvidence
+            "earthworm_evidence": models.EarthwormEvidence,
         },
         field_values=validated_fields.copy()
     )
@@ -2191,8 +2221,10 @@ def _process_stream_animal_details(instance, **validated_fields):
         ),
         dict_table_fields={
             "designated_use": models.StreamDesignatedUse,
-            "substrate": models.StreamSubstrate,
             "water_flow_type": models.WaterFlowType,
+        },
+        related_fields={
+            "substrate": models.StreamSubstrate,
         },
         field_values=validated_fields.copy()
     )
