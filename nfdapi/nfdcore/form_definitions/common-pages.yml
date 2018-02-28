@@ -29,64 +29,6 @@ management:
       widget: string
       readonly: True
 
-element_species:
-  fields:
-    - label: CM Status
-      field: species.element_species.cm_status
-      readonly: true
-    - label: S Rank
-      field: species.element_species.s_rank
-      readonly: true
-      show_key_with_value: true
-    - label: N Rank
-      field: species.element_species.n_rank
-      readonly: true
-      show_key_with_value: true
-    - label: G Rank
-      field: species.element_species.g_rank
-      readonly: true
-      show_key_with_value: true
-    - label: Native
-      field: species.element_species.native
-      widget: boolean
-      readonly: true
-    - label: OH Status
-      field: species.element_species.oh_status
-      readonly: true
-    - label: USFWS Status
-      field: species.element_species.usfws_status
-      readonly: true
-    - label: IUCN Red List Category
-      field: species.element_species.iucn_red_list_category
-      readonly: true
-    - label: IUCN Red List Category
-      field: species.element_species.iucn_red_list_category
-      readonly: true
-    - label: Other code
-      field: species.element_species.other_code
-      readonly: true
-    - label: IBP english
-      field: species.element_species.ibp_english
-      readonly: true
-    - label: IBP scientific
-      field: species.element_species.ibp_scientific
-      readonly: true
-    - label: BBLAB number
-      field: species.element_species.bblab_number
-      readonly: true
-    - label: NRCS USDA symbol
-      field: species.element_species.nrcs_usda_symbol
-      readonly: true
-    - label: Synonym NRCS USDA symbol
-      field: species.element_species.synonym_nrcs_usda_symbol
-      readonly: true
-    - label: EPA numeric code
-      field: species.element_species.epa_numeric_code
-      readonly: true
-    - label: Notes
-      field: notes.note.element_species
-      widget: textarea
-
 animal_taxon:
   fields:
     - label: TSN
@@ -409,6 +351,10 @@ taxon_status:
       show_key_with_value: true
     - label: Native
       field: taxon.native
+      widget: boolean
+      readonly: true
+    - label: LEAP Concern
+      field: taxon.leap_concern
       widget: boolean
       readonly: true
     - label: OH Status
