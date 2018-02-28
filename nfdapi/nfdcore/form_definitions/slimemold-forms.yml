@@ -45,19 +45,19 @@
   label: Lifestages
   fields:
     - label: sclerotium color
-      field: details.lifestages.sclerotium_color
+      field: details.sclerotium_color
     - label: sclerotium size
-      field: details.lifestages.sclerotium_size
+      field: details.sclerotium_size
       widget: double
     - label: sporangia color
-      field: details.lifestages.sporangia_color
+      field: details.sporangia_color
     - label: sporangia size
-      field: details.lifestages.sporangia_size
+      field: details.sporangia_size
       widget: double
     - label: streaming body color
-      field: details.lifestages.streaming_body_color
+      field: details.streaming_body_color
     - label: streaming body size
-      field: details.lifestages.streaming_body_size
+      field: details.streaming_body_size
       widget: double
     - label: Notes
       field: notes.note.lifestages
