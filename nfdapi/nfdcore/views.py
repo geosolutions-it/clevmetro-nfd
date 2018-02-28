@@ -320,10 +320,11 @@ class ItisBackedSearchViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """Search for taxa on the ITIS database"""
-        kingdoms = request.query_params.get(
-            "kingdoms",
-            "Animalia,Plantae,Fungi"
-        ).split(",")
+        feature_types = request.query_params.get("featuretypes","").split(",")
+        if not any(feature_types):
+            feature_types = models.OccurrenceCategory.objects.values_list(
+                "main_cat", flat=True).distinct()
+        kingdoms = _get_kingdoms(feature_types)
         search_results = itis.search_taxon(
             request.query_params.get("search", ""),
             kingdoms,
@@ -841,3 +842,21 @@ class PhotoViewSet(ModelViewSet):
     serializer_class = nfdserializers.PhotographPublishSerializer
     parser_classes = (MultiPartParser, FormParser,)
     queryset = Photograph.objects.all()
+
+
+def _get_kingdoms(feature_types):
+    """Map between feature types and ITIS kingdoms"""
+    feature_type_to_kingdom = {
+        "animal": "Animalia",
+        "fungus": "Fungi",
+        "plant": "Plantae",
+        "slimemold": "Fungi",
+    }
+    kingdoms = []
+    for feature_type in feature_types:
+        kingdom = feature_type_to_kingdom.get(feature_type)
+        if kingdom is not None:
+            kingdoms.append(kingdom)
+    return kingdoms
+
+
