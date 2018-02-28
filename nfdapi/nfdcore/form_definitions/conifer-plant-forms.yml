@@ -72,27 +72,14 @@
 - id: details.lifestages
   label: Lifestages
   fields:
-    - label: vegetative
-      field: details.lifestages.vegetative
-      widget: double
-    - label: immature ovulate cones
-      field: details.lifestages.immature_ovulate_cones
-      widget: double
-    - label: mature ovulate cones
-      field: details.lifestages.mature_ovulate_cones
-      widget: double
-    - label: spent ovulate cones
-      field: details.lifestages.spent_ovulate_cones
-      widget: double
-    - label: immature pollen cones
-      field: details.lifestages.immature_pollen_cones
-      widget: double
-    - label: mature pollen cones
-      field: details.lifestages.mature_pollen_cones
-      widget: double
-    - label: spent pollen cones
-      field: details.lifestages.spent_pollen_cones
-      widget: double
+    - label: lifecycle
+      field: details.lifestages
+      widget: stringcombo_multiple
+      choices: nfdcore.models.ConiferLifestages
+    - label: plant count
+      field: details.plant_count
+      widget: stringcombo
+      choices: nfdcore.models.PlantCount
     - label: Notes
       field: notes.note.lifestages
       widget: textarea

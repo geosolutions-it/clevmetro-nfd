@@ -65,12 +65,23 @@
       field: details.slope
       widget: stringcombo_multiple
       choices: nfdcore.models.Slope
-    - label: lifestages
+    - label: Notes
+      field: notes.note.details
+      widget: textarea
+
+- id: details.lifestages
+  label: Lifestages
+  fields:
+    - label: lifecycle
       field: details.lifestages
       widget: stringcombo_multiple
       choices: nfdcore.models.FernLifestages
+    - label: plant count
+      field: details.plant_count
+      widget: stringcombo
+      choices: nfdcore.models.PlantCount
     - label: Notes
-      field: notes.note.details
+      field: notes.note.lifestages
       widget: textarea
 
 - id: details.disturbance_type
