@@ -58,10 +58,10 @@ Initialize the dictionary tables (using `./manage.py shell`):
 from nfdcore import initmodel as i
 i.init_model()
 ```
-Optional: Insert some test species:
+Optional: Insert some test taxa:
 ```python
 from nfdcore import initmodel as i
-i.insert_test_species()
+i.insert_test_taxa()
 ```
 
 Optional: Insert some test occurrences (Warning: it will delete existing occurrences):

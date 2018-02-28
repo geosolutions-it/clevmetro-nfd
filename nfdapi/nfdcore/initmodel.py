@@ -1,27 +1,11 @@
-from models import OccurrenceCategory, OccurrenceTaxon
-from models import IucnRedListCategory, UsfwsStatus
-from models import ElementSpecies, DayTime, Species
-from models import Season, RecordOrigin, Preservative, Storage, Repository
-from models import Gender
-from nfdcore.models import TerrestrialSampler, LandAnimalDetails,\
-    StreamAnimalDetails, TaxonDetails, OccurrenceObservation, PointOfContact,\
-    Voucher, CmStatus, SRank, NRank, GRank, MushroomGroup, RegionalStatus, Marks,\
-    DiseasesAndAbnormalities, AquaticSampler, StreamDesignatedUse, ChannelType,\
-    LoticHabitatType, HmfeiLocalAbundance, WaterFlowType, TerrestrialStratum,\
-    PondLakeType, PondLakeUse, LakeMicrohabitat, ShorelineType, WetlandType,\
-    WetlandLocation, WetlandConnectivity, WetlandHabitatFeature, WaterSource,\
-    SlimeMoldMedia, SlimeMoldClass, ConiferLifestages, FernLifestages,\
-    MossLifestages, FloweringPlantLifestages, PlantCount, MoistureRegime,\
-    GroundSurface, CanopyCover, GeneralHabitatCategory, LandscapePosition,\
-    Aspect, Slope, Watershed, Reservation, CMSensitivity, LeapLandCover,\
-    GlacialDepositPleistoceneAge, GlacialDeposit, NaturalAreaCondition,\
-    NaturalAreaType, BedrockAndOutcrops, RegionalFrequency,\
-    FungusApparentSubstrate, MushroomVerticalLocation, MushroomGrowthForm,\
-    MushroomOdor, FungalAssociationType
 from django.utils import timezone
 import reversion
-from reversion.models import Version
-from nfdcore.nfdserializers import delete_object_and_children
+
+from . import models
+from . import nfdserializers
+
+LONTRA_TSN = 180549
+BEAR_TSN = 180544
 
 # mark messages for translations but don't translate then right now
 def _(message): return message
@@ -563,6 +547,29 @@ slime_mold_class = [
     ("3", _("Slime net"), _("Protostelia"))
     ]
 
+animal_lifestages = [
+    ("1", "egg"),
+    ("2", "egg_mass"),
+    ("3", "nest"),
+    ("4", "early_instar_larva"),
+    ("5", "larva"),
+    ("6", "late_instar_larva"),
+    ("7", "early_instar_nymph"),
+    ("8", "nymph"),
+    ("9", "late_instar_nymph"),
+    ("10", "early_pupa"),
+    ("11", "pupa"),
+    ("12", "late_pupa"),
+    ("13", "juvenile"),
+    ("14", "immature"),
+    ("15", "subadult"),
+    ("16", "adult"),
+    ("17", "adult_pregnant_or_young"),
+    ("18", "senescent"),
+    ("19", "unknown"),
+    ("20", "na"),
+]
+
 conifer_lifestages = [
     ("1", _("vegetative")),
     ("2", _("immature ovulate cones")),
@@ -949,6 +956,7 @@ def _init_dict_extended_table(model_class, values, ifempty=True, clean=False):
         c.description = entry[2]
         c.save()
 
+
 def _init_dict_table(model_class, values, ifempty=True, clean=False):
     if clean:
         model_class.objects.all().delete()
@@ -963,170 +971,148 @@ def _init_dict_table(model_class, values, ifempty=True, clean=False):
         c.name = entry[1]
         c.save()
 
+
 def init_model(ifempty=True, clean=False):
-    _init_dict_extended_table(CmStatus, cm_status)
-    _init_dict_table(SRank, s_rank)
-    _init_dict_table(NRank, n_rank)
-    _init_dict_table(GRank, g_rank)
+    _init_dict_extended_table(models.CmStatus, cm_status)
+    _init_dict_table(models.SRank, s_rank)
+    _init_dict_table(models.NRank, n_rank)
+    _init_dict_table(models.GRank, g_rank)
 
-    _init_dict_table(IucnRedListCategory, iucn_redlist, ifempty, clean)
-    _init_dict_table(UsfwsStatus, usfws_status, ifempty, clean)
-    _init_dict_table(RegionalStatus, oh_status)
-    _init_dict_table(MushroomGroup, mushroom_group)
+    _init_dict_table(models.IucnRedListCategory, iucn_redlist, ifempty, clean)
+    _init_dict_table(models.UsfwsStatus, usfws_status, ifempty, clean)
+    _init_dict_table(models.RegionalStatus, oh_status)
+    _init_dict_table(models.MushroomGroup, mushroom_group)
 
-    _init_dict_table(DayTime, day_time, ifempty, clean)
-    _init_dict_table(Season, season, ifempty, clean)
-    _init_dict_table(RecordOrigin, record_origin, ifempty, clean)
-    _init_dict_table(Preservative, preservative, ifempty, clean)
-    _init_dict_table(Gender, gender, ifempty, clean)
-    _init_dict_table(TerrestrialSampler, terrestrial_sampler, ifempty, clean)
-
-
-    _init_dict_table(Storage, storage, ifempty, clean)
-    _init_dict_table(Marks, marks, ifempty, clean)
-    _init_dict_table(DiseasesAndAbnormalities, diseases, ifempty, clean)
-
-    _init_dict_table(AquaticSampler, aquatic_sampler, ifempty, clean)
-    _init_dict_table(StreamDesignatedUse, stream_designated_use, ifempty, clean)
-    _init_dict_table(ChannelType, channel_type, ifempty, clean)
-    _init_dict_table(HmfeiLocalAbundance, hmfei_local_abundance, ifempty, clean)
-    _init_dict_table(LoticHabitatType, lotic_habitat_type, ifempty, clean)
-    _init_dict_table(WaterFlowType, water_flow_type, ifempty, clean)
-    _init_dict_table(TerrestrialStratum, terrestrial_location_or_stratum, ifempty, clean)
-
-    _init_dict_table(PondLakeType, pond_lake_type, ifempty, clean)
-    _init_dict_table(PondLakeUse, pond_lake_use, ifempty, clean)
-    _init_dict_table(ShorelineType, pond_lake_shoreline, ifempty, clean)
-    _init_dict_table(LakeMicrohabitat, pond_lake_microhabitat, ifempty, clean)
-
-    _init_dict_table(WetlandType, wetland_type, ifempty, clean)
-    _init_dict_table(WetlandLocation, wetland_location, ifempty, clean)
-    _init_dict_table(WetlandConnectivity, wetland_connectivity, ifempty, clean)
-    _init_dict_table(WaterSource, water_source, ifempty, clean)
-    _init_dict_table(WetlandHabitatFeature, wetland_habitat_feature, ifempty, clean)
-
-    _init_dict_table(SlimeMoldMedia, slime_mold_media, ifempty, clean)
-    _init_dict_extended_table(SlimeMoldClass, slime_mold_class, ifempty, clean)
-
-    #_init_dict_table(ConiferLifestages, conifer_lifestages, ifempty, clean)
-    _init_dict_table(FernLifestages, fern_lifestages, ifempty, clean)
-    _init_dict_table(FloweringPlantLifestages, flowring_plant_lifestages, ifempty, clean)
-    _init_dict_table(MossLifestages, moss_lifestages, ifempty, clean)
-    _init_dict_table(PlantCount, plant_count, ifempty, clean)
-    _init_dict_table(MoistureRegime, moisture_regime, ifempty, clean)
-    _init_dict_table(GroundSurface, ground_surface, ifempty, clean)
-    _init_dict_table(CanopyCover, tree_canopy, ifempty, clean)
-    _init_dict_table(GeneralHabitatCategory, general_habitat_category, ifempty, clean)
-    _init_dict_table(LandscapePosition, landscape_position, ifempty, clean)
-    _init_dict_table(Aspect, aspect, ifempty, clean)
-    _init_dict_table(Slope, slope, ifempty, clean)
-
-    _init_dict_table(FungusApparentSubstrate, fungus_aparent_substrate, ifempty, clean)
-    _init_dict_table(MushroomVerticalLocation, mushroom_vertical_location, ifempty, clean)
-    _init_dict_table(MushroomGrowthForm, mushroom_growth_form, ifempty, clean)
-    _init_dict_table(MushroomOdor, mushroom_odor, ifempty, clean)
-    _init_dict_table(FungalAssociationType, fungal_association_type, ifempty, clean)
+    _init_dict_table(models.DayTime, day_time, ifempty, clean)
+    _init_dict_table(models.Season, season, ifempty, clean)
+    _init_dict_table(models.RecordOrigin, record_origin, ifempty, clean)
+    _init_dict_table(models.Preservative, preservative, ifempty, clean)
+    _init_dict_table(models.Gender, gender, ifempty, clean)
+    _init_dict_table(models.TerrestrialSampler, terrestrial_sampler, ifempty, clean)
 
 
-    _init_dict_table(Watershed, watershed, ifempty, clean)
-    _init_dict_table(Reservation, reservation, ifempty, clean)
+    _init_dict_table(models.Storage, storage, ifempty, clean)
+    _init_dict_table(models.Marks, marks, ifempty, clean)
+    _init_dict_table(models.DiseasesAndAbnormalities, diseases, ifempty, clean)
 
-    _init_dict_table(CMSensitivity, cm_sensitivity, ifempty, clean)
-    _init_dict_table(LeapLandCover, leap_land_cover, ifempty, clean)
-    _init_dict_table(GlacialDepositPleistoceneAge, pleistocene_glaciar_diposits, ifempty, clean)
-    _init_dict_table(GlacialDeposit, glaciar_diposits, ifempty, clean)
-    _init_dict_table(NaturalAreaCondition, natural_area_condition, ifempty, clean)
-    _init_dict_table(NaturalAreaType, natural_area_type, ifempty, clean)
-    _init_dict_table(BedrockAndOutcrops, bedrock_and_outcrops, ifempty, clean)
-    _init_dict_table(RegionalFrequency, regional_frequency, ifempty, clean)
+    _init_dict_table(models.AquaticSampler, aquatic_sampler, ifempty, clean)
+    _init_dict_table(models.StreamDesignatedUse, stream_designated_use, ifempty, clean)
+    _init_dict_table(models.ChannelType, channel_type, ifempty, clean)
+    _init_dict_table(models.HmfeiLocalAbundance, hmfei_local_abundance, ifempty, clean)
+    _init_dict_table(models.LoticHabitatType, lotic_habitat_type, ifempty, clean)
+    _init_dict_table(models.WaterFlowType, water_flow_type, ifempty, clean)
+    _init_dict_table(models.TerrestrialStratum, terrestrial_location_or_stratum, ifempty, clean)
+
+    _init_dict_table(models.PondLakeType, pond_lake_type, ifempty, clean)
+    _init_dict_table(models.PondLakeUse, pond_lake_use, ifempty, clean)
+    _init_dict_table(models.ShorelineType, pond_lake_shoreline, ifempty, clean)
+    _init_dict_table(models.LakeMicrohabitat, pond_lake_microhabitat, ifempty, clean)
+
+    _init_dict_table(models.WetlandType, wetland_type, ifempty, clean)
+    _init_dict_table(models.WetlandLocation, wetland_location, ifempty, clean)
+    _init_dict_table(models.WetlandConnectivity, wetland_connectivity, ifempty, clean)
+    _init_dict_table(models.WaterSource, water_source, ifempty, clean)
+    _init_dict_table(models.WetlandHabitatFeature, wetland_habitat_feature, ifempty, clean)
+
+    _init_dict_table(models.SlimeMoldMedia, slime_mold_media, ifempty, clean)
+    _init_dict_extended_table(models.SlimeMoldClass, slime_mold_class, ifempty, clean)
+
+    _init_dict_table(models.AnimalLifestages, animal_lifestages, ifempty, clean)
+    _init_dict_table(models.ConiferLifestages, conifer_lifestages, ifempty, clean)
+    _init_dict_table(models.FernLifestages, fern_lifestages, ifempty, clean)
+    _init_dict_table(models.FloweringPlantLifestages, flowring_plant_lifestages, ifempty, clean)
+    _init_dict_table(models.MossLifestages, moss_lifestages, ifempty, clean)
+    _init_dict_table(models.PlantCount, plant_count, ifempty, clean)
+    _init_dict_table(models.MoistureRegime, moisture_regime, ifempty, clean)
+    _init_dict_table(models.GroundSurface, ground_surface, ifempty, clean)
+    _init_dict_table(models.CanopyCover, tree_canopy, ifempty, clean)
+    _init_dict_table(models.GeneralHabitatCategory, general_habitat_category, ifempty, clean)
+    _init_dict_table(models.LandscapePosition, landscape_position, ifempty, clean)
+    _init_dict_table(models.Aspect, aspect, ifempty, clean)
+    _init_dict_table(models.Slope, slope, ifempty, clean)
+
+    _init_dict_table(models.FungusApparentSubstrate, fungus_aparent_substrate, ifempty, clean)
+    _init_dict_table(models.MushroomVerticalLocation, mushroom_vertical_location, ifempty, clean)
+    _init_dict_table(models.MushroomGrowthForm, mushroom_growth_form, ifempty, clean)
+    _init_dict_table(models.MushroomOdor, mushroom_odor, ifempty, clean)
+    _init_dict_table(models.FungalAssociationType, fungal_association_type, ifempty, clean)
+
+
+    _init_dict_table(models.Watershed, watershed, ifempty, clean)
+    _init_dict_table(models.Reservation, reservation, ifempty, clean)
+
+    _init_dict_table(models.CMSensitivity, cm_sensitivity, ifempty, clean)
+    _init_dict_table(models.LeapLandCover, leap_land_cover, ifempty, clean)
+    _init_dict_table(models.GlacialDepositPleistoceneAge, pleistocene_glaciar_diposits, ifempty, clean)
+    _init_dict_table(models.GlacialDeposit, glaciar_diposits, ifempty, clean)
+    _init_dict_table(models.NaturalAreaCondition, natural_area_condition, ifempty, clean)
+    _init_dict_table(models.NaturalAreaType, natural_area_type, ifempty, clean)
+    _init_dict_table(models.BedrockAndOutcrops, bedrock_and_outcrops, ifempty, clean)
+    _init_dict_table(models.RegionalFrequency, regional_frequency, ifempty, clean)
 
     if clean:
-        OccurrenceCategory.objects.all().delete()
+        models.OccurrenceCategory.objects.all().delete()
 
     if ifempty:
-        if OccurrenceCategory.objects.count() > 0:
+        if models.OccurrenceCategory.objects.count() > 0:
             return
     for entry in occurrence_subcat:
-        c = OccurrenceCategory()
+        c = models.OccurrenceCategory()
         c.code = entry[0]
         c.name = entry[1]
         c.main_cat = entry[2]
         c.save()
 
-def clean_occurrences():
-    for feat in OccurrenceTaxon.objects.all():
-        delete_object_and_children(feat)
-
-def clean_species():
-    Species.objects.all().delete()
-    ElementSpecies.objects.all().delete()
 
 def fix_species():
-    iucn_cat = IucnRedListCategory.objects.get(code='LC')
-    species = Species.objects.filter().all()
+    iucn_cat = models.IucnRedListCategory.objects.get(code='LC')
+    species = models.Species.objects.filter().all()
     for specie in species:
         if not specie.element_species:
             print("Assigning IUCN Category {} to {}".format(iucn_cat, specie))
-            element_species = ElementSpecies()
+            element_species = models.ElementSpecies()
             element_species.iucn_red_list_category = iucn_cat
             element_species.save()
             specie.element_species = element_species
             specie.save()
 
-def insert_test_species(clean=False):
+
+def insert_test_taxa(clean=False):
     if clean:
-        clean_species()
+        models.Taxon.objects.all().delete()
 
-    iucn_cat = IucnRedListCategory.objects.get(code='LC')
+    iucn_cat = models.IucnRedListCategory.objects.get(code='LC')
+    taxa_info = [
+        (LONTRA_TSN, "lontra_cnd"),
+        (BEAR_TSN, "bl_bear"),
+    ]
     with reversion.create_revision():
-        element_species = ElementSpecies()
-        element_species.other_code = "lontra_cnd"
-        element_species.iucn_red_list_category = iucn_cat
-        element_species.save()
+        for taxon_params in taxa_info:
+            tsn, other_code = taxon_params
+            taxon = models.Taxon(
+                tsn=tsn,
+                other_code=other_code,
+                iucn_red_list_category=iucn_cat,
+            )
+            taxon.save()
 
-        species = Species()
-        species.tsn = 180549
-        species.first_common = 'North American river otter'
-        species.name_sci = 'Lontra canadensis'
-        species.element_species = element_species
-        species.family = 'Mustelidae'
-        species.family_common = 'Mustelids'
-        species.phylum = 'Chordata'
-        species.phylum_common = 'Chordates'
-        species.save()
-
-        element_species = ElementSpecies()
-        element_species.other_code = "bl_bear"
-        element_species.iucn_red_list_category = iucn_cat
-        element_species.save()
-
-        species = Species()
-        species.tsn = 180544
-        species.first_common = 'American black bear'
-        species.name_sci = 'Ursus americanus'
-        species.element_species = element_species
-        species.family = 'Ursidae'
-        species.family_common = 'Bears'
-        species.phylum = 'Chordata'
-        species.phylum_common = 'Chordate'
-        species.save()
 
 def insert_test_data(clean=True):
     if clean:
-        clean_occurrences()
+        for feat in models.OccurrenceTaxon.objects.all():
+            nfdserializers.delete_object_and_children(feat)
 
-    iucn_cat = IucnRedListCategory.objects.get(code='LC')
     """
-    plant_cat = OccurrenceCategory.objects.get(code='pl')
+    plant_cat = models.OccurrenceCategory.objects.get(code='pl')
 
     with reversion.create_revision():
-        element_species = ElementSpecies()
+        element_species = models.ElementSpecies()
         element_species.iucn_red_list_category = iucn_cat
         element_species.other_code = "qrc_alba"
         #element_species.nrcs_usda_symbol =
         element_species.save()
 
-        species = Species()
+        species = models.Species()
         species.tsn = '19290'
         species.first_common = 'White oak'
         species.name_sci = 'Quercus alba'
@@ -1134,69 +1120,69 @@ def insert_test_data(clean=True):
         species.save()
 
     with reversion.create_revision():
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.occurrence_cat = plant_cat
         t.geom = 'POINT( -81.564302 41.201797 )'
         t.species = species
         t.save()
 
     with reversion.create_revision():
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.occurrence_cat = plant_cat
         t.geom = 'POINT( -81.520700 41.243243 )'
         t.species = species
         t.save()
 
     with reversion.create_revision():
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.occurrence_cat = plant_cat
         t.geom = 'POINT( -81.575804 41.279632 )'
         t.species = species
         t.save()
     """
-    stream_animal_cat = OccurrenceCategory.objects.get(code='st')
-    species = Species.objects.get(tsn=180549)
-    gender = Gender.objects.get(code='fe')
+    stream_animal_cat = models.OccurrenceCategory.objects.get(code='st')
+    taxon1 = models.Taxon.objects.get(tsn=LONTRA_TSN)
+    gender = models.Gender.objects.get(code='fe')
 
     with reversion.create_revision():
-        stream_details = StreamAnimalDetails()
+        stream_details = models.StreamAnimalDetails()
         stream_details.gender = gender
         stream_details.stream_name_1 = 'Ramdom stream name1'
         stream_details.save()
 
-        reporter = PointOfContact()
+        reporter = models.PointOfContact()
         reporter.name = "I'm the reporter"
         reporter.save()
 
-        observation = OccurrenceObservation()
+        observation = models.OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.reporter = reporter
         observation.save()
 
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.geom = 'POINT( -81.554282 41.379035 )'
-        t.species = species
+        t.taxon = taxon1
         t.occurrence_cat = stream_animal_cat
         t.details = stream_details
         t.observation = observation
         t.save()
 
     with reversion.create_revision():
-        stream_details = StreamAnimalDetails()
+        stream_details = models.StreamAnimalDetails()
         stream_details.gender = gender
         stream_details.stream_name_1 = 'Ramdom stream name2'
         stream_details.save()
 
-        recorder = PointOfContact()
+        recorder = models.PointOfContact()
         recorder.name = "I'm the recorder2"
         recorder.save()
 
-        reporter = PointOfContact()
+        reporter = models.PointOfContact()
         reporter.name = "I'm the reporter2"
         reporter.save()
 
-        observation = OccurrenceObservation()
+        observation = models.OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
@@ -1204,66 +1190,66 @@ def insert_test_data(clean=True):
         observation.save()
 
 
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.geom = 'POINT( -81.546814 41.386602 )'
-        t.species = species
+        t.taxon = taxon1
         t.occurrence_cat = stream_animal_cat
         t.details = stream_details
         t.observation = observation
         t.save()
 
     with reversion.create_revision():
-        recorder = PointOfContact()
+        recorder = models.PointOfContact()
         recorder.name = "I'm the recorder"
         recorder.save()
 
-        reporter = PointOfContact()
+        reporter = models.PointOfContact()
         reporter.name = "I'm the reporter"
         reporter.save()
 
-        observation = OccurrenceObservation()
+        observation = models.OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.recorder = recorder
         observation.reporter = reporter
         observation.save()
 
-        land_animal_cat = OccurrenceCategory.objects.get(code='ln')
-        sound_recording = TerrestrialSampler.objects.get(code='sr')
-        land_animal_details = LandAnimalDetails()
+        land_animal_cat = models.OccurrenceCategory.objects.get(code='ln')
+        sound_recording = models.TerrestrialSampler.objects.get(code='sr')
+        land_animal_details = models.LandAnimalDetails()
         land_animal_details.sampler = sound_recording
         land_animal_details.gender = gender
         land_animal_details.save()
 
-        species = Species.objects.get(tsn=180544)
+        taxon2 = models.Taxon.objects.get(tsn=BEAR_TSN)
 
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.geom = 'POINT( -81.526814 41.366602 )'
-        t.species = species
+        t.taxon = taxon2
         t.occurrence_cat = land_animal_cat
         t.details = land_animal_details
         t.observation = observation
         t.save()
 
-        land_animal_details = LandAnimalDetails()
-        camera = TerrestrialSampler.objects.get(code='wc')
+        land_animal_details = models.LandAnimalDetails()
+        camera = models.TerrestrialSampler.objects.get(code='wc')
         land_animal_details.sampler = camera
         land_animal_details.gender = gender
         land_animal_details.save()
 
-        reporter = PointOfContact()
+        reporter = models.PointOfContact()
         reporter.name = "I'm the reporter 4"
         reporter.save()
 
-        observation = OccurrenceObservation()
+        observation = models.OccurrenceObservation()
         observation.observation_date = timezone.now()
         observation.recording_datetime = timezone.now()
         observation.reporter = reporter
         observation.save()
 
-        t = OccurrenceTaxon()
+        t = models.OccurrenceTaxon()
         t.geom = 'POINT( -81.226814 41.166602 )'
-        t.species = species
+        t.taxon = taxon2
         t.occurrence_cat = land_animal_cat
         t.details = land_animal_details
         t.observation = observation
