@@ -336,17 +336,25 @@ taxon_status:
   fields:
     - label: CM Status
       field: taxon.cm_status
+      widget: stringcombo
+      choices: nfdcore.models.CmStatus
       readonly: true
     - label: S Rank
       field: taxon.s_rank
+      widget: stringcombo
+      choices: nfdcore.models.SRank
       readonly: true
       show_key_with_value: true
     - label: N Rank
       field: taxon.n_rank
+      widget: stringcombo
+      choices: nfdcore.models.NRank
       readonly: true
       show_key_with_value: true
     - label: G Rank
       field: taxon.g_rank
+      widget: stringcombo
+      choices: nfdcore.models.GRank
       readonly: true
       show_key_with_value: true
     - label: Native
