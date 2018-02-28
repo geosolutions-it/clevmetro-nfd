@@ -12,6 +12,7 @@ const FilterUtils = require('../utils/FilterUtils');
 
 const {
     NFD_LOGIN_SUCCESS,
+    NFD_LOGGED,
     UPDATE_NATURAL_FEATURE,
     DELETE_NATURAL_FEATURE,
     NATURAL_FEATURE_CREATED,
@@ -69,7 +70,7 @@ module.exports = {
                                 .concat([onListLoading(false)])
                                 ),
     fetchLists: (action$, store) =>
-        action$.ofType(NFD_LOGIN_SUCCESS)
+        action$.ofType(NFD_LOGIN_SUCCESS, NFD_LOGGED)
             .switchMap(() => {
                 const {featureTypes = [], activeFt} = (store.getState()).featuresearch;
                 const ftType = activeFt || featureTypes.length > 0 && featureTypes[0];

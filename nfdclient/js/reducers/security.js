@@ -42,6 +42,9 @@ function security(state = {user: null, errorCause: null}, action) {
                 authHeader: null,
                 loginError: null
             });
+        case "persist/REHYDRATE": {
+            return action.payload && action.payload.security || {user: null, errorCause: null};
+        }
         default:
             return state;
     }

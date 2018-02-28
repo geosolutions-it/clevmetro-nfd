@@ -27,7 +27,7 @@ const FeatureCard = (props) => {
     // TODO a different card for natural features
     return (
       <span className="list-group-item nfd-list-item">
-        <span className="feature-title">{p["species.name_sci"]}</span>
+        <span className="feature-title">{p["taxon.name"]}</span>
         <span className="feature-desc" >{`${date} ${p.released ? 'released' : ''}`}</span>
         <span className="list-item-btn" style={{width: 60}} >
             <Glyphicon glyph="zoom-in" onClick={zoom}/>
