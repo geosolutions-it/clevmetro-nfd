@@ -95,19 +95,19 @@ module.exports = {
     },
     getFormIcon(formname) {
         let icon = 'question-sign';
-        if (formname.toLowerCase() === 'features') {
-            icon = 'question-sign';
-        } else if (formname.toLowerCase() === 'species.element_species') {
+        if (formname.toLowerCase() === 'species') {
+            icon = 'pen';
+        } else if (formname.toLowerCase() === 'taxon_status') {
             icon = 'star';
         } else if (formname.toLowerCase() === 'details') {
             icon = 'th-list';
         } else if (formname.toLowerCase() === 'details.lifestages') {
             icon = 'refresh';
-        } else if (formname.toLowerCase() === 'occurrencemanagement') {
+        } else if (formname.toLowerCase() === 'management') {
             icon = 'cog';
         } else if (formname.toLowerCase() === 'observation') {
             icon = 'eye-open';
-        } else if (formname.toLowerCase() === 'observer') {
+        } else if (formname.toLowerCase() === 'observation.reporter') {
             icon = 'reporter';
         } else if (formname.toLowerCase() === 'observation.recorder') {
             icon = 'recorder';
