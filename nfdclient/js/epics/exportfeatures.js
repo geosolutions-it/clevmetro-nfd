@@ -104,6 +104,6 @@ module.exports = {
             delete currentUrl.hash;
             const link = url.format(currentUrl);
             copy(link);
-            return Rx.Observable.of(info({title: "Link", message: `Permalink adde to clipboard ${link}`}));
+            return Rx.Observable.of(info({title: "Link", message: `Permalink added to clipboard ${link}`}));
         })
 };
