@@ -6,7 +6,7 @@
                 "report": "Report",
                 "search": "Search Categories",
                 "add": "Add new feature",
-                "tooglepanel": "Open view/edit panel",
+                "togglepanel": "Open view/edit panel",
                 "login": "Login/Logout"
             }
         },
