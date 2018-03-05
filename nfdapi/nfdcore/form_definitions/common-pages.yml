@@ -4,27 +4,27 @@ management:
       field: id
       widget: integer
       readonly: True
-    - label: feature type
+    - label: Feature type
       field: featuretype
       widget: string
       readonly: True
-    - label: feature sub-type
+    - label: Feature sub-type
       field: featuresubtype
       widget: string
       readonly: True
-    - label: released
+    - label: Released
       field: released
       widget: boolean
       readonly: True
-    - label: verified
+    - label: Verified
       field: verified
       widget: boolean
       readonly: True
-    - label: inclusion date
+    - label: Inclusion date
       field: inclusion_date
       widget: string
       readonly: True
-    - label: version date
+    - label: Version date
       field: version_date
       widget: string
       readonly: True
@@ -34,109 +34,109 @@ animal_taxon:
     - label: TSN
       field: taxon.tsn
       readonly: true
-    - label: scientific name
+    - label: Scientific name
       field: taxon.name
       readonly: true
-    - label: rank
+    - label: Rank
       field: taxon.rank
       readonly: true
-    - label: common names
+    - label: Common names
       field: taxon.common_names.English
       readonly: true
-    - label: kingdom
+    - label: Kingdom
       field: taxon.kingdom
       readonly: true
-    - label: subkingdom
+    - label: Subkingdom
       field: taxon.subkingdom
       readonly: true
-    - label: infrakingdom
+    - label: Infrakingdom
       field: taxon.infrakingdom
       readonly: true
-    - label: superphylum
+    - label: Superphylum
       field: taxon.superphylum
       readonly: true
-    - label: phylum
+    - label: Phylum
       field: taxon.phylum
       readonly: true
-    - label: subphylum
+    - label: Subphylum
       field: taxon.subphylum
       readonly: true
-    - label: infraphylum
+    - label: Infraphylum
       field: taxon.infraphylum
       readonly: true
-    - label: superclass
+    - label: Superclass
       field: taxon.superclass
       readonly: true
-    - label: class
+    - label: Class
       field: taxon.class
       readonly: true
-    - label: subclass
+    - label: Subclass
       field: taxon.subclass
       readonly: true
-    - label: infraclass
+    - label: Infraclass
       field: taxon.infraclass
       readonly: true
-    - label: superorder
+    - label: Superorder
       field: taxon.superorder
       readonly: true
-    - label: order
+    - label: Order
       field: taxon.order
       readonly: true
-    - label: suborder
+    - label: Suborder
       field: taxon.suborder
       readonly: true
-    - label: infraorder
+    - label: Infraorder
       field: taxon.infraorder
       readonly: true
-    - label: section
+    - label: Section
       field: taxon.section
       readonly: true
-    - label: subsection
+    - label: Subsection
       field: taxon.subsection
       readonly: true
-    - label: superfamily
+    - label: Superfamily
       field: taxon.superfamily
       readonly: true
-    - label: family
+    - label: Family
       field: taxon.family
       readonly: true
-    - label: subfamily
+    - label: Subfamily
       field: taxon.subfamily
       readonly: true
-    - label: tribe
+    - label: Tribe
       field: taxon.tribe
       readonly: true
-    - label: subtribe
+    - label: Subtribe
       field: taxon.subtribe
       readonly: true
-    - label: genus
+    - label: Genus
       field: taxon.genus
       readonly: true
-    - label: subgenus
+    - label: Subgenus
       field: taxon.subgenus
       readonly: true
-    - label: species
+    - label: Species
       field: taxon.species
       readonly: true
-    - label: subspecies
+    - label: Subspecies
       field: taxon.subspecies
       readonly: true
-    - label: variety
+    - label: Variety
       field: taxon.variety
       readonly: true
-    - label: form
+    - label: Form
       field: taxon.form
       readonly: true
-    - label: race
+    - label: Race
       field: taxon.race
       readonly: true
-    - label: stirp
+    - label: Stirp
       field: taxon.stirp
       readonly: true
-    - label: morph
+    - label: Morph
       field: taxon.morph
       readonly: true
-    - label: aberration
+    - label: Aberration
       field: taxon.aberration
       readonly: true
     - label: Notes
@@ -148,97 +148,97 @@ plant_taxon:
     - label: TSN
       field: taxon.tsn
       readonly: true
-    - label: scientific name
+    - label: Scientific name
       field: taxon.name
       readonly: true
-    - label: rank
+    - label: Rank
       field: taxon.rank
       readonly: true
-    - label: common names
+    - label: Common names
       field: taxon.common_names.English
       readonly: true
-    - label: kingdom
+    - label: Kingdom
       field: taxon.kingdom
       readonly: true
-    - label: subkingdom
+    - label: Subkingdom
       field: taxon.subkingdom
       readonly: true
-    - label: infrakingdom
+    - label: Infrakingdom
       field: taxon.infrakingdom
       readonly: true
-    - label: superdivision
+    - label: Superdivision
       field: taxon.superdivision
       readonly: true
-    - label: division
+    - label: Division
       field: taxon.division
       readonly: true
-    - label: subdivision
+    - label: Subdivision
       field: taxon.subdivision
       readonly: true
-    - label: infradivision
+    - label: Infradivision
       field: taxon.infradivision
       readonly: true
-    - label: superclass
+    - label: Superclass
       field: taxon.superclass
       readonly: true
-    - label: class
+    - label: Class
       field: taxon.class
       readonly: true
-    - label: subclass
+    - label: Subclass
       field: taxon.subclass
       readonly: true
-    - label: infraclass
+    - label: Infraclass
       field: taxon.infraclass
       readonly: true
-    - label: superorder
+    - label: Superorder
       field: taxon.superorder
       readonly: true
-    - label: order
+    - label: Order
       field: taxon.order
       readonly: true
-    - label: suborder
+    - label: Suborder
       field: taxon.suborder
       readonly: true
-    - label: family
+    - label: Family
       field: taxon.family
       readonly: true
-    - label: subfamily
+    - label: Subfamily
       field: taxon.subfamily
       readonly: true
-    - label: tribe
+    - label: Tribe
       field: taxon.tribe
       readonly: true
-    - label: subtribe
+    - label: Subtribe
       field: taxon.subtribe
       readonly: true
-    - label: genus
+    - label: Genus
       field: taxon.genus
       readonly: true
-    - label: subgenus
+    - label: Subgenus
       field: taxon.subgenus
       readonly: true
-    - label: section
+    - label: Section
       field: taxon.section
       readonly: true
-    - label: subsection
+    - label: Subsection
       field: taxon.subsection
       readonly: true
-    - label: species
+    - label: Species
       field: taxon.species
       readonly: true
-    - label: subspecies
+    - label: Subspecies
       field: taxon.subspecies
       readonly: true
-    - label: variety
+    - label: Variety
       field: taxon.variety
       readonly: true
-    - label: subvariety
+    - label: Subvariety
       field: taxon.subvariety
       readonly: true
-    - label: form
+    - label: Form
       field: taxon.form
       readonly: true
-    - label: subform
+    - label: Subform
       field: taxon.subform
       readonly: true
     - label: Notes
@@ -250,82 +250,82 @@ fungus_taxon:
     - label: TSN
       field: taxon.tsn
       readonly: true
-    - label: scientific name
+    - label: Scientific name
       field: taxon.name
       readonly: true
-    - label: rank
+    - label: Rank
       field: taxon.rank
       readonly: true
-    - label: common names
+    - label: Common names
       field: taxon.common_names.English
       readonly: true
-    - label: kingdom
+    - label: Kingdom
       field: taxon.kingdom
       readonly: true
-    - label: subkingdom
+    - label: Subkingdom
       field: taxon.subkingdom
       readonly: true
-    - label: division
+    - label: Division
       field: taxon.division
       readonly: true
-    - label: subdivision
+    - label: Subdivision
       field: taxon.subdivision
       readonly: true
-    - label: class
+    - label: Class
       field: taxon.class
       readonly: true
-    - label: subclass
+    - label: Subclass
       field: taxon.subclass
       readonly: true
-    - label: superorder
+    - label: Superorder
       field: taxon.superorder
       readonly: true
-    - label: order
+    - label: Order
       field: taxon.order
       readonly: true
-    - label: suborder
+    - label: Suborder
       field: taxon.suborder
       readonly: true
-    - label: family
+    - label: Family
       field: taxon.family
       readonly: true
-    - label: subfamily
+    - label: Subfamily
       field: taxon.subfamily
       readonly: true
-    - label: tribe
+    - label: Tribe
       field: taxon.tribe
       readonly: true
-    - label: subtribe
+    - label: Subtribe
       field: taxon.subtribe
       readonly: true
-    - label: genus
+    - label: Genus
       field: taxon.genus
       readonly: true
-    - label: subgenus
+    - label: Subgenus
       field: taxon.subgenus
       readonly: true
-    - label: section
+    - label: Section
       field: taxon.section
       readonly: true
-    - label: subsection
+    - label: Subsection
       field: taxon.subsection
       readonly: true
-    - label: species
+    - label: Species
       field: taxon.species
       readonly: true
-    - label: subspecies
+    - label: Subspecies
       field: taxon.subspecies
       readonly: true
-    - label: variety
+    - label: Variety
       field: taxon.variety
       readonly: true
-    - label: subvariety
+    - label: Subvariety
       field: taxon.subvariety
       readonly: true
-    - label: form
+    - label: Form
       field: taxon.form
       readonly: true
-    - label: subform
+    - label: Subform
       field: taxon.subform
       readonly: true
     - label: Notes
@@ -522,25 +522,25 @@ animal_lifestages:
 
 location:
   fields:
-    - label: site description
+    - label: Site description
       field: location.site_description
-    - label: reservation
+    - label: Reservation
       field: location.reservation
       widget: stringcombo_multiple
       choices: nfdcore.models.Reservation
-    - label: watershed
+    - label: Watershed
       field: location.watershed
       widget: stringcombo_multiple
       choices: nfdcore.models.Watershed
-    - label: directions
+    - label: Directions
       field: location.directions
-    - label: city township
+    - label: City township
       field: location.city_township
-    - label: county
+    - label: County
       field: location.county
-    - label: quad name
+    - label: Quad name
       field: location.quad_name
-    - label: quad number
+    - label: Quad number
       field: location.quad_number
     - label: Notes
       field: notes.note.details
@@ -548,48 +548,45 @@ location:
 
 disturbance_type:
   fields:
-    - label: browse
+    - label: Browse
       field: details.disturbance_type.browse
       widget: double
-    - label: collecting
+    - label: Collecting
       field: details.disturbance_type.collecting
       widget: double
-    - label: disease pest
+    - label: Disease pest
       field: details.disturbance_type.disease_pest
       widget: double
-    - label: mowing
+    - label: Mowing
       field: details.disturbance_type.mowing
       widget: double
-    - label: trampling
+    - label: Trampling
       field: details.disturbance_type.trampling
       widget: double
-    - label: vehicle traffic
+    - label: Vehicle traffic
       field: details.disturbance_type.vehicle_traffic
       widget: double
-    - label: woody plant removal
+    - label: Woody plant removal
       field: details.disturbance_type.woody_plant_removal
       widget: double
-    - label: Notes
-      field: notes.note.disturbance_type
-      widget: textarea
-    - label: casting piles
+    - label: Casting piles
       field: details.earthworm_evidence.casting_piles
       widget: double
-    - label: compacted soil
+    - label: Compacted soil
       field: details.earthworm_evidence.compacted_soil
       widget: double
-    - label: individuals
+    - label: Individuals
       field: details.earthworm_evidence.individuals
       widget: double
-    - label: layered castings
+    - label: Layered castings
       field: details.earthworm_evidence.layered_castings
       widget: double
-    - label: middens
+    - label: Middens
       field: details.earthworm_evidence.middens
       widget: double
-    - label: no evidence
+    - label: No evidence
       field: details.earthworm_evidence.no_evidence
       widget: double
     - label: Notes
-      field: notes.note.earthworm_evidence
+      field: notes.note.disturbance_type
       widget: textarea

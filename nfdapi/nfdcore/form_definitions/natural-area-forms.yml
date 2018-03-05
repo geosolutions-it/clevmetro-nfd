@@ -95,22 +95,22 @@
 - id: element.earthworm_evidence
   label: Earthworm evidence
   fields:
-    - label: casting piles
+    - label: Casting piles
       field: element.earthworm_evidence.casting_piles
       widget: double
-    - label: compacted soil
+    - label: Compacted soil
       field: element.earthworm_evidence.compacted_soil
       widget: double
-    - label: individuals
+    - label: Individuals
       field: element.earthworm_evidence.individuals
       widget: double
-    - label: layered castings
+    - label: Layered castings
       field: element.earthworm_evidence.layered_castings
       widget: double
-    - label: middens
+    - label: Middens
       field: element.earthworm_evidence.middens
       widget: double
-    - label: no evidence
+    - label: No evidence
       field: element.earthworm_evidence.no_evidence
       widget: double
     - label: Notes
@@ -120,25 +120,25 @@
 - id: element.disturbance_type
   label: Disturbance type
   fields:
-    - label: browse
+    - label: Browse
       field: element.disturbance_type.browse
       widget: double
-    - label: collecting
+    - label: Collecting
       field: element.disturbance_type.collecting
       widget: double
-    - label: disease pest
+    - label: Disease pest
       field: element.disturbance_type.disease_pest
       widget: double
-    - label: mowing
+    - label: Mowing
       field: element.disturbance_type.mowing
       widget: double
-    - label: trampling
+    - label: Trampling
       field: element.disturbance_type.trampling
       widget: double
-    - label: vehicle traffic
+    - label: Vehicle traffic
       field: element.disturbance_type.vehicle_traffic
       widget: double
-    - label: woody plant removal
+    - label: Woody plant removal
       field: element.disturbance_type.woody_plant_removal
       widget: double
     - label: Notes

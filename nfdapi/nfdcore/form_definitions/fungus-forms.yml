@@ -146,40 +146,40 @@
 - id: details.fruiting_bodies_age
   label: Fruiting bodies age
   fields:
-    - label: aged diam cm
+    - label: Aged diam cm
       field: details.fruiting_bodies_age.aged_diam_cm
       widget: double
-    - label: aged count
+    - label: Aged count
       field: details.fruiting_bodies_age.aged_count
       widget: integer
-    - label: buttons diam cm
+    - label: Buttons diam cm
       field: details.fruiting_bodies_age.buttons_diam_cm
       widget: double
-    - label: buttons count
+    - label: Buttons count
       field: details.fruiting_bodies_age.buttons_count
       widget: integer
-    - label: decomposing diam cm
+    - label: Decomposing diam cm
       field: details.fruiting_bodies_age.decomposing_diam_cm
       widget: double
-    - label: decomposing count
+    - label: Decomposing count
       field: details.fruiting_bodies_age.decomposing_count
       widget: integer
     - label: emergents diam cm
-      field: details.fruiting_bodies_age.emergents_diam_cm
+      field: Details.fruiting_bodies_age.emergents_diam_cm
       widget: double
     - label: emergents count
-      field: details.fruiting_bodies_age.emergents_count
+      field: Details.fruiting_bodies_age.emergents_count
       widget: integer
-    - label: mature diam cm
+    - label: Mature diam cm
       field: details.fruiting_bodies_age.mature_diam_cm
       widget: double
-    - label: mature count
+    - label: Mature count
       field: details.fruiting_bodies_age.mature_count
       widget: integer
-    - label: young diam cm
+    - label: Young diam cm
       field: details.fruiting_bodies_age.young_diam_cm
       widget: double
-    - label: young count
+    - label: Young count
       field: details.fruiting_bodies_age.young_count
       widget: integer
     - label: Notes

@@ -41,41 +41,41 @@
       field: details.diseases_and_abnormalities
       widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
-    - label: sampler
+    - label: Sampler
       field: details.sampler
       widget: stringcombo_multiple
       choices: nfdcore.models.AquaticSampler
-    - label: lentic size approx (acres)
+    - label: Lentic size approx (acres)
       field: details.lentic_size_acres_aprox
       widget: integer
-    - label: lentic size approx (square meters)
+    - label: Lentic size approx (square meters)
       field: details.lentic_size_squaremeters
       widget: integer
-    - label: lentic size exact (acres)
+    - label: Lentic size exact (acres)
       field: details.lentic_size_acres_exact
       widget: double
-    - label: lentic size exact (squaremeters)
+    - label: Lentic size exact (squaremeters)
       field: details.lentic_size_squaremeters_exact
       widget: double
-    - label: pond lake name
+    - label: Pond lake name
       field: details.pond_lake_name
     - label: pond lake type
-      field: details.pond_lake_type
+      field: Details.pond_lake_type
       widget: stringcombo
       choices: nfdcore.models.PondLakeType
-    - label: pond lake use
+    - label: Pond lake use
       field: details.pond_lake_use
       widget: stringcombo_multiple
       choices: nfdcore.models.PondLakeUse
-    - label: shoreline type
+    - label: Shoreline type
       field: details.shoreline_type
       widget: stringcombo_multiple
       choices: nfdcore.models.ShorelineType
-    - label: microhabitat
+    - label: Microhabitat
       field: details.microhabitat
       widget: stringcombo_multiple
       choices: nfdcore.models.LakeMicrohabitat
-    - label: microhabitat comments
+    - label: Microhabitat comments
       field: details.microhabitat_comments
     - label: Notes
       field: notes.note.details

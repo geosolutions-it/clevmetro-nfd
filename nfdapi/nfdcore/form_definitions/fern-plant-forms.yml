@@ -29,35 +29,35 @@
 - id: details
   label: Details
   fields:
-    - label: area ranges
+    - label: Area ranges
       field: details.area_ranges
-    - label: moisture regime
+    - label: Moisture regime
       field: details.moisture_regime
       widget: stringcombo_multiple
       choices: nfdcore.models.MoistureRegime
-    - label: ground surface
+    - label: Ground surface
       field: details.ground_surface
       widget: stringcombo_multiple
       choices: nfdcore.models.GroundSurface
-    - label: tree canopy cover
+    - label: Tree canopy cover
       field: details.tree_canopy_cover
       widget: stringcombo
       choices: nfdcore.models.CanopyCover
-    - label: general habitat category
+    - label: General habitat category
       field: details.general_habitat_category
       widget: stringcombo_multiple
       choices: nfdcore.models.GeneralHabitatCategory
-    - label: leap landcover category
+    - label: Leap landcover category
       field: details.leap_land_cover_category
-    - label: landscape position
+    - label: Landscape position
       field: details.landscape_position
       widget: stringcombo_multiple
       choices: nfdcore.models.LandscapePosition
-    - label: aspect
+    - label: Aspect
       field: details.aspect
       widget: stringcombo_multiple
       choices: nfdcore.models.Aspect
-    - label: slope
+    - label: Slope
       field: details.slope
       widget: stringcombo_multiple
       choices: nfdcore.models.Slope
@@ -68,11 +68,11 @@
 - id: details.lifestages
   label: Lifestages
   fields:
-    - label: lifecycle
+    - label: Lifecycle
       field: details.lifestages
       widget: stringcombo_multiple
       choices: nfdcore.models.FernLifestages
-    - label: plant count
+    - label: Plant count
       field: details.plant_count
       widget: stringcombo
       choices: nfdcore.models.PlantCount

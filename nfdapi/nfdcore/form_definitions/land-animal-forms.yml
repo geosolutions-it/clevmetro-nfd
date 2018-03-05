@@ -83,13 +83,13 @@
       field: voucher.repository
       widget: string
       choices: nfdcore.models.Repository
-    - label: Notes
-      field: notes.note.voucher
-      widget: textarea
     - label: Marks
       field: details.marks
       widget: stringcombo_multiple
       choices: nfdcore.models.Marks
+    - label: Notes
+      field: notes.note.voucher
+      widget: textarea
 
 - id: details
   label: Details

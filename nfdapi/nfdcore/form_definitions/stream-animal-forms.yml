@@ -82,40 +82,40 @@
 - id: details.substrate
   label: Substrate
   fields:
-    - label: artificial
+    - label: Artificial
       field: details.substrate.artificial
       widget: double
-    - label: bedrock
+    - label: Bedrock
       field: details.substrate.bedrock
       widget: double
-    - label: boulder
+    - label: Boulder
       field: details.substrate.boulder
       widget: double
-    - label: boulder slab
+    - label: Boulder slab
       field: details.substrate.boulder_slab
       widget: double
-    - label: clay hardpan
+    - label: Clay hardpan
       field: details.substrate.clay_hardpan
       widget: double
-    - label: cobble
+    - label: Cobble
       field: details.substrate.cobble
       widget: double
-    - label: fine detritus
+    - label: Fine detritus
       field: details.substrate.fine_detritus
       widget: double
-    - label: gravel
+    - label: Gravel
       field: details.substrate.gravel
       widget: double
-    - label: leafpack woody debris
+    - label: Leafpack woody debris
       field: details.substrate.leafpack_woody_debris
       widget: double
-    - label: muck
+    - label: Muck
       field: details.substrate.muck
       widget: double
-    - label: sand
+    - label: Sand
       field: details.substrate.sand
       widget: double
-    - label: silt
+    - label: Silt
       field: details.substrate.silt
       widget: double
     - label: Notes

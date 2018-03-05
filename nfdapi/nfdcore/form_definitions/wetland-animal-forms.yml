@@ -41,44 +41,44 @@
       field: details.diseases_and_abnormalities
       widget: stringcombo_multiple
       choices: nfdcore.models.DiseasesAndAbnormalities
-    - label: sampler
+    - label: Sampler
       field: details.sampler
       widget: stringcombo_multiple
       choices: nfdcore.models.AquaticSampler
-    - label: lentic size approx (acres)
+    - label: Lentic size approx (acres)
       field: details.lentic_size_acres_aprox
       widget: integer
-    - label: lentic size approx (square meters)
+    - label: Lentic size approx (square meters)
       field: details.lentic_size_squaremeters
       widget: integer
-    - label: lentic size exact (acres)
+    - label: Lentic size exact (acres)
       field: details.lentic_size_acres_exact
       widget: double
-    - label: lentic size exact (squaremeters)
+    - label: Lentic size exact (squaremeters)
       field: details.lentic_size_squaremeters_exact
       widget: double
-    - label: wetland name
+    - label: Wetland name
       field: details.wetland_name
-    - label: wetland type
+    - label: Wetland type
       field: details.wetland_type
       widget: stringcombo
       choices: nfdcore.models.WetlandType
-    - label: active management
+    - label: Active management
       field: details.active_management
       widget: boolean
-    - label: wetland location
+    - label: Wetland location
       field: details.wetland_location
       widget: stringcombo
       choices: nfdcore.models.WetlandLocation
-    - label: connectivity
+    - label: Connectivity
       field: details.connectivity
       widget: stringcombo
       choices: nfdcore.models.WetlandConnectivity
-    - label: water source
+    - label: Water source
       field: details.water_source
       widget: stringcombo_multiple
       choices: nfdcore.models.WaterSource
-    - label: habitat feature
+    - label: Habitat feature
       field: details.habitat_feature
       widget: stringcombo_multiple
       choices: nfdcore.models.WetlandHabitatFeature
@@ -93,22 +93,22 @@
 - id: details.vegetation
   label: Vegetation
   fields:
-    - label: buttonbush
+    - label: Buttonbush
       field: details.vegetation.buttonbush
       widget: double
-    - label: cattail
+    - label: Cattail
       field: details.vegetation.cattail
       widget: double
-    - label: ferns
+    - label: Ferns
       field: details.vegetation.ferns
       widget: double
-    - label: forbs
+    - label: Forbs
       field: details.vegetation.forbs
       widget: double
-    - label: phragmites
+    - label: Phragmites
       field: details.vegetation.phragmites
       widget: double
-    - label: sedges
+    - label: Sedges
       field: details.vegetation.sedges
       widget: double
     - label: Notes
