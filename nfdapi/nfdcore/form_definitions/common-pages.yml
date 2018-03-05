@@ -515,7 +515,7 @@ voucher:
 
 animal_lifestages:
   fields:
-    - label: lifestages
+    - label: Lifestages
       field: details.lifestages
       widget: stringcombo_multiple
       choices: nfdcore.models.AnimalLifestages
