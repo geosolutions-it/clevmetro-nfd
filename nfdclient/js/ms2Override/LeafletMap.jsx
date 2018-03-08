@@ -237,7 +237,7 @@ let LeafletMap = React.createClass({
                     <div className="row flex-center">
                         <div className="marker-slimemold col-xs-2"/>
                         <div className="col-xs-9">
-                            <label>Slime/Mold</label>
+                            <label>Slime mold</label>
                         </div>
                     </div>
                     <div className="row flex-center">
