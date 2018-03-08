@@ -155,7 +155,7 @@ class PdfLayerDetailRenderer(BaseRenderer):
     format = "pdf"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        if data["geom"] is not None:
+        if data.get("geom") is not None:
             geom = json.loads(data["geom"])
             lat, lon = geom["coordinates"]
         else:
