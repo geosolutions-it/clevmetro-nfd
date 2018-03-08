@@ -53,7 +53,7 @@ module.exports = {
             case 'fungus':
                 return 'Fungus';
             case 'slimemold':
-                return 'Slime/Mold';
+                return 'Slime mold';
             case 'naturalarea':
                 return 'Natural area';
             default:
