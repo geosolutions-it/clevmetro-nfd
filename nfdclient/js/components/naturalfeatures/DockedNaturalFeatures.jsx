@@ -19,7 +19,7 @@ const SpeciesSelector = require('./SpeciesSelector');
 const NfdImage = require('./NfdImage');
 
 const Utils = require("../../utils/nfdUtils");
-const Api = require('../../api/naturalfeaturesdata');
+
 
 const {isEmpty} = require('lodash');
 
@@ -175,9 +175,7 @@ const DockedNaturalFeatures = React.createClass({
             <div className="form-title">{tabName}</div>
                 {searchDiv ?
                     (<SpeciesSelector
-                        isLoading={this.state.isLoading}
-                        options={this.state.options}
-                        onSearch={this._handleSearch}
+                        featuretype={this.props.currentFeature.featuretype}
                         selectedSpecies={this.props.selectedSpecie}
                         onChange={this._handleSpeciesChange}
                     />) : null}
@@ -376,15 +374,6 @@ const DockedNaturalFeatures = React.createClass({
         if (specie) {
             this.props.getSpecies(specie.tsn);
         }
-    },
-    _handleSearch(query) {
-        if (!query) {
-            return;
-        }
-        this.setState(()=>({isLoading: true}));
-        Api.searchSpecies(query, this.props.currentFeature.featuretype)
-            .then(json => this.setState(() => ({options: json, isLoading: false})))
-            .catch(() => this.setState(() => ({isLoading: false})));
     },
     exportFt() {
         this.props.exportFt('SINGLE', this.props.currentFeature.featuretype, this.props.currentFeature.id, this.props.currentFeature.version);

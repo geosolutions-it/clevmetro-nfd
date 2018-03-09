@@ -11,6 +11,7 @@ const assign = require('object-assign');
 const toBlob = require('canvas-to-blob');
 
 const dataCache = {};
+let searchSource;
 const getAccept = (format) => {
     switch (format) {
         case 'csv':
@@ -92,8 +93,14 @@ const Api = {
         return axios.get(url, getOptions()).then(function(response) {return response.data; });
     },
     searchSpecies: function(query, featuretype) {
+        // Cancel previous request
+        if (searchSource && searchSource.cancel) {
+            searchSource.cancel("cancelled");
+        }
+        searchSource = axios.CancelToken.source();
         let url = `/nfdapi/taxon_search/?search=${query}&featuretype=${featuretype}`;
-        return axios.get(url, getOptions()).then(function(response) {return response.data; });
+        return axios.get(url, {...getOptions(), cancelToken: searchSource.token})
+        .then(function(response) {return response.data; });
     },
     createNewFeature: function(feature) {
         let url = '/nfdapi/layers/' + feature.featuretype + '/';
