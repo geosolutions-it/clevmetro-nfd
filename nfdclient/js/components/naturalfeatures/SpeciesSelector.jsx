@@ -10,9 +10,7 @@ const PropTypes = require('prop-types');
 const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
 const isMobile = require('ismobilejs');
-function isPresent(options = [], query, key) {
-    return options.filter( o => o[key].toLowerCase().indexOf(query.toLowerCase()) === 0).length > 0;
-}
+const Api = require('../../api/naturalfeaturesdata');
 
 class SpeciesSelector extends React.Component {
     static propTypes = {
@@ -27,7 +25,8 @@ class SpeciesSelector extends React.Component {
       clearBtn: PropTypes.bool,
       labelKey: React.PropTypes.string,
       keyName: React.PropTypes.string,
-      isLoading: PropTypes.bool
+      isLoading: PropTypes.bool,
+      featuretype: PropTypes.string
     };
     static defaultProps = {
         onSearch: () => {},
@@ -43,10 +42,10 @@ class SpeciesSelector extends React.Component {
     }
     constructor(props) {
         super(props);
-        this.state = {full: false};
+        this.state = {full: false, isLoading: false};
     }
-    shouldComponentUpdate({options, selectedSpecies}, {full}) {
-        return this.state.full !== full || options !== this.props.options || selectedSpecies !== this.props.selectedSpecies;
+    shouldComponentUpdate({ selectedSpecies}, {full, isLoading, options}) {
+        return isLoading !== this.state.isLoading || this.state.full !== full || options !== this.state.options || selectedSpecies !== this.props.selectedSpecies;
     }
     componentDidUpdate(prevProps) {
         // Clean selector if selectedSpecies is null
@@ -60,10 +59,13 @@ class SpeciesSelector extends React.Component {
         this.AsyncTypeahead = null;
     }
     render() {
-        const {options, selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn, isLoading} = this.props;
+
+        const {selectedSpecies, maxResults, bsSize, placeholder, paginate, clearBtn} = this.props;
+        const {options, isLoading, full} = this.state;
         return (
-            <div className={this.state.full ? 'spec-selector-full' : ''} onClick={this.exitFull}>
+            <div className={full ? 'spec-selector-full' : ''} onClick={this.exitFull}>
                 <AsyncTypeahead
+                    delay={400}
                     clearButton={clearBtn}
                     onFocus={this.enterFull}
                     paginate={paginate}
@@ -71,6 +73,7 @@ class SpeciesSelector extends React.Component {
                     options={options}
                     labelKey="name"
                     bsSize={bsSize}
+                    emptyLabel={isLoading ? "Searching..." : undefined}
                     maxResults={maxResults}
                     onSearch={this._onSearch}
                     placeholder={placeholder}
@@ -79,6 +82,8 @@ class SpeciesSelector extends React.Component {
                     onChange={this._handleSpeciesChange}
                     minLength={2}
                     isLoading={isLoading}
+                    useCache={false}
+                    searchText="Searching..."
                 />
             </div>);
     }
@@ -86,8 +91,15 @@ class SpeciesSelector extends React.Component {
         this.AsyncTypeahead = ref;
     }
     _onSearch = (query) => {
-        if (!isPresent(this.props.options, query, this.props.labelKey)) {
-            this.props.onSearch(query);
+        if (query) {
+            this.setState(()=>({isLoading: true, options: undefined}));
+            Api.searchSpecies(query, this.props.featuretype)
+                .then(json => this.setState(() => ({options: json, isLoading: false})))
+                .catch((e) => {
+                    if (e.message !== "cancelled") {
+                        this.setState(() => ({isLoading: false}));
+                    }
+                });
         }
     }
     _renderMenuItemChildren = (option) => {
