@@ -3,9 +3,11 @@
 
 {% block content %}
 
-<h1>{{ species.common_name }}({{ species.name }})</h1>
-<p>TSN: <strong>{{ species.tsn }}</strong><br>
-    Family: <strong><em>{{ species.family }}</em></strong>
+<h1>{{ taxon.name }}({{ taxon.rank }})</h1>
+<p>TSN: <strong>{{ taxon.tsn }}</strong><br>
+    {% for rank, name in taxon.taxonomic_units %}
+    {{ rank }}: <strong><em>{{ name }}</em></strong><br>
+    {% endfor %}
 </p>
 
 <h2>Individual Characteristics</h2>

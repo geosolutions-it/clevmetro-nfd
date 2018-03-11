@@ -525,12 +525,12 @@ class Taxon(Element):
             self.name = details.name
             self.common_names = details.common_names
             self.rank = details.rank
-            if self.rank.lower() == "kingdom":
-                self.kingdom = details.name
-            else:
-                upper_ranks = itis.get_taxon_upper_ranks(self.tsn)
-                self.upper_ranks = [i.__dict__ for i in upper_ranks[:-1]]
-                self.kingdom = self.upper_ranks[0]["name"]
+            upper_ranks = itis.get_taxon_upper_ranks(self.tsn)
+            self.upper_ranks = {}
+            for index, rank in enumerate(upper_ranks):
+                self.upper_ranks[rank.rank.lower()] = {"index": index}
+                self.upper_ranks[rank.rank.lower()].update(rank.__dict__)
+            self.kingdom = self.upper_ranks["kingdom"]["name"]
 
 
 class Preservative(DictionaryTable):

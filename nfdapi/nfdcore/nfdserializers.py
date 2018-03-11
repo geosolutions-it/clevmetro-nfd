@@ -1,6 +1,5 @@
 from collections import Mapping
 from collections import OrderedDict
-import datetime as dt
 import importlib
 import logging
 
@@ -395,9 +394,8 @@ class TaxonDetailSerializer(serializers.ModelSerializer):
         result = OrderedDict()
         for field_name in self.fields:
             result[field_name] = getattr(instance, field_name)
-        for rank in instance.upper_ranks:
-            result[rank["rank"].lower()] = rank["name"]
-        result[instance.rank.lower()] = instance.name
+        for rank_name, details in instance.upper_ranks.items():
+            result[rank_name] = details["name"]
         return result
 
     class Meta:
@@ -1910,51 +1908,24 @@ class ItisTaxonHierarchySerializer(serializers.Serializer):
 class OccurrenceAggregatorSerializer(serializers.BaseSerializer):
 
     def to_representation(self, instance):
-        filterer = self.context["filterer"]
         result = {
             "total_occurrences": 0,
             "title": self.context.get("title", ""),
             "items": [],
         }
-        year = filterer.get_field_by_name("year")
-        if year.value is not None:
-            result["year"] = year.value
-        if filterer.split_by_month:
-            entries = self.group_months(
-                instance,
-                filterer.get_field_by_name(filterer.aggregate_by).lookup,
-            )
-        else:
-            entries = instance
-        for entry in entries:
+        year = self.context.get("year")
+        if year is not None:
+            result["year"] = year
+        for index, entry in enumerate(instance):
             item = {}
-            for lookup, value in entry.iteritems():
-                if lookup == "num_occurrences":
-                    item["occurrences"] = value
+            for field, value in entry.__dict__.items():
+                if field == "occurrences":
+                    item[field] = value
                     result["total_occurrences"] += value
-                elif lookup == "months":
-                    item["months"] = value
-                    result["total_occurrences"] += sum(value.values())
                 else:
-                    field = filterer.get_field_by_lookup(lookup)
-                    item[field.name] = value
+                    item[field] = value
             result["items"].append(item)
         return result
-
-    def group_months(self, entries, entry_id_key):
-        grouped_entries = {}
-        initial_months = [  # here we care about months, year is irrelevant
-            (date(dt.datetime(2000, i, 1), "F"), 0) for i in range(1, 13)]
-        for entry in entries:
-            entry_id = entry[entry_id_key]
-            new_entry = grouped_entries.setdefault(
-                entry_id, {"months": OrderedDict(initial_months)})
-            month_name = date(entry["month"], "F")
-            new_entry["months"][month_name] = entry["num_occurrences"]
-            for k, v in entry.items():
-                if k not in ("month", "num_occurrences"):
-                    new_entry[k] = v
-        return grouped_entries.values()
 
 
 class FormDefinitionsSerializer(serializers.BaseSerializer):
