@@ -2,14 +2,9 @@
 from __future__ import unicode_literals
 from collections import namedtuple
 import logging
-import traceback
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.gis.geos import GEOSGeometry
-from django.db.models import Count
-from django.db.models import Q
-from django.db.models.fields import DateField
-from django.db.models.functions import TruncMonth
+from django.db import connection
 from django.http import Http404
 import django_filters
 from django_filters import FilterSet
@@ -17,11 +12,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework import filters
-from rest_framework.decorators import api_view
 from rest_framework.decorators import list_route
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
@@ -69,148 +62,63 @@ FilterField = namedtuple("FilterField", [
 ])
 
 
-class TaxonomyFilterer(object):
-    """Prepares aggregation querysets"""
-
-    @property
-    def aggregate_by(self):
-        return self._aggregate_by
-
-    @property
-    def aggregation_params(self):
-        return self._aggregation_params
-
-    def __init__(self, year=None, released=None,
-                 daytime=None, season=None, location=None,
-                 reporter=None, category=None, subcategory=None, phylum=None,
-                 family=None, taxon=None, aggregate_by=None,
-                 split_by_month=False, include_subcategories=False):
-        geom_location = self._get_geom(location) if location else None
-        year = int(year) if year is not None else None
-        self.filter_attributes = [
-            FilterField("year", year,
-                        "observation__observation_date__year"),
-            FilterField("released", bool(released),
-                        "released"),
-            FilterField("daytime", daytime,
-                        "observation__daytime__name"),
-            FilterField("season", season,
-                        "observation__season__name"),
-            FilterField("location", geom_location,
-                        "geom__contained"),
-            FilterField("reporter", reporter,
-                        ""),
-            FilterField("category", category,
-                        "occurrence_cat__main_cat"),
-            FilterField("subcategory", subcategory,
-                        "occurrence_cat__name"),
-            FilterField("phylum", phylum,
-                        "taxon__phylum"),
-            FilterField("family", family,
-                        "taxon__family"),
-            FilterField("taxon", taxon,
-                        "taxon__name"),
-        ]
-        self.split_by_month = split_by_month
-        self.include_subcategories = include_subcategories
-        self._aggregate_by = aggregate_by
-        self._aggregation_params = self._get_aggregation_parameters()
-
-    @classmethod
-    def from_query_params(cls, query_params):
-        return cls(
-            year=query_params.get("year"),
-            released=query_params.get("released"),
-            daytime=query_params.get("daytime"),
-            season=query_params.get("season"),
-            location=query_params.get("location"),
-            reporter=query_params.get("reporter"),
-            category=query_params.get("category"),
-            subcategory=query_params.get("subcategory"),
-            phylum=query_params.get("phylum"),
-            family=query_params.get("family"),
-            taxon=query_params.get("taxon"),
-            aggregate_by=query_params.get("aggregate_by", "taxon"),
-            split_by_month=query_params.get("split_by_month"),
-            include_subcategories=query_params.get(
-                "include_subcategories", False),
-        )
-
-    def get_filter_queryset(self):
-        qs = models.OccurrenceTaxon.objects.all()
-        for field in self.filter_attributes:
-            if field.value is not None:
-                qs = qs.filter(**{field.lookup: field.value})
-        return qs
-
-    def get_field_by_name(self, name):
-        try:
-            result = [f for f in self.filter_attributes if f.name == name][0]
-        except KeyError:
-            result = None
-        return result
-
-    def get_field_by_lookup(self, lookup):
-        try:
-            result = [f for f in self.filter_attributes if f.lookup == lookup][0]
-        except KeyError:
-            result = None
-        return result
-
-    def get_aggregation_queryset(self, qs, count_greater_than=0):
-        aggregation_atributes = self.aggregation_params[:]
-        if self.split_by_month is not None:
-            annotate_kwargs = {
-                "month": TruncMonth(
-                    "observation__observation_date",
-                    output_field=DateField()
-                )
-            }
-            qs = qs.annotate(**annotate_kwargs)
-            aggregation_atributes.append("month")
-        qs = qs.values(*aggregation_atributes).annotate(
-            num_occurrences=Count("id")
-        ).filter(num_occurrences__gt=count_greater_than)
-        return qs
-
-    def _get_geom(self, wkt=None, srid=4326):
-        # TODO: check for valid geometry type (POLYGON)
-        # TODO: check for valid geometry
-        return GEOSGeometry(wkt, srid=4326)
-
-    def _get_aggregation_parameters(self):
-        if self.aggregate_by == "category":
-            parameters = [
-                "occurrence_cat__main_cat",
-            ]
-        elif self.aggregate_by == "phylum":
-            parameters = [
-                "occurrence_cat__main_cat",
-                "taxon__phylum",
-            ]
-        elif self.aggregate_by == "family":
-            parameters = [
-                "occurrence_cat__main_cat",
-                "taxon__phylum",
-                "taxon__family",
-            ]
-        else:
-            parameters = [
-                "occurrence_cat__main_cat",
-                "taxon__phylum",
-                "taxon__family",
-                "taxon__name_sci",
-            ]
-        if self.include_subcategories and self.aggregate_by != "category":
-            parameters.append("occurrence_cat__name")
-        return parameters
-
-
 FeatureTypeFormCategory = namedtuple("FeatureTypeFormCategory", [
     "subtype",
     "is_writer",
     "is_publisher",
 ])
+
+
+def get_units_part(*taxonomic_units):
+    """Return a portion of the SQL used in the aggregation query"""
+    taxonomic_units = list(
+        taxonomic_units) if taxonomic_units else ["species"]
+    select_fragments = []  # for use in the SELECT clause
+    group_fragments = []  # for use in the GROUP BY clause
+    for unit in taxonomic_units:
+        part = "t.upper_ranks #>> '{%(unit)s, name}'" % {
+            "unit": unit
+        }
+        select_fragments.append(part + " AS %(unit)s" % {"unit": unit})
+        group_fragments.append(part)
+    select_part = ", ".join(select_fragments)
+    group_part = ", ".join(group_fragments)
+    ordering_part = ", ".join(group_fragments[::-1])
+    return select_part, group_part, ordering_part
+
+
+def get_aggregation_query(taxonomic_units=None):
+    """Return the SQL query that will be executed"""
+    taxonomic_units = list(taxonomic_units) if taxonomic_units else []
+    select_part, group_part, ordering_part = get_units_part(*taxonomic_units)
+    query = """
+        SELECT 
+            COUNT(o.id) AS occurrences,
+            {select_part}
+        FROM nfdcore_occurrencetaxon AS o
+            LEFT JOIN nfdcore_taxon AS t ON (t.tsn = o.taxon_id)
+            LEFT JOIN nfdcore_occurrencecategory AS c ON (c.id =  o.occurrence_cat_id)
+        WHERE c.main_cat = %(category)s
+        GROUP BY
+            {group_part}
+        ORDER BY
+            {ordering_part}
+    """.format(
+        select_part=select_part,
+        group_part=group_part,
+        ordering_part=ordering_part
+    )
+    return query
+
+
+def get_aggregation_records(category, taxonomic_units):
+    query = get_aggregation_query(taxonomic_units)
+    with connection.cursor() as cursor:
+        cursor.execute(query, {"category": category})
+        ResultTuple = namedtuple(
+            "Result", [col[0] for col in cursor.description])
+        for row in cursor.fetchall():
+            yield ResultTuple(*row)
 
 
 class FeatureTypeFormViewSet(viewsets.ViewSet):
@@ -403,70 +311,56 @@ class OccurrenceAggregatorViewSet(viewsets.ViewSet):
     )
     serializer_class = nfdserializers.OccurrenceAggregatorSerializer
 
-    def list(self, request):
-        filterer = TaxonomyFilterer.from_query_params(request.query_params)
-        filter_qs = filterer.get_filter_queryset()
-        aggregation_qs = filterer.get_aggregation_queryset(filter_qs)
+    taxonomic_units = [
+        "species",
+        "family",
+        "phylum",
+    ]
+
+    @list_route(methods=["get",])
+    def animal(self, request):
+        raw_year = request.query_params.get("year")
         serializer = self.serializer_class(
-            aggregation_qs,
-            context={"filterer": filterer}
+            get_aggregation_records("animal", self.taxonomic_units),
+            context={
+                "title": "Animals",
+                "year": int(raw_year) if raw_year is not None else raw_year
+            }
         )
         return Response(serializer.data)
 
     @list_route(methods=["get",])
-    def animal(self, request):
-        return self._aggregate_by_category(
-            request.query_params.dict(),
-            "animal",
-            title="Animals"
-        )
-
-    @list_route(methods=["get",])
-    def land_animal(self, request):
-        return self._aggregate_by_category(
-            request.query_params.dict(),
-            "animal",
-            subcategory="Land animal",
-            title="Land Animals"
-        )
-
-    @list_route(methods=["get",])
     def plant(self, request):
-        return self._aggregate_by_category(
-            request.query_params.dict(),
-            "plant",
-            title="Plants"
+        raw_year = request.query_params.get("year")
+        serializer = self.serializer_class(
+            get_aggregation_records("plant", self.taxonomic_units),
+            context={
+                "title": "Plants",
+                "year": int(raw_year) if raw_year is not None else raw_year
+            }
         )
+        return Response(serializer.data)
 
     @list_route(methods=["get",])
     def fungus(self, request):
-        return self._aggregate_by_category(
-            request.query_params.dict(),
-            "fungus",
-            title="Fungi"
+        raw_year = request.query_params.get("year")
+        serializer = self.serializer_class(
+            get_aggregation_records("fungus", self.taxonomic_units),
+            context={
+                "title": "Fungi",
+                "year": int(raw_year) if raw_year is not None else raw_year
+            }
         )
+        return Response(serializer.data)
 
     @list_route(methods=["get",])
     def slime_mold(self, request):
-        return self._aggregate_by_category(
-            request.query_params.dict(),
-            "slimemold",
-            title="Slime Molds"
-        )
-
-    def _aggregate_by_category(self, query_params, category, subcategory=None,
-                               title=""):
-        query_params["category"] = category
-        if subcategory is not None:
-            query_params["subcategory"] = subcategory
-        filterer = TaxonomyFilterer.from_query_params(query_params)
-        filter_qs = filterer.get_filter_queryset()
-        aggregation_qs = filterer.get_aggregation_queryset(filter_qs)
+        raw_year = request.query_params.get("year")
         serializer = self.serializer_class(
-            aggregation_qs,
+            get_aggregation_records("slimemold", self.taxonomic_units),
             context={
-                "filterer": filterer,
-                "title": title,
+                "title": "Slimemolds",
+                "year": int(raw_year) if raw_year is not None else raw_year
             }
         )
         return Response(serializer.data)

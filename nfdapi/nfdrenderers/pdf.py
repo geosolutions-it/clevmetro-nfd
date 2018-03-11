@@ -62,7 +62,6 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
                     group_by_month=group_by_month
                 ),
             }
-        print("context: {}".format(context))
         return render_to_pdf(
             "nfdrenderers/pdf/aggregation_stats.html",
             context
@@ -93,7 +92,6 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
 
     def get_content_rows(self, items, group_by_month=False):
         counts = self._get_counts(items)
-        print("counts: {}".format(counts))
         already_there = []
         content_rows = []
         for item in items:
@@ -103,7 +101,10 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
                     value = item[parameter]
                 except KeyError:
                     continue
-                if value not in already_there and parameter in item.keys():
+                if value is None:
+                    row.append(
+                        TableCell(value="-", rowspan=1, colspan=1))
+                elif value not in already_there:
                     rowspan = counts.get(value, 1)
                     row.append(
                         TableCell(value=value, rowspan=rowspan, colspan=1))
@@ -112,7 +113,9 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
             else:
                 if group_by_month:
                     for month, occurrences in item["months"].items():
-                        row.append(TableCell(value=occurrences, rowspan=rowspan, colspan=1))
+                        row.append(TableCell(value=occurrences,
+                                             rowspan=rowspan,
+                                             colspan=1))
                 else:
                     row.append(TableCell(value=item["occurrences"],
                                          rowspan=rowspan, colspan=1))
@@ -142,7 +145,7 @@ class PdfOccurrenceStatsRenderer(BaseRenderer):
         counts = {}
         for occurrence in occurrences:
             for param, value in occurrence.items():
-                if param not in ("occurrences", "months",) and value != "Not Specified":
+                if param not in ("occurrences", "month",):
                     counts.setdefault(value, 0)
                     counts[value] += 1
         return counts
@@ -176,15 +179,17 @@ class PdfLayerDetailRenderer(BaseRenderer):
                 "marks":  no_data,
                 "abnormalities":  no_data,
             }
-
+        name = data["taxon.name"]
+        rank = data["taxon.rank"]
+        tsn = data["taxon.tsn"]
         return render_to_pdf(
             "nfdrenderers/pdf/layer_detail.html",
             {
-                "species": {
-                    "common_name": data["species.first_common"],
-                    "name": data["species.name_sci"],
-                    "tsn": data["species.tsn"],
-                    "family": data["species.family"],
+                "taxon": {
+                    "name": name,
+                    "rank": rank,
+                    "tsn": tsn,
+                    "taxonomic_units": self.get_taxonomic_units(tsn),
                 },
                 "observation": {
                     "observation_date": data["observation.observation_date"],
@@ -201,3 +206,11 @@ class PdfLayerDetailRenderer(BaseRenderer):
                 "images": [im["image"] for im in data["images"]]
             }
         )
+
+    def get_taxonomic_units(self, tsn):
+        taxon = models.Taxon.objects.get(pk=tsn)
+        result = []
+        for rank in taxon.upper_ranks:
+            result.append((rank["rank"], rank["name"]))
+        result.append((taxon.rank, taxon.name))
+        return result
