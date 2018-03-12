@@ -210,7 +210,7 @@ class PdfLayerDetailRenderer(BaseRenderer):
     def get_taxonomic_units(self, tsn):
         taxon = models.Taxon.objects.get(pk=tsn)
         result = []
-        for rank in taxon.upper_ranks:
-            result.append((rank["rank"], rank["name"]))
+        for rank, rank_details in taxon.upper_ranks.items():
+            result.append((rank, rank_details["name"]))
         result.append((taxon.rank, taxon.name))
         return result
