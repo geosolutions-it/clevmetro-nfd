@@ -41,7 +41,8 @@ animal_taxon:
       field: taxon.rank
       readonly: true
     - label: Common names
-      field: taxon.common_names.English
+      field: taxon.common_names
+      widget: textarea
       readonly: true
     - label: Kingdom
       field: taxon.kingdom
@@ -155,7 +156,8 @@ plant_taxon:
       field: taxon.rank
       readonly: true
     - label: Common names
-      field: taxon.common_names.English
+      field: taxon.common_names
+      widget: textarea
       readonly: true
     - label: Kingdom
       field: taxon.kingdom
@@ -257,7 +259,8 @@ fungus_taxon:
       field: taxon.rank
       readonly: true
     - label: Common names
-      field: taxon.common_names.English
+      field: taxon.common_names
+      widget: textarea
       readonly: true
     - label: Kingdom
       field: taxon.kingdom

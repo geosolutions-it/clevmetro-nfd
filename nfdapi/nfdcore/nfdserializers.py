@@ -393,7 +393,15 @@ class TaxonDetailSerializer(serializers.ModelSerializer):
 
         result = OrderedDict()
         for field_name in self.fields:
-            result[field_name] = getattr(instance, field_name)
+            if field_name == "common_names":
+                try:
+                    common_names = sorted(
+                        n.capitalize() for n in instance.common_names)
+                    result[field_name] = "\n".join(common_names)
+                except TypeError:  # common names is None
+                    pass
+            else:
+                result[field_name] = getattr(instance, field_name)
         for rank_name, details in instance.upper_ranks.items():
             result[rank_name] = details["name"]
         return result
