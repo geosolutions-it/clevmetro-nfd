@@ -1908,7 +1908,7 @@ class ItisTaxonHierarchySerializer(serializers.Serializer):
             english_names = ", ".join(names)
             result["common_names.English"] = english_names
         if instance.upper_ranks is not None:
-            for rank in instance.upper_ranks:
+            for rank in instance.upper_ranks.values():
                 result[rank["rank"].lower()] = rank["name"]
         return result
 
