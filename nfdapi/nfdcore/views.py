@@ -5,6 +5,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
+from django.db.models import Q
 from django.http import Http404
 import django_filters
 from django_filters import FilterSet
@@ -429,13 +430,12 @@ class NfdLayer(ListCreateAPIView):
             )
 
 
-class TaxonFilter(FilterSet):
+class OccurrenceTaxonFilterSet(FilterSet):
     featuresubtype = django_filters.filters.CharFilter(
         name="occurrence_cat__code"
     )
     taxon = django_filters.filters.CharFilter(
-        name="taxon__upper_ranks",
-        lookup_expr="icontains"
+        method="filter_ranks",
     )
     reservation = django_filters.filters.CharFilter(
         name="location__reservation",
@@ -449,6 +449,72 @@ class TaxonFilter(FilterSet):
         name="taxon__cm_status__code",
         queryset=models.CmStatus.objects.all()
     )
+
+    def filter_ranks(self, queryset, name, value):
+        """Filter for the input name in all available hierarchical ranks
+
+        This method builds a chained OR lookup using django's Q objects. This
+        is suitable for searching in a Taxon's taxonomic ranks, which are
+        stored in a JSONField on ``models.Taxon``. This enables  searching
+        for a name in any of the taxon's ranks.
+
+        """
+
+        # the following list was obtained from ITIS DB with the query:
+        # SELECT DISTINCT rank_id, lower(rank_name)
+        # FROM taxon_unit_types
+        # ORDER BY rank_id
+        ranks = [
+            "kingdom",
+            "subkingdom",
+            "infrakingdom",
+            "superphylum",
+            "superdivision",
+            "division",
+            "phylum",
+            "subdivision",
+            "subphylum",
+            "infraphylum",
+            "infradivision",
+            "parvphylum",
+            "parvdivision",
+            "superclass",
+            "class",
+            "subclass",
+            "infraclass",
+            "superorder",
+            "order",
+            "suborder",
+            "infraorder",
+            "section",
+            "subsection",
+            "superfamily",
+            "family",
+            "subfamily",
+            "tribe",
+            "subtribe",
+            "genus",
+            "subgenus",
+            "section",
+            "subsection",
+            "species",
+            "subspecies",
+            "variety",
+            "form",
+            "race",
+            "subvariety",
+            "stirp",
+            "form",
+            "morph",
+            "aberration",
+            "subform",
+            "unspecified",
+        ]
+        lookup_pattern = "taxon__upper_ranks__{}__name__icontains"
+        q_object = Q(**{lookup_pattern.format(ranks[0]): value})
+        for rank in ranks[1:]:
+            q_object = q_object | Q(**{lookup_pattern.format(rank): value})
+        return queryset.filter(q_object)
 
     class Meta:
         model = OccurrenceTaxon
@@ -471,7 +537,7 @@ class NaturalAreaFilter(FilterSet):
 class PlantLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreatePlants]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = TaxonFilter
+    filter_class = OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
         return nfdserializers.TaxonOccurrenceSerializer
@@ -487,7 +553,7 @@ class PlantLayer(NfdLayer):
 class AnimalLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateAnimals]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = TaxonFilter
+    filter_class = OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
         return nfdserializers.TaxonOccurrenceSerializer
@@ -503,7 +569,7 @@ class AnimalLayer(NfdLayer):
 class FungusLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateFungus]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = TaxonFilter
+    filter_class = OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
         return nfdserializers.TaxonOccurrenceSerializer
@@ -519,7 +585,7 @@ class FungusLayer(NfdLayer):
 class SlimeMoldLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateSlimeMold]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = TaxonFilter
+    filter_class = OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
         return nfdserializers.TaxonOccurrenceSerializer
@@ -582,7 +648,7 @@ class NfdList(ListAPIView):
 
 
 class OccurrenceTaxonList(NfdList):
-    filter_class = TaxonFilter
+    filter_class = OccurrenceTaxonFilterSet
 
     def get_serializer_class(self):
         return nfdserializers.TaxonOccurrenceListSerializer
