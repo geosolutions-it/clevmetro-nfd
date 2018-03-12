@@ -40,11 +40,13 @@ def search_taxon(search_string, kingdoms, page_size=100, page=0):
             u.complete_name ILIKE %(search_string)s
                 OR v.vernacular_name ILIKE %(search_string)s
             )
+            AND u.n_usage in ('accepted', 'valid')
         GROUP BY u.tsn, t.rank_name
         ORDER BY u.rank_id 
         LIMIT {size}
         OFFSET {offset}
     """.format(size=size, offset=offset)
+    print("query: {}".format(query))
     with connections["itis"].cursor() as cursor:
         cursor.execute(query, {
             "kingdoms": [kingdom.capitalize() for kingdom in kingdoms],
@@ -97,6 +99,7 @@ def get_taxon_details(tsn):
           LEFT OUTER JOIN vernaculars as v ON u.tsn = v.tsn 
           INNER JOIN taxon_unit_types AS t ON u.rank_id = t.rank_id 
             AND u.kingdom_id = t.kingdom_id
+            AND u.n_usage IN ('accepted', 'valid')
         WHERE u.tsn = %(tsn)s
         GROUP BY u.tsn, t.rank_name
     """
