@@ -15,7 +15,8 @@ const {
  SEARCH_SPECIES_ERROR,
  SET_FILTER_PROP,
  RESET_FEATURETYPE_FILTERS,
- UPDATE_FILTERS_OPTIONS
+ UPDATE_FILTERS_OPTIONS,
+ TOGGLE_SEARCH_PANEL
 } = require('../actions/featuresearch');
 
 function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
@@ -37,12 +38,12 @@ function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
             return assign({}, state, {activeFt: action.activekey});
         case LIST_LOADED: {
             const {fttype, features, total, page, filter} = action;
-            return assign({}, state, {[fttype]: {features, total, page, filter}});
+            return assign({}, state, {[fttype]: {features, total, page, filter, activePanel: "features"}});
         }
         case LIST_LOADING:
             return assign({}, state, {loading: assign({}, state.loading, {[action.fttype]: action.loading})});
         case LIST_LOAD_ERROR:
-            return assign({}, state, {[action.fttype]: {error: action.error.statusText}});
+            return assign({}, state, {[action.fttype]: {error: action.error.statusText, activePanel: "filters"}});
         case SEARCH_SPECIES_RESULT:
             prop = `${action.featureType}_filters`;
             return assign({}, state, {[prop]: assign({}, state[prop], {species: action.options, selectedSpecies: undefined})});
@@ -56,6 +57,10 @@ function featuresearch(state = {pageSize: 30, defualtOperator: '>'}, action) {
             return assign({}, state, {[prop]: undefined});
         case UPDATE_FILTERS_OPTIONS:
             return assign({}, state, {filters: action.items});
+        case TOGGLE_SEARCH_PANEL: {
+            const {fttype, panel} = action;
+            return assign({}, state, {[fttype]: assign({}, state[fttype], {activePanel: panel})});
+        }
         default:
             return state;
     }
