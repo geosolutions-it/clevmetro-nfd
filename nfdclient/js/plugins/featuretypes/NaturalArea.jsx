@@ -9,7 +9,8 @@
 const React = require('react');
 const {connect} = require('react-redux');
 
-const {loadList, selectFeature, zooToFeature, setFilterProp, resetFtFilters} = require('../../actions/featuresearch');
+const {loadList, selectFeature, zooToFeature, setFilterProp, resetFtFilters,
+toggleSearchPanel} = require('../../actions/featuresearch');
 const {onToggleExport} = require('../../actions/exportfeatures');
 const FilterUtils = require('../../utils/FilterUtils');
 const SelectFilter = require('../../components/naturalfeatures/SelectFilter');
@@ -20,14 +21,22 @@ const dataFilterSelector = (state) => state.featuresearch && state.featuresearch
 const filtersSelector = (state) => state.featuresearch && state.featuresearch.filters;
 
 const cmStatusSelector = createSelector([filtersSelector, dataFilterSelector],
-    (filters, values) => ({
+    (filters = [], values = {}) => ({
         value: values.cm_status,
         options: (filters.filter((f) => f.name === 'cm_status')[0] || {}).options || []
     })
     );
 
 const toggleExport = onToggleExport.bind(null, 'LIST', 'naturalarea', null, null);
-const FeatureTypePanel = connect(() => ({}), {
+const onPanelChange = toggleSearchPanel.bind(null, 'naturalarea');
+const FeatureTypePanel = connect((state) => {
+    const data = dataSelector(state);
+    return {
+        activePanel: data.activePanel || 'features'
+    };
+
+}, {
+    onPanelChange,
     toggleExport
 })(require('../../components/naturalfeatures/FeatureTypePanel'));
 

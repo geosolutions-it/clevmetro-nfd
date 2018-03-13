@@ -13,13 +13,13 @@ const Utils = require('../../utils/nfdUtils');
 
 const {Accordion, Panel, Glyphicon} = require('react-bootstrap');
 
-const FeaturetypePanel = ({featureType: ft, children, toggleExport}) => {
+const FeaturetypePanel = ({featureType: ft, children, toggleExport, activePanel, onPanelChange}) => {
     const renderPanelHeader = (title) => {
         return (<span><div className="nfd-panel-header">{title}</div></span>);
     };
     const childs = children ? React.Children.toArray(children) : [];
     return (
-        <Accordion defaultActiveKey="features">
+        <Accordion activeKey={activePanel} onSelect={onPanelChange}>
             <div className="nfd-panel-export" onClick={toggleExport}><Glyphicon glyph="download"/></div>
             <Panel eventKey="features" header={renderPanelHeader(Utils.getPrettyFeatureType(ft))} collapsible>
                 {childs[0] ? React.cloneElement(childs[0], {featureType: ft}) : null}
@@ -32,10 +32,14 @@ const FeaturetypePanel = ({featureType: ft, children, toggleExport}) => {
 FeaturetypePanel.propTypes = {
   featureType: PropTypes.string.isRequired,
   children: PropTypes.node,
-  toggleExport: PropTypes.func
+  toggleExport: PropTypes.func,
+  onPanelChange: PropTypes.func,
+  activePanel: PropTypes.string
 };
 FeaturetypePanel.defaultProps = {
-  toggleExport: () => {}
+  toggleExport: () => {},
+  activePanel: "features",
+  onPanelChange: () => {}
 };
 
 module.exports = FeaturetypePanel;

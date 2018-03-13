@@ -19,6 +19,16 @@ const SET_FILTER_PROP = 'SET_FILTER_PROP';
 const RESET_FEATURETYPE_FILTERS = 'RESET_FEATURETYPE_FILTERS';
 const UPDATE_FILTERS_OPTIONS = 'UPDATE_FILTERS_OPTIONS';
 
+const TOGGLE_SEARCH_PANEL = 'TOGGLE_SEARCH_PANEL';
+
+function toggleSearchPanel(fttype, panel) {
+    return {
+        type: TOGGLE_SEARCH_PANEL,
+        fttype,
+        panel
+    };
+}
+
 function resetFtFilters(fttype) {
     return {
         type: RESET_FEATURETYPE_FILTERS,
@@ -124,5 +134,6 @@ module.exports = {
     SEARCH_SPECIES_ERROR, onSearchSepciesError,
     SET_FILTER_PROP, setFilterProp,
     RESET_FEATURETYPE_FILTERS, resetFtFilters,
-    UPDATE_FILTERS_OPTIONS
+    UPDATE_FILTERS_OPTIONS,
+    TOGGLE_SEARCH_PANEL, toggleSearchPanel
 };
