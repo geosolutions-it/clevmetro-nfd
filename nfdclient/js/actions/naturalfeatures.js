@@ -477,9 +477,11 @@ function showLogin() {
 
 function nfdLogout() {
     sessionStorage.removeItem('nfd-jwt-auth-token');
+    Api.cleanCache();
     return (dispatch) => {
         dispatch(changeDrawingStatus('clean', null, 'dockednaturalfeatures', []));
         dispatch(logout(null));
+        dispatch(setControlProperty("LoginForm", "enabled", true));
         dispatch(changeLayerProperties("animal", {features: []}));
         dispatch(changeLayerProperties("fungus", {features: []}));
         dispatch(changeLayerProperties("plant", {features: []}));

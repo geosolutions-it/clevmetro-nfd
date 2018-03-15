@@ -8,16 +8,11 @@
 const React = require('react');
 const {connect} = require('../../../MapStore2/web/client/utils/PluginsUtils');
 const {userLoginSubmit, nfdLogout} = require('../../actions/naturalfeatures');
-const {loginFail, logoutWithReload, resetError} = require('../../../MapStore2/web/client/actions/security');
+const {loginFail, logoutWithReload} = require('../../../MapStore2/web/client/actions/security');
 const {setControlProperty} = require('../../../MapStore2/web/client/actions/controls');
 const {Glyphicon, Tooltip, OverlayTrigger} = require('react-bootstrap');
 const Message = require('../../../MapStore2/web/client/components/I18N/Message');
-const closeLogin = () => {
-    return (dispatch) => {
-        dispatch(setControlProperty('LoginForm', 'enabled', false));
-        dispatch(resetError());
-    };
-};
+
 
 const UserMenu = connect((state) => ({
     user: state.security && state.security.user
@@ -38,10 +33,11 @@ const UserDetails = connect((state) => ({
 const Login = connect((state) => ({
     show: state.controls.LoginForm && state.controls.LoginForm.enabled,
     user: state.security && state.security.user,
-    loginError: state.security && state.security.loginError
+    loginError: state.security && state.security.loginError,
+    includeCloseButton: false,
+    options: {id: "login-dialog"}
 }), {
     onLoginSuccess: setControlProperty.bind(null, 'LoginForm', 'enabled', false, false),
-    onClose: closeLogin,
     onSubmit: userLoginSubmit,
     onError: loginFail
 })(require('../../../MapStore2/web/client/components/security/modals/LoginModal'));
