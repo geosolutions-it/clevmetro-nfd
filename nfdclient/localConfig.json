@@ -15,11 +15,6 @@
                 "tools": ["measurement", "draw"]
             }
         }, {
-            "name": "DrawerMenu",
-            "cfg": {
-                "glyph": "cleveland"
-            }
-        }, {
             "name": "Tutorial",
             "cfg": { 
               "toolsCfg": [
@@ -98,7 +93,6 @@
                 "bottom": 200
             }
         },
-        "TOC",
         "OmniBar",
         "NfdLogin",
         "Toolbar",
@@ -120,11 +114,6 @@
               "mapType": "leaflet",
               "tools": ["measurement", "draw"]
           }
-      }, {
-          "name": "DrawerMenu",
-          "cfg": {
-              "glyph": "cleveland"
-          }
       },{
                 "name": "BackgroundSelector",
                 "cfg": {
@@ -140,7 +129,6 @@
                 }
             }
       ,
-      "TOC",
       "OmniBar",
       "NfdLogin",
       "Toolbar",

@@ -35,6 +35,9 @@ let getOptions = () => {
 };
 
 const Api = {
+    cleanCache: function() {
+        Object.keys(dataCache).forEach(k => delete dataCache[k]);
+    },
     addBaseUrl: function(options) {
         return assign(options, {baseURL: ConfigUtils.getDefaults().geoStoreUrl});
     },
