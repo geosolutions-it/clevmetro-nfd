@@ -24,7 +24,6 @@ from django.contrib.gis.geos import Polygon
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.postgres.fields import JSONField
-from django.template.defaultfilters import date
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -220,7 +219,7 @@ def get_serializer_fields(form_name, model):
 def validate_json_field(values, model_class, model_field_name):
     """Perform validation on a JSONField
 
-    This function chacks that the input values are legal, according to the
+    This function checks that the input values are legal, according to the
     defined json field mappings. Since we are using JSONFields in order to
     emulate a many-to-many relation from a model to another
     ``models.DictionaryTable`` model, it is necessary to enforce validation
@@ -2283,3 +2282,231 @@ def _process_naturalarea_element(instance, **validated_fields):
         field_values=validated_fields.copy()
     )
     return _process_featuretype_details(instance, **remaining_fields)
+
+
+class GenericDictTableSerializer(serializers.ModelSerializer):
+    """Generic serializer for all models that inherit from DictionaryTable"""
+
+    def __init__(self, *args, **kwargs):
+        model_to_use = kwargs.pop("model", None)
+        if model_to_use is not None:
+            self.Meta.model = model_to_use
+        super(GenericDictTableSerializer, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = models.DictionaryTable
+        fields = (
+            "code",
+            "name",
+        )
+
+
+class TaxonRanksSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, instance):
+        return {
+            "ranks": instance
+        }
+
+
+class BaseOccurrenceReportSerializer(serializers.ModelSerializer):
+    observation_date = serializers.DateTimeField(
+        source="observation.observation_date"
+    )
+    observer = serializers.CharField(
+        source="observation.reporter.name"
+    )
+    site_description = serializers.CharField(
+        source="location.site_description"
+    )
+    reservation = serializers.SerializerMethodField()
+    watershed = serializers.SerializerMethodField()
+    global_status = serializers.SerializerMethodField()
+    federal_status = serializers.SerializerMethodField()
+    state_status = serializers.SerializerMethodField()
+    cm_status = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    latitude = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
+
+    def get_reservation(self, obj):
+        try:
+            codes = list(obj.location.reservation)
+        except (AttributeError, TypeError):
+            result = None
+        else:
+            serializer = GenericDictTableSerializer(
+                models.Reservation.objects.filter(code__in=codes),
+                many=True,
+                model=models.Reservation,
+            )
+            result = serializer.data
+        return result
+
+    def get_watershed(self, obj):
+        try:
+            codes = list(obj.location.watershed)
+        except (AttributeError, TypeError):
+            result = None
+        else:
+            serializer = GenericDictTableSerializer(
+                models.Watershed.objects.filter(code__in=codes),
+                many=True,
+                model=models.Reservation,
+            )
+            result = serializer.data
+        return result
+
+    def get_longitude(self, obj):
+        return obj.geom.coords[0]
+
+    def get_latitude(self, obj):
+        return obj.geom.coords[-1]
+
+    def get_notes(self, obj):
+        return obj.notes.all().values_list("note", flat=True)
+
+    class Meta:
+        model = models.OccurrenceTaxon
+        fields = (
+            "id",
+            "observation_date",
+            "observer",
+            "site_description",
+            "reservation",
+            "watershed",
+            "longitude",
+            "latitude",
+            "notes",
+        )
+
+
+class OccurrenceTaxonReportSerializer(BaseOccurrenceReportSerializer):
+    genus = serializers.SerializerMethodField()
+    species = serializers.SerializerMethodField()
+    common_names = serializers.SerializerMethodField()
+    rank = serializers.CharField(source="taxon.rank")
+    county = serializers.CharField(source="location.county")
+    quad_name = serializers.CharField(source="location.quad_name")
+    quad_number = serializers.CharField(source="location.quad_number")
+
+    def get_genus(self, obj):
+        return obj.taxon.upper_ranks.get("genus", {}).get("name")
+
+    def get_species(self, obj):
+        return obj.taxon.upper_ranks.get("species", {}).get("name")
+
+    def get_common_names(self, obj):
+        return obj.taxon.upper_ranks.get("species", {}).get("common_names", {})
+
+    def get_global_status(self, obj):
+        serializer = GenericDictTableSerializer(
+            instance=obj.taxon.g_rank,
+            model=models.GRank
+        )
+        return serializer.data
+
+    def get_federal_status(self, obj):
+        serializer = GenericDictTableSerializer(
+            instance=obj.taxon.n_rank,
+            model=models.NRank
+        )
+        return serializer.data
+
+    def get_state_status(self, obj):
+        serializer = GenericDictTableSerializer(
+            instance=obj.taxon.s_rank,
+            model=models.SRank
+        )
+        return serializer.data
+
+    def get_cm_status(self, obj):
+        serializer = GenericDictTableSerializer(
+            instance=obj.taxon.cm_status,
+            model=models.CmStatus
+        )
+        return serializer.data
+
+
+    class Meta:
+        model = models.OccurrenceTaxon
+        fields = (
+            "id",
+            "genus",
+            "species",
+            "common_names",
+            "observation_date",
+            "observer",
+            "site_description",
+            "reservation",
+            "watershed",
+            "global_status",
+            "federal_status",
+            "state_status",
+            "cm_status",
+            "longitude",
+            "latitude",
+            "notes",
+            "county",
+            "quad_name",
+            "quad_number",
+            "rank",
+        )
+
+
+class NaturalAreaReportSerializer(BaseOccurrenceReportSerializer):
+    natural_area_code_nac = serializers.CharField(
+        source="element.natural_area_code_nac"
+    )
+    general_description = serializers.CharField(
+        source="element.general_description"
+    )
+    notable_features = serializers.CharField(
+        source="element.notable_features"
+    )
+
+    def get_global_status(self, obj):
+        return self._get_status(obj, "g_rank", models.GRank)
+
+    def get_federal_status(self, obj):
+        return self._get_status(obj, "n_rank", models.NRank)
+
+    def get_state_status(self, obj):
+        return self._get_status(obj, "s_rank", models.SRank)
+
+    def get_cm_status(self, obj):
+        return self._get_status(obj, "cm_status", models.CmStatus)
+
+    def _get_status(self, obj, status_attribute, dict_table_model):
+        try:
+            instance = getattr(obj.element, status_attribute)
+        except AttributeError:  # element is None
+            result = None
+        else:
+            serializer = GenericDictTableSerializer(
+                instance=instance,
+                model=dict_table_model
+            )
+            result = serializer.data
+        return result
+
+    class Meta:
+        model = models.OccurrenceNaturalArea
+        fields = (
+            "id",
+            "natural_area_code_nac",
+            "general_description",
+            "notable_features",
+            "observation_date",
+            "observer",
+            "site_description",
+            "reservation",
+            "watershed",
+            "global_status",
+            "federal_status",
+            "state_status",
+            "cm_status",
+            "longitude",
+            "latitude",
+            "notes",
+        )

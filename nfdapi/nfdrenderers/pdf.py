@@ -214,3 +214,155 @@ class PdfLayerDetailRenderer(BaseRenderer):
             result.append((rank, rank_details["name"]))
         result.append((taxon.rank, taxon.name))
         return result
+
+
+class BaseOccurrenceReportRenderer(BaseRenderer):
+    """Base PDF renderer for occurrences reports"""
+
+    media_type = "application/pdf"
+    format = "pdf"
+
+    def get_filters(self, query_params):
+        return {
+            "reservation": query_params.get("reservation"),
+            "watershed": query_params.get("watershed"),
+            "global_status": _get_status_field(
+                query_params, "global_status", models.GRank),
+            "state_status": _get_status_field(
+                query_params, "state_status", models.SRank),
+            "cm_status": _get_status_field(
+                query_params, "cm_status", models.CmStatus),
+            "observer": query_params.get("observer"),
+            "observation_date": _get_observation_date(query_params),
+        }
+
+
+class OccurrenceTaxonReportRenderer(BaseOccurrenceReportRenderer):
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        occurrences = []
+        for index, occ in enumerate(data):
+            occurrence = _get_occurrence(occ)
+            try:
+                common_name = occ.get(
+                    "common_names", {}).get("English", [])[0]
+            except IndexError:
+                common_name = None
+            occurrence.update(
+                index=index+1,
+                common_name=common_name
+            )
+            occurrences.append(occurrence)
+        query_params = renderer_context["request"].query_params.dict()
+        rank_name = query_params.get("rank_name")
+        rank_value = query_params.get("rank_value")
+        filters = self.get_filters(query_params)
+        filters.update(
+            feature=" ".join((rank_name, rank_value)) if rank_value else None,
+            county=query_params.get("county"),
+            quad=_get_quad(query_params),
+        )
+        return render_to_pdf(
+            "nfdrenderers/pdf/taxon_occurrence_report.html",
+            context={
+                "occurrences": occurrences,
+                "filters": {k: v for k, v in filters.items() if v},
+            }
+        )
+
+
+class OccurrenceNaturalAreaReportRenderer(BaseOccurrenceReportRenderer):
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        occurrences = []
+        for index, occ in enumerate(data):
+            occurrence = _get_occurrence(occ)
+            occurrence.update(index=index+1)
+            occurrences.append(occurrence)
+        query_params = renderer_context["request"].query_params.dict()
+        filters = self.get_filters(query_params)
+        print("filters: {}".format(filters))
+        filters.update(
+            natural_area_code_nac=query_params.get("natural_area_code_nac"),
+            general_description=query_params.get("general_description"),
+            notable_features=query_params.get("notable_features"),
+        )
+        return render_to_pdf(
+            "nfdrenderers/pdf/natural_area_occurrence_report.html",
+            context={
+                "occurrences": occurrences,
+                "filters": {k: v for k, v in filters.items() if v},
+            }
+        )
+
+
+def get_status_description(status_model, code):
+    result = []
+    for status_code in code.split(","):
+        try:
+            instance = status_model.objects.get(code=status_code)
+        except status_model.DoesNotExist:
+            pass
+        else:
+            result.append(" - ".join((instance.code, instance.name)))
+    return ", ".join(result)
+
+
+def _get_quad(query_params):
+    quad_name = query_params.get("quad_name")
+    quad_number = query_params.get("quad_number")
+    return " ".join([i for i in (quad_name, quad_number) if i]) or None
+
+
+def _get_observation_date(query_params):
+    start_date = query_params.pop("observation_date_0", None)
+    end_date = query_params.pop("observation_date_1", None)
+    if start_date or end_date:
+        observation_date = " / ".join((start_date or "-", end_date or "-"))
+    else:
+        observation_date = None
+    return observation_date
+
+
+def _get_status_field(query_params, status_field, dict_table_model):
+    status_code = query_params.get(status_field)
+    if status_code is not None:
+        result = get_status_description(dict_table_model, status_code)
+    else:
+        result = None
+    return result
+
+
+def _get_dict_table_field(collection, show_name=True, show_code=False):
+    item = collection if isinstance(collection, dict) else collection[0]
+    parts = []
+    if show_code:
+        parts.append(item["code"])
+    if show_name:
+        parts.append(item["name"])
+    return " - ".join(parts) if any(parts) else None
+
+
+def _get_occurrence(occurrence_data):
+    occurrence = occurrence_data.copy()
+    reservation = occurrence_data["reservation"]
+    watershed = occurrence_data["watershed"]
+    state_status = occurrence_data["state_status"]
+    fed_status = occurrence_data["federal_status"]
+    global_status = occurrence_data["global_status"]
+    cm_status = occurrence_data["cm_status"]
+    occurrence.update(
+        reservation=_get_dict_table_field(
+            reservation) if reservation else None,
+        watershed=_get_dict_table_field(
+            watershed) if watershed else None,
+        state_status=_get_dict_table_field(
+            state_status, show_code=True) if state_status else None,
+        federal_status=_get_dict_table_field(
+            fed_status, show_code=True) if fed_status else None,
+        global_status=_get_dict_table_field(
+            global_status, show_code=True) if global_status else None,
+        cm_status=_get_dict_table_field(
+            cm_status, show_code=True) if cm_status else None,
+    )
+    return occurrence

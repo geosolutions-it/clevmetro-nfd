@@ -11,6 +11,16 @@ from pygments.formatters import HtmlFormatter
 from . import models
 
 
+@admin.register(models.OccurrenceTaxon)
+class OccurrenceTaxonAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "taxon",
+        "location",
+        "observation",
+    )
+
+
 @admin.register(models.Taxon)
 class TaxonAdmin(admin.ModelAdmin):
     list_display = (
