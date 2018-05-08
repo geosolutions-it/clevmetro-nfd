@@ -5,27 +5,21 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import Q
 from django.http import Http404
-import django_filters
-from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import generics
+from rest_framework import renderers
 from rest_framework import status
-from rest_framework import filters
-from rest_framework.decorators import list_route
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import viewsets
+from rest_framework.decorators import list_route
 from rest_framework.fields import empty
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import BrowsableAPIRenderer
-from rest_framework.renderers import JSONRenderer
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from rest_framework.views import APIView
 import reversion
 
 from nfdrenderers import pdf as pdfrenderers
@@ -33,15 +27,11 @@ from nfdrenderers import csv as csvrenderers
 from nfdrenderers import xlsx as xlsrenderers
 from nfdrenderers import shp as shprenderers
 
+from . import constants
+from . import filters
 from . import itis
 from . import models
-from .models import (
-    get_occurrence_model,
-    OccurrenceNaturalArea,
-    OccurrenceTaxon,
-    Photograph,
-)
-from . import nfdserializers
+from . import serializers
 from .permissions import (
     CanCreateAnimals,
     CanUpdateFeatureType,
@@ -55,13 +45,11 @@ from .permissions import (
 
 logger = logging.getLogger(__name__)
 
-
 FilterField = namedtuple("FilterField", [
     "name",
     "value",
     "lookup"
 ])
-
 
 FeatureTypeFormCategory = namedtuple("FeatureTypeFormCategory", [
     "subtype",
@@ -125,10 +113,10 @@ def get_aggregation_records(category, taxonomic_units):
 class FeatureTypeFormViewSet(viewsets.ViewSet):
     """ViewSet for featuretype forms"""
     randerer_classes = (
-        JSONRenderer,
-        BrowsableAPIRenderer,
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
     )
-    serializer_class = nfdserializers.FormDefinitionsSerializer
+    serializer_class = serializers.FormDefinitionsSerializer
 
     @list_route()
     def ln(self, request):
@@ -214,15 +202,15 @@ class ItisBackedSearchViewSet(viewsets.ViewSet):
     ]
 
     renderer_classes = (
-        JSONRenderer,
-        BrowsableAPIRenderer,
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
     )
 
     def get_serializer_class(self):
         if self.action == "list":
-            result = nfdserializers.ItisTaxonSearchSerializer
+            result = serializers.ItisTaxonSearchSerializer
         elif self.action == "retrieve":
-            result = nfdserializers.ItisTaxonHierarchySerializer
+            result = serializers.ItisTaxonHierarchySerializer
         else:
             raise RuntimeError("Invalid action")
         return result
@@ -258,7 +246,7 @@ class ItisBackedSearchViewSet(viewsets.ViewSet):
         if pk is not None:
             try:
                 taxon_instance = models.Taxon.objects.get(pk=pk)
-                serializer_class = nfdserializers.TaxonDetailSerializer
+                serializer_class = serializers.TaxonDetailSerializer
             except models.Taxon.DoesNotExist:
                 taxon_instance = models.Taxon(tsn=pk)
                 taxon_instance.populate_attributes_from_itis()
@@ -281,11 +269,11 @@ class TaxonViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
     renderer_classes = (
-        JSONRenderer,
-        BrowsableAPIRenderer,
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
     )
     filter_backends = (
-        filters.SearchFilter,
+        SearchFilter,
     )
     search_fields = (
         "name",
@@ -296,9 +284,9 @@ class TaxonViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            result = nfdserializers.TaxonListSerializer
+            result = serializers.TaxonListSerializer
         elif self.action == "retrieve":
-            result = nfdserializers.TaxonDetailSerializer
+            result = serializers.TaxonDetailSerializer
         else:
             raise RuntimeError("Invalid action")
         return result
@@ -308,11 +296,11 @@ class OccurrenceAggregatorViewSet(viewsets.ViewSet):
     """ViewSet for occurrence stats"""
 
     renderer_classes = (
-        JSONRenderer,
-        BrowsableAPIRenderer,
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
         pdfrenderers.PdfOccurrenceStatsRenderer,
     )
-    serializer_class = nfdserializers.OccurrenceAggregatorSerializer
+    serializer_class = serializers.OccurrenceAggregatorSerializer
 
     taxonomic_units = [
         "species",
@@ -369,7 +357,7 @@ class OccurrenceAggregatorViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-class NfdLayer(ListCreateAPIView):
+class NfdLayer(generics.ListCreateAPIView):
 
     def get_queryset(self):
         (is_writer, is_publisher) = get_permissions(self.request.user,
@@ -393,7 +381,7 @@ class NfdLayer(ListCreateAPIView):
         raise NotImplementedError
 
     def get_serializer_class(self):
-        return nfdserializers.LayerSerializer
+        return serializers.LayerSerializer
 
     def get_serializer(self, instance=None, data=empty, many=False,
                        partial=False):
@@ -415,7 +403,7 @@ class NfdLayer(ListCreateAPIView):
                 )
             else:
                 is_writer_or_publisher = (is_writer or is_publisher)
-                return nfdserializers.LayerSerializer(
+                return serializers.LayerSerializer(
                     data=data,
                     many=many,
                     is_writer_or_publisher=is_writer_or_publisher
@@ -430,120 +418,16 @@ class NfdLayer(ListCreateAPIView):
             )
 
 
-class OccurrenceTaxonFilterSet(FilterSet):
-    featuresubtype = django_filters.filters.CharFilter(
-        name="occurrence_cat__code"
-    )
-    taxon = django_filters.filters.CharFilter(
-        method="filter_ranks",
-    )
-    reservation = django_filters.filters.CharFilter(
-        name="location__reservation",
-        lookup_expr="icontains",
-    )
-    watershed = django_filters.filters.CharFilter(
-        name="location__watershed",
-        lookup_expr="icontains",
-    )
-    cm_status = django_filters.filters.ModelChoiceFilter(
-        name="taxon__cm_status__code",
-        queryset=models.CmStatus.objects.all()
-    )
-
-    def filter_ranks(self, queryset, name, value):
-        """Filter for the input name in all available hierarchical ranks
-
-        This method builds a chained OR lookup using django's Q objects. This
-        is suitable for searching in a Taxon's taxonomic ranks, which are
-        stored in a JSONField on ``models.Taxon``. This enables  searching
-        for a name in any of the taxon's ranks.
-
-        """
-
-        # the following list was obtained from ITIS DB with the query:
-        # SELECT DISTINCT rank_id, lower(rank_name)
-        # FROM taxon_unit_types
-        # ORDER BY rank_id
-        ranks = [
-            "kingdom",
-            "subkingdom",
-            "infrakingdom",
-            "superphylum",
-            "superdivision",
-            "division",
-            "phylum",
-            "subdivision",
-            "subphylum",
-            "infraphylum",
-            "infradivision",
-            "parvphylum",
-            "parvdivision",
-            "superclass",
-            "class",
-            "subclass",
-            "infraclass",
-            "superorder",
-            "order",
-            "suborder",
-            "infraorder",
-            "section",
-            "subsection",
-            "superfamily",
-            "family",
-            "subfamily",
-            "tribe",
-            "subtribe",
-            "genus",
-            "subgenus",
-            "section",
-            "subsection",
-            "species",
-            "subspecies",
-            "variety",
-            "form",
-            "race",
-            "subvariety",
-            "stirp",
-            "form",
-            "morph",
-            "aberration",
-            "subform",
-            "unspecified",
-        ]
-        lookup_pattern = "taxon__upper_ranks__{}__name__icontains"
-        q_object = Q(**{lookup_pattern.format(ranks[0]): value})
-        for rank in ranks[1:]:
-            q_object = q_object | Q(**{lookup_pattern.format(rank): value})
-        return queryset.filter(q_object)
-
-    class Meta:
-        model = OccurrenceTaxon
-        fields = ['location', 'released', 'verified', 'taxon']
-
-
-class NaturalAreaFilter(FilterSet):
-    featuresubtype = django_filters.filters.CharFilter(
-        name="occurrence_cat__code")
-    cm_status = django_filters.filters.ModelChoiceFilter(
-        name="element__cm_status__code",
-        queryset=models.CmStatus.objects.all()
-    )
-
-    class Meta:
-        model = OccurrenceNaturalArea
-        fields = ['released', 'verified']
-
-
 class PlantLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreatePlants]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = OccurrenceTaxonFilterSet
+    filter_class = filters.OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
-        return nfdserializers.TaxonOccurrenceSerializer
+        return serializers.TaxonOccurrenceSerializer
 
     def get_base_queryset(self):
-        return OccurrenceTaxon.objects.filter(
+        return models.OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
     def get_main_cat(self):
@@ -553,13 +437,13 @@ class PlantLayer(NfdLayer):
 class AnimalLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateAnimals]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = OccurrenceTaxonFilterSet
+    filter_class = filters.OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
-        return nfdserializers.TaxonOccurrenceSerializer
+        return serializers.TaxonOccurrenceSerializer
 
     def get_base_queryset(self):
-        return OccurrenceTaxon.objects.filter(
+        return models.OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
     def get_main_cat(self):
@@ -569,13 +453,13 @@ class AnimalLayer(NfdLayer):
 class FungusLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateFungus]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = OccurrenceTaxonFilterSet
+    filter_class = filters.OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
-        return nfdserializers.TaxonOccurrenceSerializer
+        return serializers.TaxonOccurrenceSerializer
 
     def get_base_queryset(self):
-        return OccurrenceTaxon.objects.filter(
+        return models.OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
     def get_main_cat(self):
@@ -585,13 +469,13 @@ class FungusLayer(NfdLayer):
 class SlimeMoldLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateSlimeMold]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = OccurrenceTaxonFilterSet
+    filter_class = filters.OccurrenceTaxonFilterSet
 
     def get_post_serializer_class(self):
-        return nfdserializers.TaxonOccurrenceSerializer
+        return serializers.TaxonOccurrenceSerializer
 
     def get_base_queryset(self):
-        return OccurrenceTaxon.objects.filter(
+        return models.OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
     def get_main_cat(self):
@@ -601,13 +485,13 @@ class SlimeMoldLayer(NfdLayer):
 class NaturalAreaLayer(NfdLayer):
     permission_classes = [IsAuthenticated, CanCreateNaturalAreas]
     filter_backends = (DjangoFilterBackend, )
-    filter_class = NaturalAreaFilter
+    filter_class = filters.NaturalAreaFilter
 
     def get_post_serializer_class(self):
-        return nfdserializers.NaturalAreaOccurrenceSerializer
+        return serializers.NaturalAreaOccurrenceSerializer
 
     def get_base_queryset(self):
-        return OccurrenceNaturalArea.objects.all()
+        return models.OccurrenceNaturalArea.objects.all()
 
     def get_main_cat(self):
         return "naturalarea"
@@ -617,7 +501,7 @@ class NfdListPagination(PageNumberPagination):
     page_size = 10
 
 
-class NfdList(ListAPIView):
+class NfdList(generics.ListAPIView):
     pagination_class = NfdListPagination
     filter_backends = (DjangoFilterBackend, )
 
@@ -648,13 +532,13 @@ class NfdList(ListAPIView):
 
 
 class OccurrenceTaxonList(NfdList):
-    filter_class = OccurrenceTaxonFilterSet
+    filter_class = filters.OccurrenceTaxonFilterSet
 
     def get_serializer_class(self):
-        return nfdserializers.TaxonOccurrenceListSerializer
+        return serializers.TaxonOccurrenceListSerializer
 
     def get_base_queryset(self):
-        return OccurrenceTaxon.objects.filter(
+        return models.OccurrenceTaxon.objects.filter(
             occurrence_cat__main_cat=self.get_main_cat())
 
 
@@ -688,13 +572,13 @@ class OccurrenceSlimeMoldList(OccurrenceTaxonList):
 
 class OccurrenceNaturalAreaList(NfdList):
     permission_classes = [IsAuthenticated, CanCreateNaturalAreas]
-    filter_class = NaturalAreaFilter
+    filter_class = filters.NaturalAreaFilter
 
     def get_base_queryset(self):
-        return OccurrenceNaturalArea.objects.all()
+        return models.OccurrenceNaturalArea.objects.all()
 
     def get_serializer_class(self):
-        return nfdserializers.NaturalAreaOccurrenceListSerializer
+        return serializers.NaturalAreaOccurrenceListSerializer
 
     def get_main_cat(self):
         return "naturalarea"
@@ -706,8 +590,8 @@ class LayerDetail(APIView):
     """
     permission_classes = [IsAuthenticated, CanUpdateFeatureType]
     renderer_classes = (
-        JSONRenderer,
-        BrowsableAPIRenderer,
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
         pdfrenderers.PdfLayerDetailRenderer,
         csvrenderers.CsvRenderer,
         xlsrenderers.XlsxRenderer,
@@ -716,7 +600,8 @@ class LayerDetail(APIView):
 
     def get_object(self, occurrence_maincat, pk):
         try:
-            return get_occurrence_model(occurrence_maincat).objects.get(pk=pk)
+            return models.get_occurrence_model(
+                occurrence_maincat).objects.get(pk=pk)
         except ObjectDoesNotExist:
             raise Http404
 
@@ -732,11 +617,11 @@ class LayerDetail(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN
             )
-        if isinstance(feature, OccurrenceNaturalArea):
-            serializer = nfdserializers.NaturalAreaOccurrenceSerializer(
+        if isinstance(feature, models.OccurrenceNaturalArea):
+            serializer = serializers.NaturalAreaOccurrenceSerializer(
                 feature, is_writer=is_writer, is_publisher=is_publisher)
         else:
-            serializer = nfdserializers.TaxonOccurrenceSerializer(
+            serializer = serializers.TaxonOccurrenceSerializer(
                 feature, is_writer=is_writer, is_publisher=is_publisher)
         return Response(serializer.data)
 
@@ -744,15 +629,15 @@ class LayerDetail(APIView):
         is_writer, is_publisher = get_permissions(
             request.user, occurrence_maincat)
         feature = self.get_object(occurrence_maincat, pk)
-        if isinstance(feature, OccurrenceNaturalArea):
-            serializer = nfdserializers.NaturalAreaOccurrenceSerializer(
+        if isinstance(feature, models.OccurrenceNaturalArea):
+            serializer = serializers.NaturalAreaOccurrenceSerializer(
                 feature, data=request.data, is_writer=is_writer,
                 is_publisher=is_publisher
             )
         else:
             request_data = request.data.copy()
             tsn = request_data.pop("taxon.tsn")
-            serializer = nfdserializers.TaxonOccurrenceSerializer(
+            serializer = serializers.TaxonOccurrenceSerializer(
                 feature,
                 data=request.data,
                 is_writer=is_writer,
@@ -770,7 +655,7 @@ class LayerDetail(APIView):
     def delete(self, request, occurrence_maincat, pk, format=None):
         feature = self.get_object(occurrence_maincat, pk)
         with reversion.create_revision():
-            nfdserializers.delete_object_and_children(feature)
+            serializers.delete_object_and_children(feature)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -781,9 +666,9 @@ class LayerVersionDetail(APIView):
         try:
             (is_writer, is_publisher) = get_permissions(request.user,
                                                         occurrence_maincat)
-            instance = get_occurrence_model(
+            instance = models.get_occurrence_model(
                 occurrence_maincat).objects.get(pk=pk)
-            serializer = nfdserializers.OccurrenceVersionSerializer()
+            serializer = serializers.OccurrenceVersionSerializer()
             excude_unreleased = not (is_writer or is_publisher)
             serialized = serializer.get_version(
                 instance, int(version), excude_unreleased)
@@ -803,8 +688,56 @@ class LayerVersionDetail(APIView):
             # raise Http404
 
 
-class PhotoViewSet(ModelViewSet):
+class PhotoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, CanWriteOrUpdateAny]
-    serializer_class = nfdserializers.PhotographPublishSerializer
+    serializer_class = serializers.PhotographPublishSerializer
     parser_classes = (MultiPartParser, FormParser,)
-    queryset = Photograph.objects.all()
+    queryset = models.Photograph.objects.all()
+
+
+class OccurrenceNaturalAreaReportViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.OccurrenceNaturalArea.objects.all()
+    serializer_class = serializers.NaturalAreaReportSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+    filter_backends = (
+        DjangoFilterBackend,
+        SearchFilter,
+    )
+    filter_class = filters.OccurrenceNaturalAreaReportFilterSet
+    search_fields = (
+        "element__natural_area_code_nac",
+    )
+    renderer_classes = (
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
+        pdfrenderers.OccurrenceNaturalAreaReportRenderer,
+    )
+
+
+class OccurrenceTaxonReportViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.OccurrenceTaxon.objects.all()
+    serializer_class = serializers.OccurrenceTaxonReportSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+    filter_backends = (
+        filters.ReportTaxonFilterBackend,
+        DjangoFilterBackend,
+    )
+    filter_class = filters.OccurrenceTaxonReportFilterSet
+    renderer_classes = (
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
+        pdfrenderers.OccurrenceTaxonReportRenderer,
+    )
+
+
+class TaxonRanksViewSet(viewsets.ViewSet):
+    serializer_class = serializers.TaxonRanksSerializer
+
+    def list(self, request):
+        serializer = self.serializer_class(instance=constants.TAXON_RANKS)
+        return Response(serializer.data)
+

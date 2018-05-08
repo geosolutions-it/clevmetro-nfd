@@ -276,6 +276,7 @@ class RecordingStation(DictionaryTable):
     pass
 
 
+@python_2_unicode_compatible
 @reversion.register()
 class OccurrenceObservation(models.Model):
     observation_date = models.DateField(blank=True, null=True)
@@ -288,6 +289,13 @@ class OccurrenceObservation(models.Model):
     reporter = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, related_name='reporter')
     recorder = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='recorder')
     verifier = models.ForeignKey(PointOfContact, on_delete=models.CASCADE, blank=True, null=True, related_name='verifier')
+
+    def __str__(self):
+        return "{reporter}{observation_date}".format(
+            reporter=self.reporter.name,
+            observation_date=" ({})".format(
+                self.observation_date) if self.observation_date else ""
+        )
 
 
 @reversion.register()
@@ -323,6 +331,7 @@ class Watershed(DictionaryTable):
     pass
 
 
+@python_2_unicode_compatible
 class Location(models.Model):
     site_description = models.TextField(blank=True, null=True, default='')
     reservation = JSONField(blank=True, null=True)
@@ -332,6 +341,11 @@ class Location(models.Model):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        reservation = ", ".join(self.reservation) if self.reservation else None
+        watershed = ", ".join(self.watershed) if self.watershed else None
+        return "Reservation: {} - Watershed: {}".format(reservation, watershed)
 
 
 @reversion.register()
@@ -819,7 +833,6 @@ class SlimeMoldClass(DictionaryTableExtended):
 
 class SlimeMoldMedia(DictionaryTable):
     pass
-
 
 @reversion.register(follow=['taxondetails_ptr'])
 class SlimeMoldDetails(TaxonDetails):

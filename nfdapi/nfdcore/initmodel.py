@@ -2,7 +2,7 @@ from django.utils import timezone
 import reversion
 
 from . import models
-from . import nfdserializers
+from . import serializers
 
 LONTRA_TSN = 180549
 BEAR_TSN = 180544
@@ -1100,7 +1100,7 @@ def insert_test_taxa(clean=False):
 def insert_test_data(clean=True):
     if clean:
         for feat in models.OccurrenceTaxon.objects.all():
-            nfdserializers.delete_object_and_children(feat)
+            serializers.delete_object_and_children(feat)
 
     """
     plant_cat = models.OccurrenceCategory.objects.get(code='pl')
