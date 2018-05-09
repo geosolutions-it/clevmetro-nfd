@@ -61,61 +61,99 @@
     {% if occurrences|length > 0 %}
         <table repeat="1" id="occurrences">
             <tr>
-                <th style="width: 30px">List ID</th>
-                <th style="width: 30px">DB ID</th>
-                <th>Natural area code</th>
-                <th>Observation date</th>
-                {% if not filters.observer %}
-                <th>Observer</th>
+                {% if "list_id" in table_columns %}
+                    <th style="width: 30px">List ID</th>
                 {% endif %}
-                <th>Site description</th>
-                {% if not filters.reservation %}
-                <th>Reservation</th>
+                {% if "db_id" in table_columns %}
+                    <th style="width: 30px">DB ID</th>
                 {% endif %}
-                <th>Watershed</th>
-                {% if not filters.state_status %}
-                <th>State Status</th>
+                {% if "natural_area_code" in table_columns %}
+                    <th>Natural area code</th>
                 {% endif %}
-                {% if not filters.federal_status %}
-                <th>Federal Status</th>
+                {% if "general_description" in table_columns %}
+                    <th>General description</th>
                 {% endif %}
-                {% if not filters.global_status %}
-                <th>Global Status</th>
+                {% if "observation_date" in table_columns %}
+                    <th>Observation date</th>
                 {% endif %}
-                {% if not filters.cm_status %}
-                <th>CM Status</th>
+                {% if "observer" in table_columns %}
+                    <th>Observer</th>
                 {% endif %}
-                <th style="width: 70px">Latitude</th>
-                <th style="width: 70px">Longitude</th>
+                {% if "site_description" in table_columns %}
+                    <th>Site description</th>
+                {% endif %}
+                {% if "reservation" in table_columns %}
+                    <th>Reservation</th>
+                {% endif %}
+                {% if "watershed" in table_columns %}
+                    <th>Watershed</th>
+                {% endif %}
+                {% if "state_status" in table_columns %}
+                    <th>State Status</th>
+                {% endif %}
+                {% if "federal_status" in table_columns %}
+                    <th>Federal Status</th>
+                {% endif %}
+                {% if "global_status" in table_columns %}
+                    <th>Global Status</th>
+                {% endif %}
+                {% if "cm_status" in table_columns %}
+                    <th>CM Status</th>
+                {% endif %}
+                {% if "latitude" in table_columns %}
+                    <th style="width: 70px">Latitude</th>
+                {% endif %}
+                {% if "longitude" in table_columns %}
+                    <th style="width: 70px">Longitude</th>
+                {% endif %}
             </tr>
             {% for occurrence in occurrences %}
             <tr>
-                <td>{{ occurrence.index}}</td>
-                <td>{{ occurrence.id }}</td>
-                <td>{{ occurrence.natural_area_code_nac|default_if_none:"-" }}</td>
-                <td>{{ occurrence.observation_date|default_if_none:"-" }}</td>
-                {% if not filters.observer %}
-                <td>{{ occurrence.observer|default_if_none:"-" }}</td>
+                {% if "list_id" in table_columns %}
+                    <td>{{ occurrence.index}}</td>
                 {% endif %}
-                <td>{{ occurrence.site_description|default_if_none:"-" }}</td>
-                {% if not filters.reservation %}
-                <td>{{ occurrence.reservation|default_if_none:"-" }}</td>
+                {% if "db_id" in table_columns %}
+                    <td>{{ occurrence.id }}</td>
                 {% endif %}
-                <td>{{ occurrence.watershed|default_if_none:"-" }}</td>
-                {% if not filters.state_status %}
-                <td>{{ occurrence.state_status|default_if_none:"-" }}</td>
+                {% if "natural_area_code" in table_columns %}
+                    <td>{{ occurrence.natural_area_code_nac|default_if_none:"-" }}</td>
                 {% endif %}
-                {% if not filters.federal_status %}
-                <td>{{ occurrence.federal_status|default_if_none:"-" }}</td>
+                {% if "general_description" in table_columns %}
+                <td>{{ occurrence.general_description|default_if_none:"-" }}</td>
                 {% endif %}
-                {% if not filters.global_status %}
-                <td>{{ occurrence.global_status|default_if_none:"-" }}</td>
+                {% if "observation_date" in table_columns %}
+                    <td>{{ occurrence.observation_date|default_if_none:"-" }}</td>
                 {% endif %}
-                {% if not filters.cm_status %}
-                <td>{{ occurrence.cm_status|default_if_none:"-" }}</td>
+                {% if "observer" in table_columns %}
+                    <td>{{ occurrence.observer|default_if_none:"-" }}</td>
                 {% endif %}
-                <td>{{ occurrence.latitude|default_if_none:"-"|floatformat:"3" }}</td>
-                <td>{{ occurrence.longitude|default_if_none:"-"|floatformat:"3" }}</td>
+                {% if "site_description" in table_columns %}
+                    <td>{{ occurrence.site_description|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "reservation" in table_columns %}
+                    <td>{{ occurrence.reservation|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "watershed" in table_columns %}
+                    <td>{{ occurrence.watershed|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "state_status" in table_columns %}
+                    <td>{{ occurrence.state_status|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "federal_status" in table_columns %}
+                    <td>{{ occurrence.federal_status|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "global_status" in table_columns %}
+                    <td>{{ occurrence.global_status|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "cm_status" in table_columns %}
+                    <td>{{ occurrence.cm_status|default_if_none:"-" }}</td>
+                {% endif %}
+                {% if "latitude" in table_columns %}
+                    <td>{{ occurrence.latitude|default_if_none:"-"|floatformat:"3" }}</td>
+                {% endif %}
+                {% if "longitude" in table_columns %}
+                    <td>{{ occurrence.longitude|default_if_none:"-"|floatformat:"3" }}</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </table>
