@@ -262,11 +262,21 @@ class OccurrenceTaxonReportRenderer(BaseOccurrenceReportRenderer):
             county=query_params.get("county"),
             quad=_get_quad(query_params),
         )
+        default_columns = [
+            "list_id",
+            "genus",
+            "common_name",
+            "cm_status",
+            "latitude",
+            "longitude",
+        ]
         return render_to_pdf(
             "nfdrenderers/pdf/taxon_occurrence_report.html",
             context={
                 "occurrences": occurrences,
                 "filters": {k: v for k, v in filters.items() if v},
+                "table_columns": get_table_columns(
+                    query_params, default_columns),
             }
         )
 
@@ -281,19 +291,42 @@ class OccurrenceNaturalAreaReportRenderer(BaseOccurrenceReportRenderer):
             occurrences.append(occurrence)
         query_params = renderer_context["request"].query_params.dict()
         filters = self.get_filters(query_params)
-        print("filters: {}".format(filters))
         filters.update(
             natural_area_code_nac=query_params.get("natural_area_code_nac"),
             general_description=query_params.get("general_description"),
             notable_features=query_params.get("notable_features"),
         )
+        default_columns = [
+            "list_id",
+            "genus",
+            "natural_area_code",
+            "general_description",
+            "cm_status",
+            "latitude",
+            "longitude",
+        ]
         return render_to_pdf(
             "nfdrenderers/pdf/natural_area_occurrence_report.html",
             context={
                 "occurrences": occurrences,
                 "filters": {k: v for k, v in filters.items() if v},
+                "table_columns": get_table_columns(
+                    query_params, default_columns),
             }
         )
+
+
+def get_table_columns(query_params, defaults, prefix="show_"):
+    columns = set(defaults)
+    for param, value in query_params.items():
+        name = param.replace(prefix, "")
+        bool_value = value.lower() in ("true", "1")
+        if param.startswith(prefix):
+            if bool_value:
+                columns.add(name)
+            else:
+                columns.discard(name)
+    return list(columns)
 
 
 def get_status_description(status_model, code):
