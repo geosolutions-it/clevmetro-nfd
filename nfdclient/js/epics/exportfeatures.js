@@ -11,7 +11,7 @@ const FilterUtils = require('../utils/FilterUtils');
 const fileDownload = require('react-file-download');
 const copy = require('copy-to-clipboard');
 const url = require('url');
-
+const {isArray, head, get} = require('lodash');
 
 const {setControlProperty} = require('../../MapStore2/web/client/actions/controls');
 const {
@@ -19,7 +19,10 @@ const {
     EXPORT_FEATURES,
     downloadingFeatures,
     DOWNLOAD_REPORT,
-    ADD_PERMALINK
+    DOWNLOAD_REPORT_WITH_FILTER,
+    ADD_PERMALINK,
+    INITIALIZE_REPORT_FILTERS,
+    updateReportFilters
 } = require('../actions/exportfeatures');
 const {
     userNotAuthenticatedError
@@ -105,5 +108,53 @@ module.exports = {
             const link = url.format(currentUrl);
             copy(link);
             return Rx.Observable.of(info({title: "Link", message: `Permalink added to clipboard ${link}`}));
+        }),
+    initializeReportOptions: (action$, store) =>
+        action$.ofType(INITIALIZE_REPORT_FILTERS)
+        .switchMap( action => {
+            const state = store.getState();
+            const reportFilters = state.exportfeatures && state.exportfeatures.reportFilters;
+            if (reportFilters) {
+                return Rx.Observable.empty();
+            }
+            const filters = (action.filters && action.filters.row || []).filter(filter => filter.url);
+            return Rx.Observable.from(
+                filters.map((filter) =>
+                    Rx.Observable.fromPromise(
+                        Api.getReportFilters(filter.url)
+                            .then(response => {
+                                const data = response && response.data;
+                                const key = !isArray(data) && head(Object.keys(data));
+                                // get options and set a placeholder for commas for multiselect form
+                                const options = (key && data[key] || data && data.map(({code, ...option}) => ({
+                                    ...option,
+                                    code: code && code.replace && code.replace(/\,/g, '{comma}') || code
+                                })) || []);
+                                return ({...filter, loading: false, options });
+                            })
+                            .catch(() => ({...filter, error: true}))
+                    )
+                )
+            )
+            .mergeAll()
+            .map((newFilter) => updateReportFilters(newFilter, action.filters));
+        }),
+    downloadReportWidthFilter: (action$, store) =>
+        action$.ofType(DOWNLOAD_REPORT_WITH_FILTER)
+        .switchMap(a => {
+            const {featureType, id, version} = a;
+            const state = store.getState();
+            const reportFilters = state.exportfeatures && state.exportfeatures.reportFilters || {};
+            const reportOptions = state.exportfeatures && state.exportfeatures.reportOptions || {};
+            const colFilter = get(reportFilters, 'col[0].options');
+            const col = colFilter && colFilter.reduce((newCol, checkbox) => checkbox.code && {...newCol, [checkbox.code]: true} || {...newCol}, {}) || {};
+            const params = {...col, ...(Object.keys(reportOptions)
+                .filter(key => reportOptions[key] && key !== 'featureType' && key !== 'downloadReportUrl')
+                .reduce((newOptions, key) => ({
+                    ...newOptions,
+                    [key]: reportOptions[key] && reportOptions[key].replace && reportOptions[key].replace(/\{comma\}/g, ',') || reportOptions[key] }), {}
+                ))
+            } || {};
+            return getReport(Api.downloadReportWidthFilter(reportOptions.downloadReportUrl, id, version, 'pdf', params), `${featureType}${id ? `_${id}_${version}` : ''}.${'pdf'}`);
         })
 };

@@ -29,7 +29,8 @@ module.exports = {
         ToggleAddEditPanelPlugin: require('./plugins/ToggleAddEditPanel'),
         FeaturesPlugin: require('./plugins/FeaturesPlugin'),
         ExportFeaturesPlugin: require('./plugins/ExportFeatures'),
-        FeatureTypeReportMenuPlugin: require('./plugins/FeatureTypeReportMenu')
+        FeatureTypeReportMenuPlugin: require('./plugins/FeatureTypeReportMenu'),
+        ReportConfigurationPlugin: require('./plugins/ReportConfiguration')
     },
     requires: {}
 };

@@ -140,6 +140,14 @@ const Api = {
         let url = id ? `/nfdapi/layers/${featureType}/${id}/?version=${version}&format=${format}` : `/nfdapi/stats/${featureType}?format=${format}`;
         const headers = assign({}, (getOptions()).headers, getAccept(format));
         return axios.get(url, {headers, responseType: 'arraybuffer', timeout: 60000});
+    },
+    downloadReportWidthFilter: function(featureTypeUrl = '/nfdapi/report_taxon/', id, version, format = 'pdf', params = {}) {
+        const headers = assign({}, (getOptions()).headers, getAccept(format));
+        return axios.get(featureTypeUrl, {headers, responseType: 'arraybuffer', timeout: 60000, params: {...params, format}});
+    },
+    getReportFilters: function(filterUrl) {
+        const headers = assign({}, (getOptions()).headers);
+        return axios.get(filterUrl, {headers, timeout: 60000});
     }
 };
 
