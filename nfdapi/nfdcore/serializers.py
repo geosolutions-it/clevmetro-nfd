@@ -2397,7 +2397,19 @@ class OccurrenceTaxonReportSerializer(BaseOccurrenceReportSerializer):
         return obj.taxon.upper_ranks.get("species", {}).get("name")
 
     def get_common_names(self, obj):
-        return obj.taxon.upper_ranks.get("species", {}).get("common_names", {})
+        sorted_ranks = sorted(
+            obj.taxon.upper_ranks.values(),
+            key=lambda rank_info:rank_info["index"],
+            reverse=True
+        )
+        for rank in sorted_ranks:
+            common_names = rank.get("common_names")
+            if common_names:
+                result = common_names
+                break
+        else:
+            result = {}
+        return result
 
     def get_global_status(self, obj):
         serializer = GenericDictTableSerializer(

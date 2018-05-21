@@ -243,14 +243,10 @@ class OccurrenceTaxonReportRenderer(BaseOccurrenceReportRenderer):
         occurrences = []
         for index, occ in enumerate(data):
             occurrence = _get_occurrence(occ)
-            try:
-                common_name = occ.get(
-                    "common_names", {}).get("English", [])[0]
-            except IndexError:
-                common_name = None
+            all_common_names = occ.pop("common_names", {}) or {}
             occurrence.update(
                 index=index+1,
-                common_name=common_name
+                common_name=get_relevant_common_name(**all_common_names)
             )
             occurrences.append(occurrence)
         query_params = renderer_context["request"].query_params.dict()
@@ -270,13 +266,15 @@ class OccurrenceTaxonReportRenderer(BaseOccurrenceReportRenderer):
             "latitude",
             "longitude",
         ]
+        chosen_table_columns = get_table_columns(query_params, default_columns)
+        table_columns = chosen_table_columns if len(
+            chosen_table_columns) > 0 else default_columns[0:1]
         return render_to_pdf(
             "nfdrenderers/pdf/taxon_occurrence_report.html",
             context={
                 "occurrences": occurrences,
                 "filters": {k: v for k, v in filters.items() if v},
-                "table_columns": get_table_columns(
-                    query_params, default_columns),
+                "table_columns": table_columns,
             }
         )
 
@@ -305,15 +303,32 @@ class OccurrenceNaturalAreaReportRenderer(BaseOccurrenceReportRenderer):
             "latitude",
             "longitude",
         ]
+        chosen_table_columns = get_table_columns(query_params, default_columns)
+        table_columns = chosen_table_columns if len(
+            chosen_table_columns) > 0 else default_columns[0:1]
         return render_to_pdf(
             "nfdrenderers/pdf/natural_area_occurrence_report.html",
             context={
                 "occurrences": occurrences,
                 "filters": {k: v for k, v in filters.items() if v},
-                "table_columns": get_table_columns(
-                    query_params, default_columns),
+                "table_columns": table_columns,
             }
         )
+
+
+def get_relevant_common_name(**all_common_names):
+    relevant_languages = [
+        "english",
+        "australian",
+        "hawaiian",
+        "native american",
+        "unspecified"
+    ]
+    relevant_names = []
+    for language, names in all_common_names.items():
+        if language.lower() in relevant_languages:
+            relevant_names += names
+    return " - ".join(relevant_names)
 
 
 def get_table_columns(query_params, defaults, prefix="show_"):
