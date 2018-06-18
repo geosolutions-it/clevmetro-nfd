@@ -10,7 +10,11 @@ const EXPORT_OPTIONS_CHANGE = 'EXPORT_OPTIONS_CHANGE';
 const EXPORT_FEATURES = 'EXPORT_FEATURES';
 const DOWNLOADING_FEATURES = 'DOWNLOADING_FEATURES';
 const DOWNLOADING_FEATURES_ERROR = 'DOWNLOADING_FEATURES_ERROR';
+const INITIALIZE_REPORT_FILTERS = 'INITIALIZE_REPORT_FILTERS';
+const UPDATE_REPORT_FILTERS = 'UPDATE_REPORT_FILTERS';
+const UPDATE_REPORT_OPTIONS = 'UPDATE_REPORT_OPTIONS';
 const DOWNLOAD_REPORT = 'DOWNLOAD_REPORT';
+const DOWNLOAD_REPORT_WITH_FILTER = 'DOWNLOAD_REPORT_WITH_FILTER';
 const ADD_PERMALINK = 'ADD_PERMALINK';
 
 function addPermalink(ft, sb, id, v) {
@@ -20,6 +24,37 @@ function addPermalink(ft, sb, id, v) {
         id,
         sb,
         v
+    };
+}
+
+function initializeReportFilters(filters) {
+    return {
+        type: INITIALIZE_REPORT_FILTERS,
+        filters
+    };
+}
+
+function updateReportFilters(filter, filters) {
+    return {
+        type: UPDATE_REPORT_FILTERS,
+        filter,
+        filters
+    };
+}
+
+function updateReportOptions(options) {
+    return {
+        type: UPDATE_REPORT_OPTIONS,
+        options
+    };
+}
+
+function downloadReportWithFilter(featureType, id, version) {
+    return {
+        type: DOWNLOAD_REPORT_WITH_FILTER,
+        featureType,
+        id,
+        version
     };
 }
 
@@ -76,6 +111,10 @@ module.exports = {
     EXPORT_FEATURES, downloadFeatures,
     DOWNLOADING_FEATURES, downloadingFeatures,
     DOWNLOADING_FEATURES_ERROR, downloadingError,
+    INITIALIZE_REPORT_FILTERS, initializeReportFilters,
+    UPDATE_REPORT_FILTERS, updateReportFilters,
+    UPDATE_REPORT_OPTIONS, updateReportOptions,
     DOWNLOAD_REPORT, downloadReport,
+    DOWNLOAD_REPORT_WITH_FILTER, downloadReportWithFilter,
     ADD_PERMALINK, addPermalink
 };

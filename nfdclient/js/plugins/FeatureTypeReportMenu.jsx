@@ -11,7 +11,7 @@ const {connect} = require('react-redux');
 const assign = require('object-assign');
 
 
-const {downloadReport} = require('../actions/exportfeatures');
+const {updateReportOptions} = require('../actions/exportfeatures');
 
 const Message = require('../../MapStore2/web/client/components/I18N/Message');
 
@@ -54,7 +54,7 @@ const ReportMenu = React.createClass({
 
 module.exports = {
     FeatureTypeReportMenuPlugin: assign(connect(() => ({}), {
-        onDownloadReport: downloadReport
+        onDownloadReport: updateReportOptions
     })(ReportMenu), {
         OmniBar: {
             name: "pdfFt",
