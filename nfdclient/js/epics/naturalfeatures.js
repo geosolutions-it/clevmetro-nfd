@@ -154,7 +154,7 @@ addNaturalFeature: (action$) =>
 showSaveUpdateDeleteErrors: action$ =>
     action$.ofType(CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR)
     .switchMap( a => {
-        if (a.error.status >= 500) {
+        if (a.error.status >= 500 || !a.error.data) {
             return Rx.Observable.of(error({title: 'Bad request', message: `Error: ${a.error.statusText}`}));
         }
         return Rx.Observable.from(Object.keys(a.error.data).map((k) => {

@@ -55,8 +55,8 @@ const getFilterOptions = (ftType) => {
         .map(resp => {
             if (resp.forms && resp.forms[0]) {
                 const filters = ["reservation", "watershed", "cm_status"];
-                const items = resp.forms.reduce((fields, f) => fields.concat(f.formitems.filter(({label}) => filters.indexOf(label) !== -1)), [])
-                              .map((i) => ({name: i.label, options: i.values.items}));
+                const items = resp.forms.reduce((fields, f) => fields.concat(f.formitems.filter(({key}) => filters.indexOf(key.split(".").pop()) !== -1)), [])
+                              .map((i) => ({name: i.key.split(".").pop(), options: i.values.items}));
                 return {type: UPDATE_FILTERS_OPTIONS, items};
             }
         });
