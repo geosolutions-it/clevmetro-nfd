@@ -242,8 +242,8 @@ const DockedNaturalFeatures = React.createClass({
             return buttons.concat([<Button key="save" bsSize="small"
                     bsStyle="primary"
                     onClick={() => this.props.onUpdate(this.props.featuretype, this.props.featuresubtype, this.props.currentFeature)}
-                    disabled={false}>
-                    <Message msgId="naturalfeatures.save" />
+                    disabled={!this.props.currentFeature["taxon.name"]}>
+                    <Message msgId="naturalfeatures.save"/>
                 </Button>]);
         }
         return buttons.concat([<Button key="edit" bsSize="small"
