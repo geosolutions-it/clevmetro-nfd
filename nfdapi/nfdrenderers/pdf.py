@@ -254,7 +254,8 @@ class OccurrenceTaxonReportRenderer(BaseOccurrenceReportRenderer):
         rank_value = query_params.get("rank_value")
         filters = self.get_filters(query_params)
         filters.update(
-            feature=" ".join((rank_name, rank_value)) if rank_value else None,
+            category=query_params.get("category"),
+            rank=" ".join((rank_name, rank_value)) if rank_value else None,
             county=query_params.get("county"),
             quad=_get_quad(query_params),
         )

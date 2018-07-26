@@ -80,14 +80,14 @@ class CharInFilter(django_filters.BaseInFilter, django_filters.CharFilter):
 class ReportTaxonFilterBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
+        category = request.query_params.get("category").lower()
+        result = queryset.filter(occurrence_cat__main_cat__iexact=category)
         rank_name = request.query_params.get("rank_name", "species").lower()
         rank_value = request.query_params.get("rank_value")
         if rank_value:
             lookup = "taxon__upper_ranks__{}__name__icontains".format(
                 rank_name)
-            result = queryset.filter(**{lookup: rank_value})
-        else:
-            result = queryset
+            result = result.filter(**{lookup: rank_value})
         return result
 
 
