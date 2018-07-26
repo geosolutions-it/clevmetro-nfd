@@ -29,8 +29,9 @@
     <p>
         <strong>Filters</strong><br>
         <ul>
-            {% if filters.feature %}
-                <li>Feature: <strong>{{ filters.feature }}</strong></li>
+            <li>Feature type: <strong>{{ filters.category }}</strong></li>
+            {% if filters.rank %}
+            <li>Rank: <strong>{{ filters.rank }}</strong></li>
             {% endif %}
             {% if filters.reservation %}
                 <li>Reservation: <strong>{{ filters.reservation }}</strong></li>
