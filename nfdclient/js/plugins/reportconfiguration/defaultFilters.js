@@ -21,7 +21,10 @@ module.exports = {
             type: ['select', 'text'],
             code: ['rank_name', 'rank_value'],
             url: '/nfdapi/taxon_ranks/',
-            only: '/nfdapi/report_taxon/'
+            only: '/nfdapi/report_taxon/',
+            optionsFilter: [
+                options => options !== 'kingdom'
+            ]
         },
         {
             name: 'Reservation',

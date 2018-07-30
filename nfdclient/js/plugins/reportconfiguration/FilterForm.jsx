@@ -31,12 +31,13 @@ module.exports = ({
         text: 'Insert value',
         number: 'Insert number',
         date: 'Select date'
-    }
+    },
+    optionsFilter
 }) => (
     <div>
         {desc && <div style={{fontSize: 11}}><i><Message msgId={'clevmetro.' + desc}/></i></div>}
         {(type === 'multiselect' || type === 'select') && <Select
-            options={options && options.map(option => ({
+            options={options && options.filter(optionsFilter ? optionsFilter : () => true).map(option => ({
                 value: isString(option) ? option : option.code,
                 label: isString(option) ? option : option.name
             }))}

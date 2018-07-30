@@ -146,6 +146,7 @@ module.exports = {
             const state = store.getState();
             const reportFilters = state.exportfeatures && state.exportfeatures.reportFilters || {};
             const reportOptions = state.exportfeatures && state.exportfeatures.reportOptions || {};
+            const categoryObj = reportOptions.featureType && {category: reportOptions.featureType} || {};
             const colFilter = get(reportFilters, 'col[0].options');
             const col = colFilter && colFilter.reduce((newCol, checkbox) => checkbox.code && {...newCol, [checkbox.code]: true} || {...newCol}, {}) || {};
             const params = {...col, ...(Object.keys(reportOptions)
@@ -155,6 +156,6 @@ module.exports = {
                     [key]: reportOptions[key] && reportOptions[key].replace && reportOptions[key].replace(/\{comma\}/g, ',') || reportOptions[key] }), {}
                 ))
             } || {};
-            return getReport(Api.downloadReportWidthFilter(reportOptions.downloadReportUrl, id, version, 'pdf', params), `${featureType}${id ? `_${id}_${version}` : ''}.${'pdf'}`);
+            return getReport(Api.downloadReportWidthFilter(reportOptions.downloadReportUrl, id, version, 'pdf', {...params, ...categoryObj}), `${featureType}${id ? `_${id}_${version}` : ''}.${'pdf'}`);
         })
 };
