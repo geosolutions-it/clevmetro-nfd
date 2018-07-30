@@ -44,7 +44,7 @@ const ReportMenu = React.createClass({
                         <MenuItem onClick={() => this.props.onDownloadReport("plant")}><Message msgId="naturalfeatures.plants"/></MenuItem>
                         <MenuItem onClick={() => this.props.onDownloadReport("fungus")}><Message msgId="naturalfeatures.fungus"/></MenuItem>
                         <MenuItem onClick={() => this.props.onDownloadReport("animal")}><Message msgId="naturalfeatures.animals"/></MenuItem>
-                        <MenuItem onClick={() => this.props.onDownloadReport("slime_mold")}><Message msgId="naturalfeatures.slimemold"/></MenuItem>
+                        <MenuItem onClick={() => this.props.onDownloadReport("slimemold")}><Message msgId="naturalfeatures.slimemold"/></MenuItem>
                         <MenuItem onClick={() => this.props.onDownloadReport("naturalarea")}><Message msgId="naturalfeatures.naturalarea"/></MenuItem>
                 </DropdownButton>
             </OverlayTrigger>

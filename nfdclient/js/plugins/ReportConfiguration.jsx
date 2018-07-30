@@ -74,7 +74,8 @@ const ReportConfiguration = React.createClass({
                                             loading={filter.loading}
                                             options={filter.options}
                                             onChange={this.props.onChange}
-                                            reportOptions={this.props.reportOptions || {}}/>
+                                            reportOptions={this.props.reportOptions || {}}
+                                            optionsFilter={filter.optionsFilter && filter.optionsFilter[idx]}/>
                                     ))
                                     :
                                     <FilterForm
@@ -85,7 +86,8 @@ const ReportConfiguration = React.createClass({
                                         loading={filter.loading}
                                         options={filter.options}
                                         onChange={this.props.onChange}
-                                        reportOptions={this.props.reportOptions || {}}/>}
+                                        reportOptions={this.props.reportOptions || {}}
+                                        optionsFilter={filter.optionsFilter}/>}
                                 </Col>
                             )}
                         </Row>
