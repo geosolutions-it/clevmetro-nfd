@@ -32,17 +32,9 @@ pip install -r ../clevmetro-nfd/nfdapi/requirements.txt
 
 Setup a PostgreSQL database and enable the PostGIS extension. Adjust the [settings.py](nfdapi/settings.py) file
 accordingly:
+
 ```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'metroparksnfd',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+DJANGO_DATABASE_URL="postgis://user:password@localhost:5432/metroparksnfd"
 ```
 
 Create database schema:
@@ -54,37 +46,45 @@ cd clevmetro-nfd/nfdapi
 ```
 
 Initialize the dictionary tables (using `./manage.py shell`):
+
 ```python
 from nfdcore import initmodel as i
 i.init_model()
 ```
+
 Optional: Insert some test taxa:
+
 ```python
 from nfdcore import initmodel as i
 i.insert_test_taxa()
 ```
 
-Optional: Insert some test occurrences (Warning: it will delete existing occurrences):
+Optional: Insert some test occurrences (Warning: it will delete existing 
+occurrences):
+
 ```python
 from nfdcore import initmodel as i
 i.insert_test_data()
 ```
 
-Finally, use Eclipse PyDev to edit and run REST API. By default, the application is available
-on http://localhost:8000/nfdapi/
+Finally, use Eclipse PyDev to edit and run REST API. By default, the 
+application is available on http://localhost:8000/nfdapi/
 
-We use Django Rest Framework, which offers a nice web interface to test and become familiar with the rest API.
-Have a look for instance to the following URLs:
+We use Django Rest Framework, which offers a nice web interface to test and 
+become familiar with the rest API. Have a look for instance to the 
+following URLs:
 
 * http://localhost:8000/nfdapi/layers/animal/
-* http://localhost:8000/nfdapi/layers/animal/xxx (where xxx is the id of an animal occurrence)
+* http://localhost:8000/nfdapi/layers/animal/xxx (where xxx is the id of an 
+  animal occurrence)
 
-The nfdapi static files have to be generated (using `django-admin collectstatic`)
-and copied to
+The nfdapi static files have to be generated (using 
+`django-admin collectstatic`) and copied to
 /var/www/clevmetronfd-static to properly see the styles of REST web interface
 
 In addition, you may need to adjust [settings.py](nfdapi/settings.py) to
 match your HTTP server file layout:
+
 ```python
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
