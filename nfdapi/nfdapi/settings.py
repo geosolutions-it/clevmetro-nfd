@@ -214,12 +214,12 @@ AUTH_LDAP_SERVER_URI = get_environment_variable("LDAP_HOST")
 AUTH_LDAP_BIND_DN = get_environment_variable("LDAP_BIND_DN")
 AUTH_LDAP_BIND_PASSWORD = get_environment_variable("LDAP_BIND_PASSWORD")
 AUTH_LDAP_USER_SEARCH = ldap_config.LDAPSearch(
-    "dc=nfd,dc=geo-solutions,dc=it",
+    get_environment_variable("LDAP_USER_SEARCH_DN"),
     ldap.SCOPE_SUBTREE,
     "(uid=%(user)s)"
 )
 AUTH_LDAP_GROUP_SEARCH = ldap_config.LDAPSearch(
-    "ou=groups,dc=nfd,dc=geo-solutions,dc=it",
+    get_environment_variable("LDAP_GROUP_SEARCH_DN"),
     ldap.SCOPE_SUBTREE
 )
 AUTH_LDAP_GROUP_TYPE = ldap_config.PosixGroupType()
@@ -230,23 +230,37 @@ AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
 AUTH_LDAP_MIRROR_GROUPS = True
 
 
-def _build_ldap_dn(prefix, suffix="ou=groups,dc=nfd,dc=geo-solutions,dc=it"):
-    return ",".join((prefix, suffix))
+def _build_ldap_group_dn(env_var_name, default, suffix=AUTH_LDAP_GROUP_SEARCH):
+    cn = get_environment_variable(env_var_name, default_value=default)
+    return ",".join((
+        "cn={}".format(cn),
+        suffix
+    ))
 
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_staff": _build_ldap_dn("cn=nfdadmins"),
-    "is_superuser": _build_ldap_dn("cn=nfdadmins"),
-    "is_plant_writer": _build_ldap_dn("cn=plant_writer"),
-    "is_plant_publisher": _build_ldap_dn("cn=plant_publisher"),
-    "is_animal_writer": _build_ldap_dn("cn=animal_writer"),
-    "is_animal_publisher": _build_ldap_dn("cn=animal_publisher"),
-    "is_slimemold_writer": _build_ldap_dn("cn=slimemold_writer"),
-    "is_slimemold_publisher": _build_ldap_dn("cn=slimemold_publisher"),
-    "is_fungus_writer": _build_ldap_dn("cn=fungus_writer"),
-    "is_fungus_publisher": _build_ldap_dn("cn=fungus_publisher"),
-    "is_naturalarea_writer": _build_ldap_dn("cn=naturalarea_writer"),
-    "is_naturalarea_publisher": _build_ldap_dn("cn=naturalarea_publisher"),
+    "is_staff": _build_ldap_group_dn("LDAP_STAFF_CN", "nfdadmins"),
+    "is_superuser": _build_ldap_group_dn("LDAP_ADMIN_CN", "nfdadmins"),
+    "is_plant_writer": _build_ldap_group_dn(
+        "LDAP_PLANT_WRITER_CN", "plant_writer"),
+    "is_plant_publisher": _build_ldap_group_dn(
+        "LDAP_PLANT_PUBLISHER_CN", "plant_publisher"),
+    "is_animal_writer": _build_ldap_group_dn(
+        "LDAP_ANIMAL_WRITER_CN", "animal_writer"),
+    "is_animal_publisher": _build_ldap_group_dn(
+        "LDAP_ANIMAL_PUBLISHER_CN", "animal_publisher"),
+    "is_slimemold_writer": _build_ldap_group_dn(
+        "LDAP_SLIMEMOLD_WRITER_CN", "slimemold_writer"),
+    "is_slimemold_publisher": _build_ldap_group_dn(
+        "LDAP_SLIMEMOLD_PUBLISHER_CN", "slimemold_publisher"),
+    "is_fungus_writer": _build_ldap_group_dn(
+        "LDAP_FUNGUS_WRITER_CN", "fungus_writer"),
+    "is_fungus_publisher": _build_ldap_group_dn(
+        "LDAP_FUNGUS_PUBLISHER_CN", "fungus_publisher"),
+    "is_naturalarea_writer": _build_ldap_group_dn(
+        "LDAP_NATURALAREA_WRITER_CN", "naturalarea_writer"),
+    "is_naturalarea_publisher": _build_ldap_group_dn(
+        "LDAP_NATURALAREA_PUBLISHER_CN", "naturalarea_publisher"),
 }
 
 AUTH_LDAP_USER_ATTR_MAP = {
