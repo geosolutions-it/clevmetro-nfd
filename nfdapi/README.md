@@ -12,9 +12,21 @@ The API operations are documented on the
 Install native requirements (required for Python LDAP modules):
 ```shell
 #Debian/Ubuntu:
-sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
-sudo apt-get install -y --no-install-recommends gettext libcairo2 libffi-dev libpango1.0-0 \
-  libgdk-pixbuf2.0-0 libxml2-dev libxslt1-dev shared-mime-info
+sudo apt-get install \
+    libldap2-dev \
+    libsasl2-dev \
+    libssl-dev \
+    python-dev
+sudo apt-get install --yes --no-install-recommends \
+    gettext \
+    libcairo2 \
+    libffi-dev \
+    libgdk-pixbuf2.0-0 \
+    libpango1.0-0 \
+    libxml2-dev \
+    libxslt1-dev \
+    shared-mime-info
+    
 #RedHat/CentOS:
 sudo yum install python-devel openldap-devel
 ```
@@ -30,11 +42,17 @@ source metroparksnfd/bin/activate
 pip install -r ../clevmetro-nfd/nfdapi/requirements.txt
 ```
 
-Setup a PostgreSQL database and enable the PostGIS extension. Adjust the [settings.py](nfdapi/settings.py) file
-accordingly:
+Setup a PostgreSQL database and enable the PostGIS extension. 
 
-```python
-DJANGO_DATABASE_URL="postgis://user:password@localhost:5432/metroparksnfd"
+Generate an environment file with contents similar to the one found on 
+`deploy/demo.env`. 
+
+Now export all variables in the file into the current environment:
+
+```shell
+set -o allexport
+source <env-file.env>
+set +o allexport
 ```
 
 Create database schema:
@@ -92,6 +110,43 @@ match your HTTP server file layout:
 STATIC_ROOT = '/var/www/clevmetronfd-static'
 STATIC_URL = '/nfdapi-static/'
 ```
+
+
+## ITIS Database
+
+Download the current version of the ITIS DB from:
+
+https://www.itis.gov/downloads/itisPostgreSql.zip
+
+The downloaded archive contains the `ITIS.sql` file which can be used to 
+recreate the ITIS database. Proceed as follows:
+
+- Convert strings in the file to UTF-8 using `iconv`
+
+  ```shell
+  iconv -f ISO-8859-1 -t UTF-8 ITIS.SQL > ITIS_UTF8.sql
+  ```
+- Alter the database creation command to use UTF-8 instead of ISO-8859-1
+
+  ```postgresql
+  -- Replace the line that starts with CREATE DATABASE "ITIS" with this:
+  CREATE DATABASE "ITIS"
+      WITH TEMPLATE = template0
+      ENCODING ='UTF-8' 
+      LC_COLLATE = 'en_US.UTF-8' 
+      LC_CTYPE = 'en_US.UTF-8';
+
+  ```
+  
+- Temporarily assign the `CREATEDB` role to the user that will own the database
+
+- Import the database file
+
+  ```shell
+  psql -h localhost -U <db-user> -f ITIS_UTF8.sql
+  ```
+
+
 
 ## Translations
 
