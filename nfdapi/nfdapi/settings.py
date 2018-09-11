@@ -216,13 +216,13 @@ AUTH_LDAP_BIND_PASSWORD = get_environment_variable("LDAP_BIND_PASSWORD")
 AUTH_LDAP_USER_SEARCH = ldap_config.LDAPSearch(
     get_environment_variable("LDAP_USER_SEARCH_DN"),
     ldap.SCOPE_SUBTREE,
-    "(uid=%(user)s)"
+    "(cn=%(user)s)"
 )
 AUTH_LDAP_GROUP_SEARCH = ldap_config.LDAPSearch(
     get_environment_variable("LDAP_GROUP_SEARCH_DN"),
     ldap.SCOPE_SUBTREE
 )
-AUTH_LDAP_GROUP_TYPE = ldap_config.PosixGroupType()
+AUTH_LDAP_GROUP_TYPE = ldap_config.NestedGroupOfNamesType()
 
 AUTH_LDAP_FIND_GROUP_PERMS = True
 AUTH_LDAP_CACHE_GROUPS = True
@@ -230,7 +230,8 @@ AUTH_LDAP_GROUP_CACHE_TIMEOUT = 300
 AUTH_LDAP_MIRROR_GROUPS = True
 
 
-def _build_ldap_group_dn(env_var_name, default, suffix=AUTH_LDAP_GROUP_SEARCH):
+def _build_ldap_group_dn(env_var_name, default,
+                         suffix=AUTH_LDAP_GROUP_SEARCH.base_dn):
     cn = get_environment_variable(env_var_name, default_value=default)
     return ",".join((
         "cn={}".format(cn),
