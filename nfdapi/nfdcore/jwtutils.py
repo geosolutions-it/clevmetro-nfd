@@ -1,20 +1,27 @@
 
 
 def jwt_response_payload_handler(token, user=None, request=None):
-    return {
-        'token': token,
-        'user': {
-            'name': user.username,
-            'is_staff': user.is_staff,
-            'plant_writer': user.is_plant_writer,
-            'plant_publisher': user.is_plant_publisher,
-            'animal_writer': user.is_animal_writer,
-            'animal_publisher': user.is_animal_publisher,
-            'slimemold_writer': user.is_slimemold_writer,
-            'slimemold_publisher': user.is_slimemold_publisher,
-            'fungus_writer': user.is_fungus_writer,
-            'fungus_publisher': user.is_fungus_publisher,
-            'naturalarea_writer': user.is_naturalarea_writer,
-            'naturalarea_publisher': user.is_naturalarea_publisher
-            }
+    result = {
+        "token": token,
+        "user": {
+            "name": user.username,
+            "is_staff": user.is_staff,
+        },
     }
+    feature_types = [
+        "animal",
+        "fungus",
+        "naturalarea",
+        "plant",
+        "slimemold",
+    ]
+    for feature_type in feature_types:
+        for role in ["writer", "publisher"]:
+            permission_name = "{}_{}".format(feature_type, role)
+            if user.is_superuser:
+                permission_value = True
+            else:
+                permission_value = getattr(
+                    user, "is_{}".format(permission_name), False)
+            result["user"][permission_name] = permission_value
+    return result
