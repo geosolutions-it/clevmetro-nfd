@@ -80,11 +80,13 @@ const AddNaturalFeatures = React.createClass({
         };
     },
     render() {
+
         let tooltip = <Tooltip id="toolbar-tutorial-button">{<Message msgId={"clevmetro.tooltip.add"}/>}</Tooltip>;
+        const canEdit = this.props.plant_writer || this.props.fungus_writer || this.props.slimemold_writer || this.props.animal_writer || this.props.naturalarea_writer;
         return (
             <div>
             <OverlayTrigger placement="bottom" overlay={tooltip}>
-                <DropdownButton disabled={this.props.disabled} id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
+                <DropdownButton disabled={this.props.disabled || !canEdit} id="addnf-menu-button" className={this.props.buttonClassName} pullRight bsStyle={this.props.buttonStyle} title={<Glyphicon glyph={this.props.glyph} />}>
                     {this.props.plant_writer &&
                         <MenuItem onClick={() => this.props.onToggleNewNaturalFeature({"featuretype": "plant", "featuresubtype": "co"})}><Message msgId="naturalfeatures.conifer"/></MenuItem>
                     }
