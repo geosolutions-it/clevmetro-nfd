@@ -216,7 +216,7 @@ AUTH_LDAP_BIND_PASSWORD = get_environment_variable("LDAP_BIND_PASSWORD")
 AUTH_LDAP_USER_SEARCH = ldap_config.LDAPSearch(
     get_environment_variable("LDAP_USER_SEARCH_DN"),
     ldap.SCOPE_SUBTREE,
-    "(cn=%(user)s)"
+	get_environment_variable("LDAP_USER_SEARCH_FILTERSTR"),
 )
 AUTH_LDAP_GROUP_SEARCH = ldap_config.LDAPSearch(
     get_environment_variable("LDAP_GROUP_SEARCH_DN"),
