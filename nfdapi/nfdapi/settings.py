@@ -222,7 +222,13 @@ AUTH_LDAP_GROUP_SEARCH = ldap_config.LDAPSearch(
     get_environment_variable("LDAP_GROUP_SEARCH_DN"),
     ldap.SCOPE_SUBTREE
 )
-AUTH_LDAP_GROUP_TYPE = ldap_config.NestedGroupOfNamesType()
+AUTH_LDAP_GROUP_TYPE = getattr(
+    ldap_config,
+    get_environment_variable(
+        "LDAP_GROUP_TYPE",
+        default_value="NestedGroupOfNamesType"
+    )
+)()
 
 AUTH_LDAP_FIND_GROUP_PERMS = True
 AUTH_LDAP_CACHE_GROUPS = True
