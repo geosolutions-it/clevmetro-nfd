@@ -83,7 +83,6 @@ class CanCreateFeatureType(permissions.BasePermission):
         result = True
         user = request.user
         if request.method == 'POST' and not user.is_superuser:
-            feature_type_name = view.args[0]
             result = getattr(
                 user,
                 "is_{}_writer".format(self.FEATURETYPE_NAME),
