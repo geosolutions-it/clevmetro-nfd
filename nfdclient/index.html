@@ -15,11 +15,17 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.10/proj4.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
         <script src="https://rawgit.com/Leaflet/Leaflet.draw/v0.4.10/dist/leaflet.draw.js"></script>
-
+        <script>
+            document.addEventListener("DOMContentLoaded", function(event) {
+                        history.pushState(null, null, location.href);
+                        window.onpopstate = function () {
+                            history.go(1);
+                        };
+                    });
+        </script>
     </head>
     <body>
         <div id="container"></div>
         <script src="dist/nfdclient.js"></script>
     </body>
-
 </html>
