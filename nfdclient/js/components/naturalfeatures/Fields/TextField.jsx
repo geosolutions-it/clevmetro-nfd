@@ -17,14 +17,16 @@ class TextField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         isMobile: PropTypes.bool,
-        onChange: PropTypes.func
+        onChange: PropTypes.func,
+        hasError: PropTypes.bool
     };
     static defaultProps = {
       editable: false,
       horizontal: false,
       isMobile: false,
       feature: {},
-      onChange: () => {}
+      onChange: () => {},
+      hasError: false
     }
     state = {
         full: false
@@ -35,7 +37,7 @@ class TextField extends React.Component {
         const type = item.type === 'string' && 'textarea' || item.type;
         const comp = (
             <FormGroup controlId={item.key}>
-                <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 <FormControl
                     onKeyDown={this.handleKeyDown}
                     inputRef={this.addRef}
@@ -56,7 +58,7 @@ class TextField extends React.Component {
         const comp = (
             <FormGroup controlId={item.key}>
                 <Col xs={5} className="label-col">
-                    <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                    <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={7}>
                     <FormControl

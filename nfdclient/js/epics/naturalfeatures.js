@@ -154,11 +154,12 @@ addNaturalFeature: (action$) =>
 showSaveUpdateDeleteErrors: action$ =>
     action$.ofType(CREATE_NATURAL_FEATURE_ERROR, UPDATE_NATURAL_FEATURE_ERROR)
     .switchMap( a => {
-        if (a.error.status >= 500 || !a.error.data) {
+        const hasData = a.error && a.error.response && a.error.response.data;
+        if (a.error.response.status >= 500 || !hasData) {
             return Rx.Observable.of(error({title: 'Bad request', message: `Error: ${a.error.statusText}`}));
         }
-        return Rx.Observable.from(Object.keys(a.error.data).map((k) => {
-            return error({uid: k, title: 'Bad request', message: `${k}: ${a.error.data[k]}`});
+        return Rx.Observable.from(Object.keys((hasData && a.error.response.data || {})).map((k) => {
+            return error({uid: k, title: 'Bad request', message: `${k}: ${a.error.response.data[k]}`});
         }));
     }),
 uploadImage: (action$) =>
