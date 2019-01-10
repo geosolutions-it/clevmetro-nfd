@@ -12,6 +12,7 @@ var CoordinatesUtils = require('../../MapStore2/web/client/utils/CoordinatesUtil
 var assign = require('object-assign');
 var mapUtils = require('../../MapStore2/web/client/utils/MapUtils');
 
+const NfdLegend = require('../components/NfdLegend');
 const {throttle} = require('lodash');
 
 require('./LeafletMap.css');
@@ -41,7 +42,8 @@ let LeafletMap = React.createClass({
         registerHooks: React.PropTypes.bool,
         interactive: React.PropTypes.bool,
         resolutions: React.PropTypes.array,
-        onInvalidLayer: React.PropTypes.func
+        onInvalidLayer: React.PropTypes.func,
+        isMobile: React.PropTypes.bool
     },
     getDefaultProps() {
         return {
@@ -67,7 +69,7 @@ let LeafletMap = React.createClass({
         };
     },
     getInitialState() {
-        return { };
+        return {};
     },
     componentWillMount() {
         this.zoomOffset = 0;
@@ -215,38 +217,7 @@ let LeafletMap = React.createClass({
         return (
             <div id={this.props.id} style={this.props.style}>
                 {children}
-                <div id="nfd-legend" className="nfd-legend">
-                    <div className="row flex-center">
-                        <div className="marker-plant col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Plants</label>
-                        </div>
-                    </div>
-                    <div className="row flex-center">
-                        <div className="marker-fungus col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Fungi</label>
-                        </div>
-                    </div>
-                    <div className="row flex-center">
-                        <div className="marker-animal col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Animals</label>
-                        </div>
-                    </div>
-                    <div className="row flex-center">
-                        <div className="marker-slimemold col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Slime mold</label>
-                        </div>
-                    </div>
-                    <div className="row flex-center">
-                        <div className="marker-naturalarea col-xs-2"/>
-                        <div className="col-xs-9">
-                            <label>Natural areas</label>
-                        </div>
-                    </div>
-                </div>
+                <NfdLegend isMobile={this.props.isMobile}/>
             </div>
         );
     },

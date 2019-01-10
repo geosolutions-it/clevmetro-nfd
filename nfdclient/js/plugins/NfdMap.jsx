@@ -126,7 +126,8 @@ const MapPlugin = React.createClass({
         mapOptions: React.PropTypes.object,
         toolsOptions: React.PropTypes.object,
         actions: React.PropTypes.object,
-        features: React.PropTypes.array
+        features: React.PropTypes.array,
+        isMobile: React.PropTypes.bool
     },
     getDefaultProps() {
         return {
@@ -156,7 +157,8 @@ const MapPlugin = React.createClass({
                     },
                     layers: [{type: "osm"}]
                 }
-            }
+            },
+            isMobile: false
         };
     },
     componentWillMount() {
@@ -236,7 +238,8 @@ const MapPlugin = React.createClass({
                     {...this.props.options}
                     mapOptions={this.getMapOptions()}
                     {...this.props.map}
-                    zoomControl={this.props.zoomControl}>
+                    zoomControl={this.props.zoomControl}
+                    isMobile={this.props.isMobile}>
                     {this.renderLayers()}
                     {this.renderSupportTools()}
                 </plugins.Map>
@@ -273,18 +276,20 @@ const {mapSelector} = require('../../MapStore2/web/client/selectors/map');
 const {layerSelectorWithMarkers} = require('../../MapStore2/web/client/selectors/layers');
 
 const highlightSelector = (state) => state.highlight && state.highlight.select;
-
+const isMobileSelector = (state) => state.browser && state.browser.mobile;
 const selector = createSelector(
     [
         mapSelector,
         layerSelectorWithMarkers,
         highlightSelector,
-        (state) => state.mapInitialConfig && state.mapInitialConfig.loadingError && state.mapInitialConfig.loadingError.data
-    ], (map, layers, features, loadingError) => ({
+        (state) => state.mapInitialConfig && state.mapInitialConfig.loadingError && state.mapInitialConfig.loadingError.data,
+        isMobileSelector
+    ], (map, layers, features, loadingError, isMobile) => ({
         map,
         layers,
         features,
-        loadingError
+        loadingError,
+        isMobile
     })
 );
 module.exports = {

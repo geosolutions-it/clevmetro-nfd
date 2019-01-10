@@ -118,7 +118,7 @@
       },{
                 "name": "BackgroundSelector",
                 "cfg": {
-                    "bottom": 200,
+                    "bottom": 40,
                     "dimensions": {
                     "side": 55,
                     "sidePreview": 55,
