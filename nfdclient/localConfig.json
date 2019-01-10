@@ -113,7 +113,7 @@
           "name": "Map",
           "cfg": {
               "mapType": "leaflet",
-              "tools": ["measurement", "draw"]
+              "tools": ["measurement", "draw", "locate"]
           }
       },{
                 "name": "BackgroundSelector",
@@ -130,6 +130,13 @@
                 }
             }
       ,
+      {
+        "name": "Locate",
+        "override": {
+            "Toolbar": {
+                "alwaysVisible": true
+            }
+        }},
       "OmniBar",
       "NfdLogin",
       "Toolbar",
