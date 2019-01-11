@@ -64,7 +64,7 @@ class SelectField extends React.Component {
                 <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 {this.getSelect(item, feature, readonly)}
             </FormGroup>);
-        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp} </div>) : comp;
+        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp}<div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok"/></div> </div>) : comp;
     }
     renderHorizontal = () => {
         const {item, editable, feature} = this.props;
@@ -78,7 +78,7 @@ class SelectField extends React.Component {
                     {this.getSelect(item, feature, readonly)}
                 </Col>
             </FormGroup>);
-        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp} </div>) : comp;
+        return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp}<div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok"/></div> </div>) : comp;
     }
     render() {
         return this.props.horizontal && this.renderHorizontal() || this.renderVertical();
@@ -98,7 +98,7 @@ class SelectField extends React.Component {
         }
     }
     clickExit = (e) => {
-        if (e.target.className && e.target.className === 'spec-selector-full') {
+        if (e.target && e.target.className && (e.target.className === 'spec-selector-full' || e.target.className.indexOf('back-button') !== -1 || e.target.className.indexOf('glyphicon') !== -1)) {
             this.exitFull();
         }
     }
