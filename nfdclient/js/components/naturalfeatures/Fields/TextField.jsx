@@ -49,7 +49,7 @@ class TextField extends React.Component {
                     onFocus={this.enterFull}
                     type={type}/>
             </FormGroup>);
-        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-backward" aria-hidden="true"/></div></div>) : comp;
+        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok" aria-hidden="true"/></div></div>) : comp;
     }
     renderHorizontal = () => {
         const {item, editable, feature} = this.props;
@@ -73,7 +73,7 @@ class TextField extends React.Component {
                     type="text"/>
                 </Col>
             </FormGroup>);
-        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-backward"/></div></div>) : comp;
+        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok"/></div></div>) : comp;
     }
     render() {
         return this.props.horizontal && this.renderHorizontal() || this.renderVertical();

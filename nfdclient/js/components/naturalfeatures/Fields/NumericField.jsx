@@ -49,7 +49,7 @@ class NumericField extends React.Component {
                     step={(item.type === 'double') && "any" || "1"}
                     type="number"/>
             </FormGroup>);
-        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-backward"/></div></div>) : comp;
+        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok"/></div></div>) : comp;
     }
     renderHorizontal = () => {
         const {item, editable, feature} = this.props;
@@ -73,7 +73,7 @@ class NumericField extends React.Component {
                         type="number"/>
                 </Col>
             </FormGroup>);
-        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-backward"/></div></div>) : comp;
+        return this.state.full ? (<div className="input-full" onClick={this.fullClick}> {comp} <div type="button" className="btn btn-default back-button"><span className="glyphicon glyphicon-ok"/></div></div>) : comp;
     }
     render() {
         return this.props.horizontal && this.renderHorizontal() || this.renderVertical();
