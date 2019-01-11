@@ -197,6 +197,29 @@ initPermalink: (action$) =>
         .concat([naturalFeaturesLoading(false)])
         .catch(e => Rx.Observable.from([error({title: 'Permalink failed', message: `Error: ${e.statusText}`}), setControlProperty('vieweditnaturalfeatures', 'enabled', false)]));
 
+    }),
+closePanelOnDrawingStart: (action$, {getState}) =>
+    action$.ofType("CHANGE_DRAWING_STATUS")
+    .filter(({status}) => {
+        const {browser = {}, controls = {}} = getState();
+        const open = controls.vieweditnaturalfeatures && controls.vieweditnaturalfeatures.enabled;
+        return status === "start" && browser.mobile && open;
     })
-
+    .mapTo({
+        type: 'TOGGLE_CONTROL',
+        control: 'vieweditnaturalfeatures',
+        property: null
+      }),
+openPanelOnDrawingEnd: (action$, {getState}) =>
+    action$.ofType("NATURAL_FEATURE_POLYGON_REPLACED", "NATURAL_FEATURE_MARKER_REPLACED")
+    .filter(() => {
+        const {browser = {}, controls = {}} = getState();
+        const closed = !(controls.vieweditnaturalfeatures && controls.vieweditnaturalfeatures.enabled);
+        return browser.mobile && closed;
+    })
+    .mapTo({
+        type: 'TOGGLE_CONTROL',
+        control: 'vieweditnaturalfeatures',
+        property: null
+    })
 };
