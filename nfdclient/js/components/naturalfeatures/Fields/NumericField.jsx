@@ -17,14 +17,16 @@ class NumericField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         isMobile: PropTypes.bool,
-        onChange: PropTypes.func
+        onChange: PropTypes.func,
+        hasError: PropTypes.bool
     };
     static defaultProps = {
       editable: false,
       horizontal: false,
       isMobile: false,
       feature: {},
-      onChange: () => {}
+      onChange: () => {},
+      hasError: false
     }
     state = {
         full: false
@@ -34,7 +36,7 @@ class NumericField extends React.Component {
         const readonly = !editable || !!item.readonly;
         const comp = (
             <FormGroup controlId={item.key}>
-                <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 <FormControl
                     onKeyDown={this.handleKeyDown}
                     inputRef={this.addRef}
@@ -55,7 +57,7 @@ class NumericField extends React.Component {
         const comp = (
             <FormGroup controlId={item.key}>
                 <Col xs={5} className="label-col">
-                    <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                    <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={7}>
                     <FormControl

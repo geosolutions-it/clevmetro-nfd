@@ -19,7 +19,8 @@ class DateField extends React.Component {
         horizontal: PropTypes.bool,
         onChange: PropTypes.func,
         isMobile: PropTypes.bool,
-        dateFormat: React.PropTypes.string
+        dateFormat: React.PropTypes.string,
+        hasError: PropTypes.bool
     }
     static defaultProps = {
       editable: false,
@@ -27,7 +28,8 @@ class DateField extends React.Component {
       feature: {},
       isMobile: false,
       onChange: () => {},
-      dateFormat: "MM-DD-YYYY"
+      dateFormat: "MM-DD-YYYY",
+      hasError: false
     }
     componentDidMount() {
         const el = document.getElementById(`datepicker.${this.props.item.key}`);
@@ -46,7 +48,7 @@ class DateField extends React.Component {
         const readonly = !editable || !!item.readonly;
         return (
             <FormGroup controlId={`datepicker.${item.key}`}>
-                <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 <DatePicker
                     dateFormat={this.props.dateFormat}
                     disabled={readonly}
@@ -60,7 +62,7 @@ class DateField extends React.Component {
         return (
             <FormGroup controlId={`datepicker.${item.key}`}>
                 <Col xs={4} className="label-col">
-                    <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                    <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={8}>
                     <DatePicker

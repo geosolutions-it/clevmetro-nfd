@@ -17,14 +17,16 @@ class BooleanField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         isMobile: PropTypes.bool,
-        onChange: PropTypes.func
+        onChange: PropTypes.func,
+        hasError: PropTypes.bool
     }
     static defaultProps = {
       editable: false,
       horizontal: false,
       isMobile: false,
       feature: {},
-      onChange: () => {}
+      onChange: () => {},
+      hasError: false
     }
     renderVertical = () => {
         const {item, editable, feature} = this.props;
@@ -36,7 +38,7 @@ class BooleanField extends React.Component {
                     checked={getValue(feature, item.key, false)}
                     disabled={readonly}
                     onChange={this.handleChange}>
-                    <label className={readonly && "readonly" || ""}>
+                    <label className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>
                         {getLabel(item)}
                     </label>
                 </Checkbox>
@@ -53,7 +55,7 @@ class BooleanField extends React.Component {
                         checked={getValue(feature, item.key, false)}
                         disabled={readonly}
                         onChange={this.handleChange}>
-                        <label className={readonly && "readonly" || ""}>
+                        <label className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>
                             {getLabel(item)}
                         </label>
                     </Checkbox>

@@ -131,5 +131,8 @@ module.exports = {
             icon = 'uniF8FF';
         }
         return icon;
+    },
+    hasError(formname = "", errors = {}) {
+        return Object.keys(errors).filter( k => k.split(".").slice(0, -1).join(".") === formname).length > 0;
     }
 };

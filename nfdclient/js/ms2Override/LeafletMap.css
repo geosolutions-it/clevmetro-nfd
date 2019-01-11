@@ -10,3 +10,6 @@
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
 }
+.nfd-legend.mini{
+    width: 50px;
+}

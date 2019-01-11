@@ -23,14 +23,16 @@ class SelectField extends React.Component {
         editable: PropTypes.bool,
         horizontal: PropTypes.bool,
         isMobile: PropTypes.bool,
-        onChange: PropTypes.func
+        onChange: PropTypes.func,
+        hasError: PropTypes.bool
     }
     static defaultProps = {
       editable: false,
       horizontal: false,
       isMobile: false,
       feature: {},
-      onChange: () => {}
+      onChange: () => {},
+      hasError: false
     }
     constructor(props) {
         super(props);
@@ -59,7 +61,7 @@ class SelectField extends React.Component {
         const readonly = !editable || !!item.readonly;
         const comp = (
             <FormGroup controlId={item.key}>
-                <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 {this.getSelect(item, feature, readonly)}
             </FormGroup>);
         return this.state.full ? (<div className="spec-selector-full" onClick={this.clickExit}> {comp} </div>) : comp;
@@ -70,7 +72,7 @@ class SelectField extends React.Component {
         const comp = (
             <FormGroup controlId={item.key}>
                 <Col xs={5} className="label-col">
-                   <ControlLabel className={readonly && "readonly" || ""}>{getLabel(item)}</ControlLabel>
+                   <ControlLabel className={readonly && "readonly" || ""} style={{color: this.props.hasError && "red" || "auto"}}>{getLabel(item)}</ControlLabel>
                 </Col>
                 <Col xs={7}>
                     {this.getSelect(item, feature, readonly)}

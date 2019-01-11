@@ -113,12 +113,12 @@
           "name": "Map",
           "cfg": {
               "mapType": "leaflet",
-              "tools": ["measurement", "draw"]
+              "tools": ["measurement", "draw", "locate"]
           }
       },{
                 "name": "BackgroundSelector",
                 "cfg": {
-                    "bottom": 200,
+                    "bottom": 40,
                     "dimensions": {
                     "side": 55,
                     "sidePreview": 55,
@@ -130,13 +130,17 @@
                 }
             }
       ,
+      {
+        "name": "Locate",
+        "override": {
+            "Toolbar": {
+                "alwaysVisible": true
+            }
+        }},
       "OmniBar",
       "NfdLogin",
       "Toolbar",
-      "Expander",
       "ZoomAll",
-      "ZoomIn",
-      "ZoomOut",
       "ViewEditNaturalFeatures",
       "AddNaturalFeatures",
       "ToggleAddEditPanel",

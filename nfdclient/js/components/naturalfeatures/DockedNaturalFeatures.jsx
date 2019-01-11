@@ -129,8 +129,10 @@ const DockedNaturalFeatures = React.createClass({
         let tabName = tab.formlabel;
         let items = tab.formitems.map((item) => {
             const Field = Fields[`_${item.type}`];
+            const hasError = !!this.props.errors[item.key];
             return Field ?
                 (<Field
+                    hasError={hasError}
                     key={item.key}
                     item={item}
                     editable={isEditable}
@@ -192,9 +194,10 @@ const DockedNaturalFeatures = React.createClass({
             let i = index + 1;
             let key = "tab-" + i;
             let tabIcon = Utils.getFormIcon(tab.formname);
+            let hasError = Utils.hasError(tab.formname, this.props.errors);
             tabs.push(
-                <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px"}}/>}>
-                    {this.renderTabContent(tab, i, tabContentHeigth, horizontalForm)}
+                <Tab eventKey={i} key={key} title={<Glyphicon glyph={tabIcon} style={{cursor: "pointer", fontSize: "24px", color: hasError ? "red" : "aut0"}}/>}>
+                    {this.renderTabContent(tab, i, tabContentHeigth, horizontalForm, hasError)}
                 </Tab>
             );
         });
