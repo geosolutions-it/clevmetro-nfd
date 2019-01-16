@@ -11,7 +11,7 @@ const {asyncContainer, Typeahead} = require("react-bootstrap-typeahead");
 const AsyncTypeahead = asyncContainer(Typeahead);
 const isMobile = require('ismobilejs');
 const Api = require('../../api/naturalfeaturesdata');
-
+const noFilter = () => true;
 class SpeciesSelector extends React.Component {
     static propTypes = {
       options: React.PropTypes.array,
@@ -65,6 +65,7 @@ class SpeciesSelector extends React.Component {
         return (
             <div className={full ? 'spec-selector-full' : ''} onClick={this.exitFull}>
                 <AsyncTypeahead
+                    filterBy={noFilter}
                     delay={400}
                     clearButton={clearBtn}
                     onFocus={this.enterFull}
