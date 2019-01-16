@@ -381,6 +381,37 @@ class TaxonListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaxonDetailSerializer(serializers.ModelSerializer):
+    iucn_red_list_category = serializers.SlugRelatedField(read_only=True, slug_field="name")
+    oh_status = serializers.SlugRelatedField(read_only=True, slug_field="code")
+    usfws_status = serializers.SlugRelatedField(read_only=True, slug_field="code")
+    cm_status = serializers.SerializerMethodField()
+    s_rank = serializers.SerializerMethodField()
+    n_rank = serializers.SerializerMethodField()
+    g_rank = serializers.SerializerMethodField()
+
+    common_names = serializers.SerializerMethodField()
+
+    def get_common_names(self, taxon_obj):
+        try:
+            common_names = sorted(n.capitalize() for n in taxon_obj.common_names)
+        except TypeError:
+            common_names = None
+        return common_names
+
+    def get_cm_status(self, taxon_obj):
+        return self._get_taxon_conservation_status(taxon_obj.cm_status) if taxon_obj.cm_status is not None else None
+
+    def get_s_rank(self, taxon_obj):
+        return self._get_taxon_conservation_status(taxon_obj.s_rank) if taxon_obj.s_rank is not None else None
+
+    def get_n_rank(self, taxon_obj):
+        return self._get_taxon_conservation_status(taxon_obj.n_rank) if taxon_obj.n_rank is not None else None
+
+    def get_g_rank(self, taxon_obj):
+        return self._get_taxon_conservation_status(taxon_obj.g_rank) if taxon_obj.g_rank is not None else None
+
+    def _get_taxon_conservation_status(self, related_taxon_model):
+        return "{}: {}".format(related_taxon_model.code, related_taxon_model.name)
 
     def to_representation(self, instance):
         """Serialize the instance
@@ -390,17 +421,7 @@ class TaxonDetailSerializer(serializers.ModelSerializer):
 
         """
 
-        result = OrderedDict()
-        for field_name in self.fields:
-            if field_name == "common_names":
-                try:
-                    common_names = sorted(
-                        n.capitalize() for n in instance.common_names)
-                    result[field_name] = "\n".join(common_names)
-                except TypeError:  # common names is None
-                    pass
-            else:
-                result[field_name] = getattr(instance, field_name)
+        result = super(TaxonDetailSerializer, self).to_representation(instance)
         for rank_name, details in instance.upper_ranks.items():
             result[rank_name] = details["name"]
         return result
@@ -416,6 +437,10 @@ class TaxonDetailSerializer(serializers.ModelSerializer):
             "leap_concern",
             "oh_status",
             "usfws_status",
+            "cm_status",
+            "s_rank",
+            "g_rank",
+            "n_rank",
             "iucn_red_list_category",
             "other_code",
             "ibp_english",
