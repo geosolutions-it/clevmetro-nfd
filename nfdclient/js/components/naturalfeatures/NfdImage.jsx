@@ -39,7 +39,7 @@ class NfdImage extends React.Component {
         height: 400,
         isMobile: false,
         images: [],
-        fileSize: 5242880, // in Byte
+        fileSize: 52428800, // in Byte 50MB
         glyphiconRemove: "remove-circle",
         disabled: false,
         onError: () => {},
@@ -64,7 +64,7 @@ class NfdImage extends React.Component {
         if (!this.isImage(file)) {
             errors.push("FORMAT");
         }
-        if (file.size > this.props.fileSize / KB) {
+        if (file.size > this.props.fileSize) {
             errors.push("SIZE");
         }
         this.props.onError(errors);
