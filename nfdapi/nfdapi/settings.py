@@ -144,11 +144,6 @@ DATABASES = {
             )
         )
     ),
-    'itis': dj_database_url.parse(
-        get_environment_variable(
-            'ITIS_DATABASE_URL'
-        )
-    )
 }
 
 AUTHENTICATION_BACKENDS = (
