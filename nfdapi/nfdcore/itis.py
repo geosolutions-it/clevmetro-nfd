@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 
-from django.db import connections
+from django.db import connection
 
 
 def search_taxon(search_string, kingdoms, page_size=100, page=0):
@@ -47,7 +47,7 @@ def search_taxon(search_string, kingdoms, page_size=100, page=0):
         OFFSET {offset}
     """.format(size=size, offset=offset)
     print("query: {}".format(query))
-    with connections["itis"].cursor() as cursor:
+    with connection.cursor() as cursor:
         cursor.execute(query, {
             "kingdoms": [kingdom.capitalize() for kingdom in kingdoms],
             "search_string": "%{}%".format(search_string),
@@ -83,7 +83,7 @@ def get_taxon_upper_ranks(tsn):
         GROUP BY u.tsn, t.rank_name
         ORDER BY u.rank_id;
     """
-    with connections["itis"].cursor() as cursor:
+    with connection.cursor() as cursor:
         cursor.execute(query, {"tsn": tsn})
         return list(_gen_strip_rows(cursor, fix_common_names=True))
 
@@ -103,7 +103,7 @@ def get_taxon_details(tsn):
         WHERE u.tsn = %(tsn)s
         GROUP BY u.tsn, t.rank_name
     """
-    with connections["itis"].cursor() as cursor:
+    with connection.cursor() as cursor:
         cursor.execute(query, {"tsn": int(tsn)})
         row = cursor.fetchone()
         if row is not None:
