@@ -253,6 +253,15 @@ def validate_json_field(values, model_class, model_field_name):
     return values
 
 
+def validate_file_size(value):
+    max_size = settings.NFDCORE_MAX_UPLOAD_SIZE_MEGABYTES * 1024**2
+    logger.debug("value.size: {}".format(value.size))
+    logger.debug("max_size: {}".format(max_size))
+    if value.size > max_size:
+        logger.debug("about to raise ValidationError...")
+        raise serializers.ValidationError(_("Uploaded file is too large"))
+
+
 class DictionaryField(rest_fields.CharField):
     def get_attribute(self, instance):
         entry_instance = super(DictionaryField, self).get_attribute(instance)
@@ -955,13 +964,17 @@ class FungusDetailsSerializer(CustomModelSerializerMixin,
 
 
 class PhotographPublishSerializer(serializers.Serializer):
-    """
-    Used to publish new photographs
-    """
+    """Used to publish new photographs"""
     image = serializers.ListField(
-        child=rest_fields.ImageField(max_length=1000,
+        child=rest_fields.ImageField(
+            max_length=1000,
             allow_empty_file=False,
-            use_url=True))
+            use_url=True,
+            validators=[
+                validate_file_size,
+            ]
+        )
+    )
     id = rest_fields.IntegerField(required=False, read_only=True)
     thumbnail = rest_fields.CharField(required=False, read_only=True)
     description = rest_fields.CharField(required=False, allow_blank=True)
