@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import include
+from django.conf.urls.static import static
 from django.conf.urls import url
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token
@@ -90,4 +92,4 @@ urlpatterns = [
     # url(r'^'+APP_NAME+r'species/$', views.SpeciesSearch.as_view()),
     # url(r'^'+APP_NAME+r'species/(?P<pk>[0-9]+)/$', views.SpeciesDetail.as_view()),
     url(r'^'+APP_NAME, include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
