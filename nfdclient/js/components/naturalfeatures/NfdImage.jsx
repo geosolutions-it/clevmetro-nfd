@@ -16,7 +16,7 @@ const ImageCard = require('./ImageCard');
    * A Dropzone area for a img.
    */
 const MB = 1048576;
-const KB = 1024;
+
 class NfdImage extends React.Component {
     static propTypes= {
         height: PropTypes.number,
@@ -82,7 +82,7 @@ class NfdImage extends React.Component {
         const suggestion = `Max file size ${this.props.fileSize / MB} MB`;
         return (
             <div className={`nfd-images ${this.props.isMobile ? 'nfd-images-mobile' : ''} ${this.props.disabled ? 'disabled' : ''}`} style={{height: this.props.height}}>
-                <Dropzone disabled={this.props.disabled || isUploading} multiple={false} className="dropzone alert alert-info" rejectClassName="alert-danger" onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected}accept="image/jpeg, image/png, image/jpg" disablePreview={true}>
+                <Dropzone maxSize={this.props.fileSize} disabled={this.props.disabled || isUploading} multiple={false} className="dropzone alert alert-info" rejectClassName="alert-danger" onDropAccepted={this.onDropAccepted} onDropRejected={this.onDropRejected}accept="image/jpeg, image/png, image/jpg" disablePreview={true}>
                     <div className="dropzone-content-image">{this.props.message}<br/>{suggestion}</div>
                 </Dropzone>
                 <div className="nfd-thumbnails-container" style={{height: this.props.height - 100 }}>
