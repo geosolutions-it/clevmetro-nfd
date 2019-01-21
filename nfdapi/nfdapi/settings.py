@@ -333,6 +333,8 @@ USE_TZ = True
 
 FILE_UPLOAD_PERMISSIONS = 0644  # python2 octal number - This would be different on python3
 
+NFDCORE_MAX_UPLOAD_SIZE_MEGABYTES = 50
+
 
 # LOGGING = {
 #     'version': 1,
